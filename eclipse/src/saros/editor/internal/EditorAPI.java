@@ -39,7 +39,6 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.IEditorStatusLine;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.ITextEditorActionConstants;
-import saros.activities.SPath;
 import saros.editor.text.LineRange;
 import saros.editor.text.TextPosition;
 import saros.editor.text.TextSelection;
@@ -104,8 +103,8 @@ public class EditorAPI {
    * @param activate <code>true</code>, if editor should get focus, otherwise <code>false</code>
    * @return the opened editor or <code>null</code> if the editor couldn't be opened.
    */
-  public static IEditorPart openEditor(SPath path, boolean activate) {
-    IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
+  public static IEditorPart openEditor(saros.filesystem.IFile wrappedFile, boolean activate) {
+    IFile file = ((EclipseFileImpl) wrappedFile).getDelegate();
 
     if (!file.exists()) {
       log.error("EditorAPI cannot open file which does not exist: " + file, new StackTrace());
@@ -685,10 +684,10 @@ public class EditorAPI {
    * @return the path of the file the given editor is displaying or null if the given editor is not
    *     showing a file or the file is not referenced via a path in the project.
    */
-  public static SPath getEditorPath(IEditorPart editorPart) {
-    IResource resource = getEditorResource(editorPart);
+  public static saros.filesystem.IFile getEditorPath(IEditorPart editorPart) {
+    IFile resource = getEditorResource(editorPart).getAdapter(IFile.class);
 
-    return (resource == null) ? null : new SPath(ResourceAdapterFactory.create(resource));
+    return (resource == null) ? null : ResourceAdapterFactory.create(resource);
   }
 
   /**

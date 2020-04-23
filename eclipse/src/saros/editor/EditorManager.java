@@ -126,9 +126,9 @@ public class EditorManager implements IEditorManager {
 
   private final IPartListener2 partListener;
 
-  private SPath locallyActiveEditor;
+  private saros.filesystem.IFile locallyActiveEditor;
 
-  private Set<SPath> openEditorPaths = new HashSet<SPath>();
+  private Set<saros.filesystem.IFile> openEditorPaths = new HashSet<>();
 
   private TextSelection localSelection;
 
@@ -276,16 +276,14 @@ public class EditorManager implements IEditorManager {
 
           // TODO The user should be able to ask for this
           User localUser = session.getLocalUser();
-          for (SPath path : getOpenEditors()) {
-            activityDelayer.fireActivity(
-                new EditorActivity(localUser, Type.ACTIVATED, path.getFile()));
+          for (saros.filesystem.IFile file :
+              getOpenEditors().stream().map(SPath::getFile).collect(Collectors.toSet())) {
+
+            activityDelayer.fireActivity(new EditorActivity(localUser, Type.ACTIVATED, file));
           }
 
           activityDelayer.fireActivity(
-              new EditorActivity(
-                  localUser,
-                  Type.ACTIVATED,
-                  locallyActiveEditor != null ? locallyActiveEditor.getFile() : null));
+              new EditorActivity(localUser, Type.ACTIVATED, locallyActiveEditor));
 
           if (locallyActiveEditor == null) return;
 
@@ -295,15 +293,14 @@ public class EditorManager implements IEditorManager {
                     localUser,
                     localViewport.getStartLine(),
                     localViewport.getNumberOfLines(),
-                    locallyActiveEditor.getFile()));
+                    locallyActiveEditor));
           } else {
             log.warn("No viewport for locallyActivateEditor: " + locallyActiveEditor);
           }
 
           if (localSelection != null) {
             activityDelayer.fireActivity(
-                new TextSelectionActivity(
-                    localUser, localSelection, locallyActiveEditor.getFile()));
+                new TextSelectionActivity(localUser, localSelection, locallyActiveEditor));
 
           } else {
             log.warn("No selection for locallyActivateEditor: " + locallyActiveEditor);
@@ -433,28 +430,30 @@ public class EditorManager implements IEditorManager {
 
   @Override
   public String getContent(final SPath path) {
+    saros.filesystem.IFile file = path.getFile();
+
     try {
       return SWTUtils.runSWTSync(
           new Callable<String>() {
             @Override
             public String call() throws Exception {
-              return doGetContent(path);
+              return doGetContent(file);
             }
           });
     } catch (Exception e) {
-      log.warn("Failed to get editor content for " + path, e);
+      log.warn("Failed to get editor content for " + file, e);
       return null;
     }
   }
 
-  private String doGetContent(SPath path) {
-    IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
+  private String doGetContent(saros.filesystem.IFile wrappedFile) {
+    IFile file = ((EclipseFileImpl) wrappedFile).getDelegate();
     FileEditorInput input = new FileEditorInput(file);
 
     IDocumentProvider provider = EditorAPI.connect(input);
 
     if (provider == null) {
-      log.warn("Failed to retrieve the content of " + path);
+      log.warn("Failed to retrieve the content of " + wrappedFile);
       return null;
     }
 
@@ -483,7 +482,7 @@ public class EditorManager implements IEditorManager {
 
   @Override
   public Set<SPath> getOpenEditors() {
-    return openEditorPaths;
+    return openEditorPaths.stream().map(SPath::new).collect(Collectors.toSet());
   }
 
   @Override
@@ -500,20 +499,19 @@ public class EditorManager implements IEditorManager {
    * Sets the local editor 'opened' and fires an {@link EditorActivity} of type {@link
    * Type#ACTIVATED}.
    *
-   * @param path the project-relative path to the resource that the editor is currently editing or
-   *     <code>null</code> if the local user has no editor open.
+   * @param file the file that the editor is currently editing or <code>null</code> if the local
+   *     user has no editor open.
    */
-  void generateEditorActivated(SPath path) {
+  void generateEditorActivated(saros.filesystem.IFile file) {
 
-    this.locallyActiveEditor = path;
+    this.locallyActiveEditor = file;
 
-    if (path != null && session.isShared(path.getFile())) openEditorPaths.add(path);
+    if (file != null && session.isShared(file)) openEditorPaths.add(file);
 
-    editorListenerDispatch.editorActivated(session.getLocalUser(), path);
+    editorListenerDispatch.editorActivated(
+        session.getLocalUser(), file == null ? null : new SPath(file));
 
-    activityDelayer.fireActivity(
-        new EditorActivity(
-            session.getLocalUser(), Type.ACTIVATED, path != null ? path.getFile() : null));
+    activityDelayer.fireActivity(new EditorActivity(session.getLocalUser(), Type.ACTIVATED, file));
   }
 
   /**
@@ -535,20 +533,20 @@ public class EditorManager implements IEditorManager {
       return;
     }
 
-    SPath path = EditorAPI.getEditorPath(part);
-    if (path == null) {
+    saros.filesystem.IFile wrappedFile = EditorAPI.getEditorPath(part);
+    if (wrappedFile == null) {
       log.warn("Could not find path for editor " + part.getTitle());
       return;
     }
 
-    if (path.equals(locallyActiveEditor)) this.localViewport = viewport;
+    if (wrappedFile.equals(locallyActiveEditor)) this.localViewport = viewport;
 
     ViewportActivity activity =
         new ViewportActivity(
             session.getLocalUser(),
             viewport.getStartLine(),
             viewport.getNumberOfLines(),
-            path.getFile());
+            wrappedFile);
 
     activityDelayer.fireActivity(activity);
   }
@@ -563,16 +561,16 @@ public class EditorManager implements IEditorManager {
    */
   void generateSelection(IEditorPart part, TextSelection newSelection) {
 
-    SPath path = EditorAPI.getEditorPath(part);
-    if (path == null) {
+    saros.filesystem.IFile file = EditorAPI.getEditorPath(part);
+    if (file == null) {
       log.warn("Could not find path for editor " + part.getTitle());
       return;
     }
 
-    if (path.equals(locallyActiveEditor)) localSelection = newSelection;
+    if (file.equals(locallyActiveEditor)) localSelection = newSelection;
 
     activityDelayer.fireActivity(
-        new TextSelectionActivity(session.getLocalUser(), newSelection, path.getFile()));
+        new TextSelectionActivity(session.getLocalUser(), newSelection, file));
   }
 
   /**
@@ -700,7 +698,7 @@ public class EditorManager implements IEditorManager {
         }
         break;
       case SAVED:
-        saveEditor(new SPath(file));
+        saveEditor(file);
         break;
       default:
         log.warn("Unexpected type: " + editorActivity.getType());
@@ -820,7 +818,7 @@ public class EditorManager implements IEditorManager {
 
   @Override
   public void closeEditor(final SPath path) {
-    closeEditor(path, true);
+    closeEditor(path.getFile(), true);
   }
 
   /**
@@ -829,19 +827,19 @@ public class EditorManager implements IEditorManager {
    *
    * <p>Does nothing if the resource is not shared or there is no open editor for the resource.
    *
-   * @param path the resource whose editor to close
+   * @param file the file whose editor to close
    * @param save whether to write the editor content to disk before closing it
    * @see EditorAPI#closeEditor(IEditorPart, boolean)
    */
-  public void closeEditor(final SPath path, boolean save) {
-    if (path == null) throw new IllegalArgumentException("path must not be null");
+  public void closeEditor(final saros.filesystem.IFile file, boolean save) {
+    if (file == null) throw new IllegalArgumentException("path must not be null");
 
     SWTUtils.runSafeSWTSync(
         log,
         new Runnable() {
           @Override
           public void run() {
-            for (IEditorPart part : editorPool.getEditors(path)) {
+            for (IEditorPart part : editorPool.getEditors(new SPath(file))) {
               EditorAPI.closeEditor(part, save);
             }
           }
@@ -922,12 +920,12 @@ public class EditorManager implements IEditorManager {
       return;
     }
 
-    SPath editorPath = EditorAPI.getEditorPath(editorPart);
+    saros.filesystem.IFile editorFile = EditorAPI.getEditorPath(editorPart);
 
-    if (editorPath.equals(locallyActiveEditor)) {
+    if (Objects.equals(editorFile, locallyActiveEditor)) {
       log.debug(
           "ignoring partActivated event for editor path "
-              + editorPath
+              + editorFile
               + " because it is already active");
       return;
     }
@@ -935,7 +933,7 @@ public class EditorManager implements IEditorManager {
     TextSelection selection = EditorAPI.getSelection(editorPart);
 
     // Set (and thus send) in this order:
-    generateEditorActivated(editorPath);
+    generateEditorActivated(editorFile);
     generateSelection(editorPart, selection);
 
     ITextViewer viewer = EditorAPI.getViewer(editorPart);
@@ -971,7 +969,7 @@ public class EditorManager implements IEditorManager {
       if (path == null) {
         log.warn("Editor was managed but path could not be found: " + editorPart);
       } else {
-        partClosedOfPath(editorPart, path);
+        partClosedOfPath(editorPart, path.getFile());
       }
 
       partOpened(editorPart);
@@ -1000,45 +998,44 @@ public class EditorManager implements IEditorManager {
       return;
     }
 
-    SPath path = EditorAPI.getEditorPath(editorPart);
+    saros.filesystem.IFile file = EditorAPI.getEditorPath(editorPart);
 
-    partClosedOfPath(editorPart, path);
+    partClosedOfPath(editorPart, file);
   }
 
-  private void partClosedOfPath(IEditorPart editorPart, SPath path) {
+  private void partClosedOfPath(IEditorPart editorPart, saros.filesystem.IFile file) {
     editorPool.remove(editorPart);
-    openEditorPaths.remove(path);
+    openEditorPaths.remove(file);
 
     ITextViewer viewer = EditorAPI.getViewer(editorPart);
     if (viewer instanceof ISourceViewer)
       customAnnotationManager.uninstallPainter((ISourceViewer) viewer, false);
 
-    editorListenerDispatch.editorClosed(session.getLocalUser(), path);
+    editorListenerDispatch.editorClosed(session.getLocalUser(), new SPath(file));
 
-    activityDelayer.fireActivity(
-        new EditorActivity(session.getLocalUser(), Type.CLOSED, path.getFile()));
+    activityDelayer.fireActivity(new EditorActivity(session.getLocalUser(), Type.CLOSED, file));
 
     /**
      * TODO We need a reliable way to communicate editors which are outside the shared project scope
      * and a way to deal with closing the active editor
      */
     // Check if the currently active editor is closed
-    boolean newActiveEditor = path.equals(this.locallyActiveEditor);
+    boolean newActiveEditor = file.equals(this.locallyActiveEditor);
     if (newActiveEditor) {
       partActivated(EditorAPI.getActiveEditor());
     }
   }
 
   /**
-   * Checks whether given resource is currently opened.
+   * Checks whether given file is currently opened.
    *
-   * @param path the project-relative path to the resource.
-   * @return <code>true</code> if the given resource is opened according to the editor pool.
+   * @param file the file to check
+   * @return <code>true</code> if the given file is opened according to the editor pool.
    */
   // FIXME thread access (used by ProjectDeltaVisitor which might NOT run from
   // the SWT Thread
-  public boolean isOpened(SPath path) {
-    return editorPool.getEditors(path).size() > 0;
+  public boolean isOpened(saros.filesystem.IFile file) {
+    return editorPool.getEditors(new SPath(file)).size() > 0;
   }
 
   /**
@@ -1146,12 +1143,12 @@ public class EditorManager implements IEditorManager {
   }
 
   /**
-   * Save file denoted by the given project relative path if necessary according to isDirty(IPath)
-   * and call saveText(IPath) if necessary in the SWT thread.
+   * Save file denoted by the given file if necessary according to isDirty(IPath) and call
+   * saveText(IPath) if necessary in the SWT thread.
    *
    * @blocking This method returns after the file has been saved in the SWT Thread.
    */
-  public void saveLazy(final SPath path) {
+  public void saveLazy(final saros.filesystem.IFile file) {
 
     SWTUtils.runSafeSWTSync(
         log,
@@ -1162,12 +1159,12 @@ public class EditorManager implements IEditorManager {
 
             boolean isDirty = false;
             try {
-              isDirty = isDirty(path);
+              isDirty = isDirty(file);
             } catch (FileNotFoundException e) {
-              log.warn("could not save editor: " + path, e);
+              log.warn("could not save editor: " + file, e);
             }
 
-            if (isDirty) saveEditor(path);
+            if (isDirty) saveEditor(file);
           }
         });
   }
@@ -1177,12 +1174,12 @@ public class EditorManager implements IEditorManager {
    *
    * @throws FileNotFoundException if the file denoted by the path does not exist on disk.
    */
-  private boolean isDirty(SPath path) throws FileNotFoundException {
+  private boolean isDirty(saros.filesystem.IFile wrappedFile) throws FileNotFoundException {
 
-    IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
+    IFile file = ((EclipseFileImpl) wrappedFile).getDelegate();
 
     if (file == null || !file.exists()) {
-      throw new FileNotFoundException("File not found: " + path);
+      throw new FileNotFoundException("File not found: " + wrappedFile);
     }
 
     FileEditorInput input = new FileEditorInput(file);
@@ -1200,19 +1197,19 @@ public class EditorManager implements IEditorManager {
    * <p>Calling this method will NOT trigger a {@link EditorActivity} of type Save to be sent to the
    * other clients.
    *
-   * @param path the project relative path to the file that is supposed to be saved to disk.
+   * @param wrappedFile the file that is supposed to be saved to disk.
    * @swt This method must be called from the SWT thread
    * @nonReentrant This method cannot be called twice at the same time.
    */
-  public void saveEditor(SPath path) {
+  public void saveEditor(saros.filesystem.IFile wrappedFile) {
     checkThreadAccess();
 
-    IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
+    IFile file = ((EclipseFileImpl) wrappedFile).getDelegate();
 
     log.trace(".saveEditor (" + file.getName() + ") invoked");
 
     if (!file.exists()) {
-      log.warn("File not found for saving: " + path.toString(), new StackTrace());
+      log.warn("File not found for saving: " + wrappedFile.toString(), new StackTrace());
       return;
     }
 
@@ -1254,9 +1251,9 @@ public class EditorManager implements IEditorManager {
 
     try {
       provider.saveDocument(new NullProgressMonitor(), input, doc, true);
-      log.debug("Saved document: " + path);
+      log.debug("Saved document: " + wrappedFile);
     } catch (CoreException e) {
-      log.error("Failed to save document: " + path, e);
+      log.error("Failed to save document: " + wrappedFile, e);
     }
 
     editorPool.setElementStateListenerEnabled(true);
@@ -1355,8 +1352,8 @@ public class EditorManager implements IEditorManager {
    */
   private void refreshAnnotations(IEditorPart editorPart) {
 
-    SPath path = EditorAPI.getEditorPath(editorPart);
-    if (path == null) {
+    saros.filesystem.IFile file = EditorAPI.getEditorPath(editorPart);
+    if (file == null) {
       log.warn("Could not find path for editor " + editorPart.getTitle());
       return;
     }
@@ -1387,8 +1384,7 @@ public class EditorManager implements IEditorManager {
         continue;
       }
 
-      EditorState remoteEditor =
-          userEditorStateManager.getState(user).getEditorState(path.getFile());
+      EditorState remoteEditor = userEditorStateManager.getState(user).getEditorState(file);
 
       if (remoteEditor == null) continue;
 
@@ -1418,15 +1414,10 @@ public class EditorManager implements IEditorManager {
    *
    * <p>TODO: This method is only called for an isEmpty() check
    */
-  public Set<SPath> getRemoteOpenEditors(User user) {
+  public Set<saros.filesystem.IFile> getRemoteOpenEditors(User user) {
     return userEditorStateManager == null
-        ? Collections.<SPath>emptySet()
-        : userEditorStateManager
-            .getState(user)
-            .getOpenEditors()
-            .stream()
-            .map(SPath::new)
-            .collect(Collectors.toSet());
+        ? Collections.emptySet()
+        : userEditorStateManager.getState(user).getOpenEditors();
   }
 
   /**
@@ -1446,21 +1437,21 @@ public class EditorManager implements IEditorManager {
   /**
    * Convenience method for determining whether a file is currently open in an editor.
    *
-   * @param path path of the file to check
+   * @param file the file to check
    * @return <code>true</code> if there is an open editor for this file, <code>false</code>
    *     otherwise
    */
-  public boolean isOpenEditor(SPath path) {
+  public boolean isOpenEditor(saros.filesystem.IFile file) {
     checkThreadAccess();
 
-    if (path == null) throw new IllegalArgumentException("path must not be null");
+    if (file == null) throw new IllegalArgumentException("path must not be null");
 
     for (IEditorPart editorPart : EditorAPI.getOpenEditors()) {
       IResource resource = EditorAPI.getEditorResource(editorPart);
 
       if (resource == null) continue;
 
-      if (ResourceAdapterFactory.create(resource).equals(path.getResource())) return true;
+      if (ResourceAdapterFactory.create(resource).equals(file)) return true;
     }
 
     return false;
@@ -1479,7 +1470,7 @@ public class EditorManager implements IEditorManager {
         new Runnable() {
           @Override
           public void run() {
-            EditorAPI.openEditor(path, activate);
+            EditorAPI.openEditor(path.getFile(), activate);
           }
         });
   }
@@ -1499,12 +1490,17 @@ public class EditorManager implements IEditorManager {
              */
             if (userEditorStateManager == null) return;
 
-            final Set<SPath> editorPaths = userEditorStateManager.getOpenEditors();
+            final Set<saros.filesystem.IFile> editorPaths =
+                userEditorStateManager
+                    .getOpenEditors()
+                    .stream()
+                    .map(SPath::getFile)
+                    .collect(Collectors.toSet());
 
             editorPaths.addAll(openEditorPaths);
 
-            for (final SPath path : editorPaths) {
-              if (project == null || project.equals(path.getProject())) saveLazy(path);
+            for (final saros.filesystem.IFile file : editorPaths) {
+              if (project == null || project.equals(file.getProject())) saveLazy(file);
             }
           }
         });
@@ -1533,14 +1529,14 @@ public class EditorManager implements IEditorManager {
       return;
     }
 
-    final SPath path = activeEditor.getPath();
+    final saros.filesystem.IFile file = activeEditor.getPath().getFile();
     final LineRange viewport = activeEditor.getViewport();
     final TextSelection selection = activeEditor.getSelection();
 
     // TODO So jumping to a user's position based on his/her selection is
     // not an option?
     if (viewport == null) {
-      log.warn("user " + jumpTo + " has no viewport in editor: " + path);
+      log.warn("user " + jumpTo + " has no viewport in editor: " + file);
       return;
     }
 
@@ -1549,9 +1545,9 @@ public class EditorManager implements IEditorManager {
         new Runnable() {
           @Override
           public void run() {
-            IEditorPart newEditor = EditorAPI.openEditor(path, true);
+            IEditorPart newEditor = EditorAPI.openEditor(file, true);
             if (newEditor == null) {
-              log.warn("editor for " + path + " couldn't be opened");
+              log.warn("editor for " + file + " couldn't be opened");
               return;
             }
 
