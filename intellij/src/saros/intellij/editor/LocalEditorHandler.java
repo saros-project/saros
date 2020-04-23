@@ -141,7 +141,7 @@ public class LocalEditorHandler {
       return null;
     }
 
-    editorPool.add(path, editor);
+    editorPool.add(path.getFile(), editor);
     manager.startEditor(editor);
 
     log.debug("Opened Editor " + editor + " for file " + virtualFile);
@@ -164,7 +164,7 @@ public class LocalEditorHandler {
       return;
     }
 
-    editorPool.removeEditor(new SPath(file));
+    editorPool.removeEditor(file);
     manager.generateEditorClosed(file);
   }
 
@@ -180,7 +180,7 @@ public class LocalEditorHandler {
    */
   public void saveDocument(@NotNull SPath path) {
 
-    Document document = editorPool.getDocument(path);
+    Document document = editorPool.getDocument(path.getFile());
 
     if (document != null) {
       if (DocumentAPI.hasUnsavedChanges(document)) {
@@ -252,7 +252,7 @@ public class LocalEditorHandler {
 
   /** @return <code>true</code>, if the file is opened in an editor. */
   public boolean isOpenEditor(IFile file) {
-    Document doc = editorPool.getDocument(new SPath(file));
+    Document doc = editorPool.getDocument(file);
     if (doc == null) {
       return false;
     }

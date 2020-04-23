@@ -9,7 +9,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import java.awt.Rectangle;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import saros.activities.SPath;
 import saros.editor.text.LineRange;
 import saros.filesystem.IFile;
 import saros.intellij.editor.DocumentAPI;
@@ -78,15 +77,15 @@ public class LocalViewPortChangeHandler implements IProjectEventHandler {
     Editor editor = event.getEditor();
     Rectangle newVisibleRectangle = event.getNewRectangle();
 
-    SPath path = editorManager.getFileForOpenEditor(editor.getDocument());
+    IFile file = editorManager.getFileForOpenEditor(editor.getDocument());
 
-    if (path == null) {
+    if (file == null) {
       if (log.isTraceEnabled()) {
-        VirtualFile file = DocumentAPI.getVirtualFile(editor.getDocument());
+        VirtualFile virtualFile = DocumentAPI.getVirtualFile(editor.getDocument());
 
         log.trace(
             "Ignoring local view port change for "
-                + file
+                + virtualFile
                 + " as the editor is not known to the editor pool.");
       }
 
@@ -101,7 +100,7 @@ public class LocalViewPortChangeHandler implements IProjectEventHandler {
       if (log.isTraceEnabled()) {
         log.trace(
             "Ignoring local viewport change for "
-                + path
+                + file
                 + " as the new visible rectangle does not have valid dimensions: "
                 + newVisibleRectangle);
       }
@@ -111,7 +110,7 @@ public class LocalViewPortChangeHandler implements IProjectEventHandler {
 
     LineRange newVisibleLineRange = EditorAPI.getLocalViewPortRange(editor, newVisibleRectangle);
 
-    editorManager.generateViewport(path.getFile(), newVisibleLineRange);
+    editorManager.generateViewport(file, newVisibleLineRange);
   }
 
   /**

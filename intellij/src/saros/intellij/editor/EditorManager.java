@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -158,8 +159,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
           User user = textEditActivity.getSource();
 
-          adjustAnnotationsAfterEdit(
-              user, file, editorPool.getEditor(new SPath(file)), start, oldEnd, newEnd);
+          adjustAnnotationsAfterEdit(user, file, editorPool.getEditor(file), start, oldEnd, newEnd);
 
           editorListenerDispatch.textEdited(textEditActivity);
         }
@@ -176,7 +176,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
          * @see BackgroundEditorPool
          */
         private Editor getCalculationEditor(@NotNull IFile file) {
-          Editor calculationEditor = editorPool.getEditor(new SPath(file));
+          Editor calculationEditor = editorPool.getEditor(file);
 
           if (calculationEditor != null) {
             return calculationEditor;
@@ -204,7 +204,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
             return null;
           }
 
-          return backgroundEditorPool.getBackgroundEditor(new SPath(file), document);
+          return backgroundEditorPool.getBackgroundEditor(file, document);
         }
 
         /**
@@ -317,7 +317,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
           User user = selection.getSource();
 
-          Editor editor = editorPool.getEditor(new SPath(file));
+          Editor editor = editorPool.getEditor(file);
 
           // Editor used for position calculation
           Editor calcEditor = editor;
@@ -347,7 +347,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
               return;
             }
 
-            calcEditor = backgroundEditorPool.getBackgroundEditor(new SPath(file), document);
+            calcEditor = backgroundEditorPool.getBackgroundEditor(file, document);
           }
 
           TextSelection textSelection = selection.getSelection();
@@ -431,12 +431,12 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           editorPool
               .getMapping()
               .forEach(
-                  (path, editor) -> {
-                    sendEditorOpenInformation(localUser, path.getFile());
+                  (file, editor) -> {
+                    sendEditorOpenInformation(localUser, file);
 
-                    sendViewPortInformation(localUser, path.getFile(), editor, visibleFilePaths);
+                    sendViewPortInformation(localUser, file, editor, visibleFilePaths);
 
-                    sendSelectionInformation(localUser, path.getFile(), editor);
+                    sendSelectionInformation(localUser, file, editor);
                   });
 
           sendActiveEditorInformation(localUser, project);
@@ -540,13 +540,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     IFile activeEditorFile;
 
     if (activeEditor != null) {
-      SPath activeEditorPath = editorPool.getFile(activeEditor.getDocument());
-
-      if (activeEditorPath != null) {
-        activeEditorFile = activeEditorPath.getFile();
-      } else {
-        activeEditorFile = null;
-      }
+      activeEditorFile = editorPool.getFile(activeEditor.getDocument());
 
     } else {
       activeEditorFile = null;
@@ -761,7 +755,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
   @Override
   public Set<SPath> getOpenEditors() {
-    return editorPool.getFiles();
+    return editorPool.getFiles().stream().map(SPath::new).collect(Collectors.toSet());
   }
 
   @Override
@@ -814,12 +808,12 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     localEditorHandler.saveDocument(path);
   }
 
-  public void removeAllEditorsForPath(SPath path) {
-    editorPool.removeEditor(path);
+  public void removeAllEditorsForPath(IFile file) {
+    editorPool.removeEditor(file);
   }
 
-  public void replaceAllEditorsForPath(SPath oldPath, SPath newPath) {
-    editorPool.replacePath(oldPath, newPath);
+  public void replaceAllEditorsForPath(IFile oldFile, IFile newFile) {
+    editorPool.replaceFile(oldFile, newFile);
   }
 
   /**
@@ -828,10 +822,10 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    * <p>This should be used to drop background editors for resources that are no longer available,
    * i.e. were moved or removed.
    *
-   * @param path the resource to remove from the background editor pool if present
+   * @param file the file to remove from the background editor pool if present
    */
-  public void removeBackgroundEditorForPath(@NotNull SPath path) {
-    backgroundEditorPool.dropBackgroundEditor(path);
+  public void removeBackgroundEditorForFile(@NotNull IFile file) {
+    backgroundEditorPool.dropBackgroundEditor(file);
   }
 
   EditorPool getEditorPool() {
@@ -839,15 +833,15 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   }
 
   /**
-   * Returns an SPath representing the file corresponding to the given document if the editor for
-   * the document is known to the editor pool.
+   * Returns the file corresponding to the given document if the editor for the document is known to
+   * the editor pool.
    *
-   * @param document the document to get an SPath for
-   * @return an SPath representing the file corresponding to the given document or <code>null</code>
-   *     if the given document is <code>null</code> or is not known to the editor pool.
+   * @param document the document to get a file for
+   * @return the file corresponding to the given document or <code>null</code> if the given document
+   *     is <code>null</code> or is not known to the editor pool
    */
   @Nullable
-  public SPath getFileForOpenEditor(@Nullable Document document) {
+  public IFile getFileForOpenEditor(@Nullable Document document) {
     return editorPool.getFile(document);
   }
 
@@ -953,10 +947,10 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
       return;
     }
 
-    Editor editor = editorPool.getEditor(path);
+    Editor editor = editorPool.getEditor(path.getFile());
 
     if (editor == null) {
-      editor = backgroundEditorPool.getBackgroundEditor(path, document);
+      editor = backgroundEditorPool.getBackgroundEditor(path.getFile(), document);
     }
 
     TextPosition startPosition = EditorAPI.calculatePosition(editor, offset);
@@ -1110,7 +1104,9 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   public void saveEditors(final IProject project) {
     executeInUIThreadSynchronous(
         () -> {
-          Set<SPath> editorPaths = new HashSet<>(editorPool.getFiles());
+          Set<SPath> editorPaths =
+              new HashSet<>(
+                  editorPool.getFiles().stream().map(SPath::new).collect(Collectors.toSet()));
 
           if (userEditorStateManager != null) {
             editorPaths.addAll(userEditorStateManager.getOpenEditors());
@@ -1177,7 +1173,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
       return;
     }
 
-    Editor editor = editorPool.getEditor(path);
+    Editor editor = editorPool.getEditor(path.getFile());
 
     if (!visibleFilePaths.contains(passedFile.getPath())) {
       ViewportAdjustmentExecutor.queueViewPortChange(
@@ -1200,7 +1196,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   }
 
   /**
-   * Starts the listeners for the given editor and adds it to the editor pool with the given path.
+   * Starts the listeners for the given editor and adds it to the editor pool with the given file.
    *
    * <p><b>NOTE:</b> This method should only be used when adding editors for files that are not yet
    * part of the session scope. This can be the case when an open file is moved into the session
@@ -1212,7 +1208,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    * @see #openEditor(SPath, boolean)
    * @see #startEditor(Editor)
    */
-  public void addEditorMapping(@NotNull SPath file, @NotNull Editor editor) {
+  public void addEditorMapping(@NotNull IFile file, @NotNull Editor editor) {
     startEditor(editor);
     editorPool.add(file, editor);
   }

@@ -8,7 +8,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import saros.activities.SPath;
 import saros.filesystem.IFile;
 import saros.intellij.editor.DocumentAPI;
 import saros.intellij.editor.EditorManager;
@@ -107,14 +106,14 @@ public abstract class AbstractLocalDocumentModificationHandler implements IProje
    * @return the SPath for the given document or <code>null</code> if no VirtualFile for the
    *     document could be found, the found VirtualFile could not be converted to an SPath or the
    *     resources represented by the given document is not shared
-   * @see VirtualFileConverter#convertToSPath(Project,VirtualFile)
+   * @see VirtualFileConverter#convertToResource(Project, VirtualFile)
    */
   @Nullable
   final IFile getFile(@NotNull Document document) {
-    SPath path = editorManager.getFileForOpenEditor(document);
+    IFile file = editorManager.getFileForOpenEditor(document);
 
-    if (path != null) {
-      return path.getFile();
+    if (file != null) {
+      return file;
     }
 
     VirtualFile virtualFile = DocumentAPI.getVirtualFile(document);
@@ -131,7 +130,7 @@ public abstract class AbstractLocalDocumentModificationHandler implements IProje
       return null;
     }
 
-    IFile file = (IFile) VirtualFileConverter.convertToResource(project, virtualFile);
+    file = (IFile) VirtualFileConverter.convertToResource(project, virtualFile);
 
     if (file == null || !sarosSession.isShared(file)) {
       if (log.isTraceEnabled()) {

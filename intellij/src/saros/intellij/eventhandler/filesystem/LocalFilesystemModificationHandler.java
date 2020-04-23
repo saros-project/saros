@@ -1053,7 +1053,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
    * @param deletedFile the deleted file
    */
   private void cleanUpDeletedFileState(@NotNull IFile deletedFile) {
-    editorManager.removeAllEditorsForPath(new SPath(deletedFile));
+    editorManager.removeAllEditorsForPath(deletedFile);
 
     annotationManager.removeAnnotations(deletedFile);
   }
@@ -1064,7 +1064,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
    * @param deletedFile the deleted file
    */
   private void cleanUpBackgroundEditorPool(@NotNull IFile deletedFile) {
-    editorManager.removeBackgroundEditorForPath(new SPath(deletedFile));
+    editorManager.removeBackgroundEditorForFile(deletedFile);
   }
 
   /**
@@ -1074,7 +1074,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
    * @param newFile the new location/version of the file
    */
   private void updateMovedFileState(@NotNull IFile oldFile, @NotNull IFile newFile) {
-    editorManager.replaceAllEditorsForPath(new SPath(oldFile), new SPath(newFile));
+    editorManager.replaceAllEditorsForPath(oldFile, newFile);
 
     annotationManager.updateAnnotationPath(oldFile, newFile);
   }
@@ -1098,7 +1098,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       return;
     }
 
-    editorManager.addEditorMapping(new SPath(newFile), editor);
+    editorManager.addEditorMapping(newFile, editor);
   }
 
   /**

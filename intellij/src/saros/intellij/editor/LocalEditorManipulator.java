@@ -90,7 +90,7 @@ public class LocalEditorManipulator {
     }
 
     manager.startEditor(editor);
-    editorPool.add(path, editor);
+    editorPool.add(path.getFile(), editor);
 
     log.debug("Opened Editor " + editor + " for file " + virtualFile);
 
@@ -103,7 +103,7 @@ public class LocalEditorManipulator {
    * @param path the path of the file for which to close the editor
    */
   public void closeEditor(SPath path) {
-    editorPool.removeEditor(path);
+    editorPool.removeEditor(path.getFile());
 
     log.debug("Removed editor for path " + path + " from EditorPool");
 
