@@ -445,8 +445,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
   /**
    * Generates and dispatches a TextSelectionActivity for the current selection in the given editor.
-   * The local user will be used as the source of the activity and the given path will be used as
-   * the path for the editor.
+   * The local user will be used as the source of the activity and the given file will be used as
+   * the file for the editor.
    *
    * <p><b>NOTE:</b> This should only be used to transfer pre-existing selection. To notify other
    * participants about new selections, {@link #generateSelection(IFile, SelectionEvent)} should be
@@ -489,7 +489,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
     if (fileForEditor == null) {
       log.warn(
-          "Encountered editor without valid virtual file representation - path held in editor pool: "
+          "Encountered editor without valid virtual file representation - file held in editor pool: "
               + file);
 
       return;
@@ -568,7 +568,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
       }
     }
 
-    Map<SPath, Editor> openFileMapping = new HashMap<>();
+    Map<IFile, Editor> openFileMapping = new HashMap<>();
 
     SelectedEditorStateSnapshot selectedEditorStateSnapshot =
         selectedEditorStateSnapshotFactory.capturedState();
@@ -578,14 +578,14 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
       setLocalViewPortChangeHandlersEnabled(false);
 
       for (VirtualFile openFile : openFiles) {
-        SPath path = VirtualFileConverter.convertToSPath(intellijProject, openFile);
+        IFile file = (IFile) VirtualFileConverter.convertToResource(intellijProject, openFile);
 
-        if (path == null) {
+        if (file == null) {
           throw new IllegalStateException(
-              "Could not create SPath for resource that is known to be shared: " + openFile);
+              "Could not create IFile for resource that is known to be shared: " + openFile);
 
-        } else if (path.getResource().isIgnored()) {
-          log.debug("Skipping editor for ignored open file " + path);
+        } else if (file.isIgnored()) {
+          log.debug("Skipping editor for ignored open file " + file);
 
           continue;
         }
@@ -593,7 +593,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
         Editor editor = localEditorHandler.openEditor(openFile, project, false);
 
         if (editor != null) {
-          openFileMapping.put(path, editor);
+          openFileMapping.put(file, editor);
         }
       }
 
@@ -615,12 +615,12 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     }
 
     openFileMapping.forEach(
-        (path, editor) -> {
-          sendEditorOpenInformation(localUser, path.getFile());
+        (file, editor) -> {
+          sendEditorOpenInformation(localUser, file);
 
-          sendViewPortInformation(localUser, path.getFile(), editor, selectedFiles);
+          sendViewPortInformation(localUser, file, editor, selectedFiles);
 
-          sendSelectionInformation(localUser, path.getFile(), editor);
+          sendSelectionInformation(localUser, file, editor);
         });
 
     sendActiveEditorInformation(localUser, intellijProject);
@@ -762,7 +762,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   public String getContent(final SPath path) {
     return FilesystemRunner.runReadAction(
         () -> {
-          VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(path);
+          VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(path.getFile());
 
           if (virtualFile == null || !virtualFile.exists() || virtualFile.isDirectory()) {
 
@@ -798,21 +798,21 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   }
 
   /**
-   * Saves the document under path, thereby flushing its contents to disk.
+   * Saves the document for the given file, thereby flushing its contents to disk.
    *
-   * @param path the path for the document to save
+   * @param file the file for the document to save
    * @see Document
    * @see LocalEditorHandler#saveDocument(IFile)
    */
-  private void saveDocument(SPath path) {
-    localEditorHandler.saveDocument(path.getFile());
+  private void saveDocument(IFile file) {
+    localEditorHandler.saveDocument(file);
   }
 
-  public void removeAllEditorsForPath(IFile file) {
+  public void removeAllEditorsForFile(IFile file) {
     editorPool.removeEditor(file);
   }
 
-  public void replaceAllEditorsForPath(IFile oldFile, IFile newFile) {
+  public void replaceAllEditorsForFile(IFile oldFile, IFile newFile) {
     editorPool.replaceFile(oldFile, newFile);
   }
 
@@ -879,7 +879,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   }
 
   /**
-   * Generates an editor save activity for the given path.
+   * Generates an editor save activity for the given file.
    *
    * @param file the file to generate an editor saved activity for
    */
@@ -940,17 +940,17 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
       int offset,
       @NotNull String newText,
       @NotNull String replacedText,
-      @NotNull SPath path,
+      @NotNull IFile file,
       @NotNull Document document) {
 
     if (session == null) {
       return;
     }
 
-    Editor editor = editorPool.getEditor(path.getFile());
+    Editor editor = editorPool.getEditor(file);
 
     if (editor == null) {
-      editor = backgroundEditorPool.getBackgroundEditor(path.getFile(), document);
+      editor = backgroundEditorPool.getBackgroundEditor(file, document);
     }
 
     TextPosition startPosition = EditorAPI.calculatePosition(editor, offset);
@@ -961,7 +961,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
      */
     TextEditActivity textEdit =
         TextEditActivity.buildTextEditActivity(
-            session.getLocalUser(), startPosition, newText, replacedText, path.getFile());
+            session.getLocalUser(), startPosition, newText, replacedText, file);
 
     if (!hasWriteAccess || isLocked) {
       /*
@@ -1105,18 +1105,21 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   public void saveEditors(final IProject project) {
     executeInUIThreadSynchronous(
         () -> {
-          Set<SPath> editorPaths =
-              new HashSet<>(
-                  editorPool.getFiles().stream().map(SPath::new).collect(Collectors.toSet()));
+          Set<IFile> editorFiles = new HashSet<>(editorPool.getFiles());
 
           if (userEditorStateManager != null) {
-            editorPaths.addAll(userEditorStateManager.getOpenEditors());
+            editorFiles.addAll(
+                userEditorStateManager
+                    .getOpenEditors()
+                    .stream()
+                    .map(SPath::getFile)
+                    .collect(Collectors.toSet()));
           }
 
-          for (SPath editorPath : editorPaths) {
-            if (project == null || project.equals(editorPath.getProject())) {
+          for (IFile editorFile : editorFiles) {
+            if (project == null || project.equals(editorFile.getProject())) {
 
-              saveDocument(editorPath);
+              saveDocument(editorFile);
             }
           }
         });
@@ -1160,7 +1163,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
       visibleFilePaths.add(virtualFile.getPath());
     }
 
-    VirtualFile passedFile = VirtualFileConverter.convertToVirtualFile(path);
+    VirtualFile passedFile = VirtualFileConverter.convertToVirtualFile(path.getFile());
 
     if (passedFile == null) {
       log.warn(
@@ -1202,7 +1205,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    * <p><b>NOTE:</b> This method should only be used when adding editors for files that are not yet
    * part of the session scope. This can be the case when an open file is moved into the session
    * scope. If the file is already part of the session scope, {@link #openEditor(SPath, boolean)}}
-   * should be used instead as it ensures that the right editor for the path is used.
+   * should be used instead as it ensures that the right editor for the file is used.
    *
    * @param file the file to add to the editor pool
    * @param editor the editor representing the given file
