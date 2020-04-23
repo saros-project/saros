@@ -178,7 +178,7 @@ public class ConcurrentDocumentClient implements Startable {
   }
 
   /**
-   * Resets the JupiterClient for the given path.
+   * Resets the JupiterClient for the given file.
    *
    * <p>When this is called on the client (or on the host for one of his JupiterClient), a call to
    * {@link ConcurrentDocumentServer#reset(saros.session.User, IFile)} should be executed at the

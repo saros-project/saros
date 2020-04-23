@@ -100,12 +100,12 @@ public abstract class AbstractLocalDocumentModificationHandler implements IProje
   }
 
   /**
-   * Returns the SPath for the given document.
+   * Returns the file for the given document.
    *
-   * @param document the document to get an SPath for
-   * @return the SPath for the given document or <code>null</code> if no VirtualFile for the
-   *     document could be found, the found VirtualFile could not be converted to an SPath or the
-   *     resources represented by the given document is not shared
+   * @param document the document to get a file for
+   * @return the file for the given document or <code>null</code> if no VirtualFile for the document
+   *     could be found, the found VirtualFile could not be converted to an IFile or the file
+   *     represented by the given document is not shared
    * @see VirtualFileConverter#convertToResource(Project, VirtualFile)
    */
   @Nullable

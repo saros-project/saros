@@ -119,7 +119,7 @@ public class UserEditorState {
 
   /* Public methods */
 
-  /** @return a list of path referenced by the open editors */
+  /** @return a list of files referenced by the open editors */
   public synchronized Set<IFile> getOpenEditors() {
     return new HashSet<>(openEditors.keySet());
   }
@@ -129,7 +129,7 @@ public class UserEditorState {
    *
    * @param file The file for which the editor state should be retrieved
    * @return An immutable {@link EditorState}, or <code>null</code> if there is no open editor for
-   *     the given path (i.e. it's not in {@link #getOpenEditors()})
+   *     the given file (i.e. it's not in {@link #getOpenEditors()})
    */
   public synchronized EditorState getEditorState(IFile file) {
     EditorState result = openEditors.get(file);

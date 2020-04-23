@@ -22,7 +22,7 @@ public class FolderDeletedActivity extends AbstractResourceActivity<IFolder>
   public FolderDeletedActivity(final User source, final IFolder folder) {
     super(source, folder);
 
-    if (folder == null) throw new IllegalArgumentException("path must not be null");
+    if (folder == null) throw new IllegalArgumentException("folder must not be null");
   }
 
   @Override
@@ -37,6 +37,6 @@ public class FolderDeletedActivity extends AbstractResourceActivity<IFolder>
 
   @Override
   public String toString() {
-    return "FolderDeletedActivity [path=" + getResource() + "]";
+    return "FolderDeletedActivity [folder=" + getResource() + "]";
   }
 }

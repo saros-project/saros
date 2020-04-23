@@ -8,8 +8,8 @@
  * of these converters:
  *
  * <ul>
- *   <li>UserConverter
- *   <li>SPathConverter
+ *   <li>{@link saros.misc.xstream.UserConverter}
+ *   <li>{@link saros.misc.xstream.ResourceTransportWrapperConverter}
  * </ul>
  */
 package saros.misc.xstream;

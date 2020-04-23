@@ -855,9 +855,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
       editorListenerDispatch.editorActivated(session.getLocalUser(), file);
 
       fireActivity(new EditorActivity(session.getLocalUser(), EditorActivity.Type.ACTIVATED, file));
-
-      //  generateSelection(path, selection);  //FIXME: add this feature
-      //  generateViewport(path, viewport);    //FIXME:s add this feature
     }
   }
 

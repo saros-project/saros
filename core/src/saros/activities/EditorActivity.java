@@ -56,7 +56,7 @@ public class EditorActivity extends AbstractResourceActivity<IFile> {
     if (file == null) {
       if (type != Type.ACTIVATED) {
         throw new IllegalArgumentException(
-            "Null path for non-activation type EditorActivity given.");
+            "Null file for non-activation type EditorActivity given.");
       }
     }
 
@@ -66,7 +66,7 @@ public class EditorActivity extends AbstractResourceActivity<IFile> {
   @Override
   public boolean isValid() {
     /*
-     * path might be null for Type.ACTIVATED, see ctor and TODO in
+     * file might be null for Type.ACTIVATED, see ctor and TODO in
      * AbstractResourceActivity#isValid()
      */
     return super.isValid() && (getResource() != null || type == Type.ACTIVATED);
@@ -99,7 +99,7 @@ public class EditorActivity extends AbstractResourceActivity<IFile> {
 
   @Override
   public String toString() {
-    return "EditorActivity(type: " + type + ", path: " + getResource() + ")";
+    return "EditorActivity(type: " + type + ", file: " + getResource() + ")";
   }
 
   @Override

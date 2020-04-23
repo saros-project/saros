@@ -21,8 +21,8 @@ public class TargetedFileActivity extends FileActivity implements ITargetedActiv
    *     {@link Type#MOVED}), file to remove (if {@link Type#REMOVED}); never <code>null</code>
    * @param oldFile if type is {@link Type#MOVED}, the file handle representing from where the file
    *     was moved (<code>null</code> otherwise)
-   * @param content content of the file denoted by the path (only valid for {@link
-   *     FileActivity.Type#CREATED} and {@link FileActivity.Type#MOVED})
+   * @param content content of the file (only valid for {@link FileActivity.Type#CREATED} and {@link
+   *     FileActivity.Type#MOVED})
    * @param encoding the encoding the content is encoded with or <code>null</code>
    * @param purpose purpose of this FileActivity (see {@link FileActivity.Purpose} )
    */
@@ -59,9 +59,9 @@ public class TargetedFileActivity extends FileActivity implements ITargetedActiv
         + target
         + "purpose="
         + purpose
-        + ", dst:path="
+        + ", dst:file="
         + getResource()
-        + ", src:path="
+        + ", src:file="
         + (getOldResource() == null ? "N/A" : getOldResource())
         + ", type="
         + type

@@ -3,8 +3,8 @@ package saros.concurrent.watchdog;
 import saros.filesystem.IFile;
 
 /**
- * Represents a checksum of a document in the workspace. It consists of the document's
- * project-relative path, the content length and the content's string hash code.
+ * Represents a checksum of a document in the workspace. It consists of the document's file, the
+ * content length, and the content's string hash code.
  */
 public class DocumentChecksum {
 

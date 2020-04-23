@@ -101,27 +101,25 @@ public class ResourceTransportWrapperConverterTest {
     receiver.registerConverter(new ResourceTransportWrapperConverter(session, pathFactory));
 
     /* Test */
-    ResourceTransportWrapper<IFile> file =
-        new ResourceTransportWrapper<>(ResourceTransportWrapperConverterTest.file);
+    ResourceTransportWrapper<IFile> wrappedFile = new ResourceTransportWrapper<>(file);
 
     ResourceTransportWrapper<?> fileCopy1 =
-        (ResourceTransportWrapper<?>) receiver.fromXML(sender.toXML(file));
-    assertEquals(file, fileCopy1);
+        (ResourceTransportWrapper<?>) receiver.fromXML(sender.toXML(wrappedFile));
+    assertEquals(wrappedFile, fileCopy1);
 
     ResourceTransportWrapper<?> fileCopy2 =
-        (ResourceTransportWrapper<?>) receiver.fromXML(sender.toXML(file));
-    assertEquals(file, fileCopy2);
+        (ResourceTransportWrapper<?>) receiver.fromXML(sender.toXML(wrappedFile));
+    assertEquals(wrappedFile, fileCopy2);
 
-    ResourceTransportWrapper<IFolder> folder =
-        new ResourceTransportWrapper<>(ResourceTransportWrapperConverterTest.folder);
+    ResourceTransportWrapper<IFolder> wrappedFolder = new ResourceTransportWrapper<>(folder);
 
     ResourceTransportWrapper<?> folderCopy1 =
-        (ResourceTransportWrapper<?>) receiver.fromXML(sender.toXML(folder));
-    assertEquals(folder, folderCopy1);
+        (ResourceTransportWrapper<?>) receiver.fromXML(sender.toXML(wrappedFolder));
+    assertEquals(wrappedFolder, folderCopy1);
 
     ResourceTransportWrapper<?> folderCopy2 =
-        (ResourceTransportWrapper<?>) receiver.fromXML(sender.toXML(folder));
-    assertEquals(folder, folderCopy2);
+        (ResourceTransportWrapper<?>) receiver.fromXML(sender.toXML(wrappedFolder));
+    assertEquals(wrappedFolder, folderCopy2);
   }
 
   @Test
@@ -147,15 +145,14 @@ public class ResourceTransportWrapperConverterTest {
     receiver.registerConverter(new ResourceTransportWrapperConverter(receiverSession, pathFactory));
 
     /* Test */
-    ResourceTransportWrapper<IFile> file =
-        new ResourceTransportWrapper<>(ResourceTransportWrapperConverterTest.file);
+    ResourceTransportWrapper<IFile> wrappedFile = new ResourceTransportWrapper<>(file);
 
     // first call on running session on receiver side
-    receiver.fromXML(sender.toXML(file));
+    receiver.fromXML(sender.toXML(wrappedFile));
 
     // second call on non-functional session on receiver side
     ResourceTransportWrapper<?> copy2 =
-        (ResourceTransportWrapper<?>) receiver.fromXML(sender.toXML(file));
+        (ResourceTransportWrapper<?>) receiver.fromXML(sender.toXML(wrappedFile));
     assertNull(copy2);
   }
 

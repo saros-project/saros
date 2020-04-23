@@ -133,22 +133,22 @@ public class ActivityQueuerTest {
   }
 
   @Test
-  public void testQueuingEnabledWithActivityWithoutPath() {
+  public void testQueuingEnabledWithActivityWithoutFile() {
     activityQueuer.enableQueuing(NOT_SHARED_PROJECT);
 
     IActivity serializedEditorActivity =
         new EditorActivity(ALICE, EditorActivity.Type.ACTIVATED, null);
 
     /*
-     * does this make sense ? user opened file X (path != null), closed file
-     * X (path == null), opened file Y(path != null) result = X closed, X
+     * does this make sense ? user opened file X (file != null), closed file
+     * X (file == null), opened file Y(file != null) result = X closed, X
      * opened Y opened See EditorManager#partActivated
      */
 
     List<IActivity> processedActivities =
         activityQueuer.process(Collections.singletonList(serializedEditorActivity));
 
-    assertEquals("activities with null path must not be queued", 1, processedActivities.size());
+    assertEquals("activities with null file must not be queued", 1, processedActivities.size());
   }
 
   @Test

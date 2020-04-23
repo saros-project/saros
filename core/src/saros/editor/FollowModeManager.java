@@ -145,7 +145,7 @@ public class FollowModeManager implements Startable {
 
           switch (activity.getType()) {
             case ACTIVATED:
-              // path == null means there is no open editor left
+              // file == null means there is no open editor left
               if (file != null) {
                 // open editor, but don't change focus
                 editorManager.openEditor(file, false);

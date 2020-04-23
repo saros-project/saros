@@ -37,12 +37,12 @@ public class UndoTest {
     return new NoOperation();
   }
 
-  protected Operation undo(IFile path) {
-    return undoManager.calcUndoOperation(path);
+  protected Operation undo(IFile file) {
+    return undoManager.calcUndoOperation(file);
   }
 
-  protected Operation redo(IFile path) {
-    return undoManager.calcRedoOperation(path);
+  protected Operation redo(IFile file) {
+    return undoManager.calcRedoOperation(file);
   }
 
   @Test
@@ -77,7 +77,7 @@ public class UndoTest {
   }
 
   @Test
-  public void testMixedHistoryWithOnePath() {
+  public void testMixedHistoryWithOneFile() {
     // Text: 0123456789
     history.add(file1, Type.LOCAL, I(8, "first")); // 01234567first89
     history.add(file1, Type.REMOTE, I(2, "XXX")); // 01XXX234567first89
@@ -93,7 +93,7 @@ public class UndoTest {
   }
 
   @Test
-  public void testMixedHistoryWithTwoPaths() {
+  public void testMixedHistoryWithTwoFiles() {
     // Text: 0123456789
     history.add(file1, Type.LOCAL, I(8, "first")); // 01234567first89
     history.add(file1, Type.REMOTE, I(2, "XXX")); // 01XXX234567first89

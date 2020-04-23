@@ -133,7 +133,7 @@ public class UserEditorStateTest {
   }
 
   @Test
-  public void testMultiplePaths() {
+  public void testMultipleFiles() {
     activate(fileA);
     activate(fileB);
 

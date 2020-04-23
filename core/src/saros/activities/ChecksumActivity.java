@@ -10,8 +10,8 @@ import saros.session.User;
 /**
  * A ChecksumActivity is used to communicate checksums from the host to the clients.
  *
- * <p>A ChecksumActivity always relates to a certain file (given a path) and contains the hash and
- * length of the file.
+ * <p>A ChecksumActivity always relates to a certain file and contains the hash and length of the
+ * file.
  *
  * <p>To indicate that a file is missing on the host NON_EXISTING_DOC is used.
  *
@@ -62,7 +62,7 @@ public class ChecksumActivity extends AbstractResourceActivity<IFile> {
 
   @Override
   public String toString() {
-    return "ChecksumActivity(path: "
+    return "ChecksumActivity(file: "
         + getResource()
         + ", hash: "
         + hash

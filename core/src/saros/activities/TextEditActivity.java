@@ -244,7 +244,7 @@ public class TextEditActivity extends AbstractResourceActivity<IFile> {
         + replacedTextOffsetDelta
         + ", old: '"
         + oldText
-        + "', path: "
+        + "', file: "
         + getResource()
         + ", src: "
         + getSource()

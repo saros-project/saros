@@ -141,7 +141,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer implemen
    * Returns a copy of the set of files for which the ConsistencyWatchdog has identified an
    * inconsistency
    */
-  public Set<IFile> getPathsWithWrongChecksums() {
+  public Set<IFile> getFilesWithWrongChecksums() {
     return new HashSet<>(filesWithWrongChecksums);
   }
 
@@ -192,9 +192,9 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer implemen
     try {
       cancelRecovery.set(false);
 
-      final List<IFile> pathsOfHandledFiles = new ArrayList<>(filesWithWrongChecksums);
+      final List<IFile> handledFiles = new ArrayList<>(filesWithWrongChecksums);
 
-      monitor.beginTask("Consistency recovery", pathsOfHandledFiles.size());
+      monitor.beginTask("Consistency recovery", handledFiles.size());
 
       final IProgressMonitor remoteProgress =
           remoteProgressManager.createRemoteProgressMonitor(
@@ -202,7 +202,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer implemen
 
       recoveryID = getNextRecoveryID();
 
-      filesRemaining.set(pathsOfHandledFiles.size());
+      filesRemaining.set(handledFiles.size());
 
       remoteProgress.beginTask(
           "Consistency recovery for user "
@@ -211,10 +211,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer implemen
 
       fireActivity(
           new ChecksumErrorActivity(
-              currentSession.getLocalUser(),
-              currentSession.getHost(),
-              pathsOfHandledFiles,
-              recoveryID));
+              currentSession.getLocalUser(), currentSession.getHost(), handledFiles, recoveryID));
 
       try {
         // block until all inconsistencies are resolved

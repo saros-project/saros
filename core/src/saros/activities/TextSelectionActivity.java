@@ -52,12 +52,12 @@ public class TextSelectionActivity extends AbstractResourceActivity<IFile> {
    * @param source the user that created the selection
    * @param selection the text selection
    * @param file the file the text was selected in
-   * @throws IllegalArgumentException if the source or path is <code>null</code>
+   * @throws IllegalArgumentException if the source or file is <code>null</code>
    */
   public TextSelectionActivity(User source, TextSelection selection, IFile file) {
     super(source, file);
 
-    if (file == null) throw new IllegalArgumentException("path must not be null");
+    if (file == null) throw new IllegalArgumentException("file must not be null");
 
     TextPosition startPosition = selection.getStartPosition();
     this.startLine = startPosition.getLineNumber();
@@ -116,7 +116,7 @@ public class TextSelectionActivity extends AbstractResourceActivity<IFile> {
         + endInLineOffset
         + ", src: "
         + getSource()
-        + ", path: "
+        + ", file: "
         + getResource()
         + ")";
   }
