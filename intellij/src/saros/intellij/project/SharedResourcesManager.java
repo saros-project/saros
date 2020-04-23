@@ -226,7 +226,7 @@ public class SharedResourcesManager implements Startable {
     try {
       setFilesystemModificationHandlerEnabled(false);
 
-      localEditorHandler.saveDocument(new SPath(oldFile));
+      localEditorHandler.saveDocument(oldFile);
 
       byte[] activityContent = activity.getContent();
 
@@ -283,7 +283,7 @@ public class SharedResourcesManager implements Startable {
     try {
       setFilesystemModificationHandlerEnabled(false);
 
-      localEditorHandler.saveDocument(new SPath(file));
+      localEditorHandler.saveDocument(file);
 
       file.delete();
 

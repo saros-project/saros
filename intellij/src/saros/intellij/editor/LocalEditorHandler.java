@@ -7,10 +7,8 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import saros.activities.SPath;
 import saros.filesystem.IFile;
 import saros.filesystem.IProject;
-import saros.filesystem.IResource;
 import saros.intellij.filesystem.IntelliJProjectImpl;
 import saros.intellij.filesystem.VirtualFileConverter;
 import saros.session.ISarosSession;
@@ -43,7 +41,7 @@ public class LocalEditorHandler {
    * <p><b>Note:</b> This only works for shared resources.
    *
    * @param project the project in which to open the editor
-   * @param virtualFile path of the file to open
+   * @param virtualFile the file to open
    * @param activate activate editor after opening
    * @return the opened <code>Editor</code> or <code>null</code> if the given file does not belong
    *     to a shared module
@@ -52,9 +50,9 @@ public class LocalEditorHandler {
   public Editor openEditor(
       @NotNull Project project, @NotNull VirtualFile virtualFile, boolean activate) {
 
-    SPath path = VirtualFileConverter.convertToSPath(project, virtualFile);
+    IFile file = (IFile) VirtualFileConverter.convertToResource(project, virtualFile);
 
-    if (path == null || !sarosSession.isShared(path.getResource())) {
+    if (file == null || !sarosSession.isShared(file)) {
       log.debug(
           "Ignored open editor request for file "
               + virtualFile
@@ -63,7 +61,7 @@ public class LocalEditorHandler {
       return null;
     }
 
-    return openEditor(virtualFile, path, activate);
+    return openEditor(virtualFile, file, activate);
   }
 
   /**
@@ -74,7 +72,7 @@ public class LocalEditorHandler {
    *
    * <p><b>Note:</b> This only works for shared resources that belong to the given module.
    *
-   * @param virtualFile path of the file to open
+   * @param virtualFile the file to open
    * @param project module the file belongs to
    * @param activate activate editor after opening
    * @return the opened <code>Editor</code> or <code>null</code> if the given file does not belong
@@ -84,9 +82,9 @@ public class LocalEditorHandler {
   public Editor openEditor(
       @NotNull VirtualFile virtualFile, @NotNull IProject project, boolean activate) {
 
-    IResource resource = VirtualFileConverter.convertToResource(virtualFile, project);
+    IFile file = (IFile) VirtualFileConverter.convertToResource(virtualFile, project);
 
-    if (resource == null || !sarosSession.isShared(resource)) {
+    if (file == null || !sarosSession.isShared(file)) {
       log.debug(
           "Could not open Editor for file "
               + virtualFile
@@ -96,7 +94,7 @@ public class LocalEditorHandler {
       return null;
     }
 
-    return openEditor(virtualFile, new SPath(resource), activate);
+    return openEditor(virtualFile, file, activate);
   }
 
   /**
@@ -107,31 +105,31 @@ public class LocalEditorHandler {
    *
    * <p><b>Note:</b> This only works for shared resources.
    *
-   * <p><b>Note:</b> This method expects the VirtualFile and the SPath to point to the same
+   * <p><b>Note:</b> This method expects the VirtualFile and the IFile to point to the same
    * resource.
    *
-   * @param virtualFile path of the file to open
-   * @param path saros resource representation of the file
+   * @param virtualFile the file to open
+   * @param file saros resource representation of the file
    * @param activate activate editor after opening
    * @return the opened <code>Editor</code> or <code>null</code> if the given file does not exist or
    *     does not belong to a shared module or can not be represented by a text editor
    */
   @Nullable
   private Editor openEditor(
-      @NotNull VirtualFile virtualFile, @NotNull SPath path, boolean activate) {
+      @NotNull VirtualFile virtualFile, @NotNull IFile file, boolean activate) {
 
     if (!virtualFile.exists()) {
       log.debug("Could not open Editor for file " + virtualFile + " as it does not exist");
 
       return null;
 
-    } else if (!sarosSession.isShared(path.getResource())) {
+    } else if (!sarosSession.isShared(file)) {
       log.debug("Ignored open editor request for file " + virtualFile + " as it is not shared");
 
       return null;
     }
 
-    Project project = path.getProject().adaptTo(IntelliJProjectImpl.class).getModule().getProject();
+    Project project = file.getProject().adaptTo(IntelliJProjectImpl.class).getModule().getProject();
 
     Editor editor = ProjectAPI.openEditor(project, virtualFile, activate);
 
@@ -141,7 +139,7 @@ public class LocalEditorHandler {
       return null;
     }
 
-    editorPool.add(path.getFile(), editor);
+    editorPool.add(file, editor);
     manager.startEditor(editor);
 
     log.debug("Opened Editor " + editor + " for file " + virtualFile);
@@ -169,18 +167,17 @@ public class LocalEditorHandler {
   }
 
   /**
-   * Saves the document under path, thereby flushing its contents to disk.
+   * Saves the document for the file, thereby flushing its contents to disk.
    *
-   * <p>Does nothing if there is no unsaved document content for the given resource. This is the
-   * case if the resource document has not been modified or the resource can not be opened as a
-   * document.
+   * <p>Does nothing if there is no unsaved document content for the given file. This is the case if
+   * the document has not been modified or the file can not be opened as a document.
    *
-   * @param path the path for the document to save
+   * @param file the file for the document to save
    * @see Document
    */
-  public void saveDocument(@NotNull SPath path) {
+  public void saveDocument(@NotNull IFile file) {
 
-    Document document = editorPool.getDocument(path.getFile());
+    Document document = editorPool.getDocument(file);
 
     if (document != null) {
       if (DocumentAPI.hasUnsavedChanges(document)) {
@@ -191,22 +188,23 @@ public class LocalEditorHandler {
       return;
     }
 
-    VirtualFile file = VirtualFileConverter.convertToVirtualFile(path);
+    VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(file);
 
-    if (file == null || !file.exists()) {
-      log.warn("Failed to save document for " + path + " - could not get a valid VirtualFile");
+    if (virtualFile == null || !virtualFile.exists()) {
+      log.warn("Failed to save document for " + file + " - could not get a valid VirtualFile");
 
       return;
     }
 
-    if (!DocumentAPI.hasUnsavedChanges(file)) {
+    if (!DocumentAPI.hasUnsavedChanges(virtualFile)) {
       return;
     }
 
-    document = DocumentAPI.getDocument(file);
+    document = DocumentAPI.getDocument(virtualFile);
 
     if (document == null) {
-      log.warn("Failed to save document for " + file + " - could not get a matching Document");
+      log.warn(
+          "Failed to save document for " + virtualFile + " - could not get a matching Document");
 
       return;
     }
@@ -241,7 +239,7 @@ public class LocalEditorHandler {
   }
 
   /**
-   * Generates an editor save activity for the given path.
+   * Generates an editor save activity for the given file.
    *
    * @param file the file to generate an editor saved activity for
    * @see EditorManager#generateEditorSaved(IFile)
