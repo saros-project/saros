@@ -6,9 +6,7 @@ import saros.concurrent.jupiter.Algorithm;
 import saros.concurrent.jupiter.Operation;
 import saros.concurrent.jupiter.TransformationException;
 import saros.concurrent.jupiter.internal.Jupiter;
-import saros.filesystem.IFile;
 import saros.session.User;
-import saros.test.mocks.SarosMocks;
 
 /**
  * This proxy class on server represent the server side of the two-way jupiter protocol.
@@ -23,14 +21,10 @@ public class ProxySynchronizedQueue {
   private NetworkSimulator connection;
   private User user;
 
-  private final IFile fileMock;
-
   public ProxySynchronizedQueue(User user, NetworkSimulator connection) {
     this.user = user;
     this.algorithm = new Jupiter(false);
     this.connection = connection;
-
-    this.fileMock = SarosMocks.mockFile();
   }
 
   public User getUser() {
@@ -52,7 +46,7 @@ public class ProxySynchronizedQueue {
   }
 
   public void sendOperation(Operation op) {
-    JupiterActivity jupiterActivity = algorithm.generateJupiterActivity(op, this.user, fileMock);
+    JupiterActivity jupiterActivity = algorithm.generateJupiterActivity(op, this.user, null);
     connection.sendOperation(new NetworkRequest(jupiterActivity, user, -1));
   }
 

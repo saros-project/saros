@@ -2,9 +2,9 @@ package saros.concurrent.jupiter.test.util;
 
 import java.util.HashMap;
 import java.util.PriorityQueue;
+import org.easymock.EasyMock;
 import saros.filesystem.IFile;
 import saros.session.User;
-import saros.test.mocks.SarosMocks;
 
 /**
  * This class simulates a network.
@@ -22,7 +22,7 @@ public class NetworkSimulator {
   protected int presentTime = -1;
 
   public NetworkSimulator() {
-    file = SarosMocks.mockFile();
+    file = EasyMock.createNiceMock(IFile.class);
 
     clients = new HashMap<User, NetworkEventHandler>();
   }
