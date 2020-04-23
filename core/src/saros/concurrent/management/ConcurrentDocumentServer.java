@@ -10,7 +10,6 @@ import saros.activities.ChecksumActivity;
 import saros.activities.IActivity;
 import saros.activities.JupiterActivity;
 import saros.activities.QueueItem;
-import saros.activities.SPath;
 import saros.concurrent.jupiter.TransformationException;
 import saros.filesystem.IFile;
 import saros.repackaged.picocontainer.Startable;
@@ -161,7 +160,7 @@ public class ConcurrentDocumentServer implements Startable {
   /**
    * Resets the JupiterServer for the given combination and path and user.
    *
-   * <p>When this is called on the host, a call to {@link ConcurrentDocumentClient#reset(SPath)}
+   * <p>When this is called on the host, a call to {@link ConcurrentDocumentClient#reset(IFile)}
    * should be executed at the same time on the side of the given user.
    *
    * @host
