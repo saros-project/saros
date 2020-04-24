@@ -7,16 +7,6 @@ public class EclipseProjectImpl extends EclipseContainerImpl implements IProject
   }
 
   @Override
-  public IResource findMember(IPath path) {
-    org.eclipse.core.resources.IResource resource =
-        getDelegate().findMember(((EclipsePathImpl) path).getDelegate());
-
-    if (resource == null) return null;
-
-    return ResourceAdapterFactory.create(resource);
-  }
-
-  @Override
   public IFile getFile(String name) {
     return new EclipseFileImpl(getDelegate().getFile(name));
   }

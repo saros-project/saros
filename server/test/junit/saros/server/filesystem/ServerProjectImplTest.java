@@ -2,10 +2,6 @@ package saros.server.filesystem;
 
 import static org.easymock.EasyMock.expect;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static saros.server.filesystem.FileSystemTestUtils.createFile;
-import static saros.server.filesystem.FileSystemTestUtils.createFolder;
 import static saros.server.filesystem.FileSystemTestUtils.createWorkspaceFolder;
 import static saros.server.filesystem.FileSystemTestUtils.path;
 
@@ -48,26 +44,6 @@ public class ServerProjectImplTest extends EasyMockSupport {
   @Test
   public void defaultCharsetUTF8() throws Exception {
     assertEquals("UTF-8", project.getDefaultCharset());
-  }
-
-  @Test
-  public void findMember() throws Exception {
-    createFolder(workspace, "project");
-    createFolder(workspace, "project/folder");
-    createFile(workspace, "project/folder/file");
-
-    IResource folder = project.findMember(path("folder"));
-    IResource file = project.findMember(path("folder/file"));
-    IResource nonExistent = project.findMember(path("non/existent"));
-
-    assertEquals(IResource.Type.FOLDER, folder.getType());
-    assertEquals(IResource.Type.FILE, file.getType());
-    assertNull(nonExistent);
-  }
-
-  @Test
-  public void findMemberAtEmptyPath() throws Exception {
-    assertSame(project, project.findMember(path("")));
   }
 
   @Test

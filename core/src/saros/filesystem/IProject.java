@@ -26,9 +26,6 @@ package saros.filesystem;
  * mentioned otherwise all offered methods are equivalent to their Eclipse counterpart.
  */
 public interface IProject extends IContainer {
-
-  public IResource findMember(IPath path);
-
   public IFile getFile(String name);
 
   public IFile getFile(IPath path);

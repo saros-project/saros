@@ -2,14 +2,12 @@ package saros.server.filesystem;
 
 import static saros.filesystem.IResource.Type.PROJECT;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
 import saros.filesystem.IPath;
 import saros.filesystem.IProject;
-import saros.filesystem.IResource;
 import saros.filesystem.IWorkspace;
 
 /** Server implementation of the {@link IProject} interface. */
@@ -36,24 +34,6 @@ public class ServerProjectImpl extends ServerContainerImpl implements IProject {
   public String getDefaultCharset() {
     // TODO: Read default character set from the project metadata files.
     return DEFAULT_CHARSET;
-  }
-
-  @Override
-  public IResource findMember(IPath path) {
-    if (path.segmentCount() == 0) {
-      return this;
-    }
-
-    IPath memberLocation = getLocation().append(path);
-    File memberFile = memberLocation.toFile();
-
-    if (memberFile.isFile()) {
-      return new ServerFileImpl(getWorkspace(), getFullMemberPath(path));
-    } else if (memberFile.isDirectory()) {
-      return new ServerFolderImpl(getWorkspace(), getFullMemberPath(path));
-    } else {
-      return null;
-    }
   }
 
   @Override
