@@ -1,3 +1,7 @@
+plugins {
+    id 'org.gradle.test-retry' version '1.1.5'
+}
+
 sarosEclipse {
   manifest = file('META-INF/MANIFEST.MF')
   excludeManifestDependencies = ['org.junit', 'saros.eclipse', 'saros.core']
@@ -59,6 +63,12 @@ task stfTest (type: StfTest, dependsOn: [':saros.eclipse:build']) {
 
     useJUnit {
         excludeCategories 'saros.stf.test.categories.FlakyTests'
+    }
+
+    retry {
+        failOnPassedAfterRetry = false
+        maxFailures = 10
+        maxRetries = 3
     }
 }
 
