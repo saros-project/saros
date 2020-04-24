@@ -83,8 +83,8 @@ The only differences and additional conventions are:
 * A test suite classes must contain  `TestSuite`.</br>
 * Every test class that is used for White-Box testing must be declared in the same package.</br>
   e.g. `foo.bar.HelloWorld` -> `foo.bar.HelloWorldTest`
-* STF test cases must be put in any subpackage of `de.fu_berlin.inf.dpp.stf.test`.</br>
-  e.g `de.fu_berlin.inf.dpp.stf.test.account.AccountPreferencePageTest`
+* STF test cases must be put in any subpackage of `saros.stf.test`.</br>
+  e.g `saros.stf.test.account.AccountPreferencePageTest`
 
 ### Structure
 
