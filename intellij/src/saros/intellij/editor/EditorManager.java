@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,9 +26,6 @@ import saros.activities.SPath;
 import saros.activities.TextEditActivity;
 import saros.activities.TextSelectionActivity;
 import saros.activities.ViewportActivity;
-import saros.concurrent.jupiter.Operation;
-import saros.concurrent.jupiter.internal.text.DeleteOperation;
-import saros.concurrent.jupiter.internal.text.InsertOperation;
 import saros.editor.IEditorManager;
 import saros.editor.ISharedEditorListener;
 import saros.editor.SharedEditorListenerDispatch;
@@ -123,109 +121,191 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           }
         }
 
-        private void execTextEdit(TextEditActivity editorActivity) {
-
-          SPath path = editorActivity.getPath();
+        private void execTextEdit(TextEditActivity textEditActivity) {
+          SPath path = textEditActivity.getPath();
 
           if (path == null) {
             return;
           }
 
-          log.debug(path + " text edit activity received " + editorActivity);
+          log.debug(path + " text edit activity received " + textEditActivity);
 
-          User user = editorActivity.getSource();
-
-          Operation operation = editorActivity.toOperation();
-
-          Editor calculationEditor = editorPool.getEditor(path);
+          Editor calculationEditor = getCalculationEditor(path);
 
           if (calculationEditor == null) {
+            log.warn(
+                "Could not apply text edit "
+                    + textEditActivity
+                    + " as no editor could be obtained for resource "
+                    + path);
 
-            VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(path);
-
-            if (virtualFile == null) {
-              log.warn(
-                  "Could not apply selection "
-                      + editorActivity
-                      + " as no virtual file could be obtained for resource "
-                      + path);
-
-              return;
-            }
-
-            Document document = DocumentAPI.getDocument(virtualFile);
-
-            if (document == null) {
-              log.warn(
-                  "Could not apply selection "
-                      + editorActivity
-                      + " as no document could be obtained for resource "
-                      + virtualFile);
-
-              return;
-            }
-
-            calculationEditor = backgroundEditorPool.getBackgroundEditor(path, document);
+            return;
           }
 
-          localEditorManipulator.applyTextOperations(path, operation, calculationEditor);
+          /*
+           * Intellij internally always uses UNIX line separators for editor content
+           * -> no line ending denormalization necessary as normalized format matches editor format
+           */
+          String replacedText = textEditActivity.getReplacedText();
+          String newText = textEditActivity.getNewText();
+
+          int start =
+              EditorAPI.calculateOffset(calculationEditor, textEditActivity.getStartPosition());
+
+          int oldEnd = start + replacedText.length();
+          int newEnd = start + newText.length();
+
+          Document document = calculationEditor.getDocument();
+
+          applyTextEdit(path, document, start, oldEnd, replacedText, newText);
+
+          User user = textEditActivity.getSource();
 
           adjustAnnotationsAfterEdit(
-              user, path.getFile(), editorPool.getEditor(path), operation, calculationEditor);
+              user, path.getFile(), editorPool.getEditor(path), start, oldEnd, newEnd);
 
-          editorListenerDispatch.textEdited(editorActivity);
+          editorListenerDispatch.textEdited(textEditActivity);
         }
 
         /**
-         * Adjusts the currently present notifications.
+         * Obtains an editor for the given resource.
          *
-         * <p>
+         * <p>This editor might be a background editor and must therefore only be used for
+         * calculation purposes.
          *
-         * <p>If the given operation is an <code>InsertOperation</code>, a <code>
-         * ContributionAnnotation</code> is added for the inserted text and all existing annotations
-         * for the file are adjusted through {@link
-         * AnnotationManager#moveAnnotationsAfterAddition(IFile, int, int)}.
+         * @param path the path to obtain an editor for
+         * @return returns a valid editor for the given resource or <code>null</code> if no such
+         *     editor could be obtained
+         * @see BackgroundEditorPool
+         */
+        private Editor getCalculationEditor(@NotNull SPath path) {
+          Editor calculationEditor = editorPool.getEditor(path);
+
+          if (calculationEditor != null) {
+            return calculationEditor;
+          }
+
+          VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(path);
+
+          if (virtualFile == null) {
+            log.warn(
+                "Could not create an editor instance for "
+                    + path
+                    + " as no virtual file could be obtained for the resource.");
+
+            return null;
+          }
+
+          Document document = DocumentAPI.getDocument(virtualFile);
+
+          if (document == null) {
+            log.warn(
+                "Could not create an editor instance for "
+                    + virtualFile
+                    + " as no document could be obtained for the file.");
+
+            return null;
+          }
+
+          return backgroundEditorPool.getBackgroundEditor(path, document);
+        }
+
+        /**
+         * Applies the text edit represented by the given values to the given document.
          *
-         * <p>If the given operation is a <code>DeleteOperation</code>, all existing annotations for
-         * the file are adjusted through {@link
-         * AnnotationManager#moveAnnotationsAfterDeletion(IFile, int, int)}.
+         * @param path the resource whose document to modify
+         * @param document the document to modify
+         * @param start the start offset for the modification
+         * @param oldEnd the end offset of the replaced text
+         * @param replacedText the text replaced in the document
+         * @param newText the new text inserted into the document
+         */
+        private void applyTextEdit(
+            @NotNull SPath path,
+            @NotNull Document document,
+            int start,
+            int oldEnd,
+            @NotNull String replacedText,
+            @NotNull String newText) {
+
+          Project project =
+              path.getProject().adaptTo(IntelliJProjectImpl.class).getModule().getProject();
+
+          if (!replacedText.isEmpty()) {
+            String documentReplacedText = document.getText(new TextRange(start, oldEnd));
+
+            if (!replacedText.equals(documentReplacedText)) {
+              log.error(
+                  "Text to be replaced for "
+                      + path
+                      + " from offset "
+                      + start
+                      + " to "
+                      + oldEnd
+                      + " does not match the given replaced text. Should be '"
+                      + StringEscapeUtils.escapeJava(replacedText)
+                      + "', but is '"
+                      + StringEscapeUtils.escapeJava(documentReplacedText)
+                      + "'.");
+            }
+          }
+
+          try {
+            /*
+             * Disable documentListener temporarily to avoid being notified of
+             * the change
+             */
+            setLocalDocumentModificationHandlersEnabled(false);
+
+            boolean writePermission = document.isWritable();
+
+            if (!writePermission) {
+              document.setReadOnly(false);
+            }
+
+            DocumentAPI.replaceText(project, document, start, oldEnd, newText);
+
+            if (!writePermission) {
+              document.setReadOnly(true);
+            }
+
+          } finally {
+            setLocalDocumentModificationHandlersEnabled(true);
+          }
+        }
+
+        /**
+         * Adjusts all current annotations for the given file according to the given text edit
+         * offsets. Adds a contribution annotation if the text edit added new text.
          *
-         * @param user the user for the given operation
-         * @param file the file for the given operation
-         * @param editor the editor for the given file
-         * @param operations the received operation
-         * @param calculationEditor an editor for the file; this might be a background editor (see
-         *     {@link BackgroundEditorPool}), so it must not be used for annotation purposes
+         * @param user the user that caused the text edit
+         * @param file the file that was modified
+         * @param editor the editor for the file
+         * @param start the start offset of the text edit
+         * @param oldEnd the end offset of the replaced text
+         * @param newEnd the end offset of the new text
+         * @see AnnotationManager#moveAnnotationsAfterDeletion(IFile, int, int)
+         * @see AnnotationManager#moveAnnotationsAfterAddition(IFile, int, int)
          */
         private void adjustAnnotationsAfterEdit(
             @NotNull User user,
             @NotNull IFile file,
             @Nullable Editor editor,
-            @NotNull Operation operations,
-            @NotNull Editor calculationEditor) {
+            int start,
+            int oldEnd,
+            int newEnd) {
 
-          operations
-              .getTextOperations()
-              .forEach(
-                  textOperation -> {
-                    TextPosition startPosition = textOperation.getStartPosition();
-                    TextPosition endPosition = textOperation.getEndPosition();
+          if (oldEnd != start && editor == null) {
+            annotationManager.moveAnnotationsAfterDeletion(file, start, oldEnd);
+          }
 
-                    int start = EditorAPI.calculateOffset(calculationEditor, startPosition);
-                    int end = EditorAPI.calculateOffset(calculationEditor, endPosition);
+          if (newEnd != start) {
+            if (editor == null) {
+              annotationManager.moveAnnotationsAfterAddition(file, start, newEnd);
+            }
 
-                    if (textOperation instanceof InsertOperation) {
-                      if (editor == null) {
-                        annotationManager.moveAnnotationsAfterAddition(file, start, end);
-                      }
-
-                      annotationManager.addContributionAnnotation(user, file, start, end, editor);
-
-                    } else if (textOperation instanceof DeleteOperation && editor == null) {
-
-                      annotationManager.moveAnnotationsAfterDeletion(file, start, end);
-                    }
-                  });
+            annotationManager.addContributionAnnotation(user, file, start, newEnd, editor);
+          }
         }
 
         private void execTextSelection(TextSelectionActivity selection) {

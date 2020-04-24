@@ -91,35 +91,43 @@ public class DocumentAPI {
   }
 
   /**
-   * Inserts the specified text at the specified offset in the document. Line breaks in the inserted
-   * text must be normalized as '\n'.
+   * Replaces the specified range of text in the given document with the given text. Line breaks in
+   * the given text must be normalized as '\n'.
    *
-   * <p>The insertion will be wrapped in a command processor action. The action will be assigned to
-   * the passed project. This means the action will be registered with the undo-buffer of the given
-   * project.
+   * <p>The replacement will be wrapped in a command processor action. The action will be assigned
+   * to the passed project. This means the action will be registered with the undo-buffer of the
+   * given project.
    *
-   * @param project the project to assign the resulting insertion action to
-   * @param document the document to insert the text into
-   * @param offset the offset to insert the text at
-   * @param text the text to insert
-   * @see Document#insertString(int, CharSequence)
+   * @param project the project to assign the resulting deletion action to
+   * @param document the document to delete text from
+   * @param startOffset the start offset of the range to replace
+   * @param endOffset the end offset of the range to replace
+   * @param text the text to replace the current text with
+   * @see Document#replaceString(int, int, CharSequence)
    * @see CommandProcessor
    */
-  static void insertText(
+  static void replaceText(
       @NotNull Project project,
-      @NotNull final Document document,
-      final int offset,
-      final String text) {
-
+      @NotNull Document document,
+      int startOffset,
+      int endOffset,
+      @NotNull String text) {
     Runnable insertCommand =
         () -> {
-          Runnable insertString = () -> document.insertString(offset, text);
+          Runnable replaceText = () -> document.replaceString(startOffset, endOffset, text);
 
-          String commandName = "Saros text insertion at index " + offset + " of \"" + text + "\"";
+          String commandName =
+              "Saros text replacement from index "
+                  + startOffset
+                  + " to "
+                  + endOffset
+                  + " with \""
+                  + text
+                  + "\"";
 
           commandProcessor.executeCommand(
               project,
-              insertString,
+              replaceText,
               commandName,
               commandProcessor.getCurrentCommandGroupId(),
               UndoConfirmationPolicy.REQUEST_CONFIRMATION,
@@ -127,40 +135,5 @@ public class DocumentAPI {
         };
 
     FilesystemRunner.runWriteAction(insertCommand, ModalityState.defaultModalityState());
-  }
-
-  /**
-   * Deletes the specified range of text from the given document.
-   *
-   * <p>The deletion will be wrapped in a command processor action. The action will be assigned to
-   * the passed project. This means the action will be registered with the undo-buffer of the given
-   * project.
-   *
-   * @param project the project to assign the resulting deletion action to
-   * @param document the document to delete text from
-   * @param start the start offset of the range to delete
-   * @param end the end offset of the range to delete
-   * @see Document#deleteString(int, int)
-   * @see CommandProcessor
-   */
-  static void deleteText(
-      @NotNull Project project, @NotNull final Document document, final int start, final int end) {
-
-    Runnable deletionCommand =
-        () -> {
-          Runnable deleteRange = () -> document.deleteString(start, end);
-
-          String commandName = "Saros text deletion from index " + start + " to " + end;
-
-          commandProcessor.executeCommand(
-              project,
-              deleteRange,
-              commandName,
-              commandProcessor.getCurrentCommandGroupId(),
-              UndoConfirmationPolicy.REQUEST_CONFIRMATION,
-              false);
-        };
-
-    FilesystemRunner.runWriteAction(deletionCommand, ModalityState.defaultModalityState());
   }
 }

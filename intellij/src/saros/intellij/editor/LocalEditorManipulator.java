@@ -10,9 +10,6 @@ import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import saros.activities.SPath;
-import saros.concurrent.jupiter.Operation;
-import saros.concurrent.jupiter.internal.text.DeleteOperation;
-import saros.concurrent.jupiter.internal.text.ITextOperation;
 import saros.editor.IEditorManager;
 import saros.editor.text.LineRange;
 import saros.editor.text.TextSelection;
@@ -129,60 +126,6 @@ public class LocalEditorManipulator {
     }
 
     log.debug("Closed editor for file " + virtualFile);
-  }
-
-  /**
-   * Applies the text operations to the document for the given path and adds matching contribution
-   * annotations if necessary.
-   *
-   * @param path the path of the file whose document should be modified
-   * @param operations the operations to apply to the document
-   * @param calculationEditor an editor for the file; this might be a background editor (see {@link
-   *     BackgroundEditorPool})
-   */
-  void applyTextOperations(
-      @NotNull SPath path, @NotNull Operation operations, @NotNull Editor calculationEditor) {
-
-    Project project = path.getProject().adaptTo(IntelliJProjectImpl.class).getModule().getProject();
-
-    Document doc = calculationEditor.getDocument();
-
-    try {
-      /*
-       * Disable documentListener temporarily to avoid being notified of
-       * the change
-       */
-      manager.setLocalDocumentModificationHandlersEnabled(false);
-
-      for (ITextOperation op : operations.getTextOperations()) {
-        int start = EditorAPI.calculateOffset(calculationEditor, op.getStartPosition());
-        int end = EditorAPI.calculateOffset(calculationEditor, op.getEndPosition());
-
-        /*
-         * Intellij internally always uses UNIX line separators for editor content
-         * -> no line ending denormalization necessary as normalized format matches editor format
-         */
-        if (op instanceof DeleteOperation) {
-          DocumentAPI.deleteText(project, doc, start, end);
-
-        } else {
-          boolean writePermission = doc.isWritable();
-
-          if (!writePermission) {
-            doc.setReadOnly(false);
-          }
-
-          DocumentAPI.insertText(project, doc, start, op.getText());
-
-          if (!writePermission) {
-            doc.setReadOnly(true);
-          }
-        }
-      }
-
-    } finally {
-      manager.setLocalDocumentModificationHandlersEnabled(true);
-    }
   }
 
   /**
@@ -343,8 +286,7 @@ public class LocalEditorManipulator {
         manager.setLocalDocumentModificationHandlersEnabled(false);
       }
 
-      DocumentAPI.deleteText(project, document, 0, documentLength);
-      DocumentAPI.insertText(project, document, 0, text);
+      DocumentAPI.replaceText(project, document, 0, documentLength, text);
 
     } finally {
 
