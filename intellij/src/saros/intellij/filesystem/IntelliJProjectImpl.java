@@ -243,18 +243,6 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
     return IntelliJPathImpl.fromString(getModuleContentRoot(module).getPath());
   }
 
-  @Nullable
-  @Override
-  public IResource findMember(final IPath path) {
-    final VirtualFile file = findVirtualFile(path);
-
-    if (file == null) return null;
-
-    return file.isDirectory()
-        ? new IntelliJFolderImpl(this, path)
-        : new IntelliJFileImpl(this, path);
-  }
-
   @NotNull
   @Override
   public IFile getFile(final String name) {
