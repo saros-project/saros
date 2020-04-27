@@ -14,16 +14,17 @@ public class ServerPathFactoryImpl implements IPathFactory {
   }
 
   @Override
-  public IPath fromString(String name) {
+  public IPath fromString(String pathString) {
 
-    if (name == null) throw new NullPointerException("name is null");
+    if (pathString == null) throw new NullPointerException("given string is null");
 
-    return checkRelative(ServerPathImpl.fromString(name));
+    return checkRelative(ServerPathImpl.fromString(pathString));
   }
 
   private IPath checkRelative(IPath path) {
 
-    if (path.isAbsolute()) throw new IllegalArgumentException("path is absolute: " + path);
+    if (path.isAbsolute())
+      throw new IllegalArgumentException("given string represents an absolute path: " + path);
 
     return path;
   }

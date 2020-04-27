@@ -18,16 +18,16 @@ public class PathFactory implements IPathFactory {
   }
 
   @Override
-  public IPath fromString(String name) {
-    if (name == null) {
+  public IPath fromString(String pathString) {
+    if (pathString == null) {
       throw new NullPointerException("Given string must not be null.");
     }
 
-    IPath path = IntelliJPathImpl.fromString(name);
+    IPath path = IntelliJPathImpl.fromString(pathString);
 
     if (path.isAbsolute()) {
       throw new IllegalArgumentException(
-          "The given string must not be represent an absolute path. " + "path: " + path);
+          "The given string must not represent an absolute path! - path: " + path);
     }
 
     return path;

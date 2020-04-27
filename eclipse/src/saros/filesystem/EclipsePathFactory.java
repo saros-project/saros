@@ -14,13 +14,13 @@ public class EclipsePathFactory implements IPathFactory {
   }
 
   @Override
-  public IPath fromString(String name) {
-    if (name == null) throw new NullPointerException("name is null");
+  public IPath fromString(String pathString) {
+    if (pathString == null) throw new NullPointerException("Given string is null");
 
-    Path path = new Path(name);
+    Path path = new Path(pathString);
 
     if (path.isAbsolute())
-      throw new IllegalArgumentException("name denotes an absolute path: " + name);
+      throw new IllegalArgumentException("Given string denotes an absolute path: " + pathString);
 
     return ResourceAdapterFactory.create(path);
   }
