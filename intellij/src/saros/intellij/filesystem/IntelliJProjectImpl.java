@@ -245,8 +245,8 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
 
   @NotNull
   @Override
-  public IFile getFile(final String name) {
-    return getFile(IntelliJPathImpl.fromString(name));
+  public IFile getFile(final String pathString) {
+    return getFile(IntelliJPathImpl.fromString(pathString));
   }
 
   @NotNull
@@ -279,8 +279,8 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
 
   @NotNull
   @Override
-  public IFolder getFolder(final String name) {
-    return getFolder(IntelliJPathImpl.fromString(name));
+  public IFolder getFolder(final String pathString) {
+    return getFolder(IntelliJPathImpl.fromString(pathString));
   }
 
   @NotNull
