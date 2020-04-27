@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.io.FileUtils;
 import saros.filesystem.IContainer;
+import saros.filesystem.IFile;
+import saros.filesystem.IFolder;
 import saros.filesystem.IPath;
 import saros.filesystem.IResource;
 import saros.filesystem.IWorkspace;
@@ -55,6 +57,30 @@ public abstract class ServerContainerImpl extends ServerResourceImpl implements 
     }
 
     return members.toArray(new IResource[members.size()]);
+  }
+
+  @Override
+  public IFile getFile(IPath path) {
+    return new ServerFileImpl(getWorkspace(), getFullMemberPath(path));
+  }
+
+  @Override
+  public IFile getFile(String pathString) {
+    return getFile(ServerPathImpl.fromString(pathString));
+  }
+
+  @Override
+  public IFolder getFolder(IPath path) {
+    return new ServerFolderImpl(getWorkspace(), getFullMemberPath(path));
+  }
+
+  @Override
+  public IFolder getFolder(String pathString) {
+    return getFolder(ServerPathImpl.fromString(pathString));
+  }
+
+  private IPath getFullMemberPath(IPath memberPath) {
+    return getFullPath().append(memberPath);
   }
 
   @Override

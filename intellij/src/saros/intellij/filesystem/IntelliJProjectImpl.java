@@ -243,6 +243,7 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
     return IntelliJPathImpl.fromString(getModuleContentRoot(module).getPath());
   }
 
+  // TODO unify with IntelliJFolderImpl.getFile(...) and getFolder(...)
   @NotNull
   @Override
   public IFile getFile(final String pathString) {

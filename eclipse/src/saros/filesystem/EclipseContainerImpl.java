@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Path;
 
 public class EclipseContainerImpl extends EclipseResourceImpl implements IContainer {
 
@@ -31,6 +32,37 @@ public class EclipseContainerImpl extends EclipseResourceImpl implements IContai
     } catch (CoreException e) {
       throw new IOException(e);
     }
+  }
+
+  @Override
+  public IFile getFile(String pathString) {
+    return getFile(getPath(pathString));
+  }
+
+  @Override
+  public IFile getFile(IPath path) {
+    return new EclipseFileImpl(getDelegate().getFile(((EclipsePathImpl) path).getDelegate()));
+  }
+
+  @Override
+  public IFolder getFolder(String pathString) {
+    return getFolder(getPath(pathString));
+  }
+
+  @Override
+  public IFolder getFolder(IPath path) {
+    return new EclipseFolderImpl(getDelegate().getFolder(((EclipsePathImpl) path).getDelegate()));
+  }
+
+  private IPath getPath(String pathString) {
+    if (pathString == null) throw new NullPointerException("Given string is null");
+
+    Path path = new Path(pathString);
+
+    if (path.isAbsolute())
+      throw new IllegalArgumentException("Given string denotes an absolute path: " + pathString);
+
+    return ResourceAdapterFactory.create(path);
   }
 
   @Override

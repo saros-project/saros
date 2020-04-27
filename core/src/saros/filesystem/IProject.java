@@ -25,29 +25,4 @@ package saros.filesystem;
  * This interface is under development. It currently equals its Eclipse counterpart. If not
  * mentioned otherwise all offered methods are equivalent to their Eclipse counterpart.
  */
-public interface IProject extends IContainer {
-
-  /**
-   * Returns a handle for the file with the given relative path to this resource.
-   *
-   * @param pathString a string representation of the path relative to this resource
-   * @return a handle for the file with the given relative path to this resource
-   * @throws NullPointerException if the given string is <code>null</code>
-   * @throws IllegalArgumentException if the given string represents an absolute path
-   */
-  public IFile getFile(String pathString);
-
-  public IFile getFile(IPath path);
-
-  /**
-   * Returns a handle for the folder with the given relative path to this resource.
-   *
-   * @param pathString a string representation of the path relative to this resource
-   * @return a handle for the folder with the given relative path to this resource
-   * @throws NullPointerException if the given string is <code>null</code>
-   * @throws IllegalArgumentException if the given string represents an absolute path
-   */
-  public IFolder getFolder(String pathString);
-
-  public IFolder getFolder(IPath path);
-}
+public interface IProject extends IContainer {}
