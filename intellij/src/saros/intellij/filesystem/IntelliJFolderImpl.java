@@ -16,6 +16,7 @@ import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import saros.filesystem.IContainer;
+import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
 import saros.filesystem.IPath;
 import saros.filesystem.IProject;
@@ -76,6 +77,39 @@ public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IF
     }
 
     return result.toArray(new IResource[0]);
+  }
+
+  // TODO unify with IntelliJProjectImpl.getFile(...) and getFolder(...)
+  @NotNull
+  @Override
+  public IFile getFile(final String pathString) {
+    return getFile(IntelliJPathImpl.fromString(pathString));
+  }
+
+  @NotNull
+  @Override
+  public IFile getFile(final IPath path) {
+
+    if (path.segmentCount() == 0)
+      throw new IllegalArgumentException("cannot create file handle for an empty path");
+
+    return new IntelliJFileImpl(project, path);
+  }
+
+  @NotNull
+  @Override
+  public IFolder getFolder(final String pathString) {
+    return getFolder(IntelliJPathImpl.fromString(pathString));
+  }
+
+  @NotNull
+  @Override
+  public IFolder getFolder(final IPath path) {
+
+    if (path.segmentCount() == 0)
+      throw new IllegalArgumentException("cannot create folder handle for an empty path");
+
+    return new IntelliJFolderImpl(project, path);
   }
 
   @Nullable

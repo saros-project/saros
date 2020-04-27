@@ -4,9 +4,6 @@ import static saros.filesystem.IResource.Type.PROJECT;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import saros.filesystem.IFile;
-import saros.filesystem.IFolder;
-import saros.filesystem.IPath;
 import saros.filesystem.IProject;
 import saros.filesystem.IWorkspace;
 
@@ -34,30 +31,6 @@ public class ServerProjectImpl extends ServerContainerImpl implements IProject {
   public String getDefaultCharset() {
     // TODO: Read default character set from the project metadata files.
     return DEFAULT_CHARSET;
-  }
-
-  @Override
-  public IFile getFile(IPath path) {
-    return new ServerFileImpl(getWorkspace(), getFullMemberPath(path));
-  }
-
-  @Override
-  public IFile getFile(String pathString) {
-    return getFile(ServerPathImpl.fromString(pathString));
-  }
-
-  @Override
-  public IFolder getFolder(IPath path) {
-    return new ServerFolderImpl(getWorkspace(), getFullMemberPath(path));
-  }
-
-  @Override
-  public IFolder getFolder(String pathString) {
-    return getFolder(ServerPathImpl.fromString(pathString));
-  }
-
-  private IPath getFullMemberPath(IPath memberPath) {
-    return getFullPath().append(memberPath);
   }
 
   /**

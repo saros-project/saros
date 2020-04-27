@@ -34,4 +34,28 @@ public interface IContainer extends IResource {
   public IResource[] members() throws IOException;
 
   public String getDefaultCharset() throws IOException;
+
+  /**
+   * Returns a handle for the file with the given relative path to this resource.
+   *
+   * @param pathString a string representation of the path relative to this resource
+   * @return a handle for the file with the given relative path to this resource
+   * @throws NullPointerException if the given string is <code>null</code>
+   * @throws IllegalArgumentException if the given string represents an absolute path
+   */
+  public IFile getFile(String pathString);
+
+  public IFile getFile(IPath path);
+
+  /**
+   * Returns a handle for the folder with the given relative path to this resource.
+   *
+   * @param pathString a string representation of the path relative to this resource
+   * @return a handle for the folder with the given relative path to this resource
+   * @throws NullPointerException if the given string is <code>null</code>
+   * @throws IllegalArgumentException if the given string represents an absolute path
+   */
+  public IFolder getFolder(String pathString);
+
+  public IFolder getFolder(IPath path);
 }
