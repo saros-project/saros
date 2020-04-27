@@ -1,5 +1,7 @@
 package saros.filesystem;
 
+import org.eclipse.core.runtime.Path;
+
 public class EclipseProjectImpl extends EclipseContainerImpl implements IProject {
 
   EclipseProjectImpl(org.eclipse.core.resources.IProject delegate) {
@@ -7,8 +9,8 @@ public class EclipseProjectImpl extends EclipseContainerImpl implements IProject
   }
 
   @Override
-  public IFile getFile(String name) {
-    return new EclipseFileImpl(getDelegate().getFile(name));
+  public IFile getFile(String pathString) {
+    return getFile(getPath(pathString));
   }
 
   @Override
@@ -17,13 +19,24 @@ public class EclipseProjectImpl extends EclipseContainerImpl implements IProject
   }
 
   @Override
-  public IFolder getFolder(String name) {
-    return new EclipseFolderImpl(getDelegate().getFolder(name));
+  public IFolder getFolder(String pathString) {
+    return getFolder(getPath(pathString));
   }
 
   @Override
   public IFolder getFolder(IPath path) {
     return new EclipseFolderImpl(getDelegate().getFolder(((EclipsePathImpl) path).getDelegate()));
+  }
+
+  private IPath getPath(String pathString) {
+    if (pathString == null) throw new NullPointerException("Given string is null");
+
+    Path path = new Path(pathString);
+
+    if (path.isAbsolute())
+      throw new IllegalArgumentException("Given string denotes an absolute path: " + pathString);
+
+    return ResourceAdapterFactory.create(path);
   }
 
   /**
