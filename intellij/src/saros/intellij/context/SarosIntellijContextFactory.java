@@ -11,7 +11,6 @@ import saros.editor.IEditorManager;
 import saros.filesystem.IChecksumCache;
 import saros.filesystem.IPathFactory;
 import saros.filesystem.IWorkspace;
-import saros.filesystem.IWorkspaceRoot;
 import saros.filesystem.NullChecksumCache;
 import saros.intellij.editor.EditorManager;
 import saros.intellij.negotiation.ModuleConfigurationProvider;
@@ -19,7 +18,6 @@ import saros.intellij.negotiation.hooks.ModuleTypeNegotiationHook;
 import saros.intellij.preferences.IntelliJPreferences;
 import saros.intellij.preferences.PropertiesComponentAdapter;
 import saros.intellij.project.filesystem.IntelliJWorkspaceImpl;
-import saros.intellij.project.filesystem.IntelliJWorkspaceRootImpl;
 import saros.intellij.project.filesystem.PathFactory;
 import saros.intellij.runtime.IntellijUISynchronizer;
 import saros.intellij.ui.eventhandler.ConnectingFailureHandler;
@@ -71,7 +69,6 @@ public class SarosIntellijContextFactory extends AbstractContextFactory {
 
       // IDE-specific classes for the HTML GUI
       Component.create(ICollaborationUtils.class, IntellijCollaborationUtilsImpl.class),
-      Component.create(IWorkspaceRoot.class, IntelliJWorkspaceRootImpl.class),
     };
   }
 

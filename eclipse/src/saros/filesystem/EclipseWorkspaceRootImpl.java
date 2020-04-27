@@ -1,26 +1,11 @@
-/** */
 package saros.filesystem;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.eclipse.core.resources.IWorkspaceRoot;
 
-/** Eclipse implementation of {@link IWorkspaceRoot}. */
-public class EclipseWorkspaceRootImpl extends EclipseContainerImpl implements IWorkspaceRoot {
+/** Eclipse {@link IContainer} implementation representing an {@link IWorkspaceRoot}. */
+public class EclipseWorkspaceRootImpl extends EclipseContainerImpl {
 
-  public EclipseWorkspaceRootImpl(org.eclipse.core.resources.IWorkspaceRoot delegate) {
+  public EclipseWorkspaceRootImpl(IWorkspaceRoot delegate) {
     super(delegate);
-  }
-
-  @Override
-  public IProject[] getProjects() {
-
-    final List<IProject> result = new ArrayList<IProject>();
-
-    for (final org.eclipse.core.resources.IProject project :
-        ((org.eclipse.core.resources.IWorkspaceRoot) getDelegate()).getProjects()) {
-      result.add(ResourceAdapterFactory.create(project));
-    }
-
-    return result.toArray(new IProject[result.size()]);
   }
 }
