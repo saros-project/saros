@@ -29,7 +29,7 @@ package saros.filesystem;
 public interface IPathFactory {
 
   /**
-   * Converts a path to its string representation
+   * Converts a path to its string representation.
    *
    * @param path the path to convert
    * @return the string representation of the path
@@ -37,15 +37,15 @@ public interface IPathFactory {
    * @throws IllegalArgumentException if the path is not relative (e.g it presents a full path like
    *     <code>/etc/init.d/</code>)
    */
-  public String fromPath(IPath path);
+  String fromPath(IPath path);
 
   /**
-   * Converts a string to a path object
+   * Converts a string representation of a path to an <code>IPath</code> object.
    *
-   * @param name the name of the path to convert
-   * @return a path object representing the path of the given name
+   * @param pathString the string path to convert
+   * @return an <code>IPath</code> object representing the path of the given string
    * @throws NullPointerException if name is <code>null</code>
    * @throws IllegalArgumentException if the resulting path object is not a relative path
    */
-  public IPath fromString(String name);
+  IPath fromString(String pathString);
 }
