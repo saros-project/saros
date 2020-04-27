@@ -14,13 +14,11 @@ import saros.editor.EditorManager;
 import saros.editor.IEditorManager;
 import saros.filesystem.EclipsePathFactory;
 import saros.filesystem.EclipseWorkspaceImpl;
-import saros.filesystem.EclipseWorkspaceRootImpl;
 import saros.filesystem.FileContentNotifierBridge;
 import saros.filesystem.FileSystemChecksumCache;
 import saros.filesystem.IChecksumCache;
 import saros.filesystem.IPathFactory;
 import saros.filesystem.IWorkspace;
-import saros.filesystem.IWorkspaceRoot;
 import saros.monitoring.remote.EclipseRemoteProgressIndicatorFactoryImpl;
 import saros.monitoring.remote.IRemoteProgressIndicatorFactory;
 import saros.preferences.EclipsePreferenceStoreAdapter;
@@ -85,9 +83,6 @@ public class SarosEclipseContextFactory extends AbstractContextFactory {
       Component.create(
           IChecksumCache.class, new FileSystemChecksumCache(new FileContentNotifierBridge())),
       Component.create(IWorkspace.class, new EclipseWorkspaceImpl(ResourcesPlugin.getWorkspace())),
-      Component.create(
-          IWorkspaceRoot.class,
-          new EclipseWorkspaceRootImpl(ResourcesPlugin.getWorkspace().getRoot())),
 
       // Saros Core Path Support
       Component.create(IPathFactory.class, EclipsePathFactory.class),
