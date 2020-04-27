@@ -12,6 +12,12 @@ class IntellijConfigurator {
 
   private static final String LOCKFILE_NAME = "saros_sandbox.lock";
   private static final String SANDBOX_DIR_PREFIX = "idea-sandbox-";
+  private static final String RACE_CONDITION_WARNING =
+      "\nThis issue might be caused by a race condition between two or more 'runIde'"
+          + "calls. In order to avoid that race condition: Call 'runIde' and wait until the IntelliJ instance started"
+          + "before starting the next instance with 'runIde'."
+          + "See issue #724 for the corresponding discussion.";
+
   private Project project;
 
   IntellijConfigurator(Project project) {
@@ -58,6 +64,10 @@ class IntellijConfigurator {
     intellijExtension.setUpdateSinceUntilBuild(false);
   }
 
+  private void throwGradleException(String message, Throwable t) {
+    throw new GradleException(message + RACE_CONDITION_WARNING, t);
+  }
+
   /**
    * Add tasks that locks the runIde sandbox when the runIde task is started and unlocks the sandbox
    * when runIde is finished.
@@ -65,24 +75,24 @@ class IntellijConfigurator {
   private void configureLockFileActions(File sandboxDir) {
     Task runIdeTask = project.getTasks().findByPath("runIde");
     if (runIdeTask == null)
-      throw new GradleException("Unable to find the task 'runIde' of the intellij plugin");
+      throwGradleException("Unable to find the task 'runIde' of the intellij plugin.", null);
 
     runIdeTask.doFirst(
         (Task t) -> {
           try {
             if (!sandboxDir.exists() && !sandboxDir.mkdirs()) {
-              throw new GradleException(
-                  "Unable to create the sandbox directory: " + sandboxDir.getAbsolutePath());
+              throwGradleException(
+                  "Unable to create the sandbox directory: " + sandboxDir.getAbsolutePath(), null);
             }
 
             File lockFile = getLockFile(sandboxDir);
             boolean createdNewFile = lockFile.createNewFile();
 
             if (!createdNewFile)
-              throw new GradleException(
-                  "Lock file " + lockFile.getAbsolutePath() + " already exists!");
+              throwGradleException(
+                  "Lock file " + lockFile.getAbsolutePath() + " already exists!", null);
           } catch (IOException e) {
-            throw new GradleException("Unable to lock sandbox: " + sandboxDir.getAbsolutePath(), e);
+            throwGradleException("Unable to lock sandbox: " + sandboxDir.getAbsolutePath(), e);
           }
         });
 
@@ -91,7 +101,7 @@ class IntellijConfigurator {
           File lockFile = getLockFile(sandboxDir);
 
           if (!lockFile.delete())
-            throw new GradleException("Failed to delete lock file: " + lockFile.getAbsolutePath());
+            throwGradleException("Failed to delete lock file: " + lockFile.getAbsolutePath(), null);
         });
   }
 
@@ -102,8 +112,8 @@ class IntellijConfigurator {
       sandboxBaseDir = project.getBuildDir();
     }
     if (!sandboxBaseDir.exists() && !sandboxBaseDir.mkdirs()) {
-      throw new GradleException(
-          "Unable to create the sandbox base directory: " + sandboxBaseDir.getAbsolutePath());
+      throwGradleException(
+          "Unable to create the sandbox base directory: " + sandboxBaseDir.getAbsolutePath(), null);
     }
 
     Integer sandboxCount = 1;
