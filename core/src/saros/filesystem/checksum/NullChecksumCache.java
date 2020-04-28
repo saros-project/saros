@@ -18,7 +18,9 @@
  * /
  */
 
-package saros.filesystem;
+package saros.filesystem.checksum;
+
+import saros.filesystem.IFile;
 
 /**
  * A checksum cache that always makes callers recalculate checksums.

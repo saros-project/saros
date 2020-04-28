@@ -13,7 +13,7 @@ import org.junit.runners.Suite;
   saros.editor.colorstorage.TestSuite.class,
   saros.editor.remote.TestSuite.class,
   saros.editor.text.TestSuite.class,
-  saros.filesystem.TestSuite.class,
+  saros.filesystem.checksum.TestSuite.class,
   saros.misc.xstream.TestSuite.class,
   saros.monitoring.TestSuite.class,
   saros.negotiation.TestSuite.class,

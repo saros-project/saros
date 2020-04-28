@@ -1,4 +1,6 @@
-package saros.filesystem;
+package saros.filesystem.checksum;
+
+import saros.filesystem.IFile;
 
 /**
  * An interface that can be used to access checksums. So they do not need to be recalculated as long

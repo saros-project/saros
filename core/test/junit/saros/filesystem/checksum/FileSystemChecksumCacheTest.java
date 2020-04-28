@@ -1,4 +1,4 @@
-package saros.filesystem;
+package saros.filesystem.checksum;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -7,6 +7,8 @@ import static org.junit.Assert.assertTrue;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
+import saros.filesystem.IFile;
+import saros.filesystem.IPath;
 
 public class FileSystemChecksumCacheTest {
 

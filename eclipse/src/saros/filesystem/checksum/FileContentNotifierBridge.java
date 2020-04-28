@@ -1,4 +1,4 @@
-package saros.filesystem;
+package saros.filesystem.checksum;
 
 import java.util.Arrays;
 import java.util.Deque;
@@ -10,6 +10,7 @@ import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ResourcesPlugin;
+import saros.filesystem.ResourceAdapterFactory;
 
 /**
  * Bridge class that maps Eclipse Resource change events to unique identifiers by retrieving the
