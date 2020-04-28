@@ -8,9 +8,10 @@ import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 import saros.filesystem.IFile;
-import saros.filesystem.IPath;
 
 public class FileSystemChecksumCacheTest {
+
+  private IAbsolutePathResolver absolutePathResolver;
 
   private IFile collidingA0;
   private IFile collidingA1;
@@ -38,16 +39,28 @@ public class FileSystemChecksumCacheTest {
 
   @Before
   public void setup() {
+    absolutePathResolver = EasyMock.createNiceMock(IAbsolutePathResolver.class);
+
     collidingA0 = createFileMock("righto");
     collidingA1 = createFileMock("buzzards");
     collidingB0 = createFileMock("wainages");
     collidingB1 = createFileMock("presentencing");
     nonColliding = createFileMock("01234567890123456789012345678901");
+
+    EasyMock.replay(absolutePathResolver);
+  }
+
+  private IFile createFileMock(final String path) {
+    IFile fileMock = EasyMock.createMock(IFile.class);
+
+    EasyMock.expect(absolutePathResolver.getAbsolutePath(fileMock)).andStubReturn(path);
+
+    return fileMock;
   }
 
   @Test
   public void testGetChecksumOfNonExistingEntry() {
-    IChecksumCache cache = new FileSystemChecksumCache(notifier);
+    IChecksumCache cache = new FileSystemChecksumCache(notifier, absolutePathResolver);
 
     // add a colliding entry increase branch coverage
     // has someone 3 different strings that have the same hashcode ? :P
@@ -59,14 +72,14 @@ public class FileSystemChecksumCacheTest {
 
   @Test
   public void testSingleNewInsert() {
-    IChecksumCache cache = new FileSystemChecksumCache(notifier);
+    IChecksumCache cache = new FileSystemChecksumCache(notifier, absolutePathResolver);
     assertFalse(cache.addChecksum(collidingA0, 5L));
     assertEquals(Long.valueOf(5), cache.getChecksum(collidingA0));
   }
 
   @Test
   public void testNonCollidingNewInserts() {
-    IChecksumCache cache = new FileSystemChecksumCache(notifier);
+    IChecksumCache cache = new FileSystemChecksumCache(notifier, absolutePathResolver);
     assertFalse(cache.addChecksum(collidingA0, 5L));
     assertFalse(cache.addChecksum(collidingB0, 6L));
 
@@ -77,7 +90,7 @@ public class FileSystemChecksumCacheTest {
   @Test
   public void testInsertCollidingPathes() {
 
-    IChecksumCache cache = new FileSystemChecksumCache(notifier);
+    IChecksumCache cache = new FileSystemChecksumCache(notifier, absolutePathResolver);
 
     cache.addChecksum(collidingA0, 5L);
     cache.addChecksum(collidingA1, 6L);
@@ -93,7 +106,7 @@ public class FileSystemChecksumCacheTest {
 
   @Test
   public void testChecksumInvalidationOnExistingChecksums() {
-    IChecksumCache cache = new FileSystemChecksumCache(notifier);
+    IChecksumCache cache = new FileSystemChecksumCache(notifier, absolutePathResolver);
 
     cache.addChecksum(collidingB0, 5L);
     cache.addChecksum(collidingA0, 5L);
@@ -110,7 +123,7 @@ public class FileSystemChecksumCacheTest {
 
   @Test
   public void testaddChecksumsAfterFileContentChanged() {
-    IChecksumCache cache = new FileSystemChecksumCache(notifier);
+    IChecksumCache cache = new FileSystemChecksumCache(notifier, absolutePathResolver);
 
     listener.fileContentChanged(collidingB0);
     listener.fileContentChanged(collidingA0);
@@ -127,7 +140,7 @@ public class FileSystemChecksumCacheTest {
 
   @Test
   public void testUpdateChecksum() {
-    IChecksumCache cache = new FileSystemChecksumCache(notifier);
+    IChecksumCache cache = new FileSystemChecksumCache(notifier, absolutePathResolver);
     cache.addChecksum(nonColliding, 5L);
     cache.addChecksum(collidingA0, 5L);
     cache.addChecksum(collidingA1, 6L);
@@ -139,22 +152,5 @@ public class FileSystemChecksumCacheTest {
     assertEquals(Long.valueOf(1), cache.getChecksum(nonColliding));
     assertEquals(Long.valueOf(1), cache.getChecksum(collidingA0));
     assertEquals(Long.valueOf(1), cache.getChecksum(collidingA1));
-  }
-
-  private static IFile createFileMock(final String path) {
-    IFile fileMock = EasyMock.createMock(IFile.class);
-    IPath pathMock = EasyMock.createMock(IPath.class);
-
-    pathMock.toOSString();
-
-    EasyMock.expectLastCall().andStubReturn(path);
-
-    fileMock.getFullPath();
-
-    EasyMock.expectLastCall().andStubReturn(pathMock);
-
-    EasyMock.replay(fileMock, pathMock);
-
-    return fileMock;
   }
 }
