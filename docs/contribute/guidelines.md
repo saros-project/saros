@@ -74,17 +74,17 @@ See the [development environment documentation](development-environment.md) for 
 We use the conventions defined in [Java TM Programming Language, Chapter 9](http://www.oracle.com/technetwork/java/codeconventions-135099.html#367).
 
 The only differences and additional conventions are:
-* Non-Listener interfaces should be preceded by an I.</br>
+* Non-Listener interfaces should be preceded by an I.<br>
   e.g. `IProject`, `IPreferenceStore`
-* Listener interfaces should use the name of their corresponding class and add Listener to it.</br>
+* Listener interfaces should use the name of their corresponding class and add Listener to it.<br>
   e.g. `MouseListener`
-* All test case classes must end with `Test`.</br>
+* All test case classes must end with `Test`.<br>
   e.g `HelloWorldTest`
-* A test suite classes must contain  `TestSuite`.</br>
-* Every test class that is used for White-Box testing must be declared in the same package.</br>
+* A test suite classes must contain  `TestSuite`.<br>
+* Every test class that is used for White-Box testing must be declared in the same package.<br>
   e.g. `foo.bar.HelloWorld` -> `foo.bar.HelloWorldTest`
-* STF test cases must be put in any subpackage of `de.fu_berlin.inf.dpp.stf.test`.</br>
-  e.g `de.fu_berlin.inf.dpp.stf.test.account.AccountPreferencePageTest`
+* STF test cases must be put in any subpackage of `saros.stf.test`.<br>
+  e.g `saros.stf.test.account.AccountPreferencePageTest`
 
 ### Structure
 
