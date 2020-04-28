@@ -125,12 +125,6 @@ public class EclipseResourceImpl implements IResource {
     }
   }
 
-  @Override
-  public IPath getLocation() {
-    org.eclipse.core.runtime.IPath location = delegate.getLocation();
-    return (location != null) ? new EclipsePathImpl(location) : null;
-  }
-
   /**
    * Returns the original {@link org.eclipse.core.resources.IResource IResource} object.
    *
