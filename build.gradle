@@ -45,6 +45,7 @@ ext.projectsToConfigure = subprojects - project(':saros.picocontainer')
 configure(projectsToConfigure) { projectToConf ->
 
   apply plugin: 'java' // default java build plugin
+  apply plugin: 'pmd'
   apply plugin: 'saros.gradle.eclipse.plugin'
 
   repositories {
@@ -59,6 +60,17 @@ configure(projectsToConfigure) { projectToConf ->
     // avoid that the whole dependency tree is released
     releaseDep.transitive = false
   }
+
+
+
+  pmd {
+      toolVersion = "6.22.0"
+      consoleOutput = true
+      ruleSetFiles = files(rootProject.file("ruleset.xml"))
+      ruleSets = []
+  }
+
+
 
   test {
 
