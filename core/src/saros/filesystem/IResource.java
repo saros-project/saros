@@ -54,6 +54,4 @@ public interface IResource {
    * @throws IOException if the resource deletion failed
    */
   public void delete() throws IOException;
-
-  public IPath getLocation();
 }

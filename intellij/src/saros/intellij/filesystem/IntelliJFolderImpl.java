@@ -207,13 +207,6 @@ public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IF
         ModalityState.defaultModalityState());
   }
 
-  @NotNull
-  @Override
-  public IPath getLocation() {
-    // TODO might return a wrong location
-    return project.getLocation().append(path);
-  }
-
   /**
    * Creates this folder in the local filesystem.
    *

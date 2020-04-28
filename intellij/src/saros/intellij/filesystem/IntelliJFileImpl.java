@@ -127,13 +127,6 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
         ModalityState.defaultModalityState());
   }
 
-  @NotNull
-  @Override
-  public IPath getLocation() {
-    // TODO might return a wrong location
-    return project.getLocation().append(path);
-  }
-
   @Nullable
   @Override
   public String getCharset() {

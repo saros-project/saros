@@ -52,7 +52,6 @@ public abstract class ServerResourceImpl implements IResource {
     return getFullPath().lastSegment();
   }
 
-  @Override
   public IPath getLocation() {
     return workspace.getLocation().append(path);
   }

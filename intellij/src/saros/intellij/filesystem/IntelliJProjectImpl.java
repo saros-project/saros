@@ -237,12 +237,6 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
     throw new IOException("delete is not supported");
   }
 
-  @NotNull
-  @Override
-  public IPath getLocation() {
-    return IntelliJPathImpl.fromString(getModuleContentRoot(module).getPath());
-  }
-
   // TODO unify with IntelliJFolderImpl.getFile(...) and getFolder(...)
   @NotNull
   @Override
