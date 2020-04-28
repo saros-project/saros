@@ -1,4 +1,4 @@
-package saros.filesystem;
+package saros.filesystem.checksum;
 
 public interface IFileContentChangedNotifier {
 

@@ -1,4 +1,4 @@
-package saros.filesystem;
+package saros.filesystem.checksum;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

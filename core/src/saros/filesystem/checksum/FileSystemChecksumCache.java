@@ -1,4 +1,4 @@
-package saros.filesystem;
+package saros.filesystem.checksum;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
+import saros.filesystem.IFile;
 
 /**
  * Default implementation of the checksum cache {@link IChecksumCache interface} .
