@@ -5,13 +5,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.time.StopWatch;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import saros.exceptions.OperationCanceledException;
 import saros.filesystem.IFile;
@@ -28,18 +28,16 @@ public class CreateArchiveTask implements IWorkspaceRunnable {
   private static final Logger log = Logger.getLogger(CreateArchiveTask.class);
 
   private final File archive;
-  private final List<IFile> files;
-  private final List<String> alias;
+  private final List<Pair<IFile, String>> filesToCompress;
   private final IProgressMonitor monitor;
 
   public CreateArchiveTask(
       final File archive,
-      final List<IFile> files,
-      final List<String> alias,
+      final List<Pair<IFile, String>> filesToCompress,
       final IProgressMonitor monitor) {
+
     this.archive = archive;
-    this.files = files;
-    this.alias = alias;
+    this.filesToCompress = filesToCompress;
     this.monitor = monitor;
   }
 
@@ -49,15 +47,12 @@ public class CreateArchiveTask implements IWorkspaceRunnable {
 
     if (monitor == null) monitor = new NullProgressMonitor();
 
-    assert files.size() == alias.size();
-
-    long totalSize = getTotalFileSize(files);
+    long totalSize = getTotalFileSize(filesToCompress);
 
     StopWatch stopWatch = new StopWatch();
     stopWatch.start();
 
-    final Iterator<IFile> fileIt = files.iterator();
-    final Iterator<String> aliasIt = alias == null ? null : alias.iterator();
+    final Iterator<Pair<IFile, String>> fileIt = filesToCompress.iterator();
 
     long totalRead = 0L;
 
@@ -74,22 +69,16 @@ public class CreateArchiveTask implements IWorkspaceRunnable {
           new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(archive), BUFFER_SIZE));
 
       while (fileIt.hasNext()) {
+        Pair<IFile, String> fileToCompress = fileIt.next();
 
-        IFile file = fileIt.next();
+        IFile file = fileToCompress.getLeft();
+        String qualifiedPath = fileToCompress.getRight();
 
-        String entryName = null;
+        if (log.isTraceEnabled()) log.trace("compressing file: " + qualifiedPath);
 
-        final String originalEntryName = file.getFullPath().toString();
+        monitor.subTask("compressing file: " + qualifiedPath);
 
-        if (aliasIt != null && aliasIt.hasNext()) entryName = aliasIt.next();
-
-        if (entryName == null) entryName = originalEntryName;
-
-        if (log.isTraceEnabled()) log.trace("compressing file: " + originalEntryName);
-
-        monitor.subTask("compressing file: " + originalEntryName);
-
-        zipStream.putNextEntry(new ZipEntry(entryName));
+        zipStream.putNextEntry(new ZipEntry(qualifiedPath));
 
         InputStream in = null;
 
@@ -103,7 +92,7 @@ public class CreateArchiveTask implements IWorkspaceRunnable {
 
             if (monitor.isCanceled())
               throw new OperationCanceledException(
-                  "compressing of file '" + originalEntryName + "' was canceled");
+                  "compressing of file '" + qualifiedPath + "' was canceled");
 
             zipStream.write(buffer, 0, read);
 
@@ -152,15 +141,17 @@ public class CreateArchiveTask implements IWorkspaceRunnable {
     }
   }
 
-  private final long getTotalFileSize(Collection<IFile> files) {
+  private long getTotalFileSize(List<Pair<IFile, String>> filesToCompress) {
 
     long size = 0L;
 
-    for (IFile file : files) {
+    for (Pair<IFile, String> fileToCompare : filesToCompress) {
+      IFile file = fileToCompare.getLeft();
+
       try {
         size += file.getSize();
       } catch (IOException e) {
-        log.warn("unable to retrieve file size for file: " + file.getFullPath(), e);
+        log.warn("unable to retrieve file size for file: " + file, e);
       }
     }
 
