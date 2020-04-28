@@ -16,6 +16,7 @@ import saros.filesystem.EclipsePathFactory;
 import saros.filesystem.EclipseWorkspaceImpl;
 import saros.filesystem.IPathFactory;
 import saros.filesystem.IWorkspace;
+import saros.filesystem.checksum.EclipseAbsolutePathResolver;
 import saros.filesystem.checksum.FileContentNotifierBridge;
 import saros.filesystem.checksum.FileSystemChecksumCache;
 import saros.filesystem.checksum.IChecksumCache;
@@ -81,7 +82,9 @@ public class SarosEclipseContextFactory extends AbstractContextFactory {
        * available after we added all our context stuff or vice versa
        */
       Component.create(
-          IChecksumCache.class, new FileSystemChecksumCache(new FileContentNotifierBridge())),
+          IChecksumCache.class,
+          new FileSystemChecksumCache(
+              new FileContentNotifierBridge(), new EclipseAbsolutePathResolver())),
       Component.create(IWorkspace.class, new EclipseWorkspaceImpl(ResourcesPlugin.getWorkspace())),
 
       // Saros Core Path Support

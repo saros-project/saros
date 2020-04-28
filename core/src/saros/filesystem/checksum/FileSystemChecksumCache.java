@@ -31,6 +31,8 @@ public final class FileSystemChecksumCache implements IChecksumCache {
 
   private static final int SEED = 0xDEADBEEF;
 
+  private final IAbsolutePathResolver absolutePathResolver;
+
   private static class Murmur3Hash<T> {
 
     long h1;
@@ -76,7 +78,12 @@ public final class FileSystemChecksumCache implements IChecksumCache {
         @Override
         public void fileContentChanged(IFile file) {
           synchronized (FileSystemChecksumCache.this) {
-            final String path = file.getFullPath().toOSString();
+            final String path = absolutePathResolver.getAbsolutePath(file);
+
+            if (path == null) {
+              logNoValidPath(file);
+              return;
+            }
 
             Murmur3Hash<Long> hash = create128BitMurmur3Hash(path);
             Murmur3Hash<Long> currentHash = getHash(path, hash);
@@ -100,15 +107,25 @@ public final class FileSystemChecksumCache implements IChecksumCache {
 
   private Map<Integer, Object> cache = new HashMap<Integer, Object>();
 
-  public FileSystemChecksumCache(IFileContentChangedNotifier fileContentChangedNotifier) {
+  public FileSystemChecksumCache(
+      IFileContentChangedNotifier fileContentChangedNotifier,
+      IAbsolutePathResolver absolutePathResolver) {
+
     fileContentChangedNotifier.addFileContentChangedListener(fileContentChangedListener);
+
+    this.absolutePathResolver = absolutePathResolver;
   }
 
   @Override
   @SuppressWarnings({"unchecked"})
   public synchronized Long getChecksum(IFile file) {
 
-    final String path = file.getFullPath().toOSString();
+    final String path = absolutePathResolver.getAbsolutePath(file);
+
+    if (path == null) {
+      logNoValidPath(file);
+      return null;
+    }
 
     Object object = cache.get(path.hashCode());
 
@@ -147,7 +164,12 @@ public final class FileSystemChecksumCache implements IChecksumCache {
   @SuppressWarnings("unchecked")
   public synchronized boolean addChecksum(IFile file, long checksum) {
 
-    final String path = file.getFullPath().toOSString();
+    final String path = absolutePathResolver.getAbsolutePath(file);
+
+    if (path == null) {
+      logNoValidPath(file);
+      return false;
+    }
 
     Murmur3Hash<Long> hash = create128BitMurmur3Hash(path);
     hash.setObject(checksum);
@@ -343,6 +365,10 @@ public final class FileSystemChecksumCache implements IChecksumCache {
 
   private int toInt(byte b) {
     return b & 0xFF;
+  }
+
+  private void logNoValidPath(IFile file) {
+    if (log.isTraceEnabled()) log.trace("failed to obtain absolute path for file : " + file);
   }
 
   private void logNoValidChecksum(String path) {
