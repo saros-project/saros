@@ -156,12 +156,6 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
 
   @NotNull
   @Override
-  public IPath getFullPath() {
-    return IntelliJPathImpl.fromString(getName());
-  }
-
-  @NotNull
-  @Override
   public String getName() {
     return module.getName();
   }

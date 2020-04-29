@@ -37,7 +37,6 @@ public abstract class ServerResourceImpl implements IResource {
     return workspace;
   }
 
-  @Override
   public IPath getFullPath() {
     return path;
   }

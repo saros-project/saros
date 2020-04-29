@@ -25,11 +25,6 @@ public class EclipseResourceImpl implements IResource {
   }
 
   @Override
-  public IPath getFullPath() {
-    return new EclipsePathImpl(delegate.getFullPath());
-  }
-
-  @Override
   public String getName() {
     return delegate.getName();
   }

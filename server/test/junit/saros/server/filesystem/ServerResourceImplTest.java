@@ -68,7 +68,7 @@ public class ServerResourceImplTest extends EasyMockSupport {
 
   @Test
   public void getFullPath() {
-    assertEquals(path("project/folder/file"), resource.getFullPath());
+    assertEquals(path("project/folder/file"), ((ServerResourceImpl) resource).getFullPath());
   }
 
   @Test

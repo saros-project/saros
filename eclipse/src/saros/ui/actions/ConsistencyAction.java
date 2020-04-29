@@ -215,8 +215,9 @@ public class ConsistencyAction extends Action implements Disposable {
 
             for (IFile file : files) {
               if (sb.length() > 0) sb.append(", ");
-
-              sb.append(file.getFullPath().toOSString());
+              sb.append(file.getProject().getName())
+                  .append(" - ")
+                  .append(file.getProjectRelativePath());
             }
 
             String files = sb.toString();

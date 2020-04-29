@@ -56,12 +56,6 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
 
   @NotNull
   @Override
-  public IPath getFullPath() {
-    return project.getFullPath().append(path);
-  }
-
-  @NotNull
-  @Override
   public String getName() {
     return path.lastSegment();
   }
