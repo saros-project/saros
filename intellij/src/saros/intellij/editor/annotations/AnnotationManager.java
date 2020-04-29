@@ -194,71 +194,25 @@ public class AnnotationManager implements Disposable {
    * a currently closed file.
    *
    * @param file the file text was added to
-   * @param start the start position of added text
-   * @param end the end position of the added text
+   * @param additionStart the start position of added text
+   * @param additionEnd the end position of the added text
    */
-  public void moveAnnotationsAfterAddition(@NotNull IFile file, int start, int end) {
+  public void moveAnnotationsAfterAddition(
+      @NotNull IFile file, int additionStart, int additionEnd) {
 
-    if (start == end) {
+    if (additionStart == additionEnd) {
       return;
     }
 
-    checkRange(start, end);
+    checkRange(additionStart, additionEnd);
 
-    moveAnnotationsAfterAddition(selectionAnnotationStore.getAnnotations(file), start, end);
-    moveAnnotationsAfterAddition(contributionAnnotationQueue.getAnnotations(file), start, end);
-  }
+    for (SelectionAnnotation annotation : selectionAnnotationStore.getAnnotations(file)) {
+      annotation.moveAfterAddition(additionStart, additionEnd);
+    }
 
-  /**
-   * If there are not range highlighters or editors present: Moves the given annotations back by the
-   * length of the addition if they are located behind the added text. Elongates the annotations by
-   * the length of the addition if they overlap with the added text.
-   *
-   * <p>Does nothing if the annotation has a local representation (an editor or range highlighters).
-   *
-   * @param annotations the annotations to move
-   * @param additionStart the star position of the added text
-   * @param additionEnd the end position of the added text
-   * @param <E> the annotation type
-   * @see #moveAnnotationsAfterAddition(IFile, int, int)
-   */
-  private <E extends AbstractEditorAnnotation> void moveAnnotationsAfterAddition(
-      @NotNull List<E> annotations, int additionStart, int additionEnd) {
-
-    int offset = additionEnd - additionStart;
-
-    annotations.forEach(
-        annotation -> {
-          if (annotation.getEditor() != null) {
-            return;
-          }
-
-          annotation
-              .getAnnotationRanges()
-              .forEach(
-                  annotationRange -> {
-                    int currentStart = annotationRange.getStart();
-                    int currentEnd = annotationRange.getEnd();
-
-                    if (annotationRange.getRangeHighlighter() != null
-                        || currentEnd <= additionStart) {
-
-                      return;
-                    }
-
-                    AnnotationRange newAnnotationRange;
-
-                    if (currentStart >= additionStart) {
-                      newAnnotationRange =
-                          new AnnotationRange(currentStart + offset, currentEnd + offset);
-
-                    } else {
-                      newAnnotationRange = new AnnotationRange(currentStart, currentEnd + offset);
-                    }
-
-                    annotation.replaceAnnotationRange(annotationRange, newAnnotationRange);
-                  });
-        });
+    for (ContributionAnnotation annotation : contributionAnnotationQueue.getAnnotations(file)) {
+      annotation.moveAfterAddition(additionStart, additionEnd);
+    }
   }
 
   /**
