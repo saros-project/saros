@@ -216,6 +216,49 @@ abstract class AbstractEditorAnnotation {
     return editor;
   }
 
+  /**
+   * Updates the position of the annotation according to the given addition boundaries.
+   *
+   * <p>If there are no range highlighters or editors present: Moves the given annotations back by
+   * the length of the addition if they are located behind the added text. Elongates the annotations
+   * by the length of the addition if they overlap with the added text.
+   *
+   * <p>Does nothing if the annotation has a local representation (an editor or range highlighters)
+   * as this will be done automatically by the internal Intellij logic.
+   *
+   * @param additionStart the star position of the added text
+   * @param additionEnd the end position of the added text
+   * @see AnnotationManager#moveAnnotationsAfterAddition(IFile, int, int)
+   */
+  void moveAfterAddition(int additionStart, int additionEnd) {
+    if (editor != null) {
+      return;
+    }
+
+    int offset = additionEnd - additionStart;
+
+    for (AnnotationRange annotationRange : annotationRanges) {
+      int currentStart = annotationRange.getStart();
+      int currentEnd = annotationRange.getEnd();
+
+      if (annotationRange.getRangeHighlighter() != null || currentEnd <= additionStart) {
+
+        continue;
+      }
+
+      AnnotationRange newAnnotationRange;
+
+      if (currentStart >= additionStart) {
+        newAnnotationRange = new AnnotationRange(currentStart + offset, currentEnd + offset);
+
+      } else {
+        newAnnotationRange = new AnnotationRange(currentStart, currentEnd + offset);
+      }
+
+      replaceAnnotationRange(annotationRange, newAnnotationRange);
+    }
+  }
+
   @Override
   public String toString() {
     return getClass().getSimpleName()
