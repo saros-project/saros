@@ -3,6 +3,7 @@ package saros.intellij.editor.annotations;
 import com.intellij.openapi.editor.Editor;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -145,8 +146,7 @@ abstract class AbstractEditorAnnotation {
   /**
    * Returns an <b>unmodifiable copy</b> of the held list of annotation ranges. The returned list
    * can not be used to modify the internally held list. To modify the internal list of annotation
-   * ranges, please use {@link #replaceAnnotationRange(AnnotationRange, AnnotationRange)} and {@link
-   * #removeAnnotationRange(AnnotationRange)}.
+   * ranges, please use {@link #replaceAnnotationRange(AnnotationRange, AnnotationRange)}.
    *
    * @return an unmodifiable copy of the held list of annotation ranges.
    */
@@ -178,17 +178,6 @@ abstract class AbstractEditorAnnotation {
     }
 
     annotationRanges.set(index, newAnnotationRange);
-  }
-
-  /**
-   * Removes the given <code>AnnotationRange</code> from the held list of annotation ranges if
-   * present.
-   *
-   * @param annotationRange the annotation range to remove
-   */
-  void removeAnnotationRange(@NotNull AnnotationRange annotationRange) {
-
-    annotationRanges.remove(annotationRange);
   }
 
   /**
@@ -257,6 +246,71 @@ abstract class AbstractEditorAnnotation {
 
       replaceAnnotationRange(annotationRange, newAnnotationRange);
     }
+  }
+
+  /**
+   * Updates the position of the annotation according to the given deletion boundaries. Returns
+   * whether the annotation is invalid after the deletion and should therefor be removed from the
+   * annotation store.
+   *
+   * <p>If there are no range highlighters or editors present: Moves all given annotations for the
+   * given file forward by the length of the removal if they are located behind the removed text.
+   * Shortens the annotations if they partially overlap with the removed text.
+   *
+   * <p>Does nothing if the annotation has a local representation (an editor or range highlighters)
+   * as this will be done automatically by the internal Intellij logic.
+   *
+   * @param deletionStart the start position of the deleted text
+   * @param deletionEnd the end position of the deleted text
+   * @return whether the annotation is invalid after the deletion
+   * @see AnnotationManager#moveAnnotationsAfterDeletion(IFile, int, int)
+   */
+  boolean moveAfterDeletion(int deletionStart, int deletionEnd) {
+    if (editor != null) {
+      return false;
+    }
+
+    int offset = deletionEnd - deletionStart;
+
+    for (Iterator<AnnotationRange> iterator = annotationRanges.iterator(); iterator.hasNext(); ) {
+      AnnotationRange annotationRange = iterator.next();
+
+      int currentStart = annotationRange.getStart();
+      int currentEnd = annotationRange.getEnd();
+
+      if (annotationRange.getRangeHighlighter() != null || currentEnd <= deletionStart) {
+
+        continue;
+      }
+
+      AnnotationRange newAnnotationRange;
+
+      if (currentStart >= deletionEnd) {
+        newAnnotationRange = new AnnotationRange(currentStart - offset, currentEnd - offset);
+
+      } else if (currentStart < deletionStart) {
+        if (currentEnd <= deletionEnd) {
+          newAnnotationRange = new AnnotationRange(currentStart, deletionStart);
+
+        } else {
+          newAnnotationRange = new AnnotationRange(currentStart, currentEnd - offset);
+        }
+
+      } else {
+        if (currentEnd <= deletionEnd) {
+          iterator.remove();
+
+          continue;
+
+        } else {
+          newAnnotationRange = new AnnotationRange(deletionStart, currentEnd - offset);
+        }
+      }
+
+      replaceAnnotationRange(annotationRange, newAnnotationRange);
+    }
+
+    return annotationRanges.isEmpty();
   }
 
   @Override
