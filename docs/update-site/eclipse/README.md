@@ -21,11 +21,10 @@ New versions of the update-site have to be pushed to the master branch of [saros
 ### composite(Content|Artifacts).xml
 
 These files define the composite repository with just one child (our update-site).
-See [here](https://wiki.eclipse.org/Equinox/p2/Composite_Repositories_(new) for more information.
+See [here](https://wiki.eclipse.org/Equinox/p2/Composite_Repositories_(new)) for more information.
 
 ### p2.index
 
 The file `p2.index` is optional and just defines where to find the composite meta data. without the file an eclipse instance
 tries to GET `compositeContent.jar`/`compositeArtifacts.jar` and subsequently tries to GET `compositeContent.xml`/`compositeArtifacts.xml`.
 With this file the eclipse instance only tries access the XML files.
-
