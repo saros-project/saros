@@ -107,7 +107,7 @@ public class EclipseResourceImpl implements IResource {
 
   @Override
   public boolean isIgnored() {
-    return isGitConfig() || isDerived();
+    return isGitConfig() || isEncodingConfig() || isDerived();
   }
 
   /**
@@ -131,6 +131,20 @@ public class EclipseResourceImpl implements IResource {
     return (path.startsWith(".git/")
         || path.contains("/.git/")
         || getType() == FOLDER && (path.endsWith("/.git") || path.equals(".git")));
+  }
+
+  /**
+   * Returns whether this resource is the configuration file for the project encodings.
+   *
+   * <p>Such files are ignored by Saros to avoid clashed with differing setups. The encoding
+   * management for shared resources created by a remote participant is handled by Saros itself.
+   *
+   * @return whether this resource is the configuration file for the project encodings
+   */
+  private boolean isEncodingConfig() {
+    String path = getProjectRelativePath().toPortableString();
+
+    return path.endsWith(".settings/org.eclipse.core.resources.prefs");
   }
 
   @Override
