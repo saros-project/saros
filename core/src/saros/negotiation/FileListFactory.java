@@ -168,8 +168,7 @@ public class FileListFactory {
         if (checksumCache != null) {
           boolean isInvalid = checksumCache.addChecksum(file, data.checksum);
 
-          if (isInvalid && checksum != null)
-            log.warn("calculated checksum on dirty data: " + file.getFullPath());
+          if (isInvalid && checksum != null) log.warn("calculated checksum on dirty data: " + file);
         }
 
       } catch (IOException e) {

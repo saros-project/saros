@@ -49,24 +49,24 @@ public class ServerProjectImplTest extends EasyMockSupport {
   @Test
   public void getFileByPath() {
     IFile file = project.getFile(path("folder/file"));
-    assertEquals(path("project/folder/file"), file.getFullPath());
+    assertEquals(path("project/folder/file"), ((ServerFileImpl) file).getFullPath());
   }
 
   @Test
   public void getFileByPathString() {
     IFile file = project.getFile("folder/file");
-    assertEquals(path("project/folder/file"), file.getFullPath());
+    assertEquals(path("project/folder/file"), ((ServerFileImpl) file).getFullPath());
   }
 
   @Test
   public void getFolderByPath() {
     IFolder folder = project.getFolder(path("folder/subfolder"));
-    assertEquals(path("project/folder/subfolder"), folder.getFullPath());
+    assertEquals(path("project/folder/subfolder"), ((ServerFolderImpl) folder).getFullPath());
   }
 
   @Test
   public void getFolderByPathString() {
     IFolder folder = project.getFolder("folder/subfolder");
-    assertEquals(path("project/folder/subfolder"), folder.getFullPath());
+    assertEquals(path("project/folder/subfolder"), ((ServerFolderImpl) folder).getFullPath());
   }
 }

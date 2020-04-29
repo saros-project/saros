@@ -100,7 +100,7 @@ public class FileActivityConsumer extends AbstractActivityConsumer implements St
 
     saros.filesystem.IFile file = activity.getResource();
 
-    log.debug("performing recovery for file: " + file.getFullPath());
+    log.debug("performing recovery for file: " + file);
 
     /*
      * We have to save the editor or otherwise the internal buffer is not

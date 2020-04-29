@@ -104,10 +104,13 @@ public class ServerContainerImplTest extends EasyMockSupport {
           }
         });
 
-    assertEquals(path(CONTAINER_PATH + "/file"), members[0].getFullPath());
-    assertEquals(IResource.Type.FILE, members[0].getType());
-    assertEquals(path(CONTAINER_PATH + "/subfolder"), members[1].getFullPath());
-    assertEquals(IResource.Type.FOLDER, members[1].getType());
+    ServerResourceImpl member0 = (ServerResourceImpl) members[0];
+    assertEquals(path(CONTAINER_PATH + "/file"), member0.getFullPath());
+    assertEquals(IResource.Type.FILE, member0.getType());
+
+    ServerResourceImpl member1 = (ServerResourceImpl) members[1];
+    assertEquals(path(CONTAINER_PATH + "/subfolder"), member1.getFullPath());
+    assertEquals(IResource.Type.FOLDER, member1.getType());
   }
 
   @Test(expected = IOException.class)

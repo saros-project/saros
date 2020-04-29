@@ -137,12 +137,6 @@ public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IF
 
   @NotNull
   @Override
-  public IPath getFullPath() {
-    return project.getFullPath().append(path);
-  }
-
-  @NotNull
-  @Override
   public String getName() {
     return path.lastSegment();
   }

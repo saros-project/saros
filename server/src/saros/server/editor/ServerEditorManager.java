@@ -19,6 +19,8 @@ import saros.editor.text.TextSelection;
 import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
 import saros.filesystem.IProject;
+import saros.server.filesystem.ServerFileImpl;
+import saros.server.filesystem.ServerFolderImpl;
 import saros.session.User;
 import saros.util.LineSeparatorNormalizationUtil;
 
@@ -156,10 +158,14 @@ public class ServerEditorManager implements IEditorManager {
    */
   public void closeEditorsInFolder(IFolder folder) {
     synchronized (openEditors) {
+      ServerFolderImpl serverFolder = (ServerFolderImpl) folder;
+
       Set<IFile> keys = openEditors.keySet();
       Set<IFile> invalidKeys = new HashSet<>();
       for (IFile file : keys) {
-        if (folder.getFullPath().isPrefixOf(file.getFullPath())) {
+        ServerFileImpl serverFile = (ServerFileImpl) file;
+
+        if (serverFolder.getFullPath().isPrefixOf(serverFile.getFullPath())) {
           invalidKeys.add(file);
         }
       }

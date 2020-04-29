@@ -20,8 +20,6 @@ public interface IResource {
 
   public boolean exists();
 
-  public IPath getFullPath();
-
   public String getName();
 
   public IContainer getParent();
