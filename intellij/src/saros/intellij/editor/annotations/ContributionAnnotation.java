@@ -2,7 +2,9 @@ package saros.intellij.editor.annotations;
 
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
+import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.openapi.editor.markup.TextAttributes;
+import java.util.ArrayList;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,29 +34,67 @@ class ContributionAnnotation extends AbstractEditorAnnotation {
    *
    * @param user the user the annotation belongs to and whose color is used
    * @param file the file the annotation belongs to
+   * @param start the start offset of the annotation
+   * @param end the end offset of the annotation
    * @param editor the editor the annotation is displayed in
-   * @param annotationRanges the range of the annotation
    * @see AbstractEditorAnnotation#AbstractEditorAnnotation(User, IFile, Editor, List)
+   * @throws IllegalStateException if some parts of the annotation are located after the file end
    */
   ContributionAnnotation(
-      @NotNull User user,
-      @NotNull IFile file,
-      @Nullable Editor editor,
-      @NotNull List<AnnotationRange> annotationRanges) {
+      @NotNull User user, @NotNull IFile file, int start, int end, @Nullable Editor editor) {
 
-    super(user, file, editor, annotationRanges);
+    super(user, file, editor, prepareAnnotationRanges(start, end, editor, user, file));
+  }
 
-    annotationRanges.forEach(
-        annotationRange -> {
-          int length = annotationRange.getLength();
+  /**
+   * Creates a list of one character long annotation ranges covering the given range. None of the
+   * annotation ranges has a range highlighter associated with it.
+   *
+   * @param start the start of the range
+   * @param end the end of the range
+   * @return a list of one character long annotation ranges covering the given range
+   */
+  private static List<AnnotationRange> prepareAnnotationRanges(
+      int start, int end, @Nullable Editor editor, @NotNull User user, @NotNull IFile file) {
+    List<AnnotationRange> annotationRanges = new ArrayList<>();
 
-          if (length != 1) {
-            throw new IllegalArgumentException(
-                "Each AnnotationRange for a ContributionAnnotation has to "
-                    + "be exactly one character long. Found length: "
-                    + length);
-          }
-        });
+    TextAttributes contributionTextAttributes;
+    if (editor != null) {
+      contributionTextAttributes = getContributionTextAttributes(editor, user);
+    } else {
+      contributionTextAttributes = null;
+    }
+
+    for (int i = 0; i < end - start; i++) {
+      int currentStart = start + i;
+      int currentEnd = start + i + 1;
+
+      AnnotationRange annotationRange;
+      if (editor != null) {
+        RangeHighlighter rangeHighlighter =
+            addRangeHighlighter(currentStart, currentEnd, editor, contributionTextAttributes, file);
+
+        if (rangeHighlighter == null) {
+          throw new IllegalStateException(
+              "Failed to create range highlighter for range ("
+                  + currentStart
+                  + ","
+                  + currentEnd
+                  + ") for file "
+                  + file);
+        }
+
+        annotationRange = new AnnotationRange(currentStart, currentEnd, rangeHighlighter);
+
+      } else {
+
+        annotationRange = new AnnotationRange(currentStart, currentEnd);
+      }
+
+      annotationRanges.add(annotationRange);
+    }
+
+    return annotationRanges;
   }
 
   /**
