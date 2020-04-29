@@ -2,7 +2,9 @@ package saros.intellij.editor.annotations;
 
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
+import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.openapi.editor.markup.TextAttributes;
+import java.util.Collections;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -24,22 +26,46 @@ class SelectionAnnotation extends AbstractEditorAnnotation {
    *
    * @param user the user the annotation belongs to and whose color is used
    * @param file the file the annotation belongs to
+   * @param start the start offset of the annotation
+   * @param end the end offset of the annotation
    * @param editor the editor the annotation is displayed in
-   * @param annotationRanges the range of the annotation
    * @see AbstractEditorAnnotation#AbstractEditorAnnotation(User, IFile, Editor, List)
+   * @throws IllegalStateException if some parts of the annotation are located after the file end
    */
   SelectionAnnotation(
-      @NotNull User user,
-      @NotNull IFile file,
-      @Nullable Editor editor,
-      @NotNull List<AnnotationRange> annotationRanges) {
+      @NotNull User user, @NotNull IFile file, int start, int end, @Nullable Editor editor) {
 
-    super(user, file, editor, annotationRanges);
+    super(user, file, editor, prepareAnnotationRange(user, file, start, end, editor));
+  }
 
-    if (annotationRanges.size() != 1) {
-      throw new IllegalArgumentException(
-          "A selection annotation must have exactly one " + "AnnotationRange.");
+  private static List<AnnotationRange> prepareAnnotationRange(
+      @NotNull User user, @NotNull IFile file, int start, int end, @Nullable Editor editor) {
+
+    AnnotationRange annotationRange;
+
+    if (editor != null) {
+      TextAttributes selectionTextAttributes = getSelectionTextAttributes(editor, user);
+
+      RangeHighlighter rangeHighlighter =
+          addRangeHighlighter(start, end, editor, selectionTextAttributes, file);
+
+      if (rangeHighlighter == null) {
+        throw new IllegalStateException(
+            "Failed to create range highlighter for range ("
+                + start
+                + ","
+                + end
+                + ") for file "
+                + file);
+      }
+
+      annotationRange = new AnnotationRange(start, end, rangeHighlighter);
+
+    } else {
+      annotationRange = new AnnotationRange(start, end);
     }
+
+    return Collections.singletonList(annotationRange);
   }
 
   /**
