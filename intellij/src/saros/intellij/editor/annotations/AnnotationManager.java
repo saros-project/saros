@@ -3,9 +3,9 @@ package saros.intellij.editor.annotations;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.openapi.editor.markup.TextAttributes;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import saros.filesystem.IFile;
@@ -15,6 +15,8 @@ import saros.session.User;
 /** Annotation manager used to create, delete and manage annotations for a Saros session. */
 // TODO move local selections affected by changes while editor is closed; see issue #116
 public class AnnotationManager implements Disposable {
+
+  private static final Logger log = Logger.getLogger(AnnotationManager.class);
 
   public static final int MAX_CONTRIBUTION_ANNOTATIONS =
       Integer.getInteger("saros.intellij.MAX_CONTRIBUTION_ANNOTATIONS", 50);
@@ -124,41 +126,26 @@ public class AnnotationManager implements Disposable {
       return;
     }
 
-    TextAttributes textAttributes;
-    if (editor != null) {
-      textAttributes = ContributionAnnotation.getContributionTextAttributes(editor, user);
-    } else {
-      textAttributes = null;
+    ContributionAnnotation contributionAnnotation;
+
+    try {
+      contributionAnnotation = new ContributionAnnotation(user, file, start, end, editor);
+
+    } catch (IllegalStateException e) {
+      log.warn(
+          "Failed to add contribution annotation for file "
+              + file
+              + " and user "
+              + user
+              + " at position("
+              + start
+              + ","
+              + end
+              + ").",
+          e);
+
+      return;
     }
-
-    List<AnnotationRange> annotationRanges = new ArrayList<>();
-
-    for (int i = 0; i < end - start; i++) {
-      int currentStart = start + i;
-      int currentEnd = start + i + 1;
-
-      AnnotationRange annotationRange;
-
-      if (editor != null) {
-        RangeHighlighter rangeHighlighter =
-            AbstractEditorAnnotation.addRangeHighlighter(
-                currentStart, currentEnd, editor, textAttributes, file);
-
-        if (rangeHighlighter == null) {
-          return;
-        }
-
-        annotationRange = new AnnotationRange(currentStart, currentEnd, rangeHighlighter);
-
-      } else {
-        annotationRange = new AnnotationRange(currentStart, currentEnd);
-      }
-
-      annotationRanges.add(annotationRange);
-    }
-
-    ContributionAnnotation contributionAnnotation =
-        new ContributionAnnotation(user, file, editor, annotationRanges);
 
     ContributionAnnotation dequeuedAnnotation = contributionAnnotationQueue.removeIfFull();
 
