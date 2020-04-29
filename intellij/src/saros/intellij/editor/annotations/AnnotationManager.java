@@ -3,7 +3,6 @@ package saros.intellij.editor.annotations;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.openapi.editor.markup.TextAttributes;
-import java.util.Collections;
 import java.util.List;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -62,26 +61,26 @@ public class AnnotationManager implements Disposable {
       return;
     }
 
-    AnnotationRange annotationRange;
+    SelectionAnnotation selectionAnnotation;
 
-    if (editor != null) {
-      TextAttributes textAttributes = SelectionAnnotation.getSelectionTextAttributes(editor, user);
+    try {
+      selectionAnnotation = new SelectionAnnotation(user, file, start, end, editor);
 
-      RangeHighlighter rangeHighlighter =
-          AbstractEditorAnnotation.addRangeHighlighter(start, end, editor, textAttributes, file);
+    } catch (IllegalStateException e) {
+      log.warn(
+          "Failed to add contribution annotation for file "
+              + file
+              + " and user "
+              + user
+              + " at position("
+              + start
+              + ","
+              + end
+              + ").",
+          e);
 
-      if (rangeHighlighter == null) {
-        return;
-      }
-
-      annotationRange = new AnnotationRange(start, end, rangeHighlighter);
-
-    } else {
-      annotationRange = new AnnotationRange(start, end);
+      return;
     }
-
-    SelectionAnnotation selectionAnnotation =
-        new SelectionAnnotation(user, file, editor, Collections.singletonList(annotationRange));
 
     selectionAnnotationStore.addAnnotation(selectionAnnotation);
   }
