@@ -599,6 +599,7 @@ public class AnnotationManager implements Disposable {
    * @return a RangeHighlighter with the given parameters or <code>null</code> if the given end
    *     position is located after the document end
    */
+  @Deprecated
   @Nullable
   private static RangeHighlighter addRangeHighlighter(
       @NotNull User user,
@@ -668,6 +669,7 @@ public class AnnotationManager implements Disposable {
    *
    * @param annotation the annotation whose highlighters to remove
    */
+  @Deprecated
   private static void removeRangeHighlighter(@NotNull AbstractEditorAnnotation annotation) {
 
     Editor editor = annotation.getEditor();
