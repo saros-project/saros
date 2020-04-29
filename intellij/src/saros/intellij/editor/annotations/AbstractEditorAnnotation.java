@@ -1,13 +1,21 @@
 package saros.intellij.editor.annotations;
 
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.markup.HighlighterLayer;
+import com.intellij.openapi.editor.markup.HighlighterTargetArea;
+import com.intellij.openapi.editor.markup.RangeHighlighter;
+import com.intellij.openapi.editor.markup.TextAttributes;
+import com.intellij.openapi.util.Computable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import saros.filesystem.IFile;
+import saros.intellij.runtime.EDTExecutor;
 import saros.session.User;
 
 /**
@@ -24,6 +32,8 @@ import saros.session.User;
  * @see AnnotationRange
  */
 abstract class AbstractEditorAnnotation {
+  private static final Logger log = Logger.getLogger(AbstractEditorAnnotation.class);
+
   private final User user;
   private IFile file;
   private final List<AnnotationRange> annotationRanges;
@@ -311,6 +321,93 @@ abstract class AbstractEditorAnnotation {
     }
 
     return annotationRanges.isEmpty();
+  }
+
+  /**
+   * Creates a RangeHighlighter with the given position and text attributes for the given editor.
+   *
+   * <p>The returned <code>RangeHighlighter</code> can not be modified through the API but is
+   * automatically updated by Intellij if there are changes to the editor.
+   *
+   * @param start the start of the highlighted area
+   * @param end the end of the highlighted area
+   * @param editor the editor to create the highlighter for
+   * @param file the file for the editor
+   * @return a RangeHighlighter with the given parameters or <code>null</code> if the given end
+   *     position is located after the document end
+   */
+  @Nullable
+  static RangeHighlighter addRangeHighlighter(
+      int start,
+      int end,
+      @NotNull Editor editor,
+      @NotNull TextAttributes textAttributes,
+      @NotNull IFile file) {
+
+    int documentLength = editor.getDocument().getTextLength();
+
+    if (documentLength < end) {
+      log.warn(
+          "The creation of a range highlighter with the bounds ("
+              + start
+              + ", "
+              + end
+              + ") for the file "
+              + file.getProject().getName()
+              + " - "
+              + file.getProjectRelativePath()
+              + " failed as the given end position is located after the "
+              + "document end. document length: "
+              + documentLength
+              + ", end position: "
+              + end);
+
+      return null;
+    }
+
+    return EDTExecutor.invokeAndWait(
+        (Computable<RangeHighlighter>)
+            () ->
+                editor
+                    .getMarkupModel()
+                    .addRangeHighlighter(
+                        start,
+                        end,
+                        HighlighterLayer.LAST,
+                        textAttributes,
+                        HighlighterTargetArea.EXACT_RANGE),
+        ModalityState.defaultModalityState());
+  }
+
+  /**
+   * Removes all existing range highlighters belonging to this annotation from the held editor. Also
+   * removes the references to the removed range highlighters from the held annotation ranges.
+   *
+   * <p>Does nothing if no editor is present.
+   *
+   * @param editor the current editor of the annotation
+   * @param annotationRanges the annotation ranges of the annotation
+   */
+  static void removeRangeHighlighter(
+      @Nullable Editor editor, @NotNull List<AnnotationRange> annotationRanges) {
+
+    if (editor == null) {
+      return;
+    }
+
+    for (AnnotationRange annotationRange : annotationRanges) {
+      RangeHighlighter rangeHighlighter = annotationRange.getRangeHighlighter();
+
+      if (rangeHighlighter == null || !rangeHighlighter.isValid()) {
+        return;
+      }
+
+      EDTExecutor.invokeAndWait(
+          () -> editor.getMarkupModel().removeHighlighter(rangeHighlighter),
+          ModalityState.defaultModalityState());
+
+      annotationRange.removeRangeHighlighter();
+    }
   }
 
   @Override
