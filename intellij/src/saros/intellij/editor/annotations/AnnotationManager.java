@@ -33,7 +33,7 @@ public class AnnotationManager implements Disposable {
     CONTRIBUTION_ANNOTATION
   }
 
-  private static final int MAX_CONTRIBUTION_ANNOTATIONS =
+  public static final int MAX_CONTRIBUTION_ANNOTATIONS =
       Integer.getInteger("saros.intellij.MAX_CONTRIBUTION_ANNOTATIONS", 50);
 
   private final AnnotationStore<SelectionAnnotation> selectionAnnotationStore;
