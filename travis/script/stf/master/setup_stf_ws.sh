@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/sh -e
 # Has to be called within a stf_master container
 
 [ ! -z "$DEBUG_BASH" ] && set -x
