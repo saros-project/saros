@@ -53,7 +53,11 @@ class AnnotationQueue<E extends AbstractEditorAnnotation> extends AnnotationStor
   @Nullable
   E removeIfFull() {
     if (annotationQueue.size() == maxSize) {
-      return annotationQueue.remove();
+      E removedAnnotation = annotationQueue.remove();
+
+      super.removeAnnotation(removedAnnotation);
+
+      return removedAnnotation;
     }
 
     return null;
