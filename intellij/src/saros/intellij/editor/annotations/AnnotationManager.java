@@ -109,7 +109,7 @@ public class AnnotationManager implements Disposable {
     List<SelectionAnnotation> currentSelectionAnnotation =
         selectionAnnotationStore.removeAnnotations(user, file);
 
-    currentSelectionAnnotation.forEach(this::removeRangeHighlighter);
+    currentSelectionAnnotation.forEach(AnnotationManager::removeRangeHighlighter);
   }
 
   /**
@@ -569,9 +569,13 @@ public class AnnotationManager implements Disposable {
    */
   public void removeAnnotations(@NotNull User user) {
 
-    selectionAnnotationStore.removeAnnotations(user).forEach(this::removeRangeHighlighter);
+    selectionAnnotationStore
+        .removeAnnotations(user)
+        .forEach(AnnotationManager::removeRangeHighlighter);
 
-    contributionAnnotationQueue.removeAnnotations(user).forEach(this::removeRangeHighlighter);
+    contributionAnnotationQueue
+        .removeAnnotations(user)
+        .forEach(AnnotationManager::removeRangeHighlighter);
   }
 
   /**
@@ -603,9 +607,13 @@ public class AnnotationManager implements Disposable {
    * annotation stores.
    */
   private void removeAllAnnotations() {
-    selectionAnnotationStore.removeAllAnnotations().forEach(this::removeRangeHighlighter);
+    selectionAnnotationStore
+        .removeAllAnnotations()
+        .forEach(AnnotationManager::removeRangeHighlighter);
 
-    contributionAnnotationQueue.removeAllAnnotations().forEach(this::removeRangeHighlighter);
+    contributionAnnotationQueue
+        .removeAllAnnotations()
+        .forEach(AnnotationManager::removeRangeHighlighter);
   }
 
   /**
@@ -710,7 +718,7 @@ public class AnnotationManager implements Disposable {
    *     position is located after the document end
    */
   @Nullable
-  private RangeHighlighter addRangeHighlighter(
+  private static RangeHighlighter addRangeHighlighter(
       @NotNull User user,
       int start,
       int end,
@@ -778,7 +786,7 @@ public class AnnotationManager implements Disposable {
    *
    * @param annotation the annotation whose highlighters to remove
    */
-  private void removeRangeHighlighter(@NotNull AbstractEditorAnnotation annotation) {
+  private static void removeRangeHighlighter(@NotNull AbstractEditorAnnotation annotation) {
 
     Editor editor = annotation.getEditor();
 
