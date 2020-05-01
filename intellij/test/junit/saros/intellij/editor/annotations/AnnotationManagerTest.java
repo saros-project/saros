@@ -249,6 +249,52 @@ public class AnnotationManagerTest {
     assertEquals(0, selectionAnnotations.size());
   }
 
+  /**
+   * Tests that removing selection annotations for a specific file user combination removes all
+   * corresponding annotations and does not remove any annotations for a different file or user.
+   */
+  @Test
+  public void testRemoveSelectionAnnotation() {
+    /* setup */
+    User user1 = user;
+    IFile file1 = file;
+    User user2 = EasyMock.createNiceMock(User.class);
+    IFile file2 = EasyMock.createNiceMock(IFile.class);
+
+    int start1 = 0;
+    int end1 = 20;
+    int start2 = 53;
+    int end2 = 56;
+    List<Pair<Integer, Integer>> expectedRange2 = createSelectionRange(start2, end2);
+
+    annotationManager.addSelectionAnnotation(user1, file1, start1, end1, null);
+    annotationManager.addSelectionAnnotation(user2, file2, start2, end2, null);
+
+    assertEquals(2, selectionAnnotationStore.getAnnotations().size());
+
+    /* call to test */
+    annotationManager.removeSelectionAnnotation(user1, file1);
+
+    /* check assertions */
+    List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(1, selectionAnnotations.size());
+    assertEquals(0, selectionAnnotationStore.getAnnotations(file1).size());
+    assertEquals(1, selectionAnnotationStore.getAnnotations(file2).size());
+
+    SelectionAnnotation selectionAnnotation = selectionAnnotations.get(0);
+    assertAnnotationIntegrity(selectionAnnotation, user2, file2, expectedRange2, null);
+
+    /* call to test */
+    annotationManager.removeSelectionAnnotation(user2, file2);
+
+    /* check assertions */
+    selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(0, selectionAnnotations.size());
+
+    assertEquals(0, selectionAnnotationStore.getAnnotations(file1).size());
+    assertEquals(0, selectionAnnotationStore.getAnnotations(file2).size());
+  }
+
   /** Test adding contribution annotations without an editor. */
   @Test
   public void testAddContributionAnnotationNoEditor() {
