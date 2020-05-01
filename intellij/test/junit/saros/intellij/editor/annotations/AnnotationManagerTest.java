@@ -11,6 +11,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.markup.RangeHighlighter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -76,6 +77,178 @@ public class AnnotationManagerTest {
     editor = EasyMock.createNiceMock(Editor.class);
   }
 
+  /** Test adding selection annotations without an editor. */
+  @Test
+  public void testAddSelectionAnnotationNoEditor() {
+    /* setup */
+    int start = 90;
+    int end = 200;
+    List<Pair<Integer, Integer>> expectedRange = createSelectionRange(start, end);
+
+    assertTrue(selectionAnnotationStore.getAnnotations().isEmpty());
+
+    /* call to test */
+    annotationManager.addSelectionAnnotation(user, file, start, end, null);
+
+    /* check assertions */
+    List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(1, selectionAnnotations.size());
+
+    SelectionAnnotation selectionAnnotation = selectionAnnotations.get(0);
+    assertAnnotationIntegrity(selectionAnnotation, user, file, expectedRange, null);
+  }
+
+  /** Test adding selection annotations with an editor. */
+  @Test
+  public void testAddSelectionAnnotationEditor() throws Exception {
+    /* setup */
+    int start = 50;
+    int end = 52;
+    List<Pair<Integer, Integer>> expectedRange = createSelectionRange(start, end);
+
+    mockAddRangeHighlighters(expectedRange, AnnotationType.SELECTION_ANNOTATION);
+
+    assertTrue(selectionAnnotationStore.getAnnotations().isEmpty());
+
+    /* call to test */
+    annotationManager.addSelectionAnnotation(user, file, start, end, editor);
+
+    /* check assertions */
+    List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(1, selectionAnnotations.size());
+
+    SelectionAnnotation selectionAnnotation = selectionAnnotations.get(0);
+    assertAnnotationIntegrity(selectionAnnotation, user, file, expectedRange, editor);
+  }
+
+  /**
+   * Tests that adding a new selection annotation for a file removes the old selection annotation.
+   */
+  @Test
+  public void testReplaceSelectionAnnotation() {
+    /* setup */
+    int start = 0;
+    int end = 5;
+    List<Pair<Integer, Integer>> expectedRange = createSelectionRange(start, end);
+
+    assertTrue(selectionAnnotationStore.getAnnotations().isEmpty());
+
+    /* call to test */
+    annotationManager.addSelectionAnnotation(user, file, start, end, null);
+
+    /* check assertions */
+    List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(1, selectionAnnotations.size());
+
+    SelectionAnnotation selectionAnnotation = selectionAnnotations.get(0);
+    assertAnnotationIntegrity(selectionAnnotation, user, file, expectedRange, null);
+
+    /* setup */
+    start = 15;
+    end = 22;
+    expectedRange = createSelectionRange(start, end);
+
+    /* call to test */
+    annotationManager.addSelectionAnnotation(user, file, start, end, null);
+
+    /* check assertions */
+    selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(1, selectionAnnotations.size());
+
+    selectionAnnotation = selectionAnnotations.get(0);
+    assertAnnotationIntegrity(selectionAnnotation, user, file, expectedRange, null);
+  }
+
+  /**
+   * Tests that adding a new selection annotation for a file does not remove the selection
+   * annotation for a different file.
+   */
+  @Test
+  public void testDoNotReplaceSelectionAnnotation() {
+    /* setup */
+    User user1 = user;
+    IFile file1 = file;
+    User user2 = EasyMock.createNiceMock(User.class);
+    IFile file2 = EasyMock.createNiceMock(IFile.class);
+
+    int start1 = 76;
+    int end1 = 333;
+    List<Pair<Integer, Integer>> expectedRange1 = createSelectionRange(start1, end1);
+
+    assertTrue(selectionAnnotationStore.getAnnotations().isEmpty());
+
+    /* call to test */
+    annotationManager.addSelectionAnnotation(user1, file1, start1, end1, null);
+
+    /* check assertions */
+    List<SelectionAnnotation> selectionAnnotations1 =
+        selectionAnnotationStore.getAnnotations(file1);
+    assertEquals(1, selectionAnnotations1.size());
+
+    List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(selectionAnnotations1, selectionAnnotations);
+
+    SelectionAnnotation selectionAnnotation1 = selectionAnnotations1.get(0);
+    assertAnnotationIntegrity(selectionAnnotation1, user1, file1, expectedRange1, null);
+
+    /* setup */
+    int start2 = 12;
+    int end2 = 13;
+    List<Pair<Integer, Integer>> expectedRange2 = createSelectionRange(start2, end2);
+
+    /* call to test */
+    annotationManager.addSelectionAnnotation(user2, file2, start2, end2, null);
+
+    /* check assertions */
+    selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(2, selectionAnnotations.size());
+
+    selectionAnnotations1 = selectionAnnotationStore.getAnnotations(file1);
+    assertEquals(1, selectionAnnotations1.size());
+
+    List<SelectionAnnotation> selectionAnnotations2 =
+        selectionAnnotationStore.getAnnotations(file2);
+    assertEquals(1, selectionAnnotations2.size());
+
+    selectionAnnotation1 = selectionAnnotations1.get(0);
+    assertAnnotationIntegrity(selectionAnnotation1, user1, file1, expectedRange1, null);
+
+    SelectionAnnotation selectionAnnotation2 = selectionAnnotations2.get(0);
+    assertAnnotationIntegrity(selectionAnnotation2, user2, file2, expectedRange2, null);
+  }
+
+  /**
+   * Test adding selection annotations with a zero-width range. Such calls should not lead to an
+   * annotation being added. If an old selection for the file is present, it should still be
+   * removed.
+   */
+  @Test
+  public void testAddSelectionAnnotationNoRange() {
+    /* setup */
+    int start = 0;
+    int end = 0;
+
+    assertEquals(0, selectionAnnotationStore.getAnnotations().size());
+
+    /* call to test */
+    annotationManager.addSelectionAnnotation(user, file, start, end, null);
+
+    /* check assertions */
+    List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(0, selectionAnnotations.size());
+
+    /* setup */
+    annotationManager.addSelectionAnnotation(user, file, 5, 10, null);
+    assertEquals(1, selectionAnnotationStore.getAnnotations().size());
+
+    /* call to test */
+    annotationManager.addSelectionAnnotation(user, file, start, end, null);
+
+    /* check assertions */
+    selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(0, selectionAnnotations.size());
+  }
+
   /** Test adding contribution annotations without an editor. */
   @Test
   public void testAddContributionAnnotationNoEditor() {
@@ -108,7 +281,7 @@ public class AnnotationManagerTest {
 
     List<Pair<Integer, Integer>> expectedRanges = createContributionRanges(start, end);
 
-    mockAddRangeHighlighters(expectedRanges);
+    mockAddRangeHighlighters(expectedRanges, AnnotationType.CONTRIBUTION_ANNOTATION);
 
     assertTrue(contributionAnnotationQueue.getAnnotations().isEmpty());
 
@@ -278,6 +451,17 @@ public class AnnotationManagerTest {
   }
 
   /**
+   * Creates a list containing a single entry for the given range.
+   *
+   * @param rangeStart the start of the range
+   * @param rangeEnd the end of the range
+   * @return a list containing a single entry for the given range
+   */
+  private List<Pair<Integer, Integer>> createSelectionRange(int rangeStart, int rangeEnd) {
+    return Collections.singletonList(new ImmutablePair<>(rangeStart, rangeEnd));
+  }
+
+  /**
    * Creates a list of ranges of size 1 covering the given range.
    *
    * @param rangeStart the start of the range
@@ -372,7 +556,8 @@ public class AnnotationManagerTest {
    * @param ranges the ranges to mock
    * @throws Exception see {@link PowerMock#expectPrivate(Object, Method, Object...)}
    */
-  private void mockAddRangeHighlighters(List<Pair<Integer, Integer>> ranges) throws Exception {
+  private void mockAddRangeHighlighters(
+      List<Pair<Integer, Integer>> ranges, AnnotationType annotationType) throws Exception {
     PowerMock.mockStaticPartial(AnnotationManager.class, "addRangeHighlighter");
 
     for (Pair<Integer, Integer> range : ranges) {
@@ -393,7 +578,7 @@ public class AnnotationManagerTest {
               rangeStart,
               rangeEnd,
               editor,
-              AnnotationType.CONTRIBUTION_ANNOTATION,
+              annotationType,
               file)
           .andStubReturn(rangeHighlighter);
     }
