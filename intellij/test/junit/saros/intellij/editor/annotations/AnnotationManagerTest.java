@@ -13,6 +13,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.easymock.EasyMock;
@@ -497,6 +498,331 @@ public class AnnotationManagerTest {
   }
 
   /**
+   * Tests moving annotations without an editor in reaction to text being added to the file after
+   * the annotation. The annotation position should not change.
+   */
+  @Test
+  public void testMoveAnnotationsAfterAdditionNoEditorAfterAnnotation() {
+    /* setup */
+    int start = 40;
+    int end = 50;
+    List<Pair<Integer, Integer>> expectedSelectionRanges = createSelectionRange(start, end);
+    List<Pair<Integer, Integer>> expectedContributionRanges = createContributionRanges(start, end);
+
+    SelectionAnnotation selectionAnnotation =
+        new SelectionAnnotation(
+            user, file, null, createAnnotationRanges(expectedSelectionRanges, false));
+    selectionAnnotationStore.addAnnotation(selectionAnnotation);
+
+    ContributionAnnotation contributionAnnotation =
+        new ContributionAnnotation(
+            user, file, null, createAnnotationRanges(expectedContributionRanges, false));
+    contributionAnnotationQueue.addAnnotation(contributionAnnotation);
+
+    /* call to test */
+    annotationManager.moveAnnotationsAfterAddition(file, 50, 55);
+
+    /* check assertions */
+    List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(1, selectionAnnotations.size());
+
+    selectionAnnotation = selectionAnnotations.get(0);
+    assertAnnotationIntegrity(selectionAnnotation, user, file, expectedSelectionRanges, null);
+
+    List<ContributionAnnotation> contributionAnnotations =
+        contributionAnnotationQueue.getAnnotations();
+    assertEquals(1, contributionAnnotations.size());
+
+    contributionAnnotation = contributionAnnotations.get(0);
+    assertAnnotationIntegrity(contributionAnnotation, user, file, expectedContributionRanges, null);
+  }
+
+  /**
+   * Tests moving annotations without an editor in reaction to text being added to the file before
+   * the annotation. The annotation position should be shifted right by the addition length.
+   */
+  @Test
+  public void testMoveAnnotationsAfterAdditionNoEditorBeforeAnnotation() {
+    /* setup */
+    int start = 40;
+    int end = 50;
+    List<Pair<Integer, Integer>> expectedSelectionRanges = createSelectionRange(start, end);
+    List<Pair<Integer, Integer>> expectedContributionRanges = createContributionRanges(start, end);
+
+    SelectionAnnotation selectionAnnotation =
+        new SelectionAnnotation(
+            user, file, null, createAnnotationRanges(expectedSelectionRanges, false));
+    selectionAnnotationStore.addAnnotation(selectionAnnotation);
+
+    ContributionAnnotation contributionAnnotation =
+        new ContributionAnnotation(
+            user, file, null, createAnnotationRanges(expectedContributionRanges, false));
+    contributionAnnotationQueue.addAnnotation(contributionAnnotation);
+
+    int additionStart = 2;
+    int additionEnd = 15;
+    int additionOffset = additionEnd - additionStart;
+
+    /* call to test */
+    annotationManager.moveAnnotationsAfterAddition(file, additionStart, additionEnd);
+
+    /* check assertions */
+    start += additionOffset;
+    end += additionOffset;
+    expectedSelectionRanges = createSelectionRange(start, end);
+    expectedContributionRanges = createContributionRanges(start, end);
+
+    List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(1, selectionAnnotations.size());
+
+    selectionAnnotation = selectionAnnotations.get(0);
+    assertAnnotationIntegrity(selectionAnnotation, user, file, expectedSelectionRanges, null);
+
+    List<ContributionAnnotation> contributionAnnotations =
+        contributionAnnotationQueue.getAnnotations();
+    assertEquals(1, contributionAnnotations.size());
+
+    contributionAnnotation = contributionAnnotations.get(0);
+    assertAnnotationIntegrity(contributionAnnotation, user, file, expectedContributionRanges, null);
+  }
+
+  /**
+   * Tests moving annotations without an editor in reaction to text being added to the file in the
+   * annotation range. Selection annotations should be extended by the addition length. For
+   * contribution annotations, the range highlighters after the addition point should be shifted
+   * right by the addition length.
+   */
+  @SuppressWarnings("UnnecessaryLocalVariable")
+  @Test
+  public void testMoveAnnotationsAfterAdditionNoEditorInAnnotation() {
+    /* setup */
+    int start = 40;
+    int end = 50;
+    List<Pair<Integer, Integer>> expectedSelectionRanges = createSelectionRange(start, end);
+    List<Pair<Integer, Integer>> expectedContributionRanges = createContributionRanges(start, end);
+
+    SelectionAnnotation selectionAnnotation =
+        new SelectionAnnotation(
+            user, file, null, createAnnotationRanges(expectedSelectionRanges, false));
+    selectionAnnotationStore.addAnnotation(selectionAnnotation);
+
+    ContributionAnnotation contributionAnnotation =
+        new ContributionAnnotation(
+            user, file, null, createAnnotationRanges(expectedContributionRanges, false));
+    contributionAnnotationQueue.addAnnotation(contributionAnnotation);
+
+    int additionStart = 45;
+    int additionEnd = 73;
+    int additionOffset = additionEnd - additionStart;
+
+    /* call to test */
+    annotationManager.moveAnnotationsAfterAddition(file, additionStart, additionEnd);
+
+    /* check assertions */
+    int newSelectionStart = start;
+    int newSelectionEnd = end + additionOffset;
+    expectedSelectionRanges = createSelectionRange(newSelectionStart, newSelectionEnd);
+
+    int newContributionStartFirstHalve = start;
+    int newContributionEndFirstHalve = additionStart;
+    List<Pair<Integer, Integer>> rangesFirstHalve =
+        createContributionRanges(newContributionStartFirstHalve, newContributionEndFirstHalve);
+    int newContributionStarSecondHalve = additionEnd;
+    int newContributionEndSecondHalve = additionEnd + end - additionStart;
+    List<Pair<Integer, Integer>> rangesSecondHalve =
+        createContributionRanges(newContributionStarSecondHalve, newContributionEndSecondHalve);
+
+    expectedContributionRanges = new ArrayList<>();
+    expectedContributionRanges.addAll(rangesFirstHalve);
+    expectedContributionRanges.addAll(rangesSecondHalve);
+
+    List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(1, selectionAnnotations.size());
+
+    selectionAnnotation = selectionAnnotations.get(0);
+    assertAnnotationIntegrity(selectionAnnotation, user, file, expectedSelectionRanges, null);
+
+    List<ContributionAnnotation> contributionAnnotations =
+        contributionAnnotationQueue.getAnnotations();
+    assertEquals(1, contributionAnnotations.size());
+
+    contributionAnnotation = contributionAnnotations.get(0);
+    assertAnnotationIntegrity(contributionAnnotation, user, file, expectedContributionRanges, null);
+  }
+
+  /**
+   * Tests moving annotations with an editor in reaction to text being added to the file before, in,
+   * or after the annotation. The annotation position should not be adjusted in any case.
+   */
+  @Test
+  public void testMoveAnnotationsAfterAdditionEditor() {
+    /* setup */
+    int start = 40;
+    int end = 50;
+    List<Pair<Integer, Integer>> expectedSelectionRanges = createSelectionRange(start, end);
+    List<Pair<Integer, Integer>> expectedContributionRanges = createContributionRanges(start, end);
+
+    SelectionAnnotation selectionAnnotation =
+        new SelectionAnnotation(
+            user, file, editor, createAnnotationRanges(expectedSelectionRanges, true));
+    selectionAnnotationStore.addAnnotation(selectionAnnotation);
+
+    ContributionAnnotation contributionAnnotation =
+        new ContributionAnnotation(
+            user, file, editor, createAnnotationRanges(expectedContributionRanges, true));
+    contributionAnnotationQueue.addAnnotation(contributionAnnotation);
+
+    int additionStartBefore = 50;
+    int additionEndBefore = 55;
+
+    /* call to test */
+    annotationManager.moveAnnotationsAfterAddition(file, additionStartBefore, additionEndBefore);
+
+    /* check assertions */
+    List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(1, selectionAnnotations.size());
+
+    selectionAnnotation = selectionAnnotations.get(0);
+    assertAnnotationIntegrity(selectionAnnotation, user, file, expectedSelectionRanges, editor);
+
+    List<ContributionAnnotation> contributionAnnotations =
+        contributionAnnotationQueue.getAnnotations();
+    assertEquals(1, contributionAnnotations.size());
+
+    contributionAnnotation = contributionAnnotations.get(0);
+    assertAnnotationIntegrity(
+        contributionAnnotation, user, file, expectedContributionRanges, editor);
+
+    /* setup*/
+    int additionStartAfter = 2;
+    int additionEndAfter = 15;
+
+    /* call to test */
+    annotationManager.moveAnnotationsAfterAddition(file, additionStartAfter, additionEndAfter);
+
+    /* check assertions */
+    selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(1, selectionAnnotations.size());
+
+    selectionAnnotation = selectionAnnotations.get(0);
+    assertAnnotationIntegrity(selectionAnnotation, user, file, expectedSelectionRanges, editor);
+
+    contributionAnnotations = contributionAnnotationQueue.getAnnotations();
+    assertEquals(1, contributionAnnotations.size());
+
+    contributionAnnotation = contributionAnnotations.get(0);
+    assertAnnotationIntegrity(
+        contributionAnnotation, user, file, expectedContributionRanges, editor);
+
+    /* setup*/
+    int additionStartIn = 45;
+    int additionEndIn = 73;
+
+    /* call to test */
+    annotationManager.moveAnnotationsAfterAddition(file, additionStartIn, additionEndIn);
+
+    /* check assertions */
+    selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(1, selectionAnnotations.size());
+
+    selectionAnnotation = selectionAnnotations.get(0);
+    assertAnnotationIntegrity(selectionAnnotation, user, file, expectedSelectionRanges, editor);
+
+    contributionAnnotations = contributionAnnotationQueue.getAnnotations();
+    assertEquals(1, contributionAnnotations.size());
+
+    contributionAnnotation = contributionAnnotations.get(0);
+    assertAnnotationIntegrity(
+        contributionAnnotation, user, file, expectedContributionRanges, editor);
+  }
+
+  /**
+   * Tests moving annotations without an editor in reaction to text being added to a different file
+   * before, in, or after the annotation position. The annotation position should not be adjusted in
+   * any case.
+   */
+  @Test
+  public void testMoveAnnotationsAfterAdditionDifferentFile() {
+    /* setup */
+    IFile file2 = EasyMock.createNiceMock(IFile.class);
+
+    int start = 40;
+    int end = 50;
+    List<Pair<Integer, Integer>> expectedSelectionRanges = createSelectionRange(start, end);
+    List<Pair<Integer, Integer>> expectedContributionRanges = createContributionRanges(start, end);
+
+    SelectionAnnotation selectionAnnotation =
+        new SelectionAnnotation(
+            user, file, null, createAnnotationRanges(expectedSelectionRanges, false));
+    selectionAnnotationStore.addAnnotation(selectionAnnotation);
+
+    ContributionAnnotation contributionAnnotation =
+        new ContributionAnnotation(
+            user, file, null, createAnnotationRanges(expectedContributionRanges, false));
+    contributionAnnotationQueue.addAnnotation(contributionAnnotation);
+
+    int additionStartBefore = 50;
+    int additionEndBefore = 55;
+
+    /* call to test */
+    annotationManager.moveAnnotationsAfterAddition(file2, additionStartBefore, additionEndBefore);
+
+    /* check assertions */
+    List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(1, selectionAnnotations.size());
+
+    selectionAnnotation = selectionAnnotations.get(0);
+    assertAnnotationIntegrity(selectionAnnotation, user, file, expectedSelectionRanges, null);
+
+    List<ContributionAnnotation> contributionAnnotations =
+        contributionAnnotationQueue.getAnnotations();
+    assertEquals(1, contributionAnnotations.size());
+
+    contributionAnnotation = contributionAnnotations.get(0);
+    assertAnnotationIntegrity(contributionAnnotation, user, file, expectedContributionRanges, null);
+
+    /* setup*/
+    int additionStartAfter = 2;
+    int additionEndAfter = 15;
+
+    /* call to test */
+    annotationManager.moveAnnotationsAfterAddition(file2, additionStartAfter, additionEndAfter);
+
+    /* check assertions */
+    selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(1, selectionAnnotations.size());
+
+    selectionAnnotation = selectionAnnotations.get(0);
+    assertAnnotationIntegrity(selectionAnnotation, user, file, expectedSelectionRanges, null);
+
+    contributionAnnotations = contributionAnnotationQueue.getAnnotations();
+    assertEquals(1, contributionAnnotations.size());
+
+    contributionAnnotation = contributionAnnotations.get(0);
+    assertAnnotationIntegrity(contributionAnnotation, user, file, expectedContributionRanges, null);
+
+    /* setup*/
+    int additionStartIn = 45;
+    int additionEndIn = 73;
+
+    /* call to test */
+    annotationManager.moveAnnotationsAfterAddition(file2, additionStartIn, additionEndIn);
+
+    /* check assertions */
+    selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(1, selectionAnnotations.size());
+
+    selectionAnnotation = selectionAnnotations.get(0);
+    assertAnnotationIntegrity(selectionAnnotation, user, file, expectedSelectionRanges, null);
+
+    contributionAnnotations = contributionAnnotationQueue.getAnnotations();
+    assertEquals(1, contributionAnnotations.size());
+
+    contributionAnnotation = contributionAnnotations.get(0);
+    assertAnnotationIntegrity(contributionAnnotation, user, file, expectedContributionRanges, null);
+  }
+
+  /**
    * Creates a list containing a single entry for the given range.
    *
    * @param rangeStart the start of the range
@@ -522,6 +848,26 @@ public class AnnotationManagerTest {
     }
 
     return expectedRanges;
+  }
+
+  private List<AnnotationRange> createAnnotationRanges(
+      List<Pair<Integer, Integer>> ranges, boolean addRangeHighlighters) {
+    return ranges
+        .stream()
+        .map(
+            range -> {
+              int rangeStart = range.getLeft();
+              int rangeEnd = range.getRight();
+
+              if (addRangeHighlighters) {
+                RangeHighlighter rangeHighlighter = mockRangeHighlighter(rangeStart, rangeEnd);
+
+                return new AnnotationRange(rangeStart, rangeEnd, rangeHighlighter);
+              } else {
+                return new AnnotationRange(rangeStart, rangeEnd);
+              }
+            })
+        .collect(Collectors.toList());
   }
 
   /**
@@ -610,12 +956,7 @@ public class AnnotationManagerTest {
       int rangeStart = range.getLeft();
       int rangeEnd = range.getRight();
 
-      RangeHighlighter rangeHighlighter = EasyMock.createNiceMock(RangeHighlighter.class);
-
-      EasyMock.expect(rangeHighlighter.getStartOffset()).andStubReturn(rangeStart);
-      EasyMock.expect(rangeHighlighter.getEndOffset()).andStubReturn(rangeEnd);
-
-      EasyMock.replay(rangeHighlighter);
+      RangeHighlighter rangeHighlighter = mockRangeHighlighter(rangeStart, rangeEnd);
 
       PowerMock.expectPrivate(
               annotationManager,
@@ -630,5 +971,18 @@ public class AnnotationManagerTest {
     }
 
     PowerMock.replay(AnnotationManager.class);
+  }
+
+  private RangeHighlighter mockRangeHighlighter(int rangeStart, int rangeEnd) {
+    RangeHighlighter rangeHighlighter = EasyMock.createNiceMock(RangeHighlighter.class);
+
+    EasyMock.expect(rangeHighlighter.getStartOffset()).andStubReturn(rangeStart);
+    EasyMock.expect(rangeHighlighter.getEndOffset()).andStubReturn(rangeEnd);
+
+    EasyMock.expect(rangeHighlighter.isValid()).andStubReturn(true);
+
+    EasyMock.replay(rangeHighlighter);
+
+    return rangeHighlighter;
   }
 }
