@@ -107,7 +107,9 @@ public class AnnotationManagerTest {
     int end = 52;
     List<Pair<Integer, Integer>> expectedRange = createSelectionRange(start, end);
 
+    prepareMockAddRangeHighlighters();
     mockAddRangeHighlighters(expectedRange, AnnotationType.SELECTION_ANNOTATION);
+    replayMockAddRangeHighlighters();
 
     assertTrue(selectionAnnotationStore.getAnnotations().isEmpty());
 
@@ -328,7 +330,9 @@ public class AnnotationManagerTest {
 
     List<Pair<Integer, Integer>> expectedRanges = createContributionRanges(start, end);
 
+    prepareMockAddRangeHighlighters();
     mockAddRangeHighlighters(expectedRanges, AnnotationType.CONTRIBUTION_ANNOTATION);
+    replayMockAddRangeHighlighters();
 
     assertTrue(contributionAnnotationQueue.getAnnotations().isEmpty());
 
@@ -1508,15 +1512,26 @@ public class AnnotationManagerTest {
   }
 
   /**
+   * Must be called before the first call to {@link #mockAddRangeHighlighters(List,
+   * AnnotationType)}.
+   */
+  private void prepareMockAddRangeHighlighters() {
+    PowerMock.mockStaticPartial(AnnotationManager.class, "addRangeHighlighter");
+  }
+
+  /**
    * Mocks the method creating the actual range highlighters in the editor for the list of given
    * ranges.
+   *
+   * <p>{@link #prepareMockAddRangeHighlighters()} must be called before the first call to this
+   * methods and {@link #replayMockAddRangeHighlighters()} must be called after the last call to
+   * this method to replay the added mocking logic.
    *
    * @param ranges the ranges to mock
    * @throws Exception see {@link PowerMock#expectPrivate(Object, Method, Object...)}
    */
   private void mockAddRangeHighlighters(
       List<Pair<Integer, Integer>> ranges, AnnotationType annotationType) throws Exception {
-    PowerMock.mockStaticPartial(AnnotationManager.class, "addRangeHighlighter");
 
     for (Pair<Integer, Integer> range : ranges) {
       int rangeStart = range.getLeft();
@@ -1535,7 +1550,12 @@ public class AnnotationManagerTest {
               file)
           .andStubReturn(rangeHighlighter);
     }
+  }
 
+  /**
+   * Must be called after the last call to {@link #mockAddRangeHighlighters(List, AnnotationType)}.
+   */
+  private void replayMockAddRangeHighlighters() {
     PowerMock.replay(AnnotationManager.class);
   }
 
