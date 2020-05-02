@@ -1848,6 +1848,86 @@ public class AnnotationManagerTest {
     assertAnnotationIntegrity(contributionAnnotation, user, file, expectedContributionRanges, null);
   }
 
+  /** Tests removing all annotations for a specific file. */
+  @Test
+  public void testRemoveAnnotationsForFile() throws Exception {
+    /* setup */
+    int start = 94;
+    int end = 112;
+    List<Pair<Integer, Integer>> expectedSelectionRanges = createSelectionRange(start, end);
+    List<Pair<Integer, Integer>> expectedContributionRanges = createContributionRanges(start, end);
+
+    SelectionAnnotation selectionAnnotation =
+        new SelectionAnnotation(
+            user, file, editor, createAnnotationRanges(expectedSelectionRanges, true));
+    selectionAnnotationStore.addAnnotation(selectionAnnotation);
+
+    ContributionAnnotation contributionAnnotation =
+        new ContributionAnnotation(
+            user, file, editor, createAnnotationRanges(expectedContributionRanges, true));
+    contributionAnnotationQueue.addAnnotation(contributionAnnotation);
+
+    prepareMockAddRemoveRangeHighlighters();
+    mockRemoveRangeHighlighters(selectionAnnotation);
+    mockRemoveRangeHighlighters(contributionAnnotation);
+    replayMockAddRemoveRangeHighlighters();
+
+    /* calls to test */
+    annotationManager.removeAnnotations(file);
+
+    /* check assertions */
+    PowerMock.verify(AnnotationManager.class);
+
+    List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(0, selectionAnnotations.size());
+
+    List<ContributionAnnotation> contributionAnnotations =
+        contributionAnnotationQueue.getAnnotations();
+    assertEquals(0, contributionAnnotations.size());
+  }
+
+  /**
+   * Tests removing all annotations for a different file. All annotations should still be present
+   * after the call.
+   */
+  @Test
+  public void testRemoveAnnotationsForDifferentFile() {
+    /* setup */
+    IFile file2 = EasyMock.createNiceMock(IFile.class);
+
+    int start = 94;
+    int end = 112;
+    List<Pair<Integer, Integer>> expectedSelectionRanges = createSelectionRange(start, end);
+    List<Pair<Integer, Integer>> expectedContributionRanges = createContributionRanges(start, end);
+
+    SelectionAnnotation selectionAnnotation =
+        new SelectionAnnotation(
+            user, file, null, createAnnotationRanges(expectedSelectionRanges, false));
+    selectionAnnotationStore.addAnnotation(selectionAnnotation);
+
+    ContributionAnnotation contributionAnnotation =
+        new ContributionAnnotation(
+            user, file, null, createAnnotationRanges(expectedContributionRanges, false));
+    contributionAnnotationQueue.addAnnotation(contributionAnnotation);
+
+    /* calls to test */
+    annotationManager.removeAnnotations(file2);
+
+    /* check assertions */
+    List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(1, selectionAnnotations.size());
+
+    selectionAnnotation = selectionAnnotations.get(0);
+    assertAnnotationIntegrity(selectionAnnotation, user, file, expectedSelectionRanges, null);
+
+    List<ContributionAnnotation> contributionAnnotations =
+        contributionAnnotationQueue.getAnnotations();
+    assertEquals(1, contributionAnnotations.size());
+
+    contributionAnnotation = contributionAnnotations.get(0);
+    assertAnnotationIntegrity(contributionAnnotation, user, file, expectedContributionRanges, null);
+  }
+
   /**
    * Creates a list containing a single entry for the given range.
    *
