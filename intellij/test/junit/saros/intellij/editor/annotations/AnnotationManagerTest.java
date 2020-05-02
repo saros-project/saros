@@ -1445,6 +1445,191 @@ public class AnnotationManagerTest {
   }
 
   /**
+   * Tests updating the positions of the stored annotations by using their range highlighter
+   * positions. After the call, the positions of all annotation ranges should match the position of
+   * their range highlighter.
+   */
+  @Test
+  public void testUpdateAnnotationStore() {
+    /* setup */
+    int start = 12;
+    int end = 34;
+    int offset = 23;
+    List<Pair<Integer, Integer>> startSelectionRanges = createSelectionRange(start, end);
+    List<Pair<Integer, Integer>> startContributionRanges = createContributionRanges(start, end);
+
+    List<Pair<Integer, Integer>> expectedSelectionRanges =
+        createSelectionRange(start + offset, end + offset);
+    List<Pair<Integer, Integer>> expectedContributionRanges =
+        createContributionRanges(start + offset, end + offset);
+
+    /*
+     * Mock range highlighters to return initial position for initialization check and adjusted
+     * position for all subsequent calls.
+     */
+    List<AnnotationRange> selectionAnnotationRanges =
+        startSelectionRanges
+            .stream()
+            .map(
+                range -> {
+                  int rangeStart = range.getLeft();
+                  int rangeEnd = range.getRight();
+
+                  RangeHighlighter rangeHighlighter =
+                      EasyMock.createNiceMock(RangeHighlighter.class);
+
+                  EasyMock.expect(rangeHighlighter.getStartOffset()).andReturn(rangeStart);
+                  EasyMock.expect(rangeHighlighter.getEndOffset()).andReturn(rangeEnd);
+
+                  EasyMock.expect(rangeHighlighter.getStartOffset())
+                      .andStubReturn(rangeStart + offset);
+                  EasyMock.expect(rangeHighlighter.getEndOffset()).andStubReturn(rangeEnd + offset);
+
+                  EasyMock.expect(rangeHighlighter.isValid()).andStubReturn(true);
+
+                  EasyMock.replay(rangeHighlighter);
+
+                  return new AnnotationRange(rangeStart, rangeEnd, rangeHighlighter);
+                })
+            .collect(Collectors.toList());
+
+    List<AnnotationRange> contributionAnnotationRanges =
+        startContributionRanges
+            .stream()
+            .map(
+                range -> {
+                  int rangeStart = range.getLeft();
+                  int rangeEnd = range.getRight();
+
+                  RangeHighlighter rangeHighlighter =
+                      EasyMock.createNiceMock(RangeHighlighter.class);
+
+                  EasyMock.expect(rangeHighlighter.getStartOffset()).andReturn(rangeStart);
+                  EasyMock.expect(rangeHighlighter.getEndOffset()).andReturn(rangeEnd);
+
+                  EasyMock.expect(rangeHighlighter.getStartOffset())
+                      .andStubReturn(rangeStart + offset);
+                  EasyMock.expect(rangeHighlighter.getEndOffset()).andStubReturn(rangeEnd + offset);
+
+                  EasyMock.expect(rangeHighlighter.isValid()).andStubReturn(true);
+
+                  EasyMock.replay(rangeHighlighter);
+
+                  return new AnnotationRange(rangeStart, rangeEnd, rangeHighlighter);
+                })
+            .collect(Collectors.toList());
+
+    SelectionAnnotation selectionAnnotation =
+        new SelectionAnnotation(user, file, editor, selectionAnnotationRanges);
+    selectionAnnotationStore.addAnnotation(selectionAnnotation);
+
+    ContributionAnnotation contributionAnnotation =
+        new ContributionAnnotation(user, file, editor, contributionAnnotationRanges);
+    contributionAnnotationQueue.addAnnotation(contributionAnnotation);
+
+    /* call to test */
+    annotationManager.updateAnnotationStore(file);
+
+    /* check assertions */
+    List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(1, selectionAnnotations.size());
+
+    selectionAnnotation = selectionAnnotations.get(0);
+    assertAnnotationIntegrity(selectionAnnotation, user, file, expectedSelectionRanges, editor);
+
+    List<ContributionAnnotation> contributionAnnotations =
+        contributionAnnotationQueue.getAnnotations();
+    assertEquals(1, contributionAnnotations.size());
+
+    contributionAnnotation = contributionAnnotations.get(0);
+    assertAnnotationIntegrity(
+        contributionAnnotation, user, file, expectedContributionRanges, editor);
+  }
+
+  /**
+   * Tests updating the positions of the stored annotations by using their range highlighter
+   * positions. After the call, the invalid annotations should no longer be contained in the
+   * annotation store.
+   */
+  @Test
+  public void testUpdateAnnotationStoreRemoveInvalidAnnotations() {
+    /* setup */
+    int start = 12;
+    int end = 34;
+    List<Pair<Integer, Integer>> startSelectionRanges = createSelectionRange(start, end);
+    List<Pair<Integer, Integer>> startContributionRanges = createContributionRanges(start, end);
+
+    /*
+     * Mock range highlighters to return 'isValid=true' for initialization check and 'isValid=false'
+     *  for all subsequent calls.
+     */
+    List<AnnotationRange> selectionAnnotationRanges =
+        startSelectionRanges
+            .stream()
+            .map(
+                range -> {
+                  int rangeStart = range.getLeft();
+                  int rangeEnd = range.getRight();
+
+                  RangeHighlighter rangeHighlighter =
+                      EasyMock.createNiceMock(RangeHighlighter.class);
+
+                  EasyMock.expect(rangeHighlighter.getStartOffset()).andReturn(rangeStart);
+                  EasyMock.expect(rangeHighlighter.getEndOffset()).andReturn(rangeEnd);
+
+                  EasyMock.expect(rangeHighlighter.isValid()).andReturn(true);
+                  EasyMock.expect(rangeHighlighter.isValid()).andStubReturn(false);
+
+                  EasyMock.replay(rangeHighlighter);
+
+                  return new AnnotationRange(rangeStart, rangeEnd, rangeHighlighter);
+                })
+            .collect(Collectors.toList());
+
+    List<AnnotationRange> contributionAnnotationRanges =
+        startContributionRanges
+            .stream()
+            .map(
+                range -> {
+                  int rangeStart = range.getLeft();
+                  int rangeEnd = range.getRight();
+
+                  RangeHighlighter rangeHighlighter =
+                      EasyMock.createNiceMock(RangeHighlighter.class);
+
+                  EasyMock.expect(rangeHighlighter.getStartOffset()).andReturn(rangeStart);
+                  EasyMock.expect(rangeHighlighter.getEndOffset()).andReturn(rangeEnd);
+
+                  EasyMock.expect(rangeHighlighter.isValid()).andReturn(true);
+                  EasyMock.expect(rangeHighlighter.isValid()).andStubReturn(false);
+
+                  EasyMock.replay(rangeHighlighter);
+
+                  return new AnnotationRange(rangeStart, rangeEnd, rangeHighlighter);
+                })
+            .collect(Collectors.toList());
+
+    SelectionAnnotation selectionAnnotation =
+        new SelectionAnnotation(user, file, editor, selectionAnnotationRanges);
+    selectionAnnotationStore.addAnnotation(selectionAnnotation);
+
+    ContributionAnnotation contributionAnnotation =
+        new ContributionAnnotation(user, file, editor, contributionAnnotationRanges);
+    contributionAnnotationQueue.addAnnotation(contributionAnnotation);
+
+    /* call to test */
+    annotationManager.updateAnnotationStore(file);
+
+    /* check assertions */
+    List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(0, selectionAnnotations.size());
+
+    List<ContributionAnnotation> contributionAnnotations =
+        contributionAnnotationQueue.getAnnotations();
+    assertEquals(0, contributionAnnotations.size());
+  }
+
+  /**
    * Creates a list containing a single entry for the given range.
    *
    * @param rangeStart the start of the range
