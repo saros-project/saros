@@ -823,6 +823,572 @@ public class AnnotationManagerTest {
   }
 
   /**
+   * Tests moving annotations without an editor in reaction to text being removed from the file
+   * after the annotation. The annotation position should not change.
+   */
+  @Test
+  public void testMoveAnnotationsAfterDeletionNoEditorAfterAnnotation() {
+    /* setup */
+    int start = 40;
+    int end = 50;
+    List<Pair<Integer, Integer>> expectedSelectionRanges = createSelectionRange(start, end);
+    List<Pair<Integer, Integer>> expectedContributionRanges = createContributionRanges(start, end);
+
+    SelectionAnnotation selectionAnnotation =
+        new SelectionAnnotation(
+            user, file, null, createAnnotationRanges(expectedSelectionRanges, false));
+    selectionAnnotationStore.addAnnotation(selectionAnnotation);
+
+    ContributionAnnotation contributionAnnotation =
+        new ContributionAnnotation(
+            user, file, null, createAnnotationRanges(expectedContributionRanges, false));
+    contributionAnnotationQueue.addAnnotation(contributionAnnotation);
+
+    /* call to test */
+    annotationManager.moveAnnotationsAfterDeletion(file, 50, 55);
+
+    /* check assertions */
+    List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(1, selectionAnnotations.size());
+
+    selectionAnnotation = selectionAnnotations.get(0);
+    assertAnnotationIntegrity(selectionAnnotation, user, file, expectedSelectionRanges, null);
+
+    List<ContributionAnnotation> contributionAnnotations =
+        contributionAnnotationQueue.getAnnotations();
+    assertEquals(1, contributionAnnotations.size());
+
+    contributionAnnotation = contributionAnnotations.get(0);
+    assertAnnotationIntegrity(contributionAnnotation, user, file, expectedContributionRanges, null);
+  }
+
+  /**
+   * Tests moving annotations without an editor in reaction to text being removed from the file
+   * before the annotation. The annotation position should be shifted left by the deletion length.
+   */
+  @Test
+  public void testMoveAnnotationsAfterDeletionNoEditorBeforeAnnotation() {
+    /* setup */
+    int start = 40;
+    int end = 50;
+    List<Pair<Integer, Integer>> expectedSelectionRanges = createSelectionRange(start, end);
+    List<Pair<Integer, Integer>> expectedContributionRanges = createContributionRanges(start, end);
+
+    SelectionAnnotation selectionAnnotation =
+        new SelectionAnnotation(
+            user, file, null, createAnnotationRanges(expectedSelectionRanges, false));
+    selectionAnnotationStore.addAnnotation(selectionAnnotation);
+
+    ContributionAnnotation contributionAnnotation =
+        new ContributionAnnotation(
+            user, file, null, createAnnotationRanges(expectedContributionRanges, false));
+    contributionAnnotationQueue.addAnnotation(contributionAnnotation);
+
+    int deletionStart = 2;
+    int deletionEnd = 15;
+    int deletionOffset = deletionEnd - deletionStart;
+
+    /* call to test */
+    annotationManager.moveAnnotationsAfterDeletion(file, deletionStart, deletionEnd);
+
+    /* check assertions */
+    start -= deletionOffset;
+    end -= deletionOffset;
+    expectedSelectionRanges = createSelectionRange(start, end);
+    expectedContributionRanges = createContributionRanges(start, end);
+
+    List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(1, selectionAnnotations.size());
+
+    selectionAnnotation = selectionAnnotations.get(0);
+    assertAnnotationIntegrity(selectionAnnotation, user, file, expectedSelectionRanges, null);
+
+    List<ContributionAnnotation> contributionAnnotations =
+        contributionAnnotationQueue.getAnnotations();
+    assertEquals(1, contributionAnnotations.size());
+
+    contributionAnnotation = contributionAnnotations.get(0);
+    assertAnnotationIntegrity(contributionAnnotation, user, file, expectedContributionRanges, null);
+  }
+
+  /**
+   * Tests moving annotations without an editor in reaction to text being removed from the file
+   * overlapping with the start of the the annotation. The annotation position should be shifted
+   * left to the deletion start and the range should be shortened by the overlap.
+   */
+  @Test
+  public void testMoveAnnotationsAfterDeletionNoEditorLeadingOverlap() {
+    /* setup */
+    int start = 40;
+    int end = 50;
+    List<Pair<Integer, Integer>> expectedSelectionRanges = createSelectionRange(start, end);
+    List<Pair<Integer, Integer>> expectedContributionRanges = createContributionRanges(start, end);
+
+    SelectionAnnotation selectionAnnotation =
+        new SelectionAnnotation(
+            user, file, null, createAnnotationRanges(expectedSelectionRanges, false));
+    selectionAnnotationStore.addAnnotation(selectionAnnotation);
+
+    ContributionAnnotation contributionAnnotation =
+        new ContributionAnnotation(
+            user, file, null, createAnnotationRanges(expectedContributionRanges, false));
+    contributionAnnotationQueue.addAnnotation(contributionAnnotation);
+
+    int deletionStart = 33;
+    int deletionEnd = 42;
+    int deletionOffset = deletionEnd - deletionStart;
+
+    /* call to test */
+    annotationManager.moveAnnotationsAfterDeletion(file, deletionStart, deletionEnd);
+
+    /* check assertions */
+    start = deletionStart;
+    end -= deletionOffset;
+    expectedSelectionRanges = createSelectionRange(start, end);
+    expectedContributionRanges = createContributionRanges(start, end);
+
+    List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(1, selectionAnnotations.size());
+
+    selectionAnnotation = selectionAnnotations.get(0);
+    assertAnnotationIntegrity(selectionAnnotation, user, file, expectedSelectionRanges, null);
+
+    List<ContributionAnnotation> contributionAnnotations =
+        contributionAnnotationQueue.getAnnotations();
+    assertEquals(1, contributionAnnotations.size());
+
+    contributionAnnotation = contributionAnnotations.get(0);
+    assertAnnotationIntegrity(contributionAnnotation, user, file, expectedContributionRanges, null);
+  }
+
+  /**
+   * Tests moving annotations without an editor in reaction to text being removed from the file in
+   * the annotation range. The annotation range should be shortened by the deletion length.
+   */
+  @Test
+  public void testMoveAnnotationsAfterDeletionNoEditorInAnnotation() {
+    /* setup */
+    int start = 40;
+    int end = 50;
+    List<Pair<Integer, Integer>> expectedSelectionRanges = createSelectionRange(start, end);
+    List<Pair<Integer, Integer>> expectedContributionRanges = createContributionRanges(start, end);
+
+    SelectionAnnotation selectionAnnotation =
+        new SelectionAnnotation(
+            user, file, null, createAnnotationRanges(expectedSelectionRanges, false));
+    selectionAnnotationStore.addAnnotation(selectionAnnotation);
+
+    ContributionAnnotation contributionAnnotation =
+        new ContributionAnnotation(
+            user, file, null, createAnnotationRanges(expectedContributionRanges, false));
+    contributionAnnotationQueue.addAnnotation(contributionAnnotation);
+
+    int deletionStart = 45;
+    int deletionEnd = 49;
+    int deletionOffset = deletionEnd - deletionStart;
+
+    /* call to test */
+    annotationManager.moveAnnotationsAfterDeletion(file, deletionStart, deletionEnd);
+
+    /* check assertions */
+    end -= deletionOffset;
+    expectedSelectionRanges = createSelectionRange(start, end);
+    expectedContributionRanges = createContributionRanges(start, end);
+
+    List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(1, selectionAnnotations.size());
+
+    selectionAnnotation = selectionAnnotations.get(0);
+    assertAnnotationIntegrity(selectionAnnotation, user, file, expectedSelectionRanges, null);
+
+    List<ContributionAnnotation> contributionAnnotations =
+        contributionAnnotationQueue.getAnnotations();
+    assertEquals(1, contributionAnnotations.size());
+
+    contributionAnnotation = contributionAnnotations.get(0);
+    assertAnnotationIntegrity(contributionAnnotation, user, file, expectedContributionRanges, null);
+  }
+
+  /**
+   * Tests moving annotations without an editor in reaction to text being removed from the file
+   * overlapping with the end of the annotation. The annotation range should be shortened to match
+   * the deletion start.
+   */
+  @Test
+  public void testMoveAnnotationsAfterDeletionNoEditorTrailingOverlap() {
+    /* setup */
+    int start = 40;
+    int end = 50;
+    List<Pair<Integer, Integer>> expectedSelectionRanges = createSelectionRange(start, end);
+    List<Pair<Integer, Integer>> expectedContributionRanges = createContributionRanges(start, end);
+
+    SelectionAnnotation selectionAnnotation =
+        new SelectionAnnotation(
+            user, file, null, createAnnotationRanges(expectedSelectionRanges, false));
+    selectionAnnotationStore.addAnnotation(selectionAnnotation);
+
+    ContributionAnnotation contributionAnnotation =
+        new ContributionAnnotation(
+            user, file, null, createAnnotationRanges(expectedContributionRanges, false));
+    contributionAnnotationQueue.addAnnotation(contributionAnnotation);
+
+    int deletionStart = 48;
+    int deletionEnd = 63;
+
+    /* call to test */
+    annotationManager.moveAnnotationsAfterDeletion(file, deletionStart, deletionEnd);
+
+    /* check assertions */
+    end = deletionStart;
+    expectedSelectionRanges = createSelectionRange(start, end);
+    expectedContributionRanges = createContributionRanges(start, end);
+
+    List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(1, selectionAnnotations.size());
+
+    selectionAnnotation = selectionAnnotations.get(0);
+    assertAnnotationIntegrity(selectionAnnotation, user, file, expectedSelectionRanges, null);
+
+    List<ContributionAnnotation> contributionAnnotations =
+        contributionAnnotationQueue.getAnnotations();
+    assertEquals(1, contributionAnnotations.size());
+
+    contributionAnnotation = contributionAnnotations.get(0);
+    assertAnnotationIntegrity(contributionAnnotation, user, file, expectedContributionRanges, null);
+  }
+
+  /**
+   * Tests moving annotations without an editor in reaction to text being removed from the file
+   * covering the annotation. The annotation should be removed from the annotation store.
+   */
+  @Test
+  public void testMoveAnnotationsAfterDeletionNoEditorCoveringAnnotation() {
+    /* setup */
+    int start = 40;
+    int end = 50;
+    List<Pair<Integer, Integer>> expectedSelectionRanges = createSelectionRange(start, end);
+    List<Pair<Integer, Integer>> expectedContributionRanges = createContributionRanges(start, end);
+
+    SelectionAnnotation selectionAnnotation =
+        new SelectionAnnotation(
+            user, file, null, createAnnotationRanges(expectedSelectionRanges, false));
+    selectionAnnotationStore.addAnnotation(selectionAnnotation);
+
+    ContributionAnnotation contributionAnnotation =
+        new ContributionAnnotation(
+            user, file, null, createAnnotationRanges(expectedContributionRanges, false));
+    contributionAnnotationQueue.addAnnotation(contributionAnnotation);
+
+    int deletionStart = 30;
+    int deletionEnd = 60;
+
+    /* call to test */
+    annotationManager.moveAnnotationsAfterDeletion(file, deletionStart, deletionEnd);
+
+    /* check assertions */
+    List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(0, selectionAnnotations.size());
+
+    List<ContributionAnnotation> contributionAnnotations =
+        contributionAnnotationQueue.getAnnotations();
+    assertEquals(0, contributionAnnotations.size());
+  }
+
+  /**
+   * Tests moving annotations with an editor in reaction to text being removed from the file. The
+   * annotation position should not change in any case.
+   */
+  @Test
+  public void testMoveAnnotationsAfterDeletionEditor() {
+    /* setup */
+    int start = 40;
+    int end = 50;
+    List<Pair<Integer, Integer>> expectedSelectionRanges = createSelectionRange(start, end);
+    List<Pair<Integer, Integer>> expectedContributionRanges = createContributionRanges(start, end);
+
+    SelectionAnnotation selectionAnnotation =
+        new SelectionAnnotation(
+            user, file, editor, createAnnotationRanges(expectedSelectionRanges, true));
+    selectionAnnotationStore.addAnnotation(selectionAnnotation);
+
+    ContributionAnnotation contributionAnnotation =
+        new ContributionAnnotation(
+            user, file, editor, createAnnotationRanges(expectedContributionRanges, true));
+    contributionAnnotationQueue.addAnnotation(contributionAnnotation);
+
+    int deletionStartBefore = 50;
+    int deletionEndBefore = 55;
+
+    /* call to test */
+    annotationManager.moveAnnotationsAfterDeletion(file, deletionStartBefore, deletionEndBefore);
+
+    /* check assertions */
+    List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(1, selectionAnnotations.size());
+
+    selectionAnnotation = selectionAnnotations.get(0);
+    assertAnnotationIntegrity(selectionAnnotation, user, file, expectedSelectionRanges, editor);
+
+    List<ContributionAnnotation> contributionAnnotations =
+        contributionAnnotationQueue.getAnnotations();
+    assertEquals(1, contributionAnnotations.size());
+
+    contributionAnnotation = contributionAnnotations.get(0);
+    assertAnnotationIntegrity(
+        contributionAnnotation, user, file, expectedContributionRanges, editor);
+
+    /* setup*/
+    deletionStartBefore = 33;
+    int deletionEndIn = 45;
+
+    /* call to test */
+    annotationManager.moveAnnotationsAfterDeletion(file, deletionStartBefore, deletionEndIn);
+
+    /* check assertions */
+    selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(1, selectionAnnotations.size());
+
+    selectionAnnotation = selectionAnnotations.get(0);
+    assertAnnotationIntegrity(selectionAnnotation, user, file, expectedSelectionRanges, editor);
+
+    contributionAnnotations = contributionAnnotationQueue.getAnnotations();
+    assertEquals(1, contributionAnnotations.size());
+
+    contributionAnnotation = contributionAnnotations.get(0);
+    assertAnnotationIntegrity(
+        contributionAnnotation, user, file, expectedContributionRanges, editor);
+
+    /* setup*/
+    int deletionStartIn = 45;
+    deletionEndIn = 49;
+
+    /* call to test */
+    annotationManager.moveAnnotationsAfterDeletion(file, deletionStartIn, deletionEndIn);
+
+    /* check assertions */
+    selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(1, selectionAnnotations.size());
+
+    selectionAnnotation = selectionAnnotations.get(0);
+    assertAnnotationIntegrity(selectionAnnotation, user, file, expectedSelectionRanges, editor);
+
+    contributionAnnotations = contributionAnnotationQueue.getAnnotations();
+    assertEquals(1, contributionAnnotations.size());
+
+    contributionAnnotation = contributionAnnotations.get(0);
+    assertAnnotationIntegrity(
+        contributionAnnotation, user, file, expectedContributionRanges, editor);
+
+    /* setup*/
+    deletionStartIn = 48;
+    int deletionEndAfter = 63;
+
+    /* call to test */
+    annotationManager.moveAnnotationsAfterDeletion(file, deletionStartIn, deletionEndAfter);
+
+    /* check assertions */
+    selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(1, selectionAnnotations.size());
+
+    selectionAnnotation = selectionAnnotations.get(0);
+    assertAnnotationIntegrity(selectionAnnotation, user, file, expectedSelectionRanges, editor);
+
+    contributionAnnotations = contributionAnnotationQueue.getAnnotations();
+    assertEquals(1, contributionAnnotations.size());
+
+    contributionAnnotation = contributionAnnotations.get(0);
+    assertAnnotationIntegrity(
+        contributionAnnotation, user, file, expectedContributionRanges, editor);
+
+    /* setup*/
+    int deletionStartAfter = 50;
+    deletionEndAfter = 55;
+
+    /* call to test */
+    annotationManager.moveAnnotationsAfterDeletion(file, deletionStartAfter, deletionEndAfter);
+
+    /* check assertions */
+    selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(1, selectionAnnotations.size());
+
+    selectionAnnotation = selectionAnnotations.get(0);
+    assertAnnotationIntegrity(selectionAnnotation, user, file, expectedSelectionRanges, editor);
+
+    contributionAnnotations = contributionAnnotationQueue.getAnnotations();
+    assertEquals(1, contributionAnnotations.size());
+
+    contributionAnnotation = contributionAnnotations.get(0);
+    assertAnnotationIntegrity(
+        contributionAnnotation, user, file, expectedContributionRanges, editor);
+
+    /* setup*/
+    deletionStartBefore = 30;
+    deletionEndAfter = 60;
+
+    /* call to test */
+    annotationManager.moveAnnotationsAfterDeletion(file, deletionStartBefore, deletionEndAfter);
+
+    /* check assertions */
+    selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(1, selectionAnnotations.size());
+
+    selectionAnnotation = selectionAnnotations.get(0);
+    assertAnnotationIntegrity(selectionAnnotation, user, file, expectedSelectionRanges, editor);
+
+    contributionAnnotations = contributionAnnotationQueue.getAnnotations();
+    assertEquals(1, contributionAnnotations.size());
+
+    contributionAnnotation = contributionAnnotations.get(0);
+    assertAnnotationIntegrity(
+        contributionAnnotation, user, file, expectedContributionRanges, editor);
+  }
+
+  /**
+   * Tests moving annotations without an editor in reaction to text being removed from a different
+   * file. The annotation position should not change in any case.
+   */
+  @Test
+  public void testMoveAnnotationsAfterDeletionDifferentFile() {
+    /* setup */
+    IFile file2 = EasyMock.createNiceMock(IFile.class);
+
+    int start = 40;
+    int end = 50;
+    List<Pair<Integer, Integer>> expectedSelectionRanges = createSelectionRange(start, end);
+    List<Pair<Integer, Integer>> expectedContributionRanges = createContributionRanges(start, end);
+
+    SelectionAnnotation selectionAnnotation =
+        new SelectionAnnotation(
+            user, file, null, createAnnotationRanges(expectedSelectionRanges, false));
+    selectionAnnotationStore.addAnnotation(selectionAnnotation);
+
+    ContributionAnnotation contributionAnnotation =
+        new ContributionAnnotation(
+            user, file, null, createAnnotationRanges(expectedContributionRanges, false));
+    contributionAnnotationQueue.addAnnotation(contributionAnnotation);
+
+    int deletionStartBefore = 50;
+    int deletionEndBefore = 55;
+
+    /* call to test */
+    annotationManager.moveAnnotationsAfterDeletion(file2, deletionStartBefore, deletionEndBefore);
+
+    /* check assertions */
+    List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(1, selectionAnnotations.size());
+
+    selectionAnnotation = selectionAnnotations.get(0);
+    assertAnnotationIntegrity(selectionAnnotation, user, file, expectedSelectionRanges, null);
+
+    List<ContributionAnnotation> contributionAnnotations =
+        contributionAnnotationQueue.getAnnotations();
+    assertEquals(1, contributionAnnotations.size());
+
+    contributionAnnotation = contributionAnnotations.get(0);
+    assertAnnotationIntegrity(contributionAnnotation, user, file, expectedContributionRanges, null);
+
+    /* setup*/
+    deletionStartBefore = 33;
+    int deletionEndIn = 45;
+
+    /* call to test */
+    annotationManager.moveAnnotationsAfterDeletion(file2, deletionStartBefore, deletionEndIn);
+
+    /* check assertions */
+    selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(1, selectionAnnotations.size());
+
+    selectionAnnotation = selectionAnnotations.get(0);
+    assertAnnotationIntegrity(selectionAnnotation, user, file, expectedSelectionRanges, null);
+
+    contributionAnnotations = contributionAnnotationQueue.getAnnotations();
+    assertEquals(1, contributionAnnotations.size());
+
+    contributionAnnotation = contributionAnnotations.get(0);
+    assertAnnotationIntegrity(contributionAnnotation, user, file, expectedContributionRanges, null);
+
+    /* setup*/
+    int deletionStartIn = 45;
+    deletionEndIn = 49;
+
+    /* call to test */
+    annotationManager.moveAnnotationsAfterDeletion(file2, deletionStartIn, deletionEndIn);
+
+    /* check assertions */
+    selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(1, selectionAnnotations.size());
+
+    selectionAnnotation = selectionAnnotations.get(0);
+    assertAnnotationIntegrity(selectionAnnotation, user, file, expectedSelectionRanges, null);
+
+    contributionAnnotations = contributionAnnotationQueue.getAnnotations();
+    assertEquals(1, contributionAnnotations.size());
+
+    contributionAnnotation = contributionAnnotations.get(0);
+    assertAnnotationIntegrity(contributionAnnotation, user, file, expectedContributionRanges, null);
+
+    /* setup*/
+    deletionStartIn = 48;
+    int deletionEndAfter = 63;
+
+    /* call to test */
+    annotationManager.moveAnnotationsAfterDeletion(file2, deletionStartIn, deletionEndAfter);
+
+    /* check assertions */
+    selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(1, selectionAnnotations.size());
+
+    selectionAnnotation = selectionAnnotations.get(0);
+    assertAnnotationIntegrity(selectionAnnotation, user, file, expectedSelectionRanges, null);
+
+    contributionAnnotations = contributionAnnotationQueue.getAnnotations();
+    assertEquals(1, contributionAnnotations.size());
+
+    contributionAnnotation = contributionAnnotations.get(0);
+    assertAnnotationIntegrity(contributionAnnotation, user, file, expectedContributionRanges, null);
+
+    /* setup*/
+    int deletionStartAfter = 50;
+    deletionEndAfter = 55;
+
+    /* call to test */
+    annotationManager.moveAnnotationsAfterDeletion(file2, deletionStartAfter, deletionEndAfter);
+
+    /* check assertions */
+    selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(1, selectionAnnotations.size());
+
+    selectionAnnotation = selectionAnnotations.get(0);
+    assertAnnotationIntegrity(selectionAnnotation, user, file, expectedSelectionRanges, null);
+
+    contributionAnnotations = contributionAnnotationQueue.getAnnotations();
+    assertEquals(1, contributionAnnotations.size());
+
+    contributionAnnotation = contributionAnnotations.get(0);
+    assertAnnotationIntegrity(contributionAnnotation, user, file, expectedContributionRanges, null);
+
+    /* setup*/
+    deletionStartBefore = 30;
+    deletionEndAfter = 60;
+
+    /* call to test */
+    annotationManager.moveAnnotationsAfterDeletion(file2, deletionStartBefore, deletionEndAfter);
+
+    /* check assertions */
+    selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(1, selectionAnnotations.size());
+
+    selectionAnnotation = selectionAnnotations.get(0);
+    assertAnnotationIntegrity(selectionAnnotation, user, file, expectedSelectionRanges, null);
+
+    contributionAnnotations = contributionAnnotationQueue.getAnnotations();
+    assertEquals(1, contributionAnnotations.size());
+
+    contributionAnnotation = contributionAnnotations.get(0);
+    assertAnnotationIntegrity(contributionAnnotation, user, file, expectedContributionRanges, null);
+  }
+
+  /**
    * Creates a list containing a single entry for the given range.
    *
    * @param rangeStart the start of the range
