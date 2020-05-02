@@ -1630,6 +1630,90 @@ public class AnnotationManagerTest {
   }
 
   /**
+   * Test removing the local representation of all annotations for a file. After the call, no
+   * annotation for the file should contain an editor or a range highlighter in any one of its
+   * annotation ranges.
+   */
+  @Test
+  public void testRemoveLocalRepresentation() {
+    /* setup */
+    int start = 40;
+    int end = 50;
+    List<Pair<Integer, Integer>> expectedSelectionRanges = createSelectionRange(start, end);
+    List<Pair<Integer, Integer>> expectedContributionRanges = createContributionRanges(start, end);
+
+    SelectionAnnotation selectionAnnotation =
+        new SelectionAnnotation(
+            user, file, editor, createAnnotationRanges(expectedSelectionRanges, true));
+    selectionAnnotationStore.addAnnotation(selectionAnnotation);
+
+    ContributionAnnotation contributionAnnotation =
+        new ContributionAnnotation(
+            user, file, editor, createAnnotationRanges(expectedContributionRanges, true));
+    contributionAnnotationQueue.addAnnotation(contributionAnnotation);
+
+    /* call to test */
+    annotationManager.removeLocalRepresentation(file);
+
+    /* check assertions */
+    List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(1, selectionAnnotations.size());
+
+    selectionAnnotation = selectionAnnotations.get(0);
+    assertAnnotationIntegrity(selectionAnnotation, user, file, expectedSelectionRanges, null);
+
+    List<ContributionAnnotation> contributionAnnotations =
+        contributionAnnotationQueue.getAnnotations();
+    assertEquals(1, contributionAnnotations.size());
+
+    contributionAnnotation = contributionAnnotations.get(0);
+    assertAnnotationIntegrity(contributionAnnotation, user, file, expectedContributionRanges, null);
+  }
+
+  /**
+   * Test removing the local representation of all annotations for a different file. No annotations
+   * should be changed.
+   */
+  @Test
+  public void testRemoveLocalRepresentationDifferentFile() {
+    /* setup */
+    IFile file2 = EasyMock.createNiceMock(IFile.class);
+
+    int start = 40;
+    int end = 50;
+    List<Pair<Integer, Integer>> expectedSelectionRanges = createSelectionRange(start, end);
+    List<Pair<Integer, Integer>> expectedContributionRanges = createContributionRanges(start, end);
+
+    SelectionAnnotation selectionAnnotation =
+        new SelectionAnnotation(
+            user, file, editor, createAnnotationRanges(expectedSelectionRanges, true));
+    selectionAnnotationStore.addAnnotation(selectionAnnotation);
+
+    ContributionAnnotation contributionAnnotation =
+        new ContributionAnnotation(
+            user, file, editor, createAnnotationRanges(expectedContributionRanges, true));
+    contributionAnnotationQueue.addAnnotation(contributionAnnotation);
+
+    /* call to test */
+    annotationManager.removeLocalRepresentation(file2);
+
+    /* check assertions */
+    List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(1, selectionAnnotations.size());
+
+    selectionAnnotation = selectionAnnotations.get(0);
+    assertAnnotationIntegrity(selectionAnnotation, user, file, expectedSelectionRanges, editor);
+
+    List<ContributionAnnotation> contributionAnnotations =
+        contributionAnnotationQueue.getAnnotations();
+    assertEquals(1, contributionAnnotations.size());
+
+    contributionAnnotation = contributionAnnotations.get(0);
+    assertAnnotationIntegrity(
+        contributionAnnotation, user, file, expectedContributionRanges, editor);
+  }
+
+  /**
    * Creates a list containing a single entry for the given range.
    *
    * @param rangeStart the start of the range
