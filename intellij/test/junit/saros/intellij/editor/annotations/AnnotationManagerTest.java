@@ -1393,6 +1393,58 @@ public class AnnotationManagerTest {
   }
 
   /**
+   * Test applying store annotations to a newly opened editor for a file. All annotations should
+   * contain a valid range highlighter for every annotation range after the call.
+   */
+  @Test
+  public void testApplyStoredAnnotations() throws Exception {
+    /* setup */
+    EasyMock.expect(editor.isDisposed()).andStubReturn(false);
+    EasyMock.replay(editor);
+
+    int start = 94;
+    int end = 112;
+    List<Pair<Integer, Integer>> expectedSelectionRanges = createSelectionRange(start, end);
+    List<Pair<Integer, Integer>> expectedContributionRanges = createContributionRanges(start, end);
+
+    SelectionAnnotation selectionAnnotation =
+        new SelectionAnnotation(
+            user, file, null, createAnnotationRanges(expectedSelectionRanges, false));
+    selectionAnnotationStore.addAnnotation(selectionAnnotation);
+
+    ContributionAnnotation contributionAnnotation =
+        new ContributionAnnotation(
+            user, file, null, createAnnotationRanges(expectedContributionRanges, false));
+    contributionAnnotationQueue.addAnnotation(contributionAnnotation);
+
+    assertAnnotationIntegrity(selectionAnnotation, user, file, expectedSelectionRanges, null);
+    assertAnnotationIntegrity(contributionAnnotation, user, file, expectedContributionRanges, null);
+
+    prepareMockAddRangeHighlighters();
+    mockAddRangeHighlighters(expectedSelectionRanges, AnnotationType.SELECTION_ANNOTATION);
+    mockAddRangeHighlighters(expectedContributionRanges, AnnotationType.CONTRIBUTION_ANNOTATION);
+    replayMockAddRangeHighlighters();
+
+    /* call to test */
+    annotationManager.applyStoredAnnotations(file, editor);
+
+    /* check assertions */
+    List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(1, selectionAnnotations.size());
+
+    selectionAnnotation = selectionAnnotations.get(0);
+    assertAnnotationIntegrity(selectionAnnotation, user, file, expectedSelectionRanges, editor);
+
+    List<ContributionAnnotation> contributionAnnotations =
+        contributionAnnotationQueue.getAnnotations();
+    assertEquals(1, contributionAnnotations.size());
+
+    contributionAnnotation = contributionAnnotations.get(0);
+    assertAnnotationIntegrity(
+        contributionAnnotation, user, file, expectedContributionRanges, editor);
+  }
+
+  /**
    * Creates a list containing a single entry for the given range.
    *
    * @param rangeStart the start of the range
