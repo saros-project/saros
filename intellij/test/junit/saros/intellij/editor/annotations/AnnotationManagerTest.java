@@ -2005,6 +2005,89 @@ public class AnnotationManagerTest {
     assertEquals(0, contributionAnnotations.size());
   }
 
+  /** Test updating the file mapping for annotations. */
+  @Test
+  public void testUpdateAnnotationPath() {
+    /* setup */
+    IFile file2 = EasyMock.createNiceMock(IFile.class);
+
+    int start = 94;
+    int end = 112;
+    List<Pair<Integer, Integer>> expectedSelectionRanges = createSelectionRange(start, end);
+    List<Pair<Integer, Integer>> expectedContributionRanges = createContributionRanges(start, end);
+
+    SelectionAnnotation selectionAnnotation =
+        new SelectionAnnotation(
+            user, file, null, createAnnotationRanges(expectedSelectionRanges, false));
+    selectionAnnotationStore.addAnnotation(selectionAnnotation);
+
+    ContributionAnnotation contributionAnnotation =
+        new ContributionAnnotation(
+            user, file, null, createAnnotationRanges(expectedContributionRanges, false));
+    contributionAnnotationQueue.addAnnotation(contributionAnnotation);
+
+    /* call to test */
+    annotationManager.updateAnnotationPath(file, file2);
+
+    /* check assertions */
+    List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(1, selectionAnnotations.size());
+
+    selectionAnnotation = selectionAnnotations.get(0);
+    assertAnnotationIntegrity(selectionAnnotation, user, file2, expectedSelectionRanges, null);
+
+    List<ContributionAnnotation> contributionAnnotations =
+        contributionAnnotationQueue.getAnnotations();
+    assertEquals(1, contributionAnnotations.size());
+
+    contributionAnnotation = contributionAnnotations.get(0);
+    assertAnnotationIntegrity(
+        contributionAnnotation, user, file2, expectedContributionRanges, null);
+  }
+
+  /**
+   * Test updating the file mapping for a different file. All annotations should still be unchanged
+   * after the call.
+   */
+  @Test
+  public void testUpdateAnnotationPathDifferentFile() {
+    /* setup */
+    IFile file2 = EasyMock.createNiceMock(IFile.class);
+    IFile file3 = EasyMock.createNiceMock(IFile.class);
+
+    int start = 94;
+    int end = 112;
+    List<Pair<Integer, Integer>> expectedSelectionRanges = createSelectionRange(start, end);
+    List<Pair<Integer, Integer>> expectedContributionRanges = createContributionRanges(start, end);
+
+    SelectionAnnotation selectionAnnotation =
+        new SelectionAnnotation(
+            user, file, null, createAnnotationRanges(expectedSelectionRanges, false));
+    selectionAnnotationStore.addAnnotation(selectionAnnotation);
+
+    ContributionAnnotation contributionAnnotation =
+        new ContributionAnnotation(
+            user, file, null, createAnnotationRanges(expectedContributionRanges, false));
+    contributionAnnotationQueue.addAnnotation(contributionAnnotation);
+
+    /* call to test */
+    annotationManager.updateAnnotationPath(file2, file3);
+
+    /* check assertions */
+    List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(1, selectionAnnotations.size());
+
+    selectionAnnotation = selectionAnnotations.get(0);
+    assertAnnotationIntegrity(selectionAnnotation, user, file, expectedSelectionRanges, null);
+
+    List<ContributionAnnotation> contributionAnnotations =
+        contributionAnnotationQueue.getAnnotations();
+    assertEquals(1, contributionAnnotations.size());
+
+    contributionAnnotation = contributionAnnotations.get(0);
+    assertAnnotationIntegrity(contributionAnnotation, user, file, expectedContributionRanges, null);
+  }
+
   /**
    * Creates a list containing a single entry for the given range.
    *
