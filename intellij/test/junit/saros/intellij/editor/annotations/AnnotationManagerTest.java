@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.easymock.EasyMock;
+import org.easymock.IExpectationSetters;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -107,9 +108,9 @@ public class AnnotationManagerTest {
     int end = 52;
     List<Pair<Integer, Integer>> expectedRange = createSelectionRange(start, end);
 
-    prepareMockAddRangeHighlighters();
+    prepareMockAddRemoveRangeHighlighters();
     mockAddRangeHighlighters(expectedRange, AnnotationType.SELECTION_ANNOTATION);
-    replayMockAddRangeHighlighters();
+    replayMockAddRemoveRangeHighlighters();
 
     assertTrue(selectionAnnotationStore.getAnnotations().isEmpty());
 
@@ -330,9 +331,9 @@ public class AnnotationManagerTest {
 
     List<Pair<Integer, Integer>> expectedRanges = createContributionRanges(start, end);
 
-    prepareMockAddRangeHighlighters();
+    prepareMockAddRemoveRangeHighlighters();
     mockAddRangeHighlighters(expectedRanges, AnnotationType.CONTRIBUTION_ANNOTATION);
-    replayMockAddRangeHighlighters();
+    replayMockAddRemoveRangeHighlighters();
 
     assertTrue(contributionAnnotationQueue.getAnnotations().isEmpty());
 
@@ -1420,10 +1421,10 @@ public class AnnotationManagerTest {
     assertAnnotationIntegrity(selectionAnnotation, user, file, expectedSelectionRanges, null);
     assertAnnotationIntegrity(contributionAnnotation, user, file, expectedContributionRanges, null);
 
-    prepareMockAddRangeHighlighters();
+    prepareMockAddRemoveRangeHighlighters();
     mockAddRangeHighlighters(expectedSelectionRanges, AnnotationType.SELECTION_ANNOTATION);
     mockAddRangeHighlighters(expectedContributionRanges, AnnotationType.CONTRIBUTION_ANNOTATION);
-    replayMockAddRangeHighlighters();
+    replayMockAddRemoveRangeHighlighters();
 
     /* call to test */
     annotationManager.applyStoredAnnotations(file, editor);
@@ -1833,20 +1834,21 @@ public class AnnotationManagerTest {
   }
 
   /**
-   * Must be called before the first call to {@link #mockAddRangeHighlighters(List,
-   * AnnotationType)}.
+   * Must be called before the first call to {@link #mockAddRangeHighlighters(List, AnnotationType)}
+   * or {@link #mockRemoveRangeHighlighters(AbstractEditorAnnotation)}.
    */
-  private void prepareMockAddRangeHighlighters() {
-    PowerMock.mockStaticPartial(AnnotationManager.class, "addRangeHighlighter");
+  private void prepareMockAddRemoveRangeHighlighters() {
+    PowerMock.mockStaticPartial(
+        AnnotationManager.class, "addRangeHighlighter", "removeRangeHighlighter");
   }
 
   /**
    * Mocks the method creating the actual range highlighters in the editor for the list of given
    * ranges.
    *
-   * <p>{@link #prepareMockAddRangeHighlighters()} must be called before the first call to this
-   * methods and {@link #replayMockAddRangeHighlighters()} must be called after the last call to
-   * this method to replay the added mocking logic.
+   * <p>{@link #prepareMockAddRemoveRangeHighlighters()} must be called before the first call to
+   * this methods and {@link #replayMockAddRemoveRangeHighlighters()} must be called after the last
+   * call to this method to replay the added mocking logic.
    *
    * @param ranges the ranges to mock
    * @throws Exception see {@link PowerMock#expectPrivate(Object, Method, Object...)}
@@ -1874,9 +1876,31 @@ public class AnnotationManagerTest {
   }
 
   /**
-   * Must be called after the last call to {@link #mockAddRangeHighlighters(List, AnnotationType)}.
+   * Mocks the method removing the actual range highlighters from the editor for the given
+   * annotation.
+   *
+   * <p>When using this call, it is also advised to call {@link PowerMock#verify(Object...)} on
+   * <code>AnnotationManager.class</code> to ensure that the {@link
+   * IExpectationSetters#atLeastOnce()} restriction is met.
+   *
+   * <p>{@link #prepareMockAddRemoveRangeHighlighters()} must be called before the first call to
+   * this methods and {@link #replayMockAddRemoveRangeHighlighters()} must be called after the last
+   * call to this method to replay the added mocking logic.
+   *
+   * @param annotation the annotation whose range highlighter removal to mock
+   * @throws Exception see {@link PowerMock#expectPrivate(Object, Method, Object...)}
    */
-  private void replayMockAddRangeHighlighters() {
+  private void mockRemoveRangeHighlighters(AbstractEditorAnnotation annotation) throws Exception {
+    PowerMock.expectPrivate(annotationManager, "removeRangeHighlighter", annotation)
+        .atLeastOnce()
+        .asStub();
+  }
+
+  /**
+   * Must be called after the last call to {@link #mockAddRangeHighlighters(List, AnnotationType)}
+   * or {@link #mockRemoveRangeHighlighters(AbstractEditorAnnotation)}.
+   */
+  private void replayMockAddRemoveRangeHighlighters() {
     PowerMock.replay(AnnotationManager.class);
   }
 
@@ -1885,6 +1909,7 @@ public class AnnotationManagerTest {
 
     EasyMock.expect(rangeHighlighter.getStartOffset()).andStubReturn(rangeStart);
     EasyMock.expect(rangeHighlighter.getEndOffset()).andStubReturn(rangeEnd);
+    EasyMock.expect(rangeHighlighter.isValid()).andStubReturn(true);
 
     EasyMock.expect(rangeHighlighter.isValid()).andStubReturn(true);
 
