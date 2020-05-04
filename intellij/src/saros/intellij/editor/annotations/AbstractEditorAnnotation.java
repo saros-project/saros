@@ -99,6 +99,40 @@ abstract class AbstractEditorAnnotation {
   }
 
   /**
+   * Checks whether the given start and end offset form a valid range.
+   *
+   * <p>The following conditions must hold true:
+   *
+   * <ul>
+   *   <li><code>start &ge; 0</code>
+   *   <li><code>end &ge; 0</code>
+   *   <li><code>start &le; end</code>
+   * </ul>
+   *
+   * @param start the start position
+   * @param end the end position
+   * @throws IllegalStateException if <code>start &lt; 0</code>, <code>end &lt; 0</code>, or <code>
+   *     start &gt; end</code>
+   */
+  static void checkRange(int start, int end) {
+    if (start < 0 || end < 0) {
+      throw new IllegalArgumentException(
+          "The start and end of the given range must not be a negative value. start: "
+              + start
+              + ", end: "
+              + end);
+    }
+
+    if (start > end) {
+      throw new IllegalArgumentException(
+          "The start of the given range must not be after the end of the range. start: "
+              + start
+              + ", end: "
+              + end);
+    }
+  }
+
+  /**
    * Adds the given <code>Editor</code> to the annotation.
    *
    * <p>This method should be used when adding the local representation of the annotation when an
@@ -257,6 +291,8 @@ abstract class AbstractEditorAnnotation {
       return;
     }
 
+    checkRange(additionStart, additionEnd);
+
     int offset = additionEnd - additionStart;
 
     for (AnnotationRange annotationRange : annotationRanges) {
@@ -302,6 +338,8 @@ abstract class AbstractEditorAnnotation {
     if (editor != null) {
       return false;
     }
+
+    checkRange(deletionStart, deletionEnd);
 
     int offset = deletionEnd - deletionStart;
 

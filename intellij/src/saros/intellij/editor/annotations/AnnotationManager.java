@@ -53,8 +53,6 @@ public class AnnotationManager implements Disposable {
 
     removeSelectionAnnotation(user, file);
 
-    checkRange(start, end);
-
     if (start == end) {
       return;
     }
@@ -114,8 +112,6 @@ public class AnnotationManager implements Disposable {
   public void addContributionAnnotation(
       @NotNull User user, @NotNull IFile file, int start, int end, @Nullable Editor editor) {
 
-    checkRange(start, end);
-
     if (start == end) {
       return;
     }
@@ -172,8 +168,6 @@ public class AnnotationManager implements Disposable {
       return;
     }
 
-    checkRange(additionStart, additionEnd);
-
     for (SelectionAnnotation annotation : selectionAnnotationStore.getAnnotations(file)) {
       annotation.moveAfterAddition(additionStart, additionEnd);
     }
@@ -207,8 +201,6 @@ public class AnnotationManager implements Disposable {
     if (deletionStart == deletionEnd) {
       return;
     }
-
-    checkRange(deletionStart, deletionEnd);
 
     for (SelectionAnnotation annotation : selectionAnnotationStore.getAnnotations(file)) {
       boolean isInvalid = annotation.moveAfterDeletion(deletionStart, deletionEnd);
@@ -426,41 +418,5 @@ public class AnnotationManager implements Disposable {
       annotation.updateFile(newFile);
     }
     contributionAnnotationQueue.updateAnnotationPath(oldFile, newFile);
-  }
-
-  /**
-   * Checks whether the given start and end point form a valid range.
-   *
-   * <p>The following conditions must hold true:
-   *
-   * <ul>
-   *   <li>start >= 0
-   *   <li>end >= 0
-   *   <li>start <= end
-   * </ul>
-   *
-   * Throws an <code>IllegalArgumentException</code> otherwise.
-   *
-   * @param start the start position
-   * @param end the end position
-   */
-  private void checkRange(int start, int end) {
-    if (start < 0 || end < 0) {
-      throw new IllegalArgumentException(
-          "The start and end of the annotation must not be negative "
-              + "values. start: "
-              + start
-              + ", end: "
-              + end);
-    }
-
-    if (start > end) {
-      throw new IllegalArgumentException(
-          "The start of the annotation must not be after the end of the "
-              + "annotation. start: "
-              + start
-              + ", end: "
-              + end);
-    }
   }
 }
