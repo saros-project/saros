@@ -1773,10 +1773,17 @@ public class AnnotationManagerTest {
         new ContributionAnnotation(user, file, start, end, editor);
     contributionAnnotationQueue.addAnnotation(contributionAnnotation);
 
+    prepareMockAddRemoveRangeHighlighters();
+    mockRemoveRangeHighlighters(editor, selectionAnnotation.getAnnotationRanges());
+    mockRemoveRangeHighlighters(editor, contributionAnnotation.getAnnotationRanges());
+    replayMockAddRemoveRangeHighlighters();
+
     /* call to test */
     annotationManager.removeLocalRepresentation(file);
 
     /* check assertions */
+    verifyRemovalCall();
+
     List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
     assertEquals(1, selectionAnnotations.size());
 
@@ -2104,13 +2111,9 @@ public class AnnotationManagerTest {
 
     prepareMockAddRemoveRangeHighlighters();
     mockRemoveRangeHighlighters(editor, selectionAnnotation1.getAnnotationRanges());
-    mockRemoveRangeHighlighters(editor, selectionAnnotation2.getAnnotationRanges());
     mockRemoveRangeHighlighters(editor, selectionAnnotation3.getAnnotationRanges());
-    mockRemoveRangeHighlighters(editor, selectionAnnotation4.getAnnotationRanges());
     mockRemoveRangeHighlighters(editor, contributionAnnotation1.getAnnotationRanges());
-    mockRemoveRangeHighlighters(editor, contributionAnnotation2.getAnnotationRanges());
     mockRemoveRangeHighlighters(editor, contributionAnnotation3.getAnnotationRanges());
-    mockRemoveRangeHighlighters(editor, contributionAnnotation4.getAnnotationRanges());
     replayMockAddRemoveRangeHighlighters();
 
     /* calls to test */
@@ -2432,7 +2435,8 @@ public class AnnotationManagerTest {
 
   /**
    * Mocks the method removing the actual range highlighters from the editor for the given
-   * annotation.
+   * annotation. The mock still removes the range highlighter objects from the given annotation
+   * ranges as this would normally also be done in <code>removeRangeHighlighter(...)</code>.
    *
    * <p>When using this call, it is also advised to call {@link PowerMock#verify(Object...)} on
    * <code>AbstractEditorAnnotation.class</code> to ensure that the {@link
@@ -2448,10 +2452,19 @@ public class AnnotationManagerTest {
    */
   private void mockRemoveRangeHighlighters(Editor editor, List<AnnotationRange> annotationRanges)
       throws Exception {
-    PowerMock.expectPrivate(
-            AbstractEditorAnnotation.class, "removeRangeHighlighter", editor, annotationRanges)
-        .atLeastOnce()
-        .asStub();
+
+    for (AnnotationRange annotationRange : annotationRanges) {
+      RangeHighlighter rangeHighlighter = annotationRange.getRangeHighlighter();
+
+      if (rangeHighlighter == null) {
+        continue;
+      }
+
+      PowerMock.expectPrivate(
+              AbstractEditorAnnotation.class, "removeRangeHighlighter", editor, rangeHighlighter)
+          .atLeastOnce()
+          .asStub();
+    }
   }
 
   /**

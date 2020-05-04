@@ -124,17 +124,32 @@ abstract class AbstractEditorAnnotation {
   abstract void addLocalRepresentation(@NotNull Editor editor);
 
   /**
-   * Removes the <code>Editor</code> and <code>RangeHighlighter</code> from the annotation.
+   * Removes all held range highlighters from the held editor and drops the held <code>Editor</code>
+   * and all held <code>RangeHighlighter</code> references.
    *
-   * <p><b>NOTE:</b> This does not remove the annotation from the editor. This has to be done
-   * explicitly through the {@link AnnotationManager}.
+   * <p>Does nothing if no editor is present.
    *
    * <p>This method should be used to remove the local representation of the annotation when the
    * editor for the corresponding file is closed.
    */
   void removeLocalRepresentation() {
+    if (editor == null) {
+      return;
+    }
+
+    for (AnnotationRange annotationRange : annotationRanges) {
+      RangeHighlighter rangeHighlighter = annotationRange.getRangeHighlighter();
+
+      annotationRange.removeRangeHighlighter();
+
+      if (rangeHighlighter == null || !rangeHighlighter.isValid()) {
+        continue;
+      }
+
+      removeRangeHighlighter(editor, rangeHighlighter);
+    }
+
     editor = null;
-    annotationRanges.forEach(AnnotationRange::removeRangeHighlighter);
   }
 
   /**
@@ -388,34 +403,16 @@ abstract class AbstractEditorAnnotation {
   }
 
   /**
-   * Removes all existing range highlighters belonging to this annotation from the held editor. Also
-   * removes the references to the removed range highlighters from the held annotation ranges.
+   * Removes the given range highlighter from the given editor.
    *
-   * <p>Does nothing if no editor is present.
-   *
-   * @param editor the current editor of the annotation
-   * @param annotationRanges the annotation ranges of the annotation
+   * @param editor the editor from which to remove the range highlighter
+   * @param rangeHighlighter the range highlighter to remove
    */
   static void removeRangeHighlighter(
-      @Nullable Editor editor, @NotNull List<AnnotationRange> annotationRanges) {
-
-    if (editor == null) {
-      return;
-    }
-
-    for (AnnotationRange annotationRange : annotationRanges) {
-      RangeHighlighter rangeHighlighter = annotationRange.getRangeHighlighter();
-
-      if (rangeHighlighter == null || !rangeHighlighter.isValid()) {
-        return;
-      }
-
-      EDTExecutor.invokeAndWait(
-          () -> editor.getMarkupModel().removeHighlighter(rangeHighlighter),
-          ModalityState.defaultModalityState());
-
-      annotationRange.removeRangeHighlighter();
-    }
+      @NotNull Editor editor, @NotNull RangeHighlighter rangeHighlighter) {
+    EDTExecutor.invokeAndWait(
+        () -> editor.getMarkupModel().removeHighlighter(rangeHighlighter),
+        ModalityState.defaultModalityState());
   }
 
   @Override
