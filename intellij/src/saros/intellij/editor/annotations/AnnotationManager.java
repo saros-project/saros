@@ -408,7 +408,7 @@ public class AnnotationManager implements Disposable {
    * @param oldFile the old file of the annotations
    * @param newFile the new file of the annotations
    */
-  public void updateAnnotationPath(@NotNull IFile oldFile, @NotNull IFile newFile) {
+  public void updateAnnotationFile(@NotNull IFile oldFile, @NotNull IFile newFile) {
     for (SelectionAnnotation annotation : selectionAnnotationStore.getAnnotations(oldFile)) {
       annotation.updateFile(newFile);
     }
