@@ -134,8 +134,8 @@ class ContributionAnnotation extends AbstractEditorAnnotation {
    * @param user the user to whom the annotation belongs
    * @return the text attributes used for contribution annotation range highlighters
    */
-  // TODO make private once migration is complete
-  static TextAttributes getContributionTextAttributes(@NotNull Editor editor, @NotNull User user) {
+  private static TextAttributes getContributionTextAttributes(
+      @NotNull Editor editor, @NotNull User user) {
 
     // Retrieve color keys based on the color ID selected by this user. This will automatically
     // fall back to default colors, if no colors for the given ID are available.
