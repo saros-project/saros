@@ -164,6 +164,44 @@ public class AnnotationManagerTest {
   }
 
   /**
+   * Tests that adding a new selection annotation for a file removes the old selection annotation.
+   * Checks whether the local representation of the removed annotation is also removed.
+   */
+  @Test
+  public void testReplaceSelectionAnnotationEditor() throws Exception {
+    /* setup */
+    int start = 0;
+    int end = 5;
+    List<Pair<Integer, Integer>> expectedRange = createSelectionRange(start, end);
+
+    SelectionAnnotation selectionAnnotation =
+        new SelectionAnnotation(user, file, editor, createAnnotationRanges(expectedRange, true));
+    selectionAnnotationStore.addAnnotation(selectionAnnotation);
+
+    assertEquals(1, selectionAnnotationStore.getAnnotations().size());
+
+    prepareMockAddRemoveRangeHighlighters();
+    mockRemoveRangeHighlighters(selectionAnnotation);
+    replayMockAddRemoveRangeHighlighters();
+
+    start = 15;
+    end = 22;
+    expectedRange = createSelectionRange(start, end);
+
+    /* call to test */
+    annotationManager.addSelectionAnnotation(user, file, start, end, null);
+
+    /* check assertions */
+    verifyRemovalCall();
+
+    List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(1, selectionAnnotations.size());
+
+    SelectionAnnotation newSelectionAnnotation = selectionAnnotations.get(0);
+    assertAnnotationIntegrity(newSelectionAnnotation, user, file, expectedRange, null);
+  }
+
+  /**
    * Tests that adding a new selection annotation for a file does not remove the selection
    * annotation for a different file.
    */
@@ -297,6 +335,37 @@ public class AnnotationManagerTest {
 
     assertEquals(0, selectionAnnotationStore.getAnnotations(file1).size());
     assertEquals(0, selectionAnnotationStore.getAnnotations(file2).size());
+  }
+
+  /**
+   * Tests that removing a selection annotation for a file also removes the local representation of
+   * the annotation.
+   */
+  @Test
+  public void testRemoveSelectionAnnotationEditor() throws Exception {
+    /* setup */
+    int start = 0;
+    int end = 5;
+    List<Pair<Integer, Integer>> expectedRange = createSelectionRange(start, end);
+
+    SelectionAnnotation selectionAnnotation =
+        new SelectionAnnotation(user, file, editor, createAnnotationRanges(expectedRange, true));
+    selectionAnnotationStore.addAnnotation(selectionAnnotation);
+
+    assertEquals(1, selectionAnnotationStore.getAnnotations().size());
+
+    prepareMockAddRemoveRangeHighlighters();
+    mockRemoveRangeHighlighters(selectionAnnotation);
+    replayMockAddRemoveRangeHighlighters();
+
+    /* call to test */
+    annotationManager.removeSelectionAnnotation(user, file);
+
+    /* check assertions */
+    verifyRemovalCall();
+
+    List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(0, selectionAnnotations.size());
   }
 
   /** Test adding contribution annotations without an editor. */
@@ -500,6 +569,46 @@ public class AnnotationManagerTest {
           expectedRanges.get(i),
           null);
     }
+  }
+
+  /**
+   * Tests that the contribution annotation queue mechanism to rotate out old entries also removes
+   * the local representation of the removed annotations.
+   */
+  @Test
+  public void testContributionAnnotationQueueRotationEditor() throws Exception {
+    /* setup */
+    List<Pair<Integer, Integer>> expectedRanges = createContributionRanges(100, 200);
+
+    ContributionAnnotation contributionAnnotation =
+        new ContributionAnnotation(
+            user, file, editor, createAnnotationRanges(expectedRanges, true));
+    contributionAnnotationQueue.addAnnotation(contributionAnnotation);
+
+    ContributionAnnotation filler =
+        new ContributionAnnotation(
+            user, file, null, createAnnotationRanges(createContributionRanges(0, 1), false));
+
+    for (int i = 0; i < MAX_CONTRIBUTION_ANNOTATIONS - 1; i++) {
+      contributionAnnotationQueue.addAnnotation(filler);
+    }
+
+    List<ContributionAnnotation> contributionAnnotations =
+        contributionAnnotationQueue.getAnnotations();
+    assertTrue(contributionAnnotations.contains(contributionAnnotation));
+
+    prepareMockAddRemoveRangeHighlighters();
+    mockRemoveRangeHighlighters(contributionAnnotation);
+    replayMockAddRemoveRangeHighlighters();
+
+    /* call to test */
+    annotationManager.addContributionAnnotation(user, file, 0, 1, null);
+
+    /* check assertions */
+    verifyRemovalCall();
+
+    contributionAnnotations = contributionAnnotationQueue.getAnnotations();
+    assertFalse(contributionAnnotations.contains(contributionAnnotation));
   }
 
   /**
