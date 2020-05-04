@@ -94,8 +94,7 @@ public class AnnotationManager implements Disposable {
         selectionAnnotationStore.removeAnnotations(user, file);
 
     for (SelectionAnnotation annotation : currentSelectionAnnotation) {
-      AbstractEditorAnnotation.removeRangeHighlighter(
-          annotation.getEditor(), annotation.getAnnotationRanges());
+      annotation.removeLocalRepresentation();
     }
   }
 
@@ -147,8 +146,7 @@ public class AnnotationManager implements Disposable {
     ContributionAnnotation dequeuedAnnotation = contributionAnnotationQueue.removeIfFull();
 
     if (dequeuedAnnotation != null) {
-      AbstractEditorAnnotation.removeRangeHighlighter(
-          dequeuedAnnotation.getEditor(), dequeuedAnnotation.getAnnotationRanges());
+      dequeuedAnnotation.removeLocalRepresentation();
     }
 
     contributionAnnotationQueue.addAnnotation(contributionAnnotation);
@@ -348,7 +346,6 @@ public class AnnotationManager implements Disposable {
    * @param annotationStore the annotation store whose annotations to reload
    * @param <E> the annotation type
    * @see AbstractEditorAnnotation#updateBoundaries()
-   * @see AbstractEditorAnnotation#removeRangeHighlighter(Editor, List)
    * @see AbstractEditorAnnotation#removeLocalRepresentation()
    * @see AbstractEditorAnnotation#addLocalRepresentation(Editor)
    */
@@ -363,9 +360,6 @@ public class AnnotationManager implements Disposable {
       }
 
       annotation.updateBoundaries();
-
-      AbstractEditorAnnotation.removeRangeHighlighter(
-          annotation.getEditor(), annotation.getAnnotationRanges());
 
       annotation.removeLocalRepresentation();
 
@@ -385,13 +379,11 @@ public class AnnotationManager implements Disposable {
   public void removeAnnotations(@NotNull User user) {
 
     for (SelectionAnnotation annotation : selectionAnnotationStore.removeAnnotations(user)) {
-      AbstractEditorAnnotation.removeRangeHighlighter(
-          annotation.getEditor(), annotation.getAnnotationRanges());
+      annotation.removeLocalRepresentation();
     }
 
     for (ContributionAnnotation annotation : contributionAnnotationQueue.removeAnnotations(user)) {
-      AbstractEditorAnnotation.removeRangeHighlighter(
-          annotation.getEditor(), annotation.getAnnotationRanges());
+      annotation.removeLocalRepresentation();
     }
   }
 
@@ -407,8 +399,7 @@ public class AnnotationManager implements Disposable {
 
     for (SelectionAnnotation selectionAnnotation : selectionAnnotationStore.getAnnotations(file)) {
 
-      AbstractEditorAnnotation.removeRangeHighlighter(
-          selectionAnnotation.getEditor(), selectionAnnotation.getAnnotationRanges());
+      selectionAnnotation.removeLocalRepresentation();
 
       selectionAnnotationStore.removeAnnotation(selectionAnnotation);
     }
@@ -416,8 +407,7 @@ public class AnnotationManager implements Disposable {
     for (ContributionAnnotation contributionAnnotation :
         contributionAnnotationQueue.getAnnotations(file)) {
 
-      AbstractEditorAnnotation.removeRangeHighlighter(
-          contributionAnnotation.getEditor(), contributionAnnotation.getAnnotationRanges());
+      contributionAnnotation.removeLocalRepresentation();
 
       contributionAnnotationQueue.removeAnnotation(contributionAnnotation);
     }
@@ -429,13 +419,11 @@ public class AnnotationManager implements Disposable {
    */
   private void removeAllAnnotations() {
     for (SelectionAnnotation annotation : selectionAnnotationStore.removeAllAnnotations()) {
-      AbstractEditorAnnotation.removeRangeHighlighter(
-          annotation.getEditor(), annotation.getAnnotationRanges());
+      annotation.removeLocalRepresentation();
     }
 
     for (ContributionAnnotation annotation : contributionAnnotationQueue.removeAllAnnotations()) {
-      AbstractEditorAnnotation.removeRangeHighlighter(
-          annotation.getEditor(), annotation.getAnnotationRanges());
+      annotation.removeLocalRepresentation();
     }
   }
 
