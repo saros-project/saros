@@ -1075,7 +1075,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
   private void updateMovedFileState(@NotNull IFile oldFile, @NotNull IFile newFile) {
     editorManager.replaceAllEditorsForFile(oldFile, newFile);
 
-    annotationManager.updateAnnotationPath(oldFile, newFile);
+    annotationManager.updateAnnotationFile(oldFile, newFile);
   }
 
   /**

@@ -2151,7 +2151,7 @@ public class AnnotationManagerTest {
     contributionAnnotationQueue.addAnnotation(contributionAnnotation);
 
     /* call to test */
-    annotationManager.updateAnnotationPath(file, file2);
+    annotationManager.updateAnnotationFile(file, file2);
 
     /* check assertions */
     List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
@@ -2192,7 +2192,7 @@ public class AnnotationManagerTest {
     contributionAnnotationQueue.addAnnotation(contributionAnnotation);
 
     /* call to test */
-    annotationManager.updateAnnotationPath(file2, file3);
+    annotationManager.updateAnnotationFile(file2, file3);
 
     /* check assertions */
     List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
