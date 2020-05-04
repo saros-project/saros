@@ -6,6 +6,7 @@ import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.openapi.editor.markup.TextAttributes;
 import java.util.Collections;
 import java.util.List;
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import saros.filesystem.IFile;
@@ -18,6 +19,7 @@ import saros.session.User;
  * highlight the text sections that are currently selected by other participants.
  */
 class SelectionAnnotation extends AbstractEditorAnnotation {
+  private static final Logger log = Logger.getLogger(SelectionAnnotation.class);
 
   /**
    * Creates a selection annotation with the given parameters.
@@ -66,6 +68,45 @@ class SelectionAnnotation extends AbstractEditorAnnotation {
     }
 
     return Collections.singletonList(annotationRange);
+  }
+
+  // TODO check whether local representation already added; see #958
+  @Override
+  void addLocalRepresentation(@NotNull Editor editor) {
+    User user = getUser();
+
+    TextAttributes textAttributes = getSelectionTextAttributes(editor, user);
+
+    addEditor(editor);
+
+    IFile file = getFile();
+
+    List<AnnotationRange> annotationRanges = getAnnotationRanges();
+
+    int numberOfAnnotations = annotationRanges.size();
+
+    if (numberOfAnnotations != 1) {
+      throw new IllegalStateException(
+          "Encountered selection annotation with "
+              + numberOfAnnotations
+              + " annotation ranges - "
+              + this);
+    }
+
+    AnnotationRange annotationRange = annotationRanges.get(0);
+
+    int start = annotationRange.getStart();
+    int end = annotationRange.getEnd();
+
+    RangeHighlighter rangeHighlighter =
+        AbstractEditorAnnotation.addRangeHighlighter(start, end, editor, textAttributes, file);
+
+    if (rangeHighlighter != null) {
+      annotationRange.addRangeHighlighter(rangeHighlighter);
+
+    } else {
+      log.warn("Could not create range highlighter for range " + annotationRange + " for " + this);
+    }
   }
 
   /**

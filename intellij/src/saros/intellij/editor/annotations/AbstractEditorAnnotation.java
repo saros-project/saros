@@ -116,6 +116,14 @@ abstract class AbstractEditorAnnotation {
   }
 
   /**
+   * Adds the given editor to this annotations. Creates and adds the RangeHighlighters for all
+   * contained annotation ranges.
+   *
+   * @param editor the editor to create RangeHighlighters in
+   */
+  abstract void addLocalRepresentation(@NotNull Editor editor);
+
+  /**
    * Removes the <code>Editor</code> and <code>RangeHighlighter</code> from the annotation.
    *
    * <p><b>NOTE:</b> This does not remove the annotation from the editor. This has to be done
