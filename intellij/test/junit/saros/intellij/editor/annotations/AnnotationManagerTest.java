@@ -1750,7 +1750,7 @@ public class AnnotationManagerTest {
     annotationManager.reloadAnnotations();
 
     /* check assertions */
-    PowerMock.verify(AnnotationManager.class);
+    verifyRemovalCall();
 
     /* check assertions */
     List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
@@ -1796,7 +1796,7 @@ public class AnnotationManagerTest {
     annotationManager.removeAnnotations(user);
 
     /* check assertions */
-    PowerMock.verify(AnnotationManager.class);
+    verifyRemovalCall();
 
     List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
     assertEquals(0, selectionAnnotations.size());
@@ -1876,7 +1876,7 @@ public class AnnotationManagerTest {
     annotationManager.removeAnnotations(file);
 
     /* check assertions */
-    PowerMock.verify(AnnotationManager.class);
+    verifyRemovalCall();
 
     List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
     assertEquals(0, selectionAnnotations.size());
@@ -1995,7 +1995,7 @@ public class AnnotationManagerTest {
     annotationManager.dispose();
 
     /* check assertions */
-    PowerMock.verify(AnnotationManager.class);
+    verifyRemovalCall();
 
     List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
     assertEquals(0, selectionAnnotations.size());
@@ -2276,6 +2276,14 @@ public class AnnotationManagerTest {
    */
   private void replayMockAddRemoveRangeHighlighters() {
     PowerMock.replay(AnnotationManager.class);
+  }
+
+  /**
+   * Verifies that all added range highlighter removal mocks where called at least once. This can be
+   * used to check whether the local representation of removed annotations was also removed.
+   */
+  private void verifyRemovalCall() {
+    PowerMock.verify(AnnotationManager.class);
   }
 
   private RangeHighlighter mockRangeHighlighter(int rangeStart, int rangeEnd) {
