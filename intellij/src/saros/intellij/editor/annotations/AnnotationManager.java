@@ -21,14 +21,14 @@ public class AnnotationManager implements Disposable {
   private final AnnotationStore<SelectionAnnotation> selectionAnnotationStore;
   private final AnnotationQueue<ContributionAnnotation> contributionAnnotationQueue;
 
-  @Override
-  public void dispose() {
-    removeAllAnnotations();
-  }
-
   public AnnotationManager() {
     this.selectionAnnotationStore = new AnnotationStore<>();
     this.contributionAnnotationQueue = new AnnotationQueue<>(MAX_CONTRIBUTION_ANNOTATIONS);
+  }
+
+  @Override
+  public void dispose() {
+    removeAllAnnotations();
   }
 
   /**
@@ -60,10 +60,8 @@ public class AnnotationManager implements Disposable {
     }
 
     SelectionAnnotation selectionAnnotation;
-
     try {
       selectionAnnotation = new SelectionAnnotation(user, file, start, end, editor);
-
     } catch (IllegalStateException e) {
       log.warn(
           "Failed to add contribution annotation for file "
@@ -123,10 +121,8 @@ public class AnnotationManager implements Disposable {
     }
 
     ContributionAnnotation contributionAnnotation;
-
     try {
       contributionAnnotation = new ContributionAnnotation(user, file, start, end, editor);
-
     } catch (IllegalStateException e) {
       log.warn(
           "Failed to add contribution annotation for file "
@@ -144,7 +140,6 @@ public class AnnotationManager implements Disposable {
     }
 
     ContributionAnnotation dequeuedAnnotation = contributionAnnotationQueue.removeIfFull();
-
     if (dequeuedAnnotation != null) {
       dequeuedAnnotation.removeLocalRepresentation();
     }
@@ -246,7 +241,6 @@ public class AnnotationManager implements Disposable {
    * @see Editor#isDisposed()
    */
   public void applyStoredAnnotations(@NotNull IFile file, @NotNull Editor editor) {
-
     for (SelectionAnnotation annotation : selectionAnnotationStore.getAnnotations(file)) {
       annotation.addLocalRepresentation(editor);
     }
@@ -270,33 +264,20 @@ public class AnnotationManager implements Disposable {
    * @param file the file to update
    */
   public void updateAnnotationStore(@NotNull IFile file) {
-
     updateAnnotationStore(selectionAnnotationStore, file);
     updateAnnotationStore(contributionAnnotationQueue, file);
   }
 
-  /**
-   * Updates the given annotation stores for the given file by checking if an editor for the
-   * annotation is present and then updating the stored annotation range if it has changed. If the
-   * annotation is marked as not valid by the editor, it is removed from the annotation store.
-   *
-   * @param annotationStore the annotation store to update
-   * @param file the file to update
-   * @param <E> the type of annotations stored in the given annotation store
-   */
   private <E extends AbstractEditorAnnotation> void updateAnnotationStore(
       @NotNull AnnotationStore<E> annotationStore, @NotNull IFile file) {
 
-    List<E> annotations = annotationStore.getAnnotations(file);
+    for (E annotation : annotationStore.getAnnotations(file)) {
+      annotation.updateBoundaries();
 
-    annotations.forEach(
-        annotation -> {
-          annotation.updateBoundaries();
-
-          if (annotation.getAnnotationRanges().isEmpty()) {
-            annotationStore.removeAnnotation(annotation);
-          }
-        });
+      if (annotation.getAnnotationRanges().isEmpty()) {
+        annotationStore.removeAnnotation(annotation);
+      }
+    }
   }
 
   /**
@@ -314,14 +295,13 @@ public class AnnotationManager implements Disposable {
    * @see AbstractEditorAnnotation#removeLocalRepresentation()
    */
   public void removeLocalRepresentation(@NotNull IFile file) {
+    for (SelectionAnnotation annotation : selectionAnnotationStore.getAnnotations(file)) {
+      annotation.removeLocalRepresentation();
+    }
 
-    selectionAnnotationStore
-        .getAnnotations(file)
-        .forEach(AbstractEditorAnnotation::removeLocalRepresentation);
-
-    contributionAnnotationQueue
-        .getAnnotations(file)
-        .forEach(AbstractEditorAnnotation::removeLocalRepresentation);
+    for (ContributionAnnotation annotation : contributionAnnotationQueue.getAnnotations(file)) {
+      annotation.removeLocalRepresentation();
+    }
   }
 
   /**
@@ -332,7 +312,6 @@ public class AnnotationManager implements Disposable {
    */
   public void reloadAnnotations() {
     reloadAnnotations(selectionAnnotationStore);
-
     reloadAnnotations(contributionAnnotationQueue);
   }
 
@@ -377,7 +356,6 @@ public class AnnotationManager implements Disposable {
    * @param user the user whose annotations to remove
    */
   public void removeAnnotations(@NotNull User user) {
-
     for (SelectionAnnotation annotation : selectionAnnotationStore.removeAnnotations(user)) {
       annotation.removeLocalRepresentation();
     }
@@ -396,20 +374,14 @@ public class AnnotationManager implements Disposable {
    * @param file the file to remove from the annotation store
    */
   public void removeAnnotations(@NotNull IFile file) {
-
-    for (SelectionAnnotation selectionAnnotation : selectionAnnotationStore.getAnnotations(file)) {
-
-      selectionAnnotation.removeLocalRepresentation();
-
-      selectionAnnotationStore.removeAnnotation(selectionAnnotation);
+    for (SelectionAnnotation annotation : selectionAnnotationStore.getAnnotations(file)) {
+      annotation.removeLocalRepresentation();
+      selectionAnnotationStore.removeAnnotation(annotation);
     }
 
-    for (ContributionAnnotation contributionAnnotation :
-        contributionAnnotationQueue.getAnnotations(file)) {
-
-      contributionAnnotation.removeLocalRepresentation();
-
-      contributionAnnotationQueue.removeAnnotation(contributionAnnotation);
+    for (ContributionAnnotation annotation : contributionAnnotationQueue.getAnnotations(file)) {
+      annotation.removeLocalRepresentation();
+      contributionAnnotationQueue.removeAnnotation(annotation);
     }
   }
 
@@ -445,34 +417,15 @@ public class AnnotationManager implements Disposable {
    * @param newFile the new file of the annotations
    */
   public void updateAnnotationPath(@NotNull IFile oldFile, @NotNull IFile newFile) {
-
-    updateAnnotationPath(newFile, selectionAnnotationStore.getAnnotations(oldFile));
-
+    for (SelectionAnnotation annotation : selectionAnnotationStore.getAnnotations(oldFile)) {
+      annotation.updateFile(newFile);
+    }
     selectionAnnotationStore.updateAnnotationPath(oldFile, newFile);
 
-    updateAnnotationPath(newFile, contributionAnnotationQueue.getAnnotations(oldFile));
-
-    contributionAnnotationQueue.updateAnnotationPath(oldFile, newFile);
-  }
-
-  /**
-   * Sets the given file as the new file for the given annotations to correctly store the new path
-   * of a moved file.
-   *
-   * <p><b>NOTE:</b> If the move was caused by a received Saros activity, the local representation
-   * has to be removed from the corresponding annotations. This method assumes that such local
-   * representations were already removed if necessary.
-   *
-   * @param newFile the new file of the annotations
-   * @param oldAnnotations the annotations for the old file
-   * @param <E> the type of annotations stored in the given annotation store
-   */
-  private <E extends AbstractEditorAnnotation> void updateAnnotationPath(
-      @NotNull IFile newFile, @NotNull List<E> oldAnnotations) {
-
-    for (E oldAnnotation : oldAnnotations) {
-      oldAnnotation.updateFile(newFile);
+    for (ContributionAnnotation annotation : contributionAnnotationQueue.getAnnotations(oldFile)) {
+      annotation.updateFile(newFile);
     }
+    contributionAnnotationQueue.updateAnnotationPath(oldFile, newFile);
   }
 
   /**
