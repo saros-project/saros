@@ -209,7 +209,7 @@ public class AnnotationManagerTest {
     List<Pair<Integer, Integer>> expectedRange = createSelectionRange(start, end);
 
     prepareMockAddRemoveRangeHighlighters();
-    mockAddSelectionRangeHighlighters(expectedRange);
+    mockAddRemoveSelectionRangeHighlighters(expectedRange, file, editor);
     replayMockAddRemoveRangeHighlighters();
 
     SelectionAnnotation selectionAnnotation =
@@ -221,11 +221,6 @@ public class AnnotationManagerTest {
     start = 15;
     end = 22;
     expectedRange = createSelectionRange(start, end);
-
-    prepareMockAddRemoveRangeHighlighters();
-    mockRemoveRangeHighlighters(editor, selectionAnnotation.getAnnotationRanges());
-    mockAddSelectionRangeHighlighters(expectedRange);
-    replayMockAddRemoveRangeHighlighters();
 
     /* call to test */
     annotationManager.addSelectionAnnotation(user, file, start, end, null);
@@ -386,7 +381,7 @@ public class AnnotationManagerTest {
     List<Pair<Integer, Integer>> expectedRange = createSelectionRange(start, end);
 
     prepareMockAddRemoveRangeHighlighters();
-    mockAddSelectionRangeHighlighters(expectedRange);
+    mockAddRemoveSelectionRangeHighlighters(expectedRange, file, editor);
     replayMockAddRemoveRangeHighlighters();
 
     SelectionAnnotation selectionAnnotation =
@@ -394,10 +389,6 @@ public class AnnotationManagerTest {
     selectionAnnotationStore.addAnnotation(selectionAnnotation);
 
     assertEquals(1, selectionAnnotationStore.getAnnotations().size());
-
-    prepareMockAddRemoveRangeHighlighters();
-    mockRemoveRangeHighlighters(editor, selectionAnnotation.getAnnotationRanges());
-    replayMockAddRemoveRangeHighlighters();
 
     /* call to test */
     annotationManager.removeSelectionAnnotation(user, file);
@@ -623,7 +614,7 @@ public class AnnotationManagerTest {
     List<Pair<Integer, Integer>> expectedRanges = createContributionRanges(start, end);
 
     prepareMockAddRemoveRangeHighlighters();
-    mockAddContributionRangeHighlighters(expectedRanges);
+    mockAddRemoveContributionRangeHighlighters(expectedRanges, file, editor);
     replayMockAddRemoveRangeHighlighters();
 
     ContributionAnnotation contributionAnnotation =
@@ -639,10 +630,6 @@ public class AnnotationManagerTest {
     List<ContributionAnnotation> contributionAnnotations =
         contributionAnnotationQueue.getAnnotations();
     assertTrue(contributionAnnotations.contains(contributionAnnotation));
-
-    prepareMockAddRemoveRangeHighlighters();
-    mockRemoveRangeHighlighters(editor, contributionAnnotation.getAnnotationRanges());
-    replayMockAddRemoveRangeHighlighters();
 
     /* call to test */
     annotationManager.addContributionAnnotation(user, file, 0, 1, null);
@@ -1763,8 +1750,8 @@ public class AnnotationManagerTest {
     List<Pair<Integer, Integer>> expectedContributionRanges = createContributionRanges(start, end);
 
     prepareMockAddRemoveRangeHighlighters();
-    mockAddSelectionRangeHighlighters(expectedSelectionRanges);
-    mockAddContributionRangeHighlighters(expectedContributionRanges);
+    mockAddRemoveSelectionRangeHighlighters(expectedSelectionRanges, file, editor);
+    mockAddRemoveContributionRangeHighlighters(expectedContributionRanges, file, editor);
     replayMockAddRemoveRangeHighlighters();
 
     SelectionAnnotation selectionAnnotation =
@@ -1774,11 +1761,6 @@ public class AnnotationManagerTest {
     ContributionAnnotation contributionAnnotation =
         new ContributionAnnotation(user, file, start, end, editor);
     contributionAnnotationQueue.addAnnotation(contributionAnnotation);
-
-    prepareMockAddRemoveRangeHighlighters();
-    mockRemoveRangeHighlighters(editor, selectionAnnotation.getAnnotationRanges());
-    mockRemoveRangeHighlighters(editor, contributionAnnotation.getAnnotationRanges());
-    replayMockAddRemoveRangeHighlighters();
 
     /* call to test */
     annotationManager.removeLocalRepresentation(file);
@@ -1862,8 +1844,8 @@ public class AnnotationManagerTest {
     List<Pair<Integer, Integer>> expectedContributionRanges = createContributionRanges(start, end);
 
     prepareMockAddRemoveRangeHighlighters();
-    mockAddSelectionRangeHighlighters(expectedSelectionRanges);
-    mockAddContributionRangeHighlighters(expectedContributionRanges);
+    mockAddRemoveSelectionRangeHighlighters(expectedSelectionRanges, file, editor);
+    mockAddRemoveContributionRangeHighlighters(expectedContributionRanges, file, editor);
     replayMockAddRemoveRangeHighlighters();
 
     SelectionAnnotation selectionAnnotation =
@@ -1873,13 +1855,6 @@ public class AnnotationManagerTest {
     ContributionAnnotation contributionAnnotation =
         new ContributionAnnotation(user, file, start, end, editor);
     contributionAnnotationQueue.addAnnotation(contributionAnnotation);
-
-    prepareMockAddRemoveRangeHighlighters();
-    mockAddSelectionRangeHighlighters(expectedSelectionRanges);
-    mockAddContributionRangeHighlighters(expectedContributionRanges);
-    mockRemoveRangeHighlighters(editor, selectionAnnotation.getAnnotationRanges());
-    mockRemoveRangeHighlighters(editor, contributionAnnotation.getAnnotationRanges());
-    replayMockAddRemoveRangeHighlighters();
 
     /* call to mock */
     annotationManager.reloadAnnotations();
@@ -1913,8 +1888,8 @@ public class AnnotationManagerTest {
     List<Pair<Integer, Integer>> expectedContributionRanges = createContributionRanges(start, end);
 
     prepareMockAddRemoveRangeHighlighters();
-    mockAddSelectionRangeHighlighters(expectedSelectionRanges);
-    mockAddContributionRangeHighlighters(expectedContributionRanges);
+    mockAddRemoveSelectionRangeHighlighters(expectedSelectionRanges, file, editor);
+    mockAddRemoveContributionRangeHighlighters(expectedContributionRanges, file, editor);
     replayMockAddRemoveRangeHighlighters();
 
     SelectionAnnotation selectionAnnotation =
@@ -1924,11 +1899,6 @@ public class AnnotationManagerTest {
     ContributionAnnotation contributionAnnotation =
         new ContributionAnnotation(user, file, start, end, editor);
     contributionAnnotationQueue.addAnnotation(contributionAnnotation);
-
-    prepareMockAddRemoveRangeHighlighters();
-    mockRemoveRangeHighlighters(editor, selectionAnnotation.getAnnotationRanges());
-    mockRemoveRangeHighlighters(editor, contributionAnnotation.getAnnotationRanges());
-    replayMockAddRemoveRangeHighlighters();
 
     /* calls to test */
     annotationManager.removeAnnotations(user);
@@ -1991,8 +1961,8 @@ public class AnnotationManagerTest {
     List<Pair<Integer, Integer>> expectedContributionRanges = createContributionRanges(start, end);
 
     prepareMockAddRemoveRangeHighlighters();
-    mockAddSelectionRangeHighlighters(expectedSelectionRanges);
-    mockAddContributionRangeHighlighters(expectedContributionRanges);
+    mockAddRemoveSelectionRangeHighlighters(expectedSelectionRanges, file, editor);
+    mockAddRemoveContributionRangeHighlighters(expectedContributionRanges, file, editor);
     replayMockAddRemoveRangeHighlighters();
 
     SelectionAnnotation selectionAnnotation =
@@ -2002,11 +1972,6 @@ public class AnnotationManagerTest {
     ContributionAnnotation contributionAnnotation =
         new ContributionAnnotation(user, file, start, end, editor);
     contributionAnnotationQueue.addAnnotation(contributionAnnotation);
-
-    prepareMockAddRemoveRangeHighlighters();
-    mockRemoveRangeHighlighters(editor, selectionAnnotation.getAnnotationRanges());
-    mockRemoveRangeHighlighters(editor, contributionAnnotation.getAnnotationRanges());
-    replayMockAddRemoveRangeHighlighters();
 
     /* calls to test */
     annotationManager.removeAnnotations(file);
@@ -2073,10 +2038,10 @@ public class AnnotationManagerTest {
     List<Pair<Integer, Integer>> expectedContributionRanges = createContributionRanges(start, end);
 
     prepareMockAddRemoveRangeHighlighters();
-    mockAddSelectionRangeHighlighters(expectedSelectionRanges, file);
-    mockAddSelectionRangeHighlighters(expectedSelectionRanges, file2);
-    mockAddContributionRangeHighlighters(expectedContributionRanges, file);
-    mockAddContributionRangeHighlighters(expectedContributionRanges, file2);
+    mockAddRemoveSelectionRangeHighlighters(expectedSelectionRanges, file, editor);
+    mockAddRemoveSelectionRangeHighlighters(expectedSelectionRanges, file2, editor);
+    mockAddRemoveContributionRangeHighlighters(expectedContributionRanges, file, editor);
+    mockAddRemoveContributionRangeHighlighters(expectedContributionRanges, file2, editor);
     replayMockAddRemoveRangeHighlighters();
 
     SelectionAnnotation selectionAnnotation1 =
@@ -2110,13 +2075,6 @@ public class AnnotationManagerTest {
     ContributionAnnotation contributionAnnotation4 =
         new ContributionAnnotation(user2, file2, start, end, editor);
     contributionAnnotationQueue.addAnnotation(contributionAnnotation4);
-
-    prepareMockAddRemoveRangeHighlighters();
-    mockRemoveRangeHighlighters(editor, selectionAnnotation1.getAnnotationRanges());
-    mockRemoveRangeHighlighters(editor, selectionAnnotation3.getAnnotationRanges());
-    mockRemoveRangeHighlighters(editor, contributionAnnotation1.getAnnotationRanges());
-    mockRemoveRangeHighlighters(editor, contributionAnnotation3.getAnnotationRanges());
-    replayMockAddRemoveRangeHighlighters();
 
     /* calls to test */
     annotationManager.dispose();
@@ -2309,90 +2267,75 @@ public class AnnotationManagerTest {
   }
 
   /**
-   * Must be called before the first call to {@link #mockAddRangeHighlighters(List, TextAttributes,
-   * IFile)} or {@link #mockRemoveRangeHighlighters(Editor, List)}.
+   * Must be called before the first call to {@link
+   * #mockAddRangeHighlightersWithGivenRangeHighlighters(List, TextAttributes, IFile)} or {@link
+   * #mockAddRemoveRangeHighlighters(List, IFile, Editor, TextAttributes)}.
    */
   private void prepareMockAddRemoveRangeHighlighters() {
     PowerMock.mockStaticPartial(
         AbstractEditorAnnotation.class, "addRangeHighlighter", "removeRangeHighlighter");
   }
 
-  private void mockAddSelectionRangeHighlighters(List<Pair<Integer, Integer>> ranges)
-      throws Exception {
-    mockAddSelectionRangeHighlighters(ranges, file);
+  /**
+   * Must be called after the last call to {@link
+   * #mockAddRangeHighlightersWithGivenRangeHighlighters(List, TextAttributes, IFile)} or {@link
+   * #mockAddRemoveRangeHighlighters(List, IFile, Editor, TextAttributes)}.
+   */
+  private void replayMockAddRemoveRangeHighlighters() {
+    PowerMock.replay(AbstractEditorAnnotation.class);
   }
 
-  private void mockAddSelectionRangeHighlighters(List<Pair<Integer, Integer>> ranges, IFile file)
-      throws Exception {
+  /**
+   * Verifies that all added range highlighter removal mocks where called at least once. This can be
+   * used to check whether the local representation of removed annotations was also removed.
+   *
+   * @see #mockAddRemoveRangeHighlighters(List, IFile, Editor, TextAttributes)
+   */
+  private void verifyRemovalCall() {
+    PowerMock.verify(AnnotationManager.class);
+  }
 
+  private void mockAddSelectionRangeHighlighters(List<Pair<Integer, Integer>> ranges)
+      throws Exception {
     mockAddRangeHighlighters(ranges, selectionTextAttributes, file);
   }
 
   private void mockAddContributionRangeHighlighters(List<Pair<Integer, Integer>> ranges)
       throws Exception {
-    mockAddContributionRangeHighlighters(ranges, file);
-  }
-
-  private void mockAddContributionRangeHighlighters(List<Pair<Integer, Integer>> ranges, IFile file)
-      throws Exception {
-
     mockAddRangeHighlighters(ranges, contributionTextAttributes, file);
   }
 
   /**
-   * Mocks the method creating the actual range highlighters in the editor for the list of given
-   * ranges.
-   *
-   * <p>{@link #prepareMockAddRemoveRangeHighlighters()} must be called before the first call to
-   * this methods and {@link #replayMockAddRemoveRangeHighlighters()} must be called after the last
-   * call to this method to replay the added mocking logic.
-   *
-   * @param ranges the ranges to mock
-   * @param textAttributes the text attributes of the annotation; either {@link
-   *     #selectionTextAttributes} or {@link #contributionTextAttributes}
-   * @param file the file of the annotation
-   * @throws Exception see {@link PowerMock#expectPrivate(Object, Method, Object...)}
+   * Calls {@link #mockAddContributionRangeHighlightersWithGivenRangeHighlighters(List)} with an
+   * internally created list of mocked range highlighters.
    */
   private void mockAddRangeHighlighters(
       List<Pair<Integer, Integer>> ranges, TextAttributes textAttributes, IFile file)
       throws Exception {
 
+    List<Pair<Pair<Integer, Integer>, RangeHighlighter>> rangePairs =
+        new ArrayList<>(ranges.size());
+
     for (Pair<Integer, Integer> range : ranges) {
-      int rangeStart = range.getLeft();
-      int rangeEnd = range.getRight();
+      RangeHighlighter rangeHighlighter = mockRangeHighlighter(range.getLeft(), range.getRight());
 
-      RangeHighlighter rangeHighlighter = mockRangeHighlighter(rangeStart, rangeEnd);
-
-      PowerMock.expectPrivate(
-              AbstractEditorAnnotation.class,
-              "addRangeHighlighter",
-              rangeStart,
-              rangeEnd,
-              editor,
-              textAttributes,
-              file)
-          .andStubReturn(rangeHighlighter);
+      rangePairs.add(new ImmutablePair<>(range, rangeHighlighter));
     }
+
+    mockAddRangeHighlightersWithGivenRangeHighlighters(rangePairs, textAttributes, file);
   }
 
   private void mockAddSelectionRangeHighlightersWithGivenRangeHighlighters(
       List<Pair<Pair<Integer, Integer>, RangeHighlighter>> rangePairs) throws Exception {
 
-    mockAddRangeHighlightersWithGivenRangeHighlighters(rangePairs, selectionTextAttributes);
+    mockAddRangeHighlightersWithGivenRangeHighlighters(rangePairs, selectionTextAttributes, file);
   }
 
   private void mockAddContributionRangeHighlightersWithGivenRangeHighlighters(
       List<Pair<Pair<Integer, Integer>, RangeHighlighter>> rangePairs) throws Exception {
 
-    mockAddRangeHighlightersWithGivenRangeHighlighters(rangePairs, contributionTextAttributes);
-  }
-
-  private void mockAddRangeHighlightersWithGivenRangeHighlighters(
-      List<Pair<Pair<Integer, Integer>, RangeHighlighter>> rangePairs,
-      TextAttributes textAttributes)
-      throws Exception {
-
-    mockAddRangeHighlightersWithGivenRangeHighlighters(rangePairs, textAttributes, file);
+    mockAddRangeHighlightersWithGivenRangeHighlighters(
+        rangePairs, contributionTextAttributes, file);
   }
 
   /**
@@ -2435,10 +2378,21 @@ public class AnnotationManagerTest {
     }
   }
 
+  private void mockAddRemoveSelectionRangeHighlighters(
+      List<Pair<Integer, Integer>> ranges, IFile file, Editor editor) throws Exception {
+
+    mockAddRemoveRangeHighlighters(ranges, file, editor, selectionTextAttributes);
+  }
+
+  private void mockAddRemoveContributionRangeHighlighters(
+      List<Pair<Integer, Integer>> ranges, IFile file, Editor editor) throws Exception {
+
+    mockAddRemoveRangeHighlighters(ranges, file, editor, contributionTextAttributes);
+  }
+
   /**
-   * Mocks the method removing the actual range highlighters from the editor for the given
-   * annotation. The mock still removes the range highlighter objects from the given annotation
-   * ranges as this would normally also be done in <code>removeRangeHighlighter(...)</code>.
+   * Mocks the addition and removal of range highlighters for the given ranges to the given editor
+   * and file with the given text attributes.
    *
    * <p>When using this call, it is also advised to call {@link PowerMock#verify(Object...)} on
    * <code>AbstractEditorAnnotation.class</code> to ensure that the {@link
@@ -2448,41 +2402,37 @@ public class AnnotationManagerTest {
    * this methods and {@link #replayMockAddRemoveRangeHighlighters()} must be called after the last
    * call to this method to replay the added mocking logic.
    *
-   * @param editor the editor whose range highlighter removal to mock
-   * @param annotationRanges the annotation range whose highlighter removal to mock
+   * @param ranges the ranges whose highlighter addition and removal to mock
+   * @param file the file of the annotation
+   * @param editor the editor of the annotation
+   * @param textAttributes the text attributes of the annotation
    * @throws Exception see {@link PowerMock#expectPrivate(Object, Method, Object...)}
    */
-  private void mockRemoveRangeHighlighters(Editor editor, List<AnnotationRange> annotationRanges)
+  private void mockAddRemoveRangeHighlighters(
+      List<Pair<Integer, Integer>> ranges, IFile file, Editor editor, TextAttributes textAttributes)
       throws Exception {
 
-    for (AnnotationRange annotationRange : annotationRanges) {
-      RangeHighlighter rangeHighlighter = annotationRange.getRangeHighlighter();
+    for (Pair<Integer, Integer> range : ranges) {
+      int rangeStart = range.getLeft();
+      int rangeEnd = range.getRight();
 
-      if (rangeHighlighter == null) {
-        continue;
-      }
+      RangeHighlighter rangeHighlighter = mockRangeHighlighter(rangeStart, rangeEnd);
+
+      PowerMock.expectPrivate(
+              AbstractEditorAnnotation.class,
+              "addRangeHighlighter",
+              rangeStart,
+              rangeEnd,
+              editor,
+              textAttributes,
+              file)
+          .andStubReturn(rangeHighlighter);
 
       PowerMock.expectPrivate(
               AbstractEditorAnnotation.class, "removeRangeHighlighter", editor, rangeHighlighter)
           .atLeastOnce()
           .asStub();
     }
-  }
-
-  /**
-   * Must be called after the last call to {@link #mockAddRangeHighlighters(List, TextAttributes,
-   * IFile)} or {@link #mockRemoveRangeHighlighters(Editor, List)}.
-   */
-  private void replayMockAddRemoveRangeHighlighters() {
-    PowerMock.replay(AbstractEditorAnnotation.class);
-  }
-
-  /**
-   * Verifies that all added range highlighter removal mocks where called at least once. This can be
-   * used to check whether the local representation of removed annotations was also removed.
-   */
-  private void verifyRemovalCall() {
-    PowerMock.verify(AnnotationManager.class);
   }
 
   private RangeHighlighter mockRangeHighlighter(int rangeStart, int rangeEnd) {
