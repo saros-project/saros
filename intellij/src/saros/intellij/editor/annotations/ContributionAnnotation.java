@@ -6,6 +6,7 @@ import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.openapi.editor.markup.TextAttributes;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import saros.filesystem.IFile;
@@ -24,6 +25,7 @@ import saros.session.User;
  * the creator of the contribution annotation.
  */
 class ContributionAnnotation extends AbstractEditorAnnotation {
+  private static Logger log = Logger.getLogger(ContributionAnnotation.class);
 
   /**
    * Creates a contribution annotation with the given arguments.
@@ -95,6 +97,34 @@ class ContributionAnnotation extends AbstractEditorAnnotation {
     }
 
     return annotationRanges;
+  }
+
+  // TODO check whether local representation already added; see #958
+  @Override
+  void addLocalRepresentation(@NotNull Editor editor) {
+    User user = getUser();
+
+    TextAttributes textAttributes = getContributionTextAttributes(editor, user);
+
+    addEditor(editor);
+
+    IFile file = getFile();
+
+    for (AnnotationRange annotationRange : getAnnotationRanges()) {
+      int start = annotationRange.getStart();
+      int end = annotationRange.getEnd();
+
+      RangeHighlighter rangeHighlighter =
+          AbstractEditorAnnotation.addRangeHighlighter(start, end, editor, textAttributes, file);
+
+      if (rangeHighlighter != null) {
+        annotationRange.addRangeHighlighter(rangeHighlighter);
+
+      } else {
+        log.warn(
+            "Could not create range highlighter for range " + annotationRange + " for " + this);
+      }
+    }
   }
 
   /**

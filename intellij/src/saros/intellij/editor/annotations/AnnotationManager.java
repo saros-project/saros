@@ -1,8 +1,6 @@
 package saros.intellij.editor.annotations;
 
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.markup.RangeHighlighter;
-import com.intellij.openapi.editor.markup.TextAttributes;
 import java.util.List;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -246,64 +244,18 @@ public class AnnotationManager implements Disposable {
    *
    * @param file the file that was opened in an editor
    * @param editor the new <code>Editor</code> for the annotation
+   * @see AbstractEditorAnnotation#addLocalRepresentation(Editor)
    * @see Editor#isDisposed()
    */
   public void applyStoredAnnotations(@NotNull IFile file, @NotNull Editor editor) {
 
-    selectionAnnotationStore
-        .getAnnotations(file)
-        .forEach(annotation -> addLocalRepresentationToAnnotation(annotation, editor));
-
-    contributionAnnotationQueue
-        .getAnnotations(file)
-        .forEach(annotation -> addLocalRepresentationToAnnotation(annotation, editor));
-  }
-
-  /**
-   * Creates RangeHighlighters for the given annotation and adds the given editor and the matching
-   * created RangeHighlighters to the given annotation.
-   *
-   * @param annotation the annotation to add a local representation to
-   * @param editor the editor to create RangeHighlighters in
-   * @param <E> the annotation type
-   * @see AbstractEditorAnnotation#addRangeHighlighter(int, int, Editor, TextAttributes, IFile)
-   */
-  private <E extends AbstractEditorAnnotation> void addLocalRepresentationToAnnotation(
-      @NotNull E annotation, @NotNull Editor editor) {
-
-    User user = annotation.getUser();
-
-    TextAttributes textAttributes;
-
-    if (annotation instanceof SelectionAnnotation) {
-      textAttributes = SelectionAnnotation.getSelectionTextAttributes(editor, user);
-
-    } else if (annotation instanceof ContributionAnnotation) {
-      textAttributes = ContributionAnnotation.getContributionTextAttributes(editor, user);
-
-    } else {
-      throw new IllegalArgumentException("Unknown annotation type " + annotation.getClass());
+    for (SelectionAnnotation annotation : selectionAnnotationStore.getAnnotations(file)) {
+      annotation.addLocalRepresentation(editor);
     }
 
-    List<AnnotationRange> annotationRanges = annotation.getAnnotationRanges();
-
-    annotation.addEditor(editor);
-
-    IFile file = annotation.getFile();
-
-    annotationRanges.forEach(
-        annotationRange -> {
-          int start = annotationRange.getStart();
-          int end = annotationRange.getEnd();
-
-          RangeHighlighter rangeHighlighter =
-              AbstractEditorAnnotation.addRangeHighlighter(
-                  start, end, editor, textAttributes, file);
-
-          if (rangeHighlighter != null) {
-            annotationRange.addRangeHighlighter(rangeHighlighter);
-          }
-        });
+    for (ContributionAnnotation annotation : contributionAnnotationQueue.getAnnotations(file)) {
+      annotation.addLocalRepresentation(editor);
+    }
   }
 
   /**
@@ -398,7 +350,7 @@ public class AnnotationManager implements Disposable {
    * @see AbstractEditorAnnotation#updateBoundaries()
    * @see AbstractEditorAnnotation#removeRangeHighlighter(Editor, List)
    * @see AbstractEditorAnnotation#removeLocalRepresentation()
-   * @see #addLocalRepresentationToAnnotation(AbstractEditorAnnotation, Editor)
+   * @see AbstractEditorAnnotation#addLocalRepresentation(Editor)
    */
   private <E extends AbstractEditorAnnotation> void reloadAnnotations(
       @NotNull AnnotationStore<E> annotationStore) {
@@ -417,7 +369,7 @@ public class AnnotationManager implements Disposable {
 
       annotation.removeLocalRepresentation();
 
-      addLocalRepresentationToAnnotation(annotation, editor);
+      annotation.addLocalRepresentation(editor);
     }
   }
 
