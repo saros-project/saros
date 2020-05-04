@@ -96,16 +96,18 @@ public class AnnotationManagerTest {
 
     PowerMock.mockStaticPartial(SelectionAnnotation.class, "getSelectionTextAttributes");
 
-    EasyMock.expect(SelectionAnnotation.getSelectionTextAttributes(editor, user))
+    PowerMock.expectPrivate(SelectionAnnotation.class, "getSelectionTextAttributes", editor, user)
         .andStubReturn(selectionTextAttributes);
-    EasyMock.expect(SelectionAnnotation.getSelectionTextAttributes(editor, user2))
+    PowerMock.expectPrivate(SelectionAnnotation.class, "getSelectionTextAttributes", editor, user2)
         .andStubReturn(selectionTextAttributes);
 
     PowerMock.mockStaticPartial(ContributionAnnotation.class, "getContributionTextAttributes");
 
-    EasyMock.expect(ContributionAnnotation.getContributionTextAttributes(editor, user))
+    PowerMock.expectPrivate(
+            ContributionAnnotation.class, "getContributionTextAttributes", editor, user)
         .andStubReturn(contributionTextAttributes);
-    EasyMock.expect(ContributionAnnotation.getContributionTextAttributes(editor, user2))
+    PowerMock.expectPrivate(
+            ContributionAnnotation.class, "getContributionTextAttributes", editor, user2)
         .andStubReturn(contributionTextAttributes);
 
     PowerMock.replay(SelectionAnnotation.class, ContributionAnnotation.class);
