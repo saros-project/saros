@@ -58,6 +58,9 @@ class ContributionAnnotation extends AbstractEditorAnnotation {
    */
   private static List<AnnotationRange> prepareAnnotationRanges(
       int start, int end, @Nullable Editor editor, @NotNull User user, @NotNull IFile file) {
+
+    checkRange(start, end);
+
     List<AnnotationRange> annotationRanges = new ArrayList<>();
 
     TextAttributes contributionTextAttributes;

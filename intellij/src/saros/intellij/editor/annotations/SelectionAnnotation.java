@@ -43,6 +43,8 @@ class SelectionAnnotation extends AbstractEditorAnnotation {
   private static List<AnnotationRange> prepareAnnotationRange(
       @NotNull User user, @NotNull IFile file, int start, int end, @Nullable Editor editor) {
 
+    checkRange(start, end);
+
     AnnotationRange annotationRange;
 
     if (editor != null) {
