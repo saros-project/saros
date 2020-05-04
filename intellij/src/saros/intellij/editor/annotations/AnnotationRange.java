@@ -55,11 +55,17 @@ class AnnotationRange {
               + end);
     }
 
-    if (rangeHighlighter != null
-        && (start != rangeHighlighter.getStartOffset() || end != rangeHighlighter.getEndOffset())) {
+    if (rangeHighlighter != null) {
+      if (!rangeHighlighter.isValid()) {
+        throw new IllegalArgumentException(
+            "The given RangeHighlighter for the range (" + start + "," + end + ") is invalid");
 
-      throw new IllegalArgumentException(
-          "The range of the RangeHighlighter does not match the given " + "start and end value");
+      } else if (start != rangeHighlighter.getStartOffset()
+          || end != rangeHighlighter.getEndOffset()) {
+
+        throw new IllegalArgumentException(
+            "The range of the given RangeHighlighter does not match the given start and end value");
+      }
     }
 
     this.start = start;
