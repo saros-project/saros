@@ -2,6 +2,8 @@ package saros.intellij.editor;
 
 import static org.junit.Assert.assertEquals;
 
+import com.intellij.openapi.editor.Caret;
+import com.intellij.openapi.editor.CaretModel;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.util.Pair;
@@ -25,6 +27,7 @@ public class EditorAPITextPositionTest {
    */
   private static class EditorBuild {
     private Editor editor;
+    private Caret caret;
 
     private EditorBuild() {
       editor = EasyMock.createNiceMock(Editor.class);
@@ -63,6 +66,34 @@ public class EditorAPITextPositionTest {
     }
 
     /**
+     * Sets the passed value for the caret position lookup.
+     *
+     * <p>This must be called for all needed lookup values before calling {@link #build()}.
+     *
+     * @param caretPosition the caret position to return as the answer to the lookup
+     * @return this builder
+     */
+    private EditorBuild withCaretPosition(int caretPosition) {
+      if (caret == null) {
+        setUpCaretMock();
+      }
+
+      EasyMock.expect(caret.getOffset()).andReturn(caretPosition);
+
+      return this;
+    }
+
+    private void setUpCaretMock() {
+      caret = EasyMock.createNiceMock(Caret.class);
+
+      CaretModel caretModel = EasyMock.createNiceMock(CaretModel.class);
+      EasyMock.expect(caretModel.getPrimaryCaret()).andStubReturn(caret);
+      EasyMock.replay(caretModel);
+
+      EasyMock.expect(editor.getCaretModel()).andStubReturn(caretModel);
+    }
+
+    /**
      * Builds the Editor mock.
      *
      * @return the Editor mock
@@ -72,12 +103,17 @@ public class EditorAPITextPositionTest {
     private Editor build() {
       EasyMock.replay(editor);
 
+      if (caret != null) {
+        EasyMock.replay(caret);
+      }
+
       return editor;
     }
   }
 
   /**
-   * Ease of use method to instantiate a text selection with the given parameters.
+   * Ease of use method to instantiate a text selection with the given parameters and <code>
+   * isBackwardsSelection=false</code>.
    *
    * @param startLine the start line
    * @param startInLineOffset the start in-line offset
@@ -89,9 +125,32 @@ public class EditorAPITextPositionTest {
    */
   private TextSelection selection(
       int startLine, int startInLineOffset, int endLine, int endInLineOffset) {
+    return selection(startLine, startInLineOffset, endLine, endInLineOffset, false);
+  }
+
+  /**
+   * Ease of use method to instantiate a text selection with the given parameters.
+   *
+   * @param startLine the start line
+   * @param startInLineOffset the start in-line offset
+   * @param endLine the end line
+   * @param endInLineOffset the end in-line offset
+   * @param isBackwardsSelection whether the selection is a backwards selection
+   * @return a text selection with the given parameters
+   * @see TextPosition#TextPosition(int, int)
+   * @see TextSelection#TextSelection(TextPosition, TextPosition)
+   */
+  private TextSelection selection(
+      int startLine,
+      int startInLineOffset,
+      int endLine,
+      int endInLineOffset,
+      boolean isBackwardsSelection) {
 
     return new TextSelection(
-        new TextPosition(startLine, startInLineOffset), new TextPosition(endLine, endInLineOffset));
+        new TextPosition(startLine, startInLineOffset),
+        new TextPosition(endLine, endInLineOffset),
+        isBackwardsSelection);
   }
 
   /**
@@ -187,9 +246,34 @@ public class EditorAPITextPositionTest {
             .withLineNumberLookupAnswer(endOffset, endLine)
             .withLineOffsetLookupAnswer(startLine, 0)
             .withLineOffsetLookupAnswer(endLine, 8)
+            .withCaretPosition(endOffset)
             .build();
 
-    TextSelection expectedSelection = selection(startLine, 0, endLine, 7);
+    TextSelection expectedSelection = selection(startLine, 0, endLine, 7, false);
+
+    TextSelection calculatedSelection =
+        EditorAPI.calculateSelectionPosition(editor, offset, endOffset);
+
+    assertEquals(expectedSelection, calculatedSelection);
+  }
+
+  @Test
+  public void testCalculateSelectionStartSelectionBackwards() {
+    int offset = 0;
+    int endOffset = 15;
+    int startLine = 0;
+    int endLine = 1;
+
+    Editor editor =
+        new EditorBuild()
+            .withLineNumberLookupAnswer(offset, startLine)
+            .withLineNumberLookupAnswer(endOffset, endLine)
+            .withLineOffsetLookupAnswer(startLine, 0)
+            .withLineOffsetLookupAnswer(endLine, 8)
+            .withCaretPosition(offset)
+            .build();
+
+    TextSelection expectedSelection = selection(startLine, 0, endLine, 7, true);
 
     TextSelection calculatedSelection =
         EditorAPI.calculateSelectionPosition(editor, offset, endOffset);
@@ -210,9 +294,34 @@ public class EditorAPITextPositionTest {
             .withLineNumberLookupAnswer(endOffset, endLine)
             .withLineOffsetLookupAnswer(startLine, 68)
             .withLineOffsetLookupAnswer(endLine, 290)
+            .withCaretPosition(endOffset)
             .build();
 
-    TextSelection expectedSelection = selection(startLine, 7, endLine, 61);
+    TextSelection expectedSelection = selection(startLine, 7, endLine, 61, false);
+
+    TextSelection calculatedSelection =
+        EditorAPI.calculateSelectionPosition(editor, offset, endOffset);
+
+    assertEquals(expectedSelection, calculatedSelection);
+  }
+
+  @Test
+  public void testCalculateSelectionMultipleLineSelectionBackwards() {
+    int offset = 75;
+    int endOffset = 351;
+    int startLine = 9;
+    int endLine = 28;
+
+    Editor editor =
+        new EditorBuild()
+            .withLineNumberLookupAnswer(offset, startLine)
+            .withLineNumberLookupAnswer(endOffset, endLine)
+            .withLineOffsetLookupAnswer(startLine, 68)
+            .withLineOffsetLookupAnswer(endLine, 290)
+            .withCaretPosition(offset)
+            .build();
+
+    TextSelection expectedSelection = selection(startLine, 7, endLine, 61, true);
 
     TextSelection calculatedSelection =
         EditorAPI.calculateSelectionPosition(editor, offset, endOffset);
@@ -232,9 +341,33 @@ public class EditorAPITextPositionTest {
             .withLineNumberLookupAnswer(offset, startLine)
             .withLineNumberLookupAnswer(endOffset, endLine)
             .withLineOffsetLookupAnswer(startLine, 79)
+            .withCaretPosition(endOffset)
             .build();
 
-    TextSelection expectedSelection = selection(startLine, 6, endLine, 31);
+    TextSelection expectedSelection = selection(startLine, 6, endLine, 31, false);
+
+    TextSelection calculatedSelection =
+        EditorAPI.calculateSelectionPosition(editor, offset, endOffset);
+
+    assertEquals(expectedSelection, calculatedSelection);
+  }
+
+  @Test
+  public void testCalculateSelectionOneLineSelectionBackwards() {
+    int offset = 85;
+    int endOffset = 110;
+    int startLine = 10;
+    int endLine = 10;
+
+    Editor editor =
+        new EditorBuild()
+            .withLineNumberLookupAnswer(offset, startLine)
+            .withLineNumberLookupAnswer(endOffset, endLine)
+            .withLineOffsetLookupAnswer(startLine, 79)
+            .withCaretPosition(offset)
+            .build();
+
+    TextSelection expectedSelection = selection(startLine, 6, endLine, 31, true);
 
     TextSelection calculatedSelection =
         EditorAPI.calculateSelectionPosition(editor, offset, endOffset);
@@ -253,9 +386,10 @@ public class EditorAPITextPositionTest {
         new EditorBuild()
             .withLineNumberLookupAnswer(offset, startLine)
             .withLineOffsetLookupAnswer(startLine, 100)
+            .withCaretPosition(endOffset)
             .build();
 
-    TextSelection expectedSelection = selection(startLine, 143, endLine, 143);
+    TextSelection expectedSelection = selection(startLine, 143, endLine, 143, false);
 
     TextSelection calculatedSelection =
         EditorAPI.calculateSelectionPosition(editor, offset, endOffset);

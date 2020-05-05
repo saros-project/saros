@@ -104,10 +104,10 @@ public class EditorAPI {
   static TextSelection getSelection(@NotNull Editor editor) {
     SelectionModel selectionModel = editor.getSelectionModel();
 
-    int selectionStartOffset = selectionModel.getSelectionStart();
-    int selectionEndOffset = selectionModel.getSelectionEnd();
+    int selectionStart = selectionModel.getSelectionStart();
+    int selectionEnd = selectionModel.getSelectionEnd();
 
-    return calculateSelectionPosition(editor, selectionStartOffset, selectionEndOffset);
+    return calculateSelectionPosition(editor, selectionStart, selectionEnd);
   }
 
   /**
@@ -198,6 +198,9 @@ public class EditorAPI {
               + selectionEndOffset);
     }
 
+    boolean isBackwardsSelection =
+        isBackwardsSelection(editor, selectionStartOffset, selectionEndOffset);
+
     Pair<TextPosition, Pair<Integer, Integer>> startPositionResult =
         calculatePositionInternal(editor, selectionStartOffset, null);
 
@@ -205,7 +208,7 @@ public class EditorAPI {
 
     // Skip second part of calculation if no selection is present
     if (selectionEndOffset == selectionStartOffset) {
-      return new TextSelection(startPosition, startPosition);
+      return new TextSelection(startPosition, startPosition, isBackwardsSelection);
     }
 
     Pair<Integer, Integer> knownLineStartOffset = startPositionResult.second;
@@ -215,7 +218,7 @@ public class EditorAPI {
 
     TextPosition endPosition = endPositionResult.first;
 
-    return new TextSelection(startPosition, endPosition);
+    return new TextSelection(startPosition, endPosition, isBackwardsSelection);
   }
 
   /**

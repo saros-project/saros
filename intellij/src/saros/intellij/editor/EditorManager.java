@@ -3,7 +3,6 @@ package saros.intellij.editor;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.event.SelectionEvent;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleFileIndex;
@@ -449,8 +448,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    * the file for the editor.
    *
    * <p><b>NOTE:</b> This should only be used to transfer pre-existing selection. To notify other
-   * participants about new selections, {@link #generateSelection(IFile, SelectionEvent)} should be
-   * used instead.
+   * participants about new selections, {@link #generateSelection(IFile, Editor, int, int)} should
+   * be used instead.
    *
    * <p><b>NOTE:</b> This class is meant for internal use only and should generally not be used
    * outside the editor package. If you still need to access this method, please consider whether
@@ -879,16 +878,9 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    * outside the editor package. If you still need to access this method, please consider whether
    * your class should rather be located in the editor package.
    */
-  // TODO handle TextRange.EMPTY_RANGE separately? Could represent no valid selection for editor
-  public void generateSelection(IFile file, SelectionEvent newSelection) {
-    TextRange newSelectionRange = newSelection.getNewRange();
+  public void generateSelection(IFile file, Editor editor, int startOffset, int endOffset) {
 
-    Editor editor = newSelection.getEditor();
-
-    if (editor != null && newSelectionRange != null) {
-      int startOffset = newSelectionRange.getStartOffset();
-      int endOffset = newSelectionRange.getEndOffset();
-
+    if (editor != null) {
       TextSelection selection =
           EditorAPI.calculateSelectionPosition(editor, startOffset, endOffset);
 
