@@ -9,6 +9,7 @@ import saros.intellij.editor.LocalEditorHandler;
 import saros.intellij.editor.LocalEditorManipulator;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.eventhandler.colorscheme.AnnotationReloader;
+import saros.intellij.eventhandler.editor.caret.LocalCaretPositionChangeHandler;
 import saros.intellij.eventhandler.editor.document.LocalClosedEditorModificationHandler;
 import saros.intellij.eventhandler.editor.document.LocalDocumentModificationHandler;
 import saros.intellij.eventhandler.editor.editorstate.AnnotationUpdater;
@@ -58,6 +59,16 @@ public class ProjectEventHandlersFactory {
     Set<IProjectEventHandler> projectEventHandlers = new HashSet<>();
 
     /*
+     * caret position change handlers
+     */
+    projectEventHandlers.add(new LocalCaretPositionChangeHandler(project, editorManager));
+
+    /*
+     * color scheme change handlers
+     */
+    projectEventHandlers.add(new AnnotationReloader(project, annotationManager));
+
+    /*
      * document modification handlers
      */
     projectEventHandlers.add(
@@ -90,11 +101,6 @@ public class ProjectEventHandlersFactory {
      * editor viewport change handlers
      */
     projectEventHandlers.add(new LocalViewPortChangeHandler(editorManager));
-
-    /*
-     * color scheme change handlers
-     */
-    projectEventHandlers.add(new AnnotationReloader(project, annotationManager));
 
     return new ProjectEventHandlers(projectEventHandlers);
   }

@@ -18,10 +18,11 @@ public interface IProjectEventHandler extends IEventHandler {
 
   /** The possible types of project event handlers. */
   enum ProjectEventHandlerType {
+    CARET_LOCATION_CHANGE_HANDLER,
+    COLOR_SCHEME_CHANGE_HANDLER,
     DOCUMENT_MODIFICATION_HANDLER,
     EDITOR_STATUS_CHANGE_HANDLER,
     TEXT_SELECTION_CHANGE_HANDLER,
-    VIEWPORT_CHANGE_HANDLER,
-    COLOR_SCHEME_CHANGE_HANDLER
+    VIEWPORT_CHANGE_HANDLER
   }
 }
