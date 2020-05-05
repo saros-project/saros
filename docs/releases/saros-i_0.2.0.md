@@ -67,7 +67,7 @@ You can
 - interact freely with non-shared resources
 - follow other participants of the session ([follow mode](../documentation/features.md#follow-mode))
 
-For a guide on how to use Saros/I, have a look at our [Getting Started](../documentation/getting-started.html?tab=intellij#how-to-use-sarosi) page.
+For a guide on how to use Saros/I, have a look at our [Getting Started](../documentation/getting-started.html?tab=intellij) page.
 
 ## Restrictions
 

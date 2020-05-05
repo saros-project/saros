@@ -4,7 +4,7 @@ title: Saros Server Development
 
 ## What is the Saros Server?
 
-Please refer to the [User Documentation](../documentation/saros-server.md) for an explanation and the use-case of the Saros server.
+Please refer to the [User Documentation](../documentation/how-tos/hostless-sessions.md) for an explanation and the use-case of the Saros server.
 
 Technically it is a headless session-host.
 

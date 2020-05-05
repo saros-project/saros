@@ -264,7 +264,7 @@ Connections and make sure, that there are no proxy settings checked.
 {% endcollapsible %}
 {% collapsible I cannot access public servers from my location. Can I still use Saros over the local network somehow? %}
 
-Yes. See the [Installation and setup page](setup-xmpp.md) for
+Yes. See the [Installation and setup page](how-tos/setup-xmpp.md) for
 information on setting up your own local XMPP server.
 {% endcollapsible %}
 {% collapsible The updates I'm getting from others in the session seem to arrive slowly. %}

@@ -137,3 +137,20 @@ Example:
 * **If** `bundle exec jekyll serve`
   **fails with** `bundler: command not found: jekyll`
   **try** `jekyll serve`
+
+## Find broken links automatically
+
+You can [`html-proofer`](https://github.com/gjtorikian/html-proofer) to
+verify your build results (produced by `bundle exec jekyll serve` or `bundle exec jekyll build`)
+in the directory `docs/_site`.
+
+```bash
+htmlproofer \
+  ./_site \
+  --assume-extension \ # Allows urls without a file extension
+  --allow-hash-href \ # Allow hash refs (e.g. '#test')
+  --alt-ignore '/.*/'\ # Ignore missing "alt" warning
+  --file-ignore "/node_modules\/.*/" # Ignore html files in the 'node_modules' dir
+```
+
+If you want to exclude external links add the option `--disable-external`.
