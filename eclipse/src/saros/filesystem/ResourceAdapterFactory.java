@@ -125,7 +125,7 @@ public class ResourceAdapterFactory {
             resource.getAdapter(org.eclipse.core.resources.IProject.class));
 
       case org.eclipse.core.resources.IResource.ROOT:
-        return new EclipseWorkspaceRootImpl(
+        return new EclipseContainerImpl(
             resource.getAdapter(org.eclipse.core.resources.IWorkspaceRoot.class));
 
       default:
