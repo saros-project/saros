@@ -70,9 +70,8 @@ class ContributionAnnotation extends AbstractEditorAnnotation {
       contributionTextAttributes = null;
     }
 
-    for (int i = 0; i < end - start; i++) {
-      int currentStart = start + i;
-      int currentEnd = start + i + 1;
+    for (int currentStart = start; currentStart < end; currentStart++) {
+      int currentEnd = currentStart + 1;
 
       AnnotationRange annotationRange;
       if (editor != null) {
