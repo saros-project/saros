@@ -86,7 +86,7 @@ In the following we are using these definitions:
 {% endcollapsible %}
 {% collapsible How many users does Saros support? %}
 
-Saros supports up to 5 users (currently restricted to 2 users in IntelliJ).
+Saros supports up to 5 users (see [here](/releases/saros-i_0.2.2.html#number-of-participants) for the current restrictions in IntelliJ).
 However, this is not a hard limit. But the sixth and seventh and n-th user will get the same gray-ish color.
 
 {% endcollapsible %}
@@ -149,10 +149,14 @@ workspace directory is shown if you open `"Switch Workspace" > "Other..."`.
 {% endcapture %}
 {% capture intellij %}
 
-By default, the directory `.IdeaXXXXXXXX` is located in the user directory. The exact directory name is determined by your IntelliJ version, e.g. `.IdeaIC2019.1` for IntelliJ IDEA 2019.1.
-More information about the location of the directory is given here: https://intellij-support.jetbrains.com/hc/en-us/articles/206544519-Directories-used-by-the-IDE-to-store-settings-caches-plugins-and-logs
-* IDE logs - `~/.IdeaXXXXXXXX/system/log/idea.log*`
-* Saros logs - `~/.IdeaXXXXXXXX/system/log/SarosLogs/*.log`
+The log files for JetBrains IDEs are located in the IDE system directory (here called `IDE_SYSTEM_DIR`).
+An overview over all configurations is given on https://intellij-support.jetbrains.com/hc/en-us/articles/206544519-Directories-used-by-the-IDE-to-store-settings-caches-plugins-and-logs
+
+For releases 2019.3 and earlier: https://www.jetbrains.com/help/idea/2019.3/tuning-the-ide.html#system-directory
+For release 2020.1 and later: https://www.jetbrains.com/help/idea/2020.1/tuning-the-ide.html#system-directory
+
+* IDE logs - `[IDE_SYSTEM_DIR]/log/idea.log*`
+* Saros logs - `~[IDE_SYSTEM_DIR]/log/SarosLogs/*.log`
 
 {% endcapture %}
 {% include ide-tabs.html eclipse=eclipse intellij=intellij %}

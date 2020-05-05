@@ -9,7 +9,7 @@ It works with and within **Eclipse**. Saros users can use all Eclipse functional
 We are working on an **IntelliJ** version as well. See the [release notes](/releases) of our
 latest alpha release for more information.
 
-## Saros is a real-time collaborative editor
+## Saros is a real-time collaborative editor.
 
 *   All collaborators have an **identical copy of Eclipse projects.**
 *   Two or more users can **jointly edit files** in the project.
@@ -18,7 +18,7 @@ latest alpha release for more information.
 *   Saros **keeps these copies in sync** by transmitting each change to
     all of the other collaborators.
 
-## Saros supports up to 5 participants at once
+## Saros supports up to 5 participants at once.
 
 *   Saros is designed to at least work with two participants in a
     session - as inherent for pair programming.

@@ -2,9 +2,9 @@
 title: Install Saros
 ---
 
-Here you will find a guide **on how to install Saros**
-see the [getting started](getting-started.md) guide if
-you want to know how to set up Saros.
+Here you will find a guide **on how to install Saros**.
+If you want to know how to set up Saros,
+have a look at the [getting started](getting-started.md) guide.
 
 ## Prerequisites
 
@@ -19,7 +19,7 @@ Saros/E requires
 
 Saros/I requires
  - `JDK 8` or newer
- - `IntelliJ 2018.2.7` or newer (download [here](https://www.jetbrains.com/idea/download/))
+ - `IntelliJ 2019.2.3` or newer (download [here](https://www.jetbrains.com/idea/download/))
 
 {% endcapture %}
 {% include ide-tabs.html eclipse=eclipse intellij=intellij %}
