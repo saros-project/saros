@@ -46,6 +46,10 @@ public class TextSelectionActivity extends AbstractResourceActivity<IFile> {
   @XStreamAsAttribute
   private final int endInLineOffset;
 
+  @XStreamAlias("bs")
+  @XStreamAsAttribute
+  private final boolean isBackwardsSelection;
+
   /**
    * Instantiates a new text selection activity.
    *
@@ -55,6 +59,7 @@ public class TextSelectionActivity extends AbstractResourceActivity<IFile> {
    * @throws IllegalArgumentException if the source or file is <code>null</code>
    */
   public TextSelectionActivity(User source, TextSelection selection, IFile file) {
+
     super(source, file);
 
     if (file == null) throw new IllegalArgumentException("file must not be null");
@@ -66,6 +71,8 @@ public class TextSelectionActivity extends AbstractResourceActivity<IFile> {
     TextPosition endPosition = selection.getEndPosition();
     this.endLine = endPosition.getLineNumber();
     this.endInLineOffset = endPosition.getInLineOffset();
+
+    this.isBackwardsSelection = selection.isBackwardsSelection();
   }
 
   @Override
@@ -82,7 +89,7 @@ public class TextSelectionActivity extends AbstractResourceActivity<IFile> {
     TextPosition startPosition = new TextPosition(startLine, startInLineOffset);
     TextPosition endPosition = new TextPosition(endLine, endInLineOffset);
 
-    return new TextSelection(startPosition, endPosition);
+    return new TextSelection(startPosition, endPosition, isBackwardsSelection);
   }
 
   @Override
@@ -114,6 +121,8 @@ public class TextSelectionActivity extends AbstractResourceActivity<IFile> {
         + endLine
         + ", in-line offset: "
         + endInLineOffset
+        + ", is backwards: "
+        + isBackwardsSelection
         + ", src: "
         + getSource()
         + ", file: "
