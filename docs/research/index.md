@@ -3,7 +3,7 @@ title: Research
 ---
 
 In the following you will find all information about Saros in the context of research.<br/>
-**If you are interested in using Saros as part of your own research, feel free to [contact us](../support).**
+**If you are interested in using Saros as part of your own research, feel free to [contact us](/contact).**
 
 ## Research Topics and Questions
 The [AG SE (working group software engineering *@FU Berlin*)](http://www.inf.fu-berlin.de/w/SE/WebHome) has been doing research on pair programming for a number of years. Saros is a platform for extending this work to distributed pair programming (and general collaborative programming). We also investigate a number of research questions that concern the Saros tool itself (as well as similar tools).

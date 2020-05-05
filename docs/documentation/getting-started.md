@@ -61,7 +61,7 @@ You first need an **XMPP account** to use Saros.
         * Note: Due to abuse by spammers, we had to disable in-band registration and from within Saros.
   * On other XMPP servers as [jabber.org](https://www.jabber.org/) ([register.jabber.org](https://register.jabber.org/)).
 2.  You can **use an existing account**
-3.  You [setup your own XMPP server](setup-xmpp.md).
+3.  You [setup your own XMPP server](how-tos/setup-xmpp.md).
 
 * Please note that your performance may vary depending on the XMPP server settings, such as bandwidth restrictions or feature supports.
 * It is recommended to **use the same XMPP server** for all users
@@ -148,7 +148,7 @@ computer of your invited contacts.
 - Choose the section "Contacts" in the window on the left side of the Saros view.
 - Choose a friend that is online.
 - Right-click the name of that friend. This will open a list of all open projects. Each project contains a list of its shareable modules.
-  - If the module you would like to share is not listed, it most likely does not adhere to the mentioned restrictions (see [module restrictions](#module-restrictions)).
+  - If the module you would like to share is not listed, it most likely does not adhere to the mentioned restrictions (see [module restrictions](/releases/saros-i_0.2.2.html#module-restrictions)).
 - Choose the module that is supposed to be shared from the displayed list of modules.
 
 *Alternatively:*
@@ -212,7 +212,7 @@ For more complex modules, it is advised to share the module structure some other
     - Specify the module base path.
   - *To use an existing module:* Choose "Use existing module"
     - Select a module from the drop-down menu.
-      - If the module you would like to share is not listed, it most likely does not adhere to the mentioned restrictions (see [module restrictions](#module-restrictions)).
+      - If the module you would like to share is not listed, it most likely does not adhere to the mentioned restrictions (see [module restrictions](/releases/saros-i_0.2.2.html#module-restrictions)).
 - Click "Next".
   - If an existing local module was chosen, a list of local file changes that will be made during the negotiation will be shown. These are the differences between the local version of the module and the version held by the host. The shown actions are the actions necessary to align the local module with the host module.
   - **Warning:** Any local differences will be removed during the project negotiation. These adjustments will only be done if the "Finish" button is selected. If the project negotiation is aborted at this stage, no local files are changed.
