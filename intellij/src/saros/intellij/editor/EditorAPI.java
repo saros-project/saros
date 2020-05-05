@@ -1,13 +1,18 @@
 package saros.intellij.editor;
 
 import com.intellij.openapi.application.ModalityState;
+import com.intellij.openapi.editor.Caret;
+import com.intellij.openapi.editor.CaretModel;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.editor.ScrollType;
 import com.intellij.openapi.editor.SelectionModel;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.util.Pair;
+import com.intellij.openapi.vfs.VirtualFile;
 import java.awt.Point;
 import java.awt.Rectangle;
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import saros.editor.text.LineRange;
@@ -21,6 +26,7 @@ import saros.intellij.runtime.EDTExecutor;
  * <p>Performs Intellij editor related actions in the UI thread.
  */
 public class EditorAPI {
+  private static Logger log = Logger.getLogger(EditorAPI.class);
 
   private EditorAPI() {
     // NOP
@@ -210,6 +216,57 @@ public class EditorAPI {
     TextPosition endPosition = endPositionResult.first;
 
     return new TextSelection(startPosition, endPosition);
+  }
+
+  /**
+   * Returns whether the given selection range represent a backwards selection in the given editor.
+   *
+   * <p>A backwards selection is defined by the start of the selection being located before the end
+   * of the selection. This is checked by using the caret position in the editor.
+   *
+   * <p>Returns <code>false</code> as the default value if the selection start matches the selection
+   * end or the caret position in the editor matches neither the start nor the end of the selection
+   * range.
+   *
+   * @param editor the editor for the selection
+   * @param selectionStart the selection start
+   * @param selectionEnd the selection end
+   * @return whether the given selection range represent a backwards selection in the given editor
+   *     or <code>false</code> if the selection start matches the selection end or the caret
+   *     position in the editor matches neither the start nor the end of the selection range.
+   */
+  private static boolean isBackwardsSelection(
+      @NotNull Editor editor, int selectionStart, int selectionEnd) {
+    if (selectionStart == selectionEnd) {
+      return false;
+    }
+
+    CaretModel caretModel = editor.getCaretModel();
+
+    Caret caret = caretModel.getPrimaryCaret();
+
+    int caretOffset = caret.getOffset();
+
+    if (caretOffset == selectionEnd) {
+      return false;
+    } else if (caretOffset == selectionStart) {
+      return true;
+    } else {
+      VirtualFile file = FileDocumentManager.getInstance().getFile(editor.getDocument());
+
+      log.warn(
+          "Encountered caret for file "
+              + file
+              + " which is located neither at the start nor at the end of the selection."
+              + " Returning 'isBackwardsSelection=false' by default - caret offset: "
+              + caretOffset
+              + ", selection start: "
+              + selectionStart
+              + ", selection end: "
+              + selectionEnd);
+
+      return false;
+    }
   }
 
   /**
