@@ -339,15 +339,16 @@ public class AnnotationManagerTest {
   }
 
   /**
-   * Test adding selection annotations with a zero-width range. Such calls should not lead to an
-   * annotation being added. If an old selection for the file is present, it should still be
-   * removed.
+   * Test adding selection annotations with a zero-width range. Such calls are used to mimic caret
+   * annotations using selection annotations. If the position is 0, the selection should have the
+   * range (0, 0). Otherwise, the selection should have the range (position-1, position).
    */
   @Test
-  public void testAddSelectionAnnotationNoRange() {
+  public void testAddSelectionAnnotationAsCaretAnnotation() {
     /* setup */
     int start = 0;
     int end = 0;
+    List<Pair<Integer, Integer>> expectedSelectionRange = createSelectionRange(start, end);
 
     assertEquals(0, selectionAnnotationStore.getAnnotations().size());
 
@@ -356,18 +357,25 @@ public class AnnotationManagerTest {
 
     /* check assertions */
     List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
-    assertEquals(0, selectionAnnotations.size());
+    assertEquals(1, selectionAnnotations.size());
+
+    SelectionAnnotation selectionAnnotation = selectionAnnotations.get(0);
+    assertAnnotationIntegrity(selectionAnnotation, user, file, expectedSelectionRange, null);
 
     /* setup */
-    annotationManager.addSelectionAnnotation(user, file, 5, 10, null, false);
-    assertEquals(1, selectionAnnotationStore.getAnnotations().size());
+    start = 15;
+    end = 15;
+    expectedSelectionRange = createSelectionRange(start - 1, end);
 
     /* call to test */
     annotationManager.addSelectionAnnotation(user, file, start, end, null, false);
 
     /* check assertions */
     selectionAnnotations = selectionAnnotationStore.getAnnotations();
-    assertEquals(0, selectionAnnotations.size());
+    assertEquals(1, selectionAnnotations.size());
+
+    selectionAnnotation = selectionAnnotations.get(0);
+    assertAnnotationIntegrity(selectionAnnotation, user, file, expectedSelectionRange, null);
   }
 
   /**

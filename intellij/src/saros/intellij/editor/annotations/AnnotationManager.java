@@ -59,8 +59,10 @@ public class AnnotationManager implements Disposable {
 
     removeSelectionAnnotation(user, file);
 
-    if (start == end) {
-      return;
+    // TODO introduce more edit-resistant caret annotations instead of using selection annotations
+    // highlight character before caret if there is no selection to make it easier to find
+    if (start == end && start != 0) {
+      start = start - 1;
     }
 
     SelectionAnnotation selectionAnnotation;
