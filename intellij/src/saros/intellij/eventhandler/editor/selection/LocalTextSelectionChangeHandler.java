@@ -1,5 +1,6 @@
 package saros.intellij.eventhandler.editor.selection;
 
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.event.SelectionEvent;
 import com.intellij.openapi.editor.event.SelectionListener;
@@ -18,8 +19,8 @@ public class LocalTextSelectionChangeHandler implements IProjectEventHandler {
   private final SelectionListener selectionListener =
       new SelectionListener() {
         @Override
-        public void selectionChanged(@NotNull SelectionEvent e) {
-          generateSelectionActivity(e);
+        public void selectionChanged(@NotNull SelectionEvent selectionEvent) {
+          handleTextSelectionChanged(selectionEvent);
         }
       };
 
@@ -59,21 +60,25 @@ public class LocalTextSelectionChangeHandler implements IProjectEventHandler {
   }
 
   /**
-   * Calls {@link EditorManager#generateSelection(IFile, SelectionEvent)}.
+   * Calls {@link EditorManager#generateSelection(IFile, Editor, int, int)}.
    *
    * <p>This method relies on the EditorPool to filter editor events.
    *
    * @param event the event to react to
-   * @see SelectionListener#selectionChanged(SelectionEvent)
    */
-  private void generateSelectionActivity(@NotNull SelectionEvent event) {
-    assert enabled : "the selection changed listener was triggered while it was disabled";
+  // TODO handle TextRange.EMPTY_RANGE separately? Could represent no valid selection for editor
+  private void handleTextSelectionChanged(SelectionEvent event) {
+    Editor editor = event.getEditor();
+    IFile file = editorManager.getFileForOpenEditor(editor.getDocument());
 
-    IFile file = editorManager.getFileForOpenEditor(event.getEditor().getDocument());
-
-    if (file != null) {
-      editorManager.generateSelection(file, event);
+    if (file == null) {
+      return;
     }
+
+    int selectionStart = event.getNewRange().getStartOffset();
+    int selectionEnd = event.getNewRange().getEndOffset();
+
+    editorManager.generateSelection(file, editor, selectionStart, selectionEnd);
   }
 
   /**
