@@ -358,7 +358,10 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
             int start = offsets.first;
             int end = offsets.second;
 
-            annotationManager.addSelectionAnnotation(user, file, start, end, editor);
+            boolean isBackwardsSelection = false;
+
+            annotationManager.addSelectionAnnotation(
+                user, file, start, end, editor, isBackwardsSelection);
           }
 
           editorListenerDispatch.textSelectionChanged(selection);
@@ -446,8 +449,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    * the file for the editor.
    *
    * <p><b>NOTE:</b> This should only be used to transfer pre-existing selection. To notify other
-   * participants about new selections, {@link #generateSelection(IFile, SelectionEvent)} should be
-   * used instead.
+   * participants about new selections, {@link #generateSelection(IFile, Editor, int, int, boolean)}
+   * should be used instead.
    *
    * <p><b>NOTE:</b> This class is meant for internal use only and should generally not be used
    * outside the editor package. If you still need to access this method, please consider whether

@@ -67,6 +67,7 @@ public class AnnotationManagerTest {
   private Editor editor;
 
   private TextAttributes selectionTextAttributes;
+  private TextAttributes caretTextAttributes;
   private TextAttributes contributionTextAttributes;
 
   @Before
@@ -92,14 +93,21 @@ public class AnnotationManagerTest {
     editor = EasyMock.createNiceMock(Editor.class);
 
     selectionTextAttributes = EasyMock.createNiceMock(TextAttributes.class);
+    caretTextAttributes = EasyMock.createNiceMock(TextAttributes.class);
     contributionTextAttributes = EasyMock.createNiceMock(TextAttributes.class);
 
-    PowerMock.mockStaticPartial(SelectionAnnotation.class, "getSelectionTextAttributes");
+    PowerMock.mockStaticPartial(
+        SelectionAnnotation.class, "getSelectionTextAttributes", "getCaretTextAttributes");
 
     PowerMock.expectPrivate(SelectionAnnotation.class, "getSelectionTextAttributes", editor, user)
         .andStubReturn(selectionTextAttributes);
     PowerMock.expectPrivate(SelectionAnnotation.class, "getSelectionTextAttributes", editor, user2)
         .andStubReturn(selectionTextAttributes);
+
+    PowerMock.expectPrivate(SelectionAnnotation.class, "getCaretTextAttributes", editor, user)
+        .andStubReturn(caretTextAttributes);
+    PowerMock.expectPrivate(SelectionAnnotation.class, "getCaretTextAttributes", editor, user2)
+        .andStubReturn(caretTextAttributes);
 
     PowerMock.mockStaticPartial(ContributionAnnotation.class, "getContributionTextAttributes");
 
@@ -124,7 +132,7 @@ public class AnnotationManagerTest {
     assertTrue(selectionAnnotationStore.getAnnotations().isEmpty());
 
     /* call to test */
-    annotationManager.addSelectionAnnotation(user, file, start, end, null);
+    annotationManager.addSelectionAnnotation(user, file, start, end, null, false);
 
     /* check assertions */
     List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
@@ -144,12 +152,47 @@ public class AnnotationManagerTest {
 
     prepareMockAddRemoveRangeHighlighters();
     mockAddSelectionRangeHighlighters(expectedRange);
+    mockAddCaretRangeHighlighters(end);
     replayMockAddRemoveRangeHighlighters();
 
     assertTrue(selectionAnnotationStore.getAnnotations().isEmpty());
 
     /* call to test */
-    annotationManager.addSelectionAnnotation(user, file, start, end, editor);
+    annotationManager.addSelectionAnnotation(user, file, start, end, editor, false);
+
+    /* check assertions */
+    List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
+    assertEquals(1, selectionAnnotations.size());
+
+    SelectionAnnotation selectionAnnotation = selectionAnnotations.get(0);
+    assertAnnotationIntegrity(selectionAnnotation, user, file, expectedRange, editor);
+  }
+
+  /**
+   * Tests that the caret annotation is added to the front of the annotation for backwards
+   * selection.
+   *
+   * <p>The actual check of the annotation position is done implicitly by setting up the caret
+   * annotation mock. By setting it up for the start of the range, the test would run into an
+   * exception for an unexpected call to <code>addRangeHighlighter</code> if the highlighter were
+   * actually added to the back instead of the front.
+   */
+  @Test
+  public void testAddBackwardsSelectionAnnotations() throws Exception {
+    /* setup */
+    int start = 50;
+    int end = 52;
+    List<Pair<Integer, Integer>> expectedRange = createSelectionRange(start, end);
+
+    prepareMockAddRemoveRangeHighlighters();
+    mockAddSelectionRangeHighlighters(expectedRange);
+    mockAddCaretRangeHighlighters(start);
+    replayMockAddRemoveRangeHighlighters();
+
+    assertTrue(selectionAnnotationStore.getAnnotations().isEmpty());
+
+    /* call to test */
+    annotationManager.addSelectionAnnotation(user, file, start, end, editor, true);
 
     /* check assertions */
     List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
@@ -172,7 +215,7 @@ public class AnnotationManagerTest {
     assertTrue(selectionAnnotationStore.getAnnotations().isEmpty());
 
     /* call to test */
-    annotationManager.addSelectionAnnotation(user, file, start, end, null);
+    annotationManager.addSelectionAnnotation(user, file, start, end, null, false);
 
     /* check assertions */
     List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
@@ -187,7 +230,7 @@ public class AnnotationManagerTest {
     expectedRange = createSelectionRange(start, end);
 
     /* call to test */
-    annotationManager.addSelectionAnnotation(user, file, start, end, null);
+    annotationManager.addSelectionAnnotation(user, file, start, end, null, false);
 
     /* check assertions */
     selectionAnnotations = selectionAnnotationStore.getAnnotations();
@@ -210,10 +253,11 @@ public class AnnotationManagerTest {
 
     prepareMockAddRemoveRangeHighlighters();
     mockAddRemoveSelectionRangeHighlighters(expectedRange, file, editor);
+    mockAddRemoveCaretRangeHighlighters(end, file, editor);
     replayMockAddRemoveRangeHighlighters();
 
     SelectionAnnotation selectionAnnotation =
-        new SelectionAnnotation(user, file, start, end, editor);
+        new SelectionAnnotation(user, file, start, end, editor, false);
     selectionAnnotationStore.addAnnotation(selectionAnnotation);
 
     assertEquals(1, selectionAnnotationStore.getAnnotations().size());
@@ -223,7 +267,7 @@ public class AnnotationManagerTest {
     expectedRange = createSelectionRange(start, end);
 
     /* call to test */
-    annotationManager.addSelectionAnnotation(user, file, start, end, null);
+    annotationManager.addSelectionAnnotation(user, file, start, end, null, false);
 
     /* check assertions */
     verifyRemovalCall();
@@ -253,7 +297,7 @@ public class AnnotationManagerTest {
     assertTrue(selectionAnnotationStore.getAnnotations().isEmpty());
 
     /* call to test */
-    annotationManager.addSelectionAnnotation(user1, file1, start1, end1, null);
+    annotationManager.addSelectionAnnotation(user1, file1, start1, end1, null, false);
 
     /* check assertions */
     List<SelectionAnnotation> selectionAnnotations1 =
@@ -272,7 +316,7 @@ public class AnnotationManagerTest {
     List<Pair<Integer, Integer>> expectedRange2 = createSelectionRange(start2, end2);
 
     /* call to test */
-    annotationManager.addSelectionAnnotation(user2, file2, start2, end2, null);
+    annotationManager.addSelectionAnnotation(user2, file2, start2, end2, null, false);
 
     /* check assertions */
     selectionAnnotations = selectionAnnotationStore.getAnnotations();
@@ -306,18 +350,18 @@ public class AnnotationManagerTest {
     assertEquals(0, selectionAnnotationStore.getAnnotations().size());
 
     /* call to test */
-    annotationManager.addSelectionAnnotation(user, file, start, end, null);
+    annotationManager.addSelectionAnnotation(user, file, start, end, null, false);
 
     /* check assertions */
     List<SelectionAnnotation> selectionAnnotations = selectionAnnotationStore.getAnnotations();
     assertEquals(0, selectionAnnotations.size());
 
     /* setup */
-    annotationManager.addSelectionAnnotation(user, file, 5, 10, null);
+    annotationManager.addSelectionAnnotation(user, file, 5, 10, null, false);
     assertEquals(1, selectionAnnotationStore.getAnnotations().size());
 
     /* call to test */
-    annotationManager.addSelectionAnnotation(user, file, start, end, null);
+    annotationManager.addSelectionAnnotation(user, file, start, end, null, false);
 
     /* check assertions */
     selectionAnnotations = selectionAnnotationStore.getAnnotations();
@@ -341,8 +385,8 @@ public class AnnotationManagerTest {
     int end2 = 56;
     List<Pair<Integer, Integer>> expectedRange2 = createSelectionRange(start2, end2);
 
-    annotationManager.addSelectionAnnotation(user1, file1, start1, end1, null);
-    annotationManager.addSelectionAnnotation(user2, file2, start2, end2, null);
+    annotationManager.addSelectionAnnotation(user1, file1, start1, end1, null, false);
+    annotationManager.addSelectionAnnotation(user2, file2, start2, end2, null, false);
 
     assertEquals(2, selectionAnnotationStore.getAnnotations().size());
 
@@ -382,10 +426,11 @@ public class AnnotationManagerTest {
 
     prepareMockAddRemoveRangeHighlighters();
     mockAddRemoveSelectionRangeHighlighters(expectedRange, file, editor);
+    mockAddRemoveCaretRangeHighlighters(end, file, editor);
     replayMockAddRemoveRangeHighlighters();
 
     SelectionAnnotation selectionAnnotation =
-        new SelectionAnnotation(user, file, start, end, editor);
+        new SelectionAnnotation(user, file, start, end, editor, false);
     selectionAnnotationStore.addAnnotation(selectionAnnotation);
 
     assertEquals(1, selectionAnnotationStore.getAnnotations().size());
@@ -653,7 +698,8 @@ public class AnnotationManagerTest {
     List<Pair<Integer, Integer>> expectedSelectionRanges = createSelectionRange(start, end);
     List<Pair<Integer, Integer>> expectedContributionRanges = createContributionRanges(start, end);
 
-    SelectionAnnotation selectionAnnotation = new SelectionAnnotation(user, file, start, end, null);
+    SelectionAnnotation selectionAnnotation =
+        new SelectionAnnotation(user, file, start, end, null, false);
     selectionAnnotationStore.addAnnotation(selectionAnnotation);
 
     ContributionAnnotation contributionAnnotation =
@@ -688,7 +734,8 @@ public class AnnotationManagerTest {
     int start = 40;
     int end = 50;
 
-    SelectionAnnotation selectionAnnotation = new SelectionAnnotation(user, file, start, end, null);
+    SelectionAnnotation selectionAnnotation =
+        new SelectionAnnotation(user, file, start, end, null, false);
     selectionAnnotationStore.addAnnotation(selectionAnnotation);
 
     ContributionAnnotation contributionAnnotation =
@@ -735,7 +782,8 @@ public class AnnotationManagerTest {
     int start = 40;
     int end = 50;
 
-    SelectionAnnotation selectionAnnotation = new SelectionAnnotation(user, file, start, end, null);
+    SelectionAnnotation selectionAnnotation =
+        new SelectionAnnotation(user, file, start, end, null, false);
     selectionAnnotationStore.addAnnotation(selectionAnnotation);
 
     ContributionAnnotation contributionAnnotation =
@@ -796,11 +844,12 @@ public class AnnotationManagerTest {
 
     prepareMockAddRemoveRangeHighlighters();
     mockAddSelectionRangeHighlighters(expectedSelectionRanges);
+    mockAddCaretRangeHighlighters(end);
     mockAddContributionRangeHighlighters(expectedContributionRanges);
     replayMockAddRemoveRangeHighlighters();
 
     SelectionAnnotation selectionAnnotation =
-        new SelectionAnnotation(user, file, start, end, editor);
+        new SelectionAnnotation(user, file, start, end, editor, false);
     selectionAnnotationStore.addAnnotation(selectionAnnotation);
 
     ContributionAnnotation contributionAnnotation =
@@ -886,7 +935,8 @@ public class AnnotationManagerTest {
     List<Pair<Integer, Integer>> expectedSelectionRanges = createSelectionRange(start, end);
     List<Pair<Integer, Integer>> expectedContributionRanges = createContributionRanges(start, end);
 
-    SelectionAnnotation selectionAnnotation = new SelectionAnnotation(user, file, start, end, null);
+    SelectionAnnotation selectionAnnotation =
+        new SelectionAnnotation(user, file, start, end, null, false);
     selectionAnnotationStore.addAnnotation(selectionAnnotation);
 
     ContributionAnnotation contributionAnnotation =
@@ -966,7 +1016,8 @@ public class AnnotationManagerTest {
     List<Pair<Integer, Integer>> expectedSelectionRanges = createSelectionRange(start, end);
     List<Pair<Integer, Integer>> expectedContributionRanges = createContributionRanges(start, end);
 
-    SelectionAnnotation selectionAnnotation = new SelectionAnnotation(user, file, start, end, null);
+    SelectionAnnotation selectionAnnotation =
+        new SelectionAnnotation(user, file, start, end, null, false);
     selectionAnnotationStore.addAnnotation(selectionAnnotation);
 
     ContributionAnnotation contributionAnnotation =
@@ -1001,7 +1052,8 @@ public class AnnotationManagerTest {
     int start = 40;
     int end = 50;
 
-    SelectionAnnotation selectionAnnotation = new SelectionAnnotation(user, file, start, end, null);
+    SelectionAnnotation selectionAnnotation =
+        new SelectionAnnotation(user, file, start, end, null, false);
     selectionAnnotationStore.addAnnotation(selectionAnnotation);
 
     ContributionAnnotation contributionAnnotation =
@@ -1046,7 +1098,8 @@ public class AnnotationManagerTest {
     int start = 40;
     int end = 50;
 
-    SelectionAnnotation selectionAnnotation = new SelectionAnnotation(user, file, start, end, null);
+    SelectionAnnotation selectionAnnotation =
+        new SelectionAnnotation(user, file, start, end, null, false);
     selectionAnnotationStore.addAnnotation(selectionAnnotation);
 
     ContributionAnnotation contributionAnnotation =
@@ -1090,7 +1143,8 @@ public class AnnotationManagerTest {
     int start = 40;
     int end = 50;
 
-    SelectionAnnotation selectionAnnotation = new SelectionAnnotation(user, file, start, end, null);
+    SelectionAnnotation selectionAnnotation =
+        new SelectionAnnotation(user, file, start, end, null, false);
     selectionAnnotationStore.addAnnotation(selectionAnnotation);
 
     ContributionAnnotation contributionAnnotation =
@@ -1134,7 +1188,8 @@ public class AnnotationManagerTest {
     int start = 40;
     int end = 50;
 
-    SelectionAnnotation selectionAnnotation = new SelectionAnnotation(user, file, start, end, null);
+    SelectionAnnotation selectionAnnotation =
+        new SelectionAnnotation(user, file, start, end, null, false);
     selectionAnnotationStore.addAnnotation(selectionAnnotation);
 
     ContributionAnnotation contributionAnnotation =
@@ -1176,7 +1231,8 @@ public class AnnotationManagerTest {
     int start = 40;
     int end = 50;
 
-    SelectionAnnotation selectionAnnotation = new SelectionAnnotation(user, file, start, end, null);
+    SelectionAnnotation selectionAnnotation =
+        new SelectionAnnotation(user, file, start, end, null, false);
     selectionAnnotationStore.addAnnotation(selectionAnnotation);
 
     ContributionAnnotation contributionAnnotation =
@@ -1212,11 +1268,12 @@ public class AnnotationManagerTest {
 
     prepareMockAddRemoveRangeHighlighters();
     mockAddSelectionRangeHighlighters(expectedSelectionRanges);
+    mockAddCaretRangeHighlighters(end);
     mockAddContributionRangeHighlighters(expectedContributionRanges);
     replayMockAddRemoveRangeHighlighters();
 
     SelectionAnnotation selectionAnnotation =
-        new SelectionAnnotation(user, file, start, end, editor);
+        new SelectionAnnotation(user, file, start, end, editor, false);
     selectionAnnotationStore.addAnnotation(selectionAnnotation);
 
     ContributionAnnotation contributionAnnotation =
@@ -1364,7 +1421,8 @@ public class AnnotationManagerTest {
     List<Pair<Integer, Integer>> expectedSelectionRanges = createSelectionRange(start, end);
     List<Pair<Integer, Integer>> expectedContributionRanges = createContributionRanges(start, end);
 
-    SelectionAnnotation selectionAnnotation = new SelectionAnnotation(user, file, start, end, null);
+    SelectionAnnotation selectionAnnotation =
+        new SelectionAnnotation(user, file, start, end, null, false);
     selectionAnnotationStore.addAnnotation(selectionAnnotation);
 
     ContributionAnnotation contributionAnnotation =
@@ -1507,7 +1565,8 @@ public class AnnotationManagerTest {
     List<Pair<Integer, Integer>> expectedSelectionRanges = createSelectionRange(start, end);
     List<Pair<Integer, Integer>> expectedContributionRanges = createContributionRanges(start, end);
 
-    SelectionAnnotation selectionAnnotation = new SelectionAnnotation(user, file, start, end, null);
+    SelectionAnnotation selectionAnnotation =
+        new SelectionAnnotation(user, file, start, end, null, false);
     selectionAnnotationStore.addAnnotation(selectionAnnotation);
 
     ContributionAnnotation contributionAnnotation =
@@ -1519,6 +1578,7 @@ public class AnnotationManagerTest {
 
     prepareMockAddRemoveRangeHighlighters();
     mockAddSelectionRangeHighlighters(expectedSelectionRanges);
+    mockAddCaretRangeHighlighters(end);
     mockAddContributionRangeHighlighters(expectedContributionRanges);
     replayMockAddRemoveRangeHighlighters();
 
@@ -1618,11 +1678,12 @@ public class AnnotationManagerTest {
 
     prepareMockAddRemoveRangeHighlighters();
     mockAddSelectionRangeHighlightersWithGivenRangeHighlighters(selectionRangePairs);
+    mockAddCaretRangeHighlighters(end);
     mockAddContributionRangeHighlightersWithGivenRangeHighlighters(contributionRangePairs);
     replayMockAddRemoveRangeHighlighters();
 
     SelectionAnnotation selectionAnnotation =
-        new SelectionAnnotation(user, file, start, end, editor);
+        new SelectionAnnotation(user, file, start, end, editor, false);
     selectionAnnotationStore.addAnnotation(selectionAnnotation);
 
     ContributionAnnotation contributionAnnotation =
@@ -1713,11 +1774,12 @@ public class AnnotationManagerTest {
 
     prepareMockAddRemoveRangeHighlighters();
     mockAddSelectionRangeHighlightersWithGivenRangeHighlighters(selectionRangePairs);
+    mockAddCaretRangeHighlighters(end);
     mockAddContributionRangeHighlightersWithGivenRangeHighlighters(contributionRangePairs);
     replayMockAddRemoveRangeHighlighters();
 
     SelectionAnnotation selectionAnnotation =
-        new SelectionAnnotation(user, file, start, end, editor);
+        new SelectionAnnotation(user, file, start, end, editor, false);
     selectionAnnotationStore.addAnnotation(selectionAnnotation);
 
     ContributionAnnotation contributionAnnotation =
@@ -1751,11 +1813,12 @@ public class AnnotationManagerTest {
 
     prepareMockAddRemoveRangeHighlighters();
     mockAddRemoveSelectionRangeHighlighters(expectedSelectionRanges, file, editor);
+    mockAddRemoveCaretRangeHighlighters(end, file, editor);
     mockAddRemoveContributionRangeHighlighters(expectedContributionRanges, file, editor);
     replayMockAddRemoveRangeHighlighters();
 
     SelectionAnnotation selectionAnnotation =
-        new SelectionAnnotation(user, file, start, end, editor);
+        new SelectionAnnotation(user, file, start, end, editor, false);
     selectionAnnotationStore.addAnnotation(selectionAnnotation);
 
     ContributionAnnotation contributionAnnotation =
@@ -1798,11 +1861,12 @@ public class AnnotationManagerTest {
 
     prepareMockAddRemoveRangeHighlighters();
     mockAddSelectionRangeHighlighters(expectedSelectionRanges);
+    mockAddCaretRangeHighlighters(end);
     mockAddContributionRangeHighlighters(expectedContributionRanges);
     replayMockAddRemoveRangeHighlighters();
 
     SelectionAnnotation selectionAnnotation =
-        new SelectionAnnotation(user, file, start, end, editor);
+        new SelectionAnnotation(user, file, start, end, editor, false);
     selectionAnnotationStore.addAnnotation(selectionAnnotation);
 
     ContributionAnnotation contributionAnnotation =
@@ -1845,11 +1909,12 @@ public class AnnotationManagerTest {
 
     prepareMockAddRemoveRangeHighlighters();
     mockAddRemoveSelectionRangeHighlighters(expectedSelectionRanges, file, editor);
+    mockAddRemoveCaretRangeHighlighters(end, file, editor);
     mockAddRemoveContributionRangeHighlighters(expectedContributionRanges, file, editor);
     replayMockAddRemoveRangeHighlighters();
 
     SelectionAnnotation selectionAnnotation =
-        new SelectionAnnotation(user, file, start, end, editor);
+        new SelectionAnnotation(user, file, start, end, editor, false);
     selectionAnnotationStore.addAnnotation(selectionAnnotation);
 
     ContributionAnnotation contributionAnnotation =
@@ -1889,11 +1954,12 @@ public class AnnotationManagerTest {
 
     prepareMockAddRemoveRangeHighlighters();
     mockAddRemoveSelectionRangeHighlighters(expectedSelectionRanges, file, editor);
+    mockAddRemoveCaretRangeHighlighters(end, file, editor);
     mockAddRemoveContributionRangeHighlighters(expectedContributionRanges, file, editor);
     replayMockAddRemoveRangeHighlighters();
 
     SelectionAnnotation selectionAnnotation =
-        new SelectionAnnotation(user, file, start, end, editor);
+        new SelectionAnnotation(user, file, start, end, editor, false);
     selectionAnnotationStore.addAnnotation(selectionAnnotation);
 
     ContributionAnnotation contributionAnnotation =
@@ -1926,7 +1992,8 @@ public class AnnotationManagerTest {
     List<Pair<Integer, Integer>> expectedSelectionRanges = createSelectionRange(start, end);
     List<Pair<Integer, Integer>> expectedContributionRanges = createContributionRanges(start, end);
 
-    SelectionAnnotation selectionAnnotation = new SelectionAnnotation(user, file, start, end, null);
+    SelectionAnnotation selectionAnnotation =
+        new SelectionAnnotation(user, file, start, end, null, false);
     selectionAnnotationStore.addAnnotation(selectionAnnotation);
 
     ContributionAnnotation contributionAnnotation =
@@ -1962,11 +2029,12 @@ public class AnnotationManagerTest {
 
     prepareMockAddRemoveRangeHighlighters();
     mockAddRemoveSelectionRangeHighlighters(expectedSelectionRanges, file, editor);
+    mockAddRemoveCaretRangeHighlighters(end, file, editor);
     mockAddRemoveContributionRangeHighlighters(expectedContributionRanges, file, editor);
     replayMockAddRemoveRangeHighlighters();
 
     SelectionAnnotation selectionAnnotation =
-        new SelectionAnnotation(user, file, start, end, editor);
+        new SelectionAnnotation(user, file, start, end, editor, false);
     selectionAnnotationStore.addAnnotation(selectionAnnotation);
 
     ContributionAnnotation contributionAnnotation =
@@ -2001,7 +2069,8 @@ public class AnnotationManagerTest {
     List<Pair<Integer, Integer>> expectedSelectionRanges = createSelectionRange(start, end);
     List<Pair<Integer, Integer>> expectedContributionRanges = createContributionRanges(start, end);
 
-    SelectionAnnotation selectionAnnotation = new SelectionAnnotation(user, file, start, end, null);
+    SelectionAnnotation selectionAnnotation =
+        new SelectionAnnotation(user, file, start, end, null, false);
     selectionAnnotationStore.addAnnotation(selectionAnnotation);
 
     ContributionAnnotation contributionAnnotation =
@@ -2040,12 +2109,14 @@ public class AnnotationManagerTest {
     prepareMockAddRemoveRangeHighlighters();
     mockAddRemoveSelectionRangeHighlighters(expectedSelectionRanges, file, editor);
     mockAddRemoveSelectionRangeHighlighters(expectedSelectionRanges, file2, editor);
+    mockAddRemoveCaretRangeHighlighters(end, file, editor);
+    mockAddRemoveCaretRangeHighlighters(end, file2, editor);
     mockAddRemoveContributionRangeHighlighters(expectedContributionRanges, file, editor);
     mockAddRemoveContributionRangeHighlighters(expectedContributionRanges, file2, editor);
     replayMockAddRemoveRangeHighlighters();
 
     SelectionAnnotation selectionAnnotation1 =
-        new SelectionAnnotation(user, file, start, end, editor);
+        new SelectionAnnotation(user, file, start, end, editor, false);
     selectionAnnotationStore.addAnnotation(selectionAnnotation1);
 
     ContributionAnnotation contributionAnnotation1 =
@@ -2053,7 +2124,7 @@ public class AnnotationManagerTest {
     contributionAnnotationQueue.addAnnotation(contributionAnnotation1);
 
     SelectionAnnotation selectionAnnotation2 =
-        new SelectionAnnotation(user2, file, start, end, editor);
+        new SelectionAnnotation(user2, file, start, end, editor, false);
     selectionAnnotationStore.addAnnotation(selectionAnnotation2);
 
     ContributionAnnotation contributionAnnotation2 =
@@ -2061,7 +2132,7 @@ public class AnnotationManagerTest {
     contributionAnnotationQueue.addAnnotation(contributionAnnotation2);
 
     SelectionAnnotation selectionAnnotation3 =
-        new SelectionAnnotation(user, file2, start, end, editor);
+        new SelectionAnnotation(user, file2, start, end, editor, false);
     selectionAnnotationStore.addAnnotation(selectionAnnotation3);
 
     ContributionAnnotation contributionAnnotation3 =
@@ -2069,7 +2140,7 @@ public class AnnotationManagerTest {
     contributionAnnotationQueue.addAnnotation(contributionAnnotation3);
 
     SelectionAnnotation selectionAnnotation4 =
-        new SelectionAnnotation(user2, file2, start, end, editor);
+        new SelectionAnnotation(user2, file2, start, end, editor, false);
     selectionAnnotationStore.addAnnotation(selectionAnnotation4);
 
     ContributionAnnotation contributionAnnotation4 =
@@ -2101,7 +2172,8 @@ public class AnnotationManagerTest {
     List<Pair<Integer, Integer>> expectedSelectionRanges = createSelectionRange(start, end);
     List<Pair<Integer, Integer>> expectedContributionRanges = createContributionRanges(start, end);
 
-    SelectionAnnotation selectionAnnotation = new SelectionAnnotation(user, file, start, end, null);
+    SelectionAnnotation selectionAnnotation =
+        new SelectionAnnotation(user, file, start, end, null, false);
     selectionAnnotationStore.addAnnotation(selectionAnnotation);
 
     ContributionAnnotation contributionAnnotation =
@@ -2142,7 +2214,8 @@ public class AnnotationManagerTest {
     List<Pair<Integer, Integer>> expectedSelectionRanges = createSelectionRange(start, end);
     List<Pair<Integer, Integer>> expectedContributionRanges = createContributionRanges(start, end);
 
-    SelectionAnnotation selectionAnnotation = new SelectionAnnotation(user, file, start, end, null);
+    SelectionAnnotation selectionAnnotation =
+        new SelectionAnnotation(user, file, start, end, null, false);
     selectionAnnotationStore.addAnnotation(selectionAnnotation);
 
     ContributionAnnotation contributionAnnotation =
@@ -2300,6 +2373,10 @@ public class AnnotationManagerTest {
     mockAddRangeHighlighters(ranges, selectionTextAttributes, file);
   }
 
+  private void mockAddCaretRangeHighlighters(int position) throws Exception {
+    mockAddRangeHighlighters(createSelectionRange(position, position), caretTextAttributes, file);
+  }
+
   private void mockAddContributionRangeHighlighters(List<Pair<Integer, Integer>> ranges)
       throws Exception {
     mockAddRangeHighlighters(ranges, contributionTextAttributes, file);
@@ -2382,6 +2459,13 @@ public class AnnotationManagerTest {
       List<Pair<Integer, Integer>> ranges, IFile file, Editor editor) throws Exception {
 
     mockAddRemoveRangeHighlighters(ranges, file, editor, selectionTextAttributes);
+  }
+
+  private void mockAddRemoveCaretRangeHighlighters(int position, IFile file, Editor editor)
+      throws Exception {
+
+    mockAddRemoveRangeHighlighters(
+        createSelectionRange(position, position), file, editor, caretTextAttributes);
   }
 
   private void mockAddRemoveContributionRangeHighlighters(
