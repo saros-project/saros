@@ -6,9 +6,9 @@ import java.util.Arrays;
 import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 
-public abstract class EclipseContainerImpl extends EclipseResourceImpl implements IContainer {
+public class EclipseContainerImpl extends EclipseResourceImpl implements IContainer {
 
-  EclipseContainerImpl(org.eclipse.core.resources.IResource delegate) {
+  EclipseContainerImpl(org.eclipse.core.resources.IContainer delegate) {
     super(delegate);
   }
 
