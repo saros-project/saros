@@ -6,6 +6,9 @@
 
 - title: How-Tos
   sublinks:
+  - title: Awareness Information
+    url: /documentation/how-tos/awareness-information.html 
+
   - title: Change Colors
     url: /documentation/how-tos/change-colors.html
 
@@ -14,6 +17,9 @@
 
   - title: Hostless Sessions (alpha)
     url: /documentation/how-tos/hostless-sessions.html
+
+  - title: Manage XMPP Accounts
+    url: /documentation/how-tos/manage-xmpp-accounts.html
 
   - title: Resolve Desynchronization
     url: /documentation/how-tos/resolve-desynchronization.html

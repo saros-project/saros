@@ -19,7 +19,7 @@ contributions. Therefore, the preferences are not located at the Saros preferenc
 * Select the entry you would like to change.
 * Make sure to change the color of all entries of one user:
   * `Saros User 1 Contribution` - Defines how the changes of user 1 are highlighted.
-  * `Saros User 1 Selection` - Defines how the code is highlighted selected by user 1.
+  * `Saros User 1 Selection` - Defines how the code selected by user 1 is highlighted.
   * `Saros User 1 Viewport` - Defines how the viewport of user 1 is highlighted.
 
 {% endcapture %}

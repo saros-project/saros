@@ -3,7 +3,7 @@ title: Getting Started
 ---
 
 Here you will find a guide **on how to set up Saros**.
-If you still need to installed Saros look into our
+If you still need to install Saros, you can have a look at our
 [installation](installation.md) guide.
 
 After that you might want to find out **what Saros can do**: Here is the
@@ -29,7 +29,15 @@ check their availability, send them instant messages, and invite them to
 Saros sessions.
 
 When you are in a Saros session you will see all **participants in the
-session list**. Saros also provides **instant chat messaging** to
+session list**. Furthermore, the session list indicates
+* which participant has which color,
+* which participant has which editor focused, and
+* which participant is currently following whom.
+
+See the [awareness information page](how-tos/awareness-information.md) for more information
+concerning visualizations indicating the participant's actions.
+
+Saros also provides **instant chat messaging** to
 accompany your sessions.
 Whenever you begin a Saros session, a **chat session** is also
 automatically started.
@@ -56,12 +64,12 @@ In the following we show you how to set up Saros to start your first session.
 
 You first need an **XMPP account** to use Saros.
 
-1.  You can **create a new account**:
+* You can **create a new account**:
   * On our XMPP server using our **[signup page](https://saros-con.imp.fu-berlin.de:5280/register/new)**
         * Note: Due to abuse by spammers, we had to disable in-band registration and from within Saros.
   * On other XMPP servers as [jabber.org](https://www.jabber.org/) ([register.jabber.org](https://register.jabber.org/)).
-2.  You can **use an existing account**
-3.  You [setup your own XMPP server](how-tos/setup-xmpp.md).
+* You can **use an existing account**
+* You [setup your own XMPP server](how-tos/setup-xmpp.md).
 
 * Please note that your performance may vary depending on the XMPP server settings, such as bandwidth restrictions or feature supports.
 * It is recommended to **use the same XMPP server** for all users
@@ -103,7 +111,7 @@ To add a contact to your list you need to **know his/her XMPP ID**.
 
 **After entering your partner's XMPP ID**, a message will be sent to
 your contact.
-Once s/he accepts your request you will be able to see his/her **online
+Once they accept your request you will be able to see their **online
 status in your contact list**.
 
 ![Adding Contacts](images/2_GettingStartedAddContacts.png){:class="img-fluid"}
@@ -129,8 +137,8 @@ This will automatically be displayed by the plugin as a dialog when you are conn
 You can work together with your contacts by either **starting your own
 session** or by **being invited to one**.
 
-When **starting** a session, **Saros will copy the project** to the
-computer of your invited contacts.
+When **starting** a session, **Saros will produce the same project state** 
+in the Saros instances of your invited contacts (with synchronizing files, copying missing files or creating missing directories).
 
 #### Start a Session ([host](#the-host))
 

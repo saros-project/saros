@@ -75,7 +75,7 @@ Content
 {{ "{% endaccordion " }}%}
 ```
 
-The `collapsible` entry uses a default heading of h5. If you need another heading define it in markdown (as in `### Entry h3`).
+The `collapsible` entry uses a default heading of h5. If you need another heading, define it in markdown (as in `### Entry h3`).
 If you want to inspect or change the corresponding code see `docs/_plugins/accordion.rb` and `docs/_plugins/collapsible.rb`.
 
 ## Write IDE Specific Documentation
