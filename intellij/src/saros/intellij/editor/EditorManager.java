@@ -1,6 +1,7 @@
 package saros.intellij.editor;
 
 import com.intellij.openapi.application.ModalityState;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.module.Module;
@@ -909,9 +910,14 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   /**
    * Generates a TextEditActivity and fires it.
    *
+   * <p>Also generates a text selection activity for the new selection after the edit as document
+   * modification induced changes are not covered by the caret listener.
+   *
    * <p><b>NOTE:</b> This class is meant for internal use only and should generally not be used
    * outside the editor package. If you still need to access this method, please consider whether
    * your class should rather be located in the editor package.
+   *
+   * @see saros.intellij.eventhandler.editor.caret.LocalCaretPositionChangeHandler
    */
   public void generateTextEdit(
       int offset,
@@ -926,11 +932,14 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
     Editor editor = editorPool.getEditor(file);
 
-    if (editor == null) {
-      editor = backgroundEditorPool.getBackgroundEditor(file, document);
+    Editor calculationEditor;
+    if (editor != null) {
+      calculationEditor = editor;
+    } else {
+      calculationEditor = backgroundEditorPool.getBackgroundEditor(file, document);
     }
 
-    TextPosition startPosition = EditorAPI.calculatePosition(editor, offset);
+    TextPosition startPosition = EditorAPI.calculatePosition(calculationEditor, offset);
 
     /*
      * Intellij internally always uses UNIX line separators for editor content
@@ -975,6 +984,34 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     fireActivity(textEdit);
 
     editorListenerDispatch.textEdited(textEdit);
+
+    // send selection after text edit
+    if (editor != null) {
+      Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
+      int caretPosition = primaryCaret.getOffset();
+
+      int selectionStart;
+      int selectionEnd;
+
+      if (primaryCaret.hasSelection()) {
+        selectionStart = primaryCaret.getSelectionStart();
+        selectionEnd = primaryCaret.getSelectionEnd();
+
+      } else {
+        selectionStart = caretPosition;
+        selectionEnd = caretPosition;
+      }
+
+      log.debug(
+          "Sending selection ("
+              + selectionStart
+              + ","
+              + selectionEnd
+              + ") after text edit "
+              + textEdit);
+
+      generateSelection(file, editor, selectionStart, selectionEnd);
+    }
   }
 
   @Override
