@@ -1,6 +1,7 @@
 package saros.intellij.eventhandler.editor.caret;
 
 import com.intellij.openapi.editor.Caret;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.event.CaretEvent;
@@ -18,7 +19,17 @@ import saros.filesystem.IFile;
 import saros.intellij.editor.EditorManager;
 import saros.intellij.eventhandler.IProjectEventHandler;
 
-/** Dispatches text selection activities for caret moves. */
+/**
+ * Dispatches text selection activities for caret moves.
+ *
+ * <p>This handler is only triggered for explicit caret moves caused by the user and not implicit
+ * caret moves caused by text edits (even if these edits were caused by the user).
+ *
+ * <p>Caret moves caused by document modifications are handled in {@link
+ * EditorManager#generateTextEdit(int, String, String, IFile, Document)}.
+ *
+ * @see CaretListener#caretPositionChanged(CaretEvent)
+ */
 public class LocalCaretPositionChangeHandler implements IProjectEventHandler {
   private static final Logger log = Logger.getLogger(LocalCaretPositionChangeHandler.class);
 
