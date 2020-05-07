@@ -52,4 +52,4 @@ activities and changes.
 ## Staying Aware of Your Fellow Participants
 
 There are multiple ways of staying aware of what a driver is currently
-doing see the [awareness information section](awareness-information.md) for more details.
+doing. See the [awareness information section](awareness-information.md) for more details.

@@ -140,7 +140,7 @@ Example:
 
 ## Find broken links automatically
 
-You can [`html-proofer`](https://github.com/gjtorikian/html-proofer) to
+You can use [`html-proofer`](https://github.com/gjtorikian/html-proofer) to
 verify your build results (produced by `bundle exec jekyll serve` or `bundle exec jekyll build`)
 in the directory `docs/_site`.
 

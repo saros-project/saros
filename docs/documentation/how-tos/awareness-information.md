@@ -45,8 +45,8 @@ the file.
 
 ![contribution annotation](images/awareness/eclipse_editor_contribution_annotation.png)
 
-If a participant writes something, his/her text will appear
-highlighted in his/her color.
+If a participant writes something, their text will appear
+highlighted in their color.
 
 ## Viewports
 
