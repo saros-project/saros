@@ -1,15 +1,15 @@
 <idea-plugin url="https://www.saros-project.org">
 
-    <name>Saros</name>
+  <name>Saros</name>
 
-    <id>saros</id>
+  <id>saros</id>
 
-    <description>
-        Saros is an Open Source IDE plugin for distributed collaborative software development.
-    </description>
+  <description>
+    Saros is an Open Source IDE plugin for distributed collaborative software development.
+  </description>
 
-    <change-notes>
-        <![CDATA[
+  <change-notes>
+    <![CDATA[
         <ul>
             <li>Bumped minimal required IntelliJ version to 2019.2.3</li>
             <li>Adds support for caret/cursor annotations.</li>
@@ -27,47 +27,47 @@
         <a href="https://www.saros-project.org/releases/">our release page</a>,
         which also contains a more detailed version of the release notes.
         ]]>
-    </change-notes>
+  </change-notes>
 
-    <vendor url="https://www.saros-project.org" email="saros-devel@googlegroups.com">
-        Saros Project
-    </vendor>
+  <vendor url="https://www.saros-project.org" email="saros-devel@googlegroups.com">
+    Saros Project
+  </vendor>
 
-    <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
-    <idea-version since-build="192.6817.14"/>
+  <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+  <idea-version since-build="192.6817.14"/>
 
-    <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html on how to target different products -->
-    <!-- ATTENTION: the following "depends" tags are automatically uncommented by nightly-rel.yml. Make sure that changes do not break the logic. -->
-    <!-- uncomment to enable plugin in all products -->
-    <!--depends>com.intellij.modules.platform</depends-->
-    <!--depends>com.intellij.modules.lang</depends-->
+  <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html on how to target different products -->
+  <!-- ATTENTION: the following "depends" tags are automatically uncommented by nightly-rel.yml. Make sure that changes do not break the logic. -->
+  <!-- uncomment to enable plugin in all products -->
+  <!--depends>com.intellij.modules.platform</depends-->
+  <!--depends>com.intellij.modules.lang</depends-->
 
-    <application-components>
-        <component>
-            <implementation-class>
-                saros.intellij.SarosComponent
-            </implementation-class>
-        </component>
-    </application-components>
+  <application-components>
+    <component>
+      <implementation-class>
+        saros.intellij.SarosComponent
+      </implementation-class>
+    </component>
+  </application-components>
 
-    <actions>
-        <group keep-content="true" compact="false" popup="true"
-               id="saros.ShareWith"
-               icon="/icons/famfamfam/session_tsk.png" text="_Share With..."
-               description="Share this module using Saros"
-               class="saros.intellij.ui.menu.SarosFileShareGroup">
-            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
-        </group>
-    </actions>
+  <actions>
+    <group keep-content="true" compact="false" popup="true"
+      id="saros.ShareWith"
+      icon="/icons/famfamfam/session_tsk.png" text="_Share With..."
+      description="Share this module using Saros"
+      class="saros.intellij.ui.menu.SarosFileShareGroup">
+      <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+    </group>
+  </actions>
 
-    <extensions defaultExtensionNs="com.intellij">
-        <toolWindow id="Saros" icon="/icons/saros/saros_misc.png"
-                    anchor="bottom" secondary="true"
-                    factoryClass="saros.intellij.ui.SarosToolWindowFactory"/>
+  <extensions defaultExtensionNs="com.intellij">
+    <toolWindow id="Saros" icon="/icons/saros/saros_misc.png"
+      anchor="bottom" secondary="true"
+      factoryClass="saros.intellij.ui.SarosToolWindowFactory"/>
 
-        <colorSettingsPage id="saros"
-                           implementation="saros.intellij.preferences.colors.LocalSarosAnnotationColorsPage" />
-        <additionalTextAttributes scheme="Default" file="/colorSchemes/SarosDefault.xml" />
-        <additionalTextAttributes scheme="Darcula" file="/colorSchemes/SarosDarcula.xml" />
-    </extensions>
+    <colorSettingsPage id="saros"
+      implementation="saros.intellij.preferences.colors.LocalSarosAnnotationColorsPage"/>
+    <additionalTextAttributes scheme="Default" file="/colorSchemes/SarosDefault.xml"/>
+    <additionalTextAttributes scheme="Darcula" file="/colorSchemes/SarosDarcula.xml"/>
+  </extensions>
 </idea-plugin>
