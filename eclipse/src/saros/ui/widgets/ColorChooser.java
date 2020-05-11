@@ -74,7 +74,7 @@ public class ColorChooser extends Composite {
     setLayout(layout);
 
     for (int colorId = 0; colorId < SarosAnnotation.SIZE; colorId++) {
-      ColorLabel label = createColorLabel(this, style, colorId);
+      ColorLabel label = createColorLabel(style, colorId);
       label.setPreferredSize(50, 50);
       colorLabels.add(label);
     }
@@ -88,7 +88,7 @@ public class ColorChooser extends Composite {
         });
   }
 
-  private ColorLabel createColorLabel(Composite parent, int style, int colorId) {
+  private ColorLabel createColorLabel(int style, int colorId) {
     ColorLabel label = new ColorLabel(this, style);
 
     Color color = SarosAnnotation.getUserColor(colorId);

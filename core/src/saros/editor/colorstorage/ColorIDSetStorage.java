@@ -1,7 +1,6 @@
 package saros.editor.colorstorage;
 
 import com.thoughtworks.xstream.XStream;
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -151,8 +150,6 @@ public final class ColorIDSetStorage {
   private synchronized void save() {
 
     String serializedData = null;
-
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
 
     try {
       serializedData = createXStream().toXML(currentAvailableSets);

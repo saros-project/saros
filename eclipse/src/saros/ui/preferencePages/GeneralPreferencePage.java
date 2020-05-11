@@ -317,11 +317,6 @@ public final class GeneralPreferencePage extends FieldEditorPreferencePage
     addField(new BooleanFieldEditor(PreferenceConstants.AUTO_CONNECT, STARTUP_CONNECT_TEXT, group));
   }
 
-  private void createConcurrentUndoField(Composite group) {
-    addField(
-        new BooleanFieldEditor(PreferenceConstants.CONCURRENT_UNDO, CONCURRENT_UNDO_TEXT, group));
-  }
-
   @Override
   public void init(IWorkbench workbench) {
     // Nothing to initialize

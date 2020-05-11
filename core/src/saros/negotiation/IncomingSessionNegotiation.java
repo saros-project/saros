@@ -173,7 +173,7 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
 
       startSession(monitor);
 
-      sendInvitationCompleted(monitor);
+      sendInvitationCompleted();
 
       awaitFinalAcknowledgement(monitor);
     } catch (Exception e) {
@@ -311,7 +311,7 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
   }
 
   /** Signal the host that the session invitation is complete (from the client's perspective). */
-  private void sendInvitationCompleted(IProgressMonitor monitor) throws IOException {
+  private void sendInvitationCompleted() throws IOException {
     transmitter.send(
         ISarosSession.SESSION_CONNECTION_ID,
         getPeer(),

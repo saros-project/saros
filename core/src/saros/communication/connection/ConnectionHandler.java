@@ -55,7 +55,7 @@ public class ConnectionHandler {
           final Exception error =
               state == ConnectionState.ERROR ? connectionService.getConnectionError() : null;
 
-          setConnectionState(state, error, true);
+          setConnectionState(state, error);
         }
       };
 
@@ -303,8 +303,7 @@ public class ConnectionHandler {
     return connectionConfiguration;
   }
 
-  private void setConnectionState(
-      final ConnectionState state, final Exception error, final boolean fireChanges) {
+  private void setConnectionState(final ConnectionState state, final Exception error) {
     synchronized (notifyLock) {
       this.currentConnectionState = state;
       this.currentConnectionError = error;

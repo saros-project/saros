@@ -182,7 +182,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
       applySessionParameters(
           actualSessionParameters, sarosSession.getHost().getPreferences(), clientProperties);
 
-      User newUser = completeInvitation(clientProperties, monitor);
+      completeInvitation(clientProperties, monitor);
 
       monitor.done();
 
@@ -452,7 +452,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
    *
    * @throws IOException
    */
-  private User completeInvitation(IPreferenceStore properties, IProgressMonitor monitor)
+  private void completeInvitation(IPreferenceStore properties, IProgressMonitor monitor)
       throws IOException {
 
     log.debug(this + " : synchronizing user list");
@@ -489,8 +489,6 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
     }
 
     log.debug(this + " : session negotiation finished");
-
-    return user;
   }
 
   private void createCollectors() {

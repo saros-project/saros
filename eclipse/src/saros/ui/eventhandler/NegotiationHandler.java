@@ -18,7 +18,6 @@ import saros.negotiation.ProjectNegotiation;
 import saros.negotiation.SessionNegotiation;
 import saros.net.util.XMPPUtils;
 import saros.net.xmpp.JID;
-import saros.net.xmpp.XMPPConnectionService;
 import saros.session.INegotiationHandler;
 import saros.session.ISarosSessionManager;
 import saros.ui.ImageManager;
@@ -192,8 +191,7 @@ public class NegotiationHandler implements INegotiationHandler {
 
   private final ISarosSessionManager sessionManager;
 
-  public NegotiationHandler(
-      ISarosSessionManager sessionManager, XMPPConnectionService connectionService) {
+  public NegotiationHandler(ISarosSessionManager sessionManager) {
     sessionManager.setNegotiationHandler(this);
     this.sessionManager = sessionManager;
   }
