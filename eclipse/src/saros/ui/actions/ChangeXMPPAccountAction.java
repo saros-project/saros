@@ -21,7 +21,6 @@ import saros.communication.connection.IConnectionStateListener;
 import saros.net.ConnectionState;
 import saros.net.xmpp.JID;
 import saros.repackaged.picocontainer.annotations.Inject;
-import saros.session.ISarosSessionManager;
 import saros.ui.ImageManager;
 import saros.ui.Messages;
 import saros.ui.util.SWTUtils;
@@ -42,8 +41,6 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator, Dis
   @Inject private XMPPAccountStore accountService;
 
   @Inject private ConnectionHandler connectionHandler;
-
-  @Inject private ISarosSessionManager sarosSessionManager;
 
   private boolean isConnectionError;
 

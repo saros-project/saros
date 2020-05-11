@@ -5,7 +5,6 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import org.apache.log4j.Logger;
 import saros.net.xmpp.JID;
 import saros.stf.server.rmi.controlbot.IControlBot;
 import saros.stf.server.rmi.remotebot.IRemoteBot;
@@ -18,8 +17,6 @@ import saros.stf.server.rmi.superbot.ISuperBot;
  * nicely. STF is short for Saros Test Framework.
  */
 class RealTester implements AbstractTester {
-
-  private static final Logger log = Logger.getLogger(RealTester.class);
 
   private IRemoteWorkbenchBot bot;
   private ISuperBot superBot;

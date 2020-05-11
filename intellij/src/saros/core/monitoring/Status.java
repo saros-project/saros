@@ -6,6 +6,7 @@ package saros.core.monitoring;
  *
  * <p>TODO Check whether this actually necessary
  */
+@SuppressWarnings({"PMD.UnusedFormalParameter"})
 public class Status implements IStatus {
   public static final Status CANCEL_STATUS = new Status(0);
   public static final Status OK_STATUS = new Status(1);

@@ -43,9 +43,7 @@ public final class JoinSessionRequestHandler {
                 new Runnable() {
                   @Override
                   public void run() {
-                    handleInvitationRequest(
-                        new JID(packet.getFrom()),
-                        JoinSessionRequestExtension.PROVIDER.getPayload(packet));
+                    handleInvitationRequest(new JID(packet.getFrom()));
                   }
                 });
           } catch (RejectedExecutionException e) {
@@ -61,7 +59,7 @@ public final class JoinSessionRequestHandler {
         joinSessionRequestListener, JoinSessionRequestExtension.PROVIDER.getPacketFilter());
   }
 
-  private void handleInvitationRequest(final JID from, JoinSessionRequestExtension extension) {
+  private void handleInvitationRequest(final JID from) {
 
     sessionManager.invite(from, "Invitation by request");
   }

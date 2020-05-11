@@ -15,7 +15,9 @@ import saros.lsp.extensions.server.account.IAccountService;
 import saros.lsp.service.DocumentServiceStub;
 import saros.lsp.service.WorkspaceServiceStub;
 
-/** Implmenentation of the Saros language server. */
+/** Implementation of the Saros language server. */
+// TODO: Remove SuppressWarning after Server and Client interaction is on master branch
+@SuppressWarnings({"PMD.UnusedPrivateField"})
 public class SarosLanguageServer implements ISarosLanguageServer, ISarosLanguageClientAware {
 
   private static final Logger log = Logger.getLogger(SarosLanguageServer.class);

@@ -79,7 +79,7 @@ public class LeaveAndKickHandler implements Startable {
       return;
     }
 
-    stopSession(user, SessionEndReason.KICKED);
+    stopSession(SessionEndReason.KICKED);
   }
 
   private void leaveReceived(JID from) {
@@ -91,7 +91,7 @@ public class LeaveAndKickHandler implements Startable {
     }
 
     if (user.isHost()) {
-      stopSession(user, SessionEndReason.HOST_LEFT);
+      stopSession(SessionEndReason.HOST_LEFT);
       return;
     }
 
@@ -116,7 +116,7 @@ public class LeaveAndKickHandler implements Startable {
         });
   }
 
-  private void stopSession(final User user, final SessionEndReason reason) {
+  private void stopSession(final SessionEndReason reason) {
     ThreadUtils.runSafeAsync(
         "stop-host",
         log,
