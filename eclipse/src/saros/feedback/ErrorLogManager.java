@@ -22,7 +22,7 @@ import saros.annotations.Component;
 import saros.preferences.EclipsePreferenceConstants;
 import saros.repackaged.picocontainer.Startable;
 import saros.session.ISarosSession;
-import saros.ui.preferencePages.FeedbackPreferencePage;
+import saros.ui.preference_pages.FeedbackPreferencePage;
 
 /**
  * The ErrorLogManager is supposed to upload an error log file to our server at the end of a

@@ -1,4 +1,4 @@
-package saros.ui.menuContributions;
+package saros.ui.menu_contributions;
 
 import java.util.Arrays;
 import java.util.Collections;

@@ -1,11 +1,11 @@
-package saros.ui.commandHandlers;
+package saros.ui.command_handlers;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IResource;
-import saros.ui.menuContributions.StartSessionWithContacts;
-import saros.ui.menuContributions.StartSessionWithProjects;
+import saros.ui.menu_contributions.StartSessionWithContacts;
+import saros.ui.menu_contributions.StartSessionWithProjects;
 import saros.ui.util.WizardUtils;
 import saros.ui.util.selection.retriever.SelectionRetrieverFactory;
 

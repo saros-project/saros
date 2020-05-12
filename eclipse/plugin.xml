@@ -56,35 +56,35 @@
       </decorator>
    </extension>
    <extension
-         point="org.eclipse.ui.preferencePages">
+         point="org.eclipse.ui.preference_pages">
       <page
-            class="saros.ui.preferencePages.GeneralPreferencePage"
+            class="saros.ui.preference_pages.GeneralPreferencePage"
             id="saros.preferences"
             name="Saros"/>
       <page
             category="saros.preferences"
-            class="saros.ui.preferencePages.AdvancedPreferencePage"
+            class="saros.ui.preference_pages.AdvancedPreferencePage"
             id="saros.preferences.advanced"
             name="Advanced"/>
       <page
             category="saros.preferences"
-            class="saros.ui.preferencePages.NetworkPreferencePage"
+            class="saros.ui.preference_pages.NetworkPreferencePage"
             id="saros.preferences.network"
             name="Network"/>
       <!--page
             category="saros.preferences"
-            class="saros.ui.preferencePages.FeedbackPreferencePage"
+            class="saros.ui.preference_pages.FeedbackPreferencePage"
             id="saros.preferences.feedback"
             name="Feedback"/-->
       <page
             category="saros.preferences"
-            class="saros.ui.preferencePages.CommunicationPreferencePage"
+            class="saros.ui.preference_pages.CommunicationPreferencePage"
             id="saros.preferences.communication"
             name="Communication">
       </page>
       <page
               category="saros.preferences"
-              class="saros.ui.preferencePages.PersonalizationPreferencePage"
+              class="saros.ui.preference_pages.PersonalizationPreferencePage"
               id="saros.preferences.personalization"
               name="Personalization">
       </page>
@@ -550,34 +550,34 @@
    <extension
          point="org.eclipse.ui.handlers">
       <handler
-            class="saros.ui.commandHandlers.GettingStartedHandler"
+            class="saros.ui.command_handlers.GettingStartedHandler"
             commandId="saros.ui.commands.GettingStarted">
       </handler>
       <handler
-            class="saros.ui.commandHandlers.StartSarosConfigurationHandler"
+            class="saros.ui.command_handlers.StartSarosConfigurationHandler"
             commandId="saros.ui.commands.StartSarosConfiguration">
       </handler>
       <handler
-            class="saros.ui.commandHandlers.CreateXMPPAccountHandler"
+            class="saros.ui.command_handlers.CreateXMPPAccountHandler"
             commandId="saros.ui.commands.CreateXMPPAccount">
       </handler>
       <handler
-            class="saros.ui.commandHandlers.AddXMPPAccountHandler"
+            class="saros.ui.command_handlers.AddXMPPAccountHandler"
             commandId="saros.ui.commands.AddXMPPAccount">
       </handler>
       <handler
-            class="saros.ui.commandHandlers.AddContactHandler"
+            class="saros.ui.command_handlers.AddContactHandler"
             commandId="saros.ui.commands.AddContact">
          <enabledWhen>
              <reference definitionId="saros.ui.definitions.isConnected" />
          </enabledWhen>
       </handler>
       <handler
-            class="saros.ui.commandHandlers.OpenSarosPreferencesHandler"
+            class="saros.ui.command_handlers.OpenSarosPreferencesHandler"
             commandId="saros.ui.commands.OpenSarosPreferences">
       </handler>
       <handler
-      class="saros.ui.commandHandlers.ShareProjectHandler"
+      class="saros.ui.command_handlers.ShareProjectHandler"
             commandId="saros.ui.commands.ShareResource">
          <enabledWhen>
             <and>
@@ -593,7 +593,7 @@
          </enabledWhen>
       </handler>
       <handler
-            class="saros.ui.commandHandlers.SessionLeaveHandler"
+            class="saros.ui.command_handlers.SessionLeaveHandler"
             commandId="saros.ui.commands.SessionLeave">
          <activeWhen>
             <and>
@@ -607,7 +607,7 @@
          </activeWhen>
       </handler>
       <handler
-            class="saros.ui.commandHandlers.SessionAddProjectsHandler"
+            class="saros.ui.command_handlers.SessionAddProjectsHandler"
             commandId="saros.ui.commands.SessionAddResources">
          <activeWhen>
             <and>
@@ -626,7 +626,7 @@
          </enabledWhen>
       </handler>
       <handler
-            class="saros.ui.commandHandlers.SessionAddContactsHandler"
+            class="saros.ui.command_handlers.SessionAddContactsHandler"
             commandId="saros.ui.commands.SessionAddContacts">
          <activeWhen>
             <and>
@@ -640,7 +640,7 @@
          </activeWhen>
       </handler>
       <handler
-            class="saros.ui.commandHandlers.SessionAddSelectedProjectsHandler"
+            class="saros.ui.command_handlers.SessionAddSelectedProjectsHandler"
             commandId="saros.ui.commands.SessionAddSelectedResources">
          <activeWhen>
             <and>
@@ -667,7 +667,7 @@
          </enabledWhen>
       </handler>
       <handler
-            class="saros.ui.commandHandlers.SessionAddSelectedContactsHandler"
+            class="saros.ui.command_handlers.SessionAddSelectedContactsHandler"
             commandId="saros.ui.commands.SessionAddSelectedContacts">
          <activeWhen>
             <and>
@@ -1386,7 +1386,7 @@
    <extension
          point="org.eclipse.ui.services">
       <sourceProvider
-            provider="saros.serviceProviders.SarosSourceProvider">
+            provider="saros.service_providers.SarosSourceProvider">
          <variable
                name="saros.Saros"
                priorityLevel="workbench">

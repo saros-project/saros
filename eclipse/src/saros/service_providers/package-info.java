@@ -3,4 +3,4 @@
  * href="http://wiki.eclipse.org/Command_Core_Expressions">Eclipse Core Expressions</a>, which are
  * programmatic or declarative expressions.
  */
-package saros.serviceProviders;
+package saros.service_providers;

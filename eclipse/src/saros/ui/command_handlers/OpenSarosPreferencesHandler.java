@@ -1,4 +1,4 @@
-package saros.ui.commandHandlers;
+package saros.ui.command_handlers;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;

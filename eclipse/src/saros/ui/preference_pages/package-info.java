@@ -3,4 +3,4 @@
  * provide several setting options to configurate Saros behavior. Pages have to implement
  * IWorkbenchPreferencePage.
  */
-package saros.ui.preferencePages;
+package saros.ui.preference_pages;

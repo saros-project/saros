@@ -16,7 +16,7 @@ import saros.Saros;
 import saros.annotations.Component;
 import saros.preferences.EclipsePreferenceConstants;
 import saros.repackaged.picocontainer.Startable;
-import saros.ui.preferencePages.FeedbackPreferencePage;
+import saros.ui.preference_pages.FeedbackPreferencePage;
 import saros.util.StackTrace;
 
 /**

@@ -93,7 +93,7 @@ Export-Package: saros;
    org.eclipse.jface.viewers,
    saros.invitation,
    saros.net",
- saros.ui.commandHandlers,
+ saros.ui.command_handlers,
  saros.ui.decorators;
   uses:="org.eclipse.core.runtime,
    saros.project,
@@ -101,7 +101,7 @@ Export-Package: saros;
    saros.editor,
    saros.invitation",
  saros.ui.model,
- saros.ui.preferencePages,
+ saros.ui.preference_pages,
  saros.ui.util,
  saros.ui.util.selection,
  saros.ui.util.selection.retriever,

@@ -1,2 +1,2 @@
 /** Classes in this package are responsible to provide MenuItems for Saros Menus. */
-package saros.ui.menuContributions;
+package saros.ui.menu_contributions;
