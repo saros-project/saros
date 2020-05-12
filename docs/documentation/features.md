@@ -40,7 +40,7 @@ or audio conferencing tool.
 As a user in a session you can see who of the other participants is
 where (file/region) and who just changed what.
 
-See [here](how-tos/awareness-information.md) for an overview of all information.
+See [here](awareness-information.md) for an overview of all information.
 
 ## Follow-Mode
 

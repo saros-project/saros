@@ -15,10 +15,10 @@ If you are following another participant you see something like:
 ## File Navigations
 
 In the package explorer:
-- ![active file](images/icons-e/active_file.png) A colored dot decorates the file that a participant has currently
+- ![active file](how-tos/images/icons-e/active_file.png) A colored dot decorates the file that a participant has currently
     in focus. The color resembles the color of the active user. If multiple users have the same file focused,
     the dot will turn grey (![multiple active file](images/awareness/eclipse_package_manager_annotated_file_multiple.png)).
-- ![shared file](images/icons-e/shared_file.png) A
+- ![shared file](how-tos/images/icons-e/shared_file.png) A
     blue arrow decorates a file that is shared with
     other participants.
 

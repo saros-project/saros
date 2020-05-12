@@ -26,7 +26,7 @@ Please provide the corresponding log files, but be sure to **remove or obfuscate
 
 You can find the log files in the following locations:
 * IntelliJ IDEA:
-  The log files for JetBrains IDEs are located in the IDE system directory (here called`IDE_SYSTEM_DIR`).
+  The log files for JetBrains IDEs are located in the IDE system directory (here called `IDE_SYSTEM_DIR`).
   An overview over all configurations is given  on https://intellij-support.jetbrains.com/hc/en-us/articles/206544519-Directories-used-by-the-IDE-to-store-settings-caches-plugins-and-logs
 
   For releases 2019.3 and earlier, see https://www.jetbrains.com/help/idea/2019.3/tuning-the-ide.html#system-directory

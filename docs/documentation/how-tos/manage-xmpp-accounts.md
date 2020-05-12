@@ -2,7 +2,7 @@
 title: Manage XMPP Accounts
 ---
 
-This page described how to manage your XMPP accounts (**not the accounts of your contacts**).
+This page described how to manage your XMPP accounts (**not your contacts**).
 Therefore, the information is only relevant if you want to replace an old account with a new one,
 update the information for an added account (like the password), or you want to use multiple accounts.
 
@@ -58,7 +58,7 @@ Saros account preferences. You can open these preferences:
 {% capture intellij %}
 ## Add an Account
 
-- In the top bar of the Saros view, click the "Connect" button (![connect icon](images/icons/connect.png)).
+- In the top bar of the Saros view, click the "Connect" button (![connect icon](../images/icons/connect.png)).
 - Choose `Add account...` from the pop-up menu.
 
 {% alert warning %}
