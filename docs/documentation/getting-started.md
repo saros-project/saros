@@ -34,7 +34,7 @@ session list**. Furthermore, the session list indicates
 * which participant has which editor focused, and
 * which participant is currently following whom.
 
-See the [awareness information page](how-tos/awareness-information.md) for more information
+See the [awareness information page](awareness-information.md) for more information
 concerning visualizations indicating the participant's actions.
 
 Saros also provides **instant chat messaging** to
@@ -66,7 +66,7 @@ You first need an **XMPP account** to use Saros.
 
 * You can **create a new account**:
   * On our XMPP server using our **[signup page](https://saros-con.imp.fu-berlin.de:5280/register/new)**
-        * Note: Due to abuse by spammers, we had to disable in-band registration and from within Saros.
+      * Note: Due to abuse by spammers, we had to disable in-band registration and from within Saros.
   * On other XMPP servers as [jabber.org](https://www.jabber.org/) ([register.jabber.org](https://register.jabber.org/)).
 * You can **use an existing account**
 * You [setup your own XMPP server](how-tos/setup-xmpp.md).
@@ -140,7 +140,7 @@ session** or by **being invited to one**.
 When **starting** a session, **Saros will produce the same project state** 
 in the Saros instances of your invited contacts (with synchronizing files, copying missing files or creating missing directories).
 
-#### Start a Session ([host](#the-host))
+#### Start a Session ([Host](#the-host))
 
 {% capture eclipse %}
 
