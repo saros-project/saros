@@ -1,4 +1,4 @@
-package saros.ui.preferencePages;
+package saros.ui.preference_pages;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;

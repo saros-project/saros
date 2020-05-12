@@ -1,4 +1,4 @@
-package saros.ui.preferencePages;
+package saros.ui.preference_pages;
 
 import java.text.MessageFormat;
 import org.eclipse.jface.dialogs.MessageDialog;

@@ -79,7 +79,7 @@ import saros.ui.actions.RenameContactAction;
 import saros.ui.actions.RequestSessionInviteAction;
 import saros.ui.actions.SendFileAction;
 import saros.ui.actions.SkypeAction;
-import saros.ui.menuContributions.StartSessionWithProjects;
+import saros.ui.menu_contributions.StartSessionWithProjects;
 import saros.ui.model.roster.RosterEntryElement;
 import saros.ui.sounds.SoundPlayer;
 import saros.ui.sounds.Sounds;

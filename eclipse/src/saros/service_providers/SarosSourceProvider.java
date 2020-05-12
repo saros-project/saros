@@ -1,4 +1,4 @@
-package saros.serviceProviders;
+package saros.service_providers;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,10 +24,10 @@ import saros.ui.util.SWTUtils;
  */
 public class SarosSourceProvider extends AbstractSourceProvider {
 
-  /** Corresponds to a serviceProvider variable as defined in Extension org.eclipse.ui.services. */
+  /** Corresponds to a service_provider variable as defined in Extension org.eclipse.ui.services. */
   public static final String SAROS = "saros.Saros";
 
-  /** Corresponds to a serviceProvider variable as defined in Extension org.eclipse.ui.services. */
+  /** Corresponds to a service_provider variable as defined in Extension org.eclipse.ui.services. */
   public static final String SAROS_SESSION = "saros.SarosSession";
 
   @Inject private Saros saros;

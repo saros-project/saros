@@ -1,15 +1,15 @@
-package saros.ui.commandHandlers;
+package saros.ui.command_handlers;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import saros.ui.util.WizardUtils;
+import saros.ui.util.CollaborationUtils;
 
-public class AddXMPPAccountHandler extends AbstractHandler {
+public class SessionLeaveHandler extends AbstractHandler {
 
   @Override
   public Object execute(ExecutionEvent event) throws ExecutionException {
-    WizardUtils.openAddXMPPAccountWizard();
+    CollaborationUtils.leaveSession();
     return null;
   }
 }

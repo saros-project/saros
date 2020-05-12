@@ -1,4 +1,4 @@
-package saros.ui.preferencePages;
+package saros.ui.preference_pages;
 
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditor;
