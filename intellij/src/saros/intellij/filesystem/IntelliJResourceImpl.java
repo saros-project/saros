@@ -12,6 +12,8 @@ import org.jetbrains.annotations.NotNull;
 import saros.filesystem.IResource;
 import saros.intellij.editor.ProjectAPI;
 
+/** @deprecated use {@link IntellijResourceImplV2} instead */
+@Deprecated
 public abstract class IntelliJResourceImpl implements IResource {
 
   @Override

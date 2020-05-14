@@ -26,7 +26,12 @@ import saros.filesystem.IResource;
 import saros.intellij.project.filesystem.IntelliJPathImpl;
 import saros.intellij.runtime.FilesystemRunner;
 
-/** A <code>IntelliJProjectImpl</code> represents a specific module loaded in a specific project. */
+/**
+ * A <code>IntelliJProjectImpl</code> represents a specific module loaded in a specific project.
+ *
+ * @deprecated use {@link IntellijReferencePointImpl} instead
+ */
+@Deprecated
 public final class IntelliJProjectImpl extends IntelliJResourceImpl implements IProject {
   private static final Logger log = Logger.getLogger(IntelliJProjectImpl.class);
 
