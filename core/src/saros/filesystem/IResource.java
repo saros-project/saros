@@ -3,10 +3,9 @@ package saros.filesystem;
 import java.io.IOException;
 
 /**
- * This interface is under development. It currently equals its Eclipse counterpart. If not
- * mentioned otherwise all offered methods are equivalent to their Eclipse counterpart.
+ * Represents a handle for an element (normally a file or folder) in the (virtual) file system.
  *
- * <p>Represents an element (normally a file or folder) in the (virtual) file system.
+ * <p>The referenced resources do not necessarily have to exist in the local filesystem.
  */
 public interface IResource {
 
@@ -18,17 +17,53 @@ public interface IResource {
     ROOT
   }
 
-  public boolean exists();
+  /**
+   * Returns whether the resource exists in the local filesystem.
+   *
+   * @return whether the resource exists in the local filesystem
+   */
+  boolean exists();
 
-  public String getName();
+  /**
+   * Returns the name of the resource.
+   *
+   * @return the name of the resource
+   */
+  String getName();
 
-  public IContainer getParent();
+  /**
+   * Returns the parent for the resource.
+   *
+   * <p>Returns <code>null</code> if the resource is a project.
+   *
+   * @return the parent for the resource or <code>null</code> if the resource is a project
+   */
+  IContainer getParent();
 
-  public IProject getProject();
+  /**
+   * Returns the project for the resource.
+   *
+   * @return the project for the resource
+   */
+  IProject getProject();
 
-  public IPath getProjectRelativePath();
+  /**
+   * Returns the project-relative path for the resource.
+   *
+   * <p>Returns an empty path if the resource is a project.
+   *
+   * @return the project-relative path for the resource or an empty path if the resource is a
+   *     project
+   */
+  IPath getProjectRelativePath();
 
-  public Type getType();
+  /**
+   * Returns the type of the resource.
+   *
+   * @return the type of the resource
+   * @see Type
+   */
+  Type getType();
 
   /**
    * Returns whether the resource should be ignored. Resources should be ignored if they match any
@@ -42,7 +77,7 @@ public interface IResource {
    *
    * @return whether the resource should be ignored
    */
-  public boolean isIgnored();
+  boolean isIgnored();
 
   /**
    * Deletes this resource from the disk.
@@ -51,5 +86,5 @@ public interface IResource {
    *
    * @throws IOException if the resource deletion failed
    */
-  public void delete() throws IOException;
+  void delete() throws IOException;
 }

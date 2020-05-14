@@ -1,24 +1,3 @@
-/*
- *
- *  DPP - Serious Distributed Pair Programming
- *  (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2010
- *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 1, or (at your option)
- *  any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- * /
- */
-
 package saros.filesystem;
 
 import java.io.IOException;
@@ -27,11 +6,19 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.IllegalCharsetNameException;
 
 /**
- * This interface is under development. It currently equals its Eclipse counterpart. If not
- * mentioned otherwise all offered methods are equivalent to their Eclipse counterpart.
+ * Represents a handle for a file in the (virtual) file system.
+ *
+ * <p>The referenced file do not necessarily have to exist in the local filesystem.
  */
 public interface IFile extends IResource {
-  public String getCharset() throws IOException;
+
+  /**
+   * Returns the charset for the file.
+   *
+   * @return the charset for the file
+   * @throws IOException if the charset could not be read
+   */
+  String getCharset() throws IOException;
 
   /**
    * Sets the given character set for this file.
@@ -46,32 +33,46 @@ public interface IFile extends IResource {
    */
   void setCharset(String charset) throws IOException;
 
-  public InputStream getContents() throws IOException;
+  /**
+   * Returns an input stream containing the content of the file.
+   *
+   * @return an input stream containing the content of the file
+   * @throws IOException if the file does not exist or its contents could not be read
+   */
+  InputStream getContents() throws IOException;
 
   /**
    * Writes the content of the given input stream into the file. Any existing file content is
    * overwritten.
    *
-   * @param input the input stream to write into the file
-   * @throws IOException if the content could not be written to the file
+   * <p>Passing <code>null</code> as the input stream will result in the current content being
+   * dropped without any replacement, resulting in an empty file.
+   *
+   * @param input an input stream to write into the file or <code>null</code> if the current content
+   *     should just be dropped
+   * @throws IOException if file does not exist or the content could not be written to the file
    */
-  public void setContents(InputStream input) throws IOException;
+  void setContents(InputStream input) throws IOException;
 
   /**
    * Creates the this file with the given content.
    *
+   * <p>Passing <code>null</code> as the input stream will result in the file being created empty.
+   *
+   * @param input an input stream to write into the file or <code>null</code> if the file should be
+   *     created without any content
    * @throws IOException if the file already exists, could not be created, or the content of the
    *     newly created file could not be set
    */
-  public void create(InputStream input) throws IOException;
+  void create(InputStream input) throws IOException;
 
   /**
-   * Returns the size of the file.
+   * Returns the size of the file in bytes.
    *
    * @return the size of the file in bytes
-   * @throws IOException if an I/O error occurred
+   * @throws IOException if the file does not exist or its contents could not be read
    */
-  public long getSize() throws IOException;
+  long getSize() throws IOException;
 
   default Type getType() {
     return Type.FILE;

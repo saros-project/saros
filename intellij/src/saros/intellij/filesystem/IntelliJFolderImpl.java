@@ -37,8 +37,8 @@ public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IF
   }
 
   @Override
-  public boolean exists(@NotNull IPath path) {
-    return project.exists(this.path.append(path));
+  public boolean exists(@NotNull IPath relativePath) {
+    return project.exists(this.path.append(relativePath));
   }
 
   @NotNull
