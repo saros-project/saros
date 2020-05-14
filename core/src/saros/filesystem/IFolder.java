@@ -35,4 +35,8 @@ public interface IFolder extends IContainer {
    * @throws IOException if the folder creation failed or the resource already exists
    */
   void create() throws IOException;
+
+  default Type getType() {
+    return Type.FOLDER;
+  }
 }
