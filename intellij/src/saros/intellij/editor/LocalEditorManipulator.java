@@ -66,7 +66,7 @@ public class LocalEditorManipulator {
       return null;
     }
 
-    VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFileV2(file);
+    VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(file);
 
     if (virtualFile == null || !virtualFile.exists()) {
       log.warn(
@@ -106,7 +106,7 @@ public class LocalEditorManipulator {
 
     log.debug("Removed editor for file " + file + " from EditorPool");
 
-    VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFileV2(file);
+    VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(file);
 
     if (virtualFile == null || !virtualFile.exists()) {
       log.warn(
@@ -225,7 +225,7 @@ public class LocalEditorManipulator {
    * @see Document
    */
   public void handleContentRecovery(IFile file, byte[] content, String encoding, User source) {
-    VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFileV2(file);
+    VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(file);
     if (virtualFile == null) {
       log.warn(
           "Could not recover file content of "

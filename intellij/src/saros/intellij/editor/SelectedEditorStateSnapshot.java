@@ -98,8 +98,8 @@ public class SelectedEditorStateSnapshot {
    *     VirtualFile
    */
   public void replaceSelectedFile(@NotNull IFile oldFile, @NotNull IFile newFile) {
-    VirtualFile oldVirtualFile = VirtualFileConverter.convertToVirtualFileV2(oldFile);
-    VirtualFile newVirtualFile = VirtualFileConverter.convertToVirtualFileV2(newFile);
+    VirtualFile oldVirtualFile = VirtualFileConverter.convertToVirtualFile(oldFile);
+    VirtualFile newVirtualFile = VirtualFileConverter.convertToVirtualFile(newFile);
 
     if (oldVirtualFile == null) {
       throw new IllegalStateException(

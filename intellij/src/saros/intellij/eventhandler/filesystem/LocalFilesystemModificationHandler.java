@@ -218,8 +218,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     Set<IProject> sharedReferencePoints = session.getProjects();
 
-    IFile file =
-        (IFile) VirtualFileConverter.convertToResourceV2(sharedReferencePoints, virtualFile);
+    IFile file = (IFile) VirtualFileConverter.convertToResource(sharedReferencePoints, virtualFile);
 
     if (file == null || !session.isShared(file)) {
       if (log.isTraceEnabled()) {
@@ -282,7 +281,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
     Set<IProject> sharedReferencePoints = session.getProjects();
 
     IResource resource =
-        VirtualFileConverter.convertToResourceV2(sharedReferencePoints, createdVirtualFile);
+        VirtualFileConverter.convertToResource(sharedReferencePoints, createdVirtualFile);
 
     if (resource == null || !session.isShared(resource)) {
       if (log.isTraceEnabled()) {
@@ -350,8 +349,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     Set<IProject> sharedReferencePoints = session.getProjects();
 
-    IFile copyWrapper =
-        (IFile) VirtualFileConverter.convertToResourceV2(sharedReferencePoints, copy);
+    IFile copyWrapper = (IFile) VirtualFileConverter.convertToResource(sharedReferencePoints, copy);
 
     if (copyWrapper == null || !session.isShared(copyWrapper)) {
       if (log.isTraceEnabled()) {
@@ -413,7 +411,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
     Set<IProject> sharedReferencePoints = session.getProjects();
 
     IFolder folder =
-        (IFolder) VirtualFileConverter.convertToResourceV2(sharedReferencePoints, deletedFolder);
+        (IFolder) VirtualFileConverter.convertToResource(sharedReferencePoints, deletedFolder);
 
     if (folder == null || !session.isShared(folder)) {
       if (log.isTraceEnabled()) {
@@ -444,7 +442,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
           }
 
           IFolder childFolder =
-              (IFolder) VirtualFileConverter.convertToResourceV2(sharedReferencePoints, fileOrDir);
+              (IFolder) VirtualFileConverter.convertToResource(sharedReferencePoints, fileOrDir);
 
           if (childFolder == null) {
             log.debug("Skipping deleted folder as no IFile could be obtained " + fileOrDir);
@@ -481,8 +479,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
   private void generateFileDeletionActivity(VirtualFile deletedFile) {
     Set<IProject> sharedReferencePoints = session.getProjects();
 
-    IFile file =
-        (IFile) VirtualFileConverter.convertToResourceV2(sharedReferencePoints, deletedFile);
+    IFile file = (IFile) VirtualFileConverter.convertToResource(sharedReferencePoints, deletedFile);
 
     if (file == null || !session.isShared(file)) {
       if (log.isTraceEnabled()) {
@@ -587,9 +584,9 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
     Set<IProject> sharedReferencePoints = session.getProjects();
 
     IFolder oldFolderWrapper =
-        (IFolder) VirtualFileConverter.convertToResourceV2(sharedReferencePoints, oldFile);
+        (IFolder) VirtualFileConverter.convertToResource(sharedReferencePoints, oldFile);
     IFolder newParentWrapper =
-        (IFolder) VirtualFileConverter.convertToResourceV2(sharedReferencePoints, newParent);
+        (IFolder) VirtualFileConverter.convertToResource(sharedReferencePoints, newParent);
 
     User user = session.getLocalUser();
 
@@ -760,9 +757,9 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
     Set<IProject> sharedReferencePoints = session.getProjects();
 
     IFile oldFileWrapper =
-        (IFile) VirtualFileConverter.convertToResourceV2(sharedReferencePoints, oldFile);
+        (IFile) VirtualFileConverter.convertToResource(sharedReferencePoints, oldFile);
     IFolder newParentWrapper =
-        (IFolder) VirtualFileConverter.convertToResourceV2(sharedReferencePoints, newBaseParent);
+        (IFolder) VirtualFileConverter.convertToResource(sharedReferencePoints, newBaseParent);
 
     User user = session.getLocalUser();
 
@@ -947,8 +944,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
         if (parent == null) {
           Set<IProject> sharedReferencePoints = session.getProjects();
 
-          IResource resource =
-              VirtualFileConverter.convertToResourceV2(sharedReferencePoints, file);
+          IResource resource = VirtualFileConverter.convertToResource(sharedReferencePoints, file);
 
           if (resource != null && session.isShared(resource)) {
             log.error(
