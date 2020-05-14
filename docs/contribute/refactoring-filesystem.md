@@ -15,7 +15,7 @@ The structure of the IntelliJ filesystem can be read [here](https://www.jetbrain
 
 The new approach is to leave the project-based architecture of Saros:
 
-A Saros user should be able to share an any subtree of his resources with Saros. The root of the subtree must have an absolute path on each Saros user's enviroment. It doesn't matter, where the the subtree is located (ex. On *C*: oder *D*: drive), but what the absolute paths unites is, that they mean the same reference (IReferencePoint). That means that every Saros user can choose for themselves where the resources are located. If a user uses Windows, the resources can be located in `C:` or `D:` drive. If a user uses Linux, the resources can be located in `/home/path/to/bar`. So the absolute paths of the resources are different, but if they start a session and want sharing their resources, the resources have the same reference point even though they have different absolute paths. Every Saros instance should know, where an IReferencePoint object is located in the local file system, so that the resources can be determined in combination of an IReferencePoint and a relative path to the resource.
+A Saros user should be able to share an any subtree of his resources with Saros. The root of the subtree must have an absolute path on each Saros user's environment. It doesn't matter, where the the subtree is located (ex. On *C*: oder *D*: drive), but what the absolute paths unites is, that they mean the same reference (IReferencePoint). That means that every Saros user can choose for themselves where the resources are located. If a user uses Windows, the resources can be located in `C:` or `D:` drive. If a user uses Linux, the resources can be located in `/home/path/to/bar`. So the absolute paths of the resources are different, but if they start a session and want sharing their resources, the resources have the same reference point even though they have different absolute paths. Every Saros instance should know, where an IReferencePoint object is located in the local file system, so that the resources can be determined in combination of an IReferencePoint and a relative path to the resource.
 
 The IReferencePoint can be look like this:
 
@@ -85,10 +85,10 @@ For introducing the reference point based interfaces, but also keeping project-b
 2.  Insert the reference point based interface
 3.  Implement the reference point based interface
 4.  Remove the project-based interface's implementation and reference this to the reference point based interface
-5.  Find alle usages of project-based interfaces and reference them to reference point based interface
+5.  Find all usages of project-based interfaces and reference them to reference point based interface
 6.  Delete project based interface
 
-This procedure has the adventages, that the parallel development of Saros is provided, so that developer can use the reference point based interfaces and the (still) untouched components are not affected directly. After all usages references the reference point based interface, the project based one can be deleted.
+This procedure has the advantages, that the parallel development of Saros is provided, so that developer can use the reference point based interfaces and the (still) untouched components are not affected directly. After all usages references the reference point based interface, the project based one can be deleted.
 
 There are other refactoring situations to handle for reaching to final state:
 
@@ -98,7 +98,7 @@ Because of the project-based architecture many classes and methods contain the k
 
 #### Insert Parameter:
 
-There are some situations during the refactoring, that a Saros project for example determated resources, which the reference point can not do. So the affected methods should be extended by a ReferencePointManager, so that previous functionalities still remains.
+There are some situations during the refactoring, that a Saros project for example determined resources, which the reference point can not do. So the affected methods should be extended by a ReferencePointManager, so that previous functionalities still remains.
 
 #### Remove Parameter:
 

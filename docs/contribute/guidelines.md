@@ -120,7 +120,7 @@ is not acceptable to make a member part of a package's API
 *   For local variables and parameters: In principle, the same rule
     applies as for class variables. But since local variables and
     parameters have a limited scope, the additional information gained
-    through the presence of a final modifer is not tremendous.
+    through the presence of a final modifier is not tremendous.
     Therefore, we tend to not use the final keyword here.
 *   For methods: By default, don't make them final, unless you have good
     reason not to. After all, we want to use

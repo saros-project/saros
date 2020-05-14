@@ -93,7 +93,7 @@ In case you don't know yet:
     *   Even if you perform a review in such a pair session, the
         reviewer should still post his remarks in Gerrit, so others can
         learn from the mistakes and defects you two found.
-*   Since we require two reviewers for each pull request, *everytime* you
+*   Since we require two reviewers for each pull request, *every time* you
     submit a new pull request (or new version of a pull request) you need to do at
     least *two reviews* yourself to maintain that ratio. Having a hard
     time getting others to review your pull request? Be a role model and do a

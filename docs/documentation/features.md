@@ -3,7 +3,7 @@ title: Features of Saros
 toc: false
 ---
 
-Saros comes with a **boundle of nice features**.
+Saros comes with a **bundle of nice features**.
 
 ## Collaborative Real-Time File Editing
 

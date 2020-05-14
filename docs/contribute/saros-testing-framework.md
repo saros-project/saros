@@ -46,7 +46,7 @@ Therefore the current workaround is to execute the Gradle task `generateLibAll` 
 
 ### Run Tests
 
-1.  Start the **requiered launch configurations** which are located
+1.  Start the **required launch configurations** which are located
     in the directory `stf/launch` by **right clicking the
     launch file** and chose **Run As > Saros\_STF\_\<name\>**. This
     will start a new Eclipse instance with the selected launch

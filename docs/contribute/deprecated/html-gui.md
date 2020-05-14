@@ -13,7 +13,7 @@ In the following you find a list of pro and cons for each approach and why we we
 The solution based on the SWT browser used the SWTBrowser which was delivered with the swt toolkit that is released with eclipse.
 
 ### Eclipse Integration
-In order to build and test Saros it was necessary to download an OS specific SWT version (this was handeled by the build tool). It was easy to
+In order to build and test Saros it was necessary to download an OS specific SWT version (this was handled by the build tool). It was easy to
 release the solution for eclipse, because eclipse already provides a swt version, because the whole IDE is written in swt.
 
 ### IntelliJ Integration
@@ -54,7 +54,7 @@ One approach that might work for eclipse, but not Intellij (therefore we never t
 * Create osgi bundles for each JavaFX module for each platform
 * Add a corresponding `Eclipse-PlatformFilter:` to the manifest file.
 * Add the line `Java-Module: <JavaFX module name>` to the manifest file.
-* Provide all bundles via an update-site an hope that the eclipse plugin installer decides which platform is required and installes only the required version.
+* Provide all bundles via an update-site an hope that the eclipse plugin installer decides which platform is required and installs only the required version.
 * The `org.eclipse.fx.osgi` bundle should detect the JavaFX bundle and add it to the class or module path during runtime.
 
 ### IntelliJ Tests
@@ -114,11 +114,11 @@ separately. To build the JavaScript application, navigate to
 `ui.frontend/html` and run `npm run build`.
 Alternatively it is also possible to run `npm run watch`, which builds
 the application once and then listens to any future changes and
-automatically rebuilds everytime.
+automatically rebuilds every time.
 
 ### Run the HTML-GUI
 
-* Perform the IDE specific setup steps as descibed above.
+* Perform the IDE specific setup steps as described above.
 * Install javascript dependencies and build the pages as described above.
 * Start an intellij/eclipse test instance and search for the saros html view.
 

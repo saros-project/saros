@@ -21,7 +21,7 @@ Nevertheless the topic is on hold mainly because it is mandatory to change the w
 Goal of this topic is to speed up the initial file sharing process at session starts.
 Instead of waiting for full synchronization, this feature prioritizes files and allows direct access after receiving.
 This main goal has already been achieved, but users are still bound to the read-only mode during project sharing and optimizations are open / on hold for merging.
-More Infos can be found in this [thesis](https://www.inf.fu-berlin.de/inst/ag-se/theses/Moll18-saros-session-start.pdf) (German only).
+More information can be found in this [thesis](https://www.inf.fu-berlin.de/inst/ag-se/theses/Moll18-saros-session-start.pdf) (German only).
 
 An Overview of the current work state is documented here: [Project Board: Instant Session Start Feature](https://github.com/saros-project/saros/projects/15) and a broader view at [Project Board: Session Start Topics](https://github.com/saros-project/saros/projects/18).
 
@@ -30,7 +30,7 @@ An Overview of the current work state is documented here: [Project Board: Instan
 
 Corresponding Pull Requests:
 * [Add JGit facade](https://github.com/saros-project/saros/pull/428)
-* [Add Activties to Share Commit](https://github.com/saros-project/saros/pull/444)
+* [Add Activities to Share Commit](https://github.com/saros-project/saros/pull/444)
 
 A former contributor started an implementation of a basic git support.
 The main idea was to send differences between the git history of two developers as [git bundle](https://git-scm.com/docs/git-bundle). The determination of the differences was 
