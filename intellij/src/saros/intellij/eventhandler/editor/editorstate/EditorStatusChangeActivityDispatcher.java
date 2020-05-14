@@ -53,7 +53,7 @@ public class EditorStatusChangeActivityDispatcher extends AbstractLocalEditorSta
   }
 
   /**
-   * Calls {@link LocalEditorHandler#closeEditor(Project, VirtualFile)}.
+   * Calls {@link LocalEditorHandler#closeEditor(VirtualFile)}.
    *
    * <p>Does nothing if the closed editor is not a text editor.
    *
@@ -62,12 +62,12 @@ public class EditorStatusChangeActivityDispatcher extends AbstractLocalEditorSta
    */
   private void generateEditorClosedActivity(@NotNull VirtualFile virtualFile) {
     if (ProjectAPI.isOpenInTextEditor(project, virtualFile)) {
-      localEditorHandler.closeEditor(project, virtualFile);
+      localEditorHandler.closeEditor(virtualFile);
     }
   }
 
   /**
-   * Calls {@link LocalEditorHandler#activateEditor(Project, VirtualFile)}.
+   * Calls {@link LocalEditorHandler#activateEditor(VirtualFile)}.
    *
    * <p>Does nothing if the opened editor is not a text editor.
    *
@@ -78,7 +78,7 @@ public class EditorStatusChangeActivityDispatcher extends AbstractLocalEditorSta
     FileEditor newEditor = event.getNewEditor();
 
     if (newEditor == null || newEditor instanceof TextEditor) {
-      localEditorHandler.activateEditor(project, event.getNewFile());
+      localEditorHandler.activateEditor(event.getNewFile());
     }
   }
 

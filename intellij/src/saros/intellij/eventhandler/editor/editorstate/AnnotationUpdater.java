@@ -65,15 +65,15 @@ public class AnnotationUpdater extends AbstractLocalEditorStatusChangeHandler {
    * @see FileEditorManagerListener#fileOpened(FileEditorManager, VirtualFile)
    */
   private void setUpOpenedEditor(@NotNull VirtualFile virtualFile) {
-    Editor editor = localEditorHandler.openEditor(project, virtualFile, false);
-
     IFile file = (IFile) VirtualFileConverter.convertToResource(project, virtualFile);
 
-    if (file == null || editor == null) {
+    if (file == null || !sarosSession.isShared(file)) {
       return;
     }
 
-    if (sarosSession.isShared(file)) {
+    Editor editor = localEditorHandler.openEditor(file, virtualFile, false);
+
+    if (editor != null) {
       annotationManager.applyStoredAnnotations(file, editor);
     }
   }
