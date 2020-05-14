@@ -81,7 +81,7 @@ public class LocalEditorHandler {
   public Editor openEditor(
       @NotNull VirtualFile virtualFile, @NotNull IProject project, boolean activate) {
 
-    IFile file = (IFile) VirtualFileConverter.convertToResourceV2(virtualFile, project);
+    IFile file = (IFile) VirtualFileConverter.convertToResource(virtualFile, project);
 
     if (file == null || !sarosSession.isShared(file)) {
       log.debug(
@@ -156,7 +156,7 @@ public class LocalEditorHandler {
   public void closeEditor(@NotNull VirtualFile virtualFile) {
     Set<IProject> sharedProjects = sarosSession.getProjects();
 
-    IFile file = (IFile) VirtualFileConverter.convertToResourceV2(sharedProjects, virtualFile);
+    IFile file = (IFile) VirtualFileConverter.convertToResource(sharedProjects, virtualFile);
 
     if (file == null || !sarosSession.isShared(file)) {
       return;
@@ -188,7 +188,7 @@ public class LocalEditorHandler {
       return;
     }
 
-    VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFileV2(file);
+    VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(file);
 
     if (virtualFile == null || !virtualFile.exists()) {
       log.warn("Failed to save document for " + file + " - could not get a valid VirtualFile");
@@ -231,7 +231,7 @@ public class LocalEditorHandler {
 
     Set<IProject> sharedProjects = sarosSession.getProjects();
 
-    IFile file = (IFile) VirtualFileConverter.convertToResourceV2(sharedProjects, virtualFile);
+    IFile file = (IFile) VirtualFileConverter.convertToResource(sharedProjects, virtualFile);
 
     if (file != null && sarosSession.isShared(file)) {
       manager.generateEditorActivated(file);

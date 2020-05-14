@@ -111,7 +111,7 @@ public abstract class AbstractLocalDocumentModificationHandler implements IProje
    * @return the file for the given document or <code>null</code> if no VirtualFile for the document
    *     could be found, the found VirtualFile could not be converted to an IFile or the file
    *     represented by the given document is not shared
-   * @see VirtualFileConverter#convertToResourceV2(Collection, VirtualFile)
+   * @see VirtualFileConverter#convertToResource(Collection, VirtualFile)
    */
   @Nullable
   final IFile getFile(@NotNull Document document) {
@@ -137,7 +137,7 @@ public abstract class AbstractLocalDocumentModificationHandler implements IProje
 
     Set<IProject> sharedReferencePoints = sarosSession.getProjects();
 
-    file = (IFile) VirtualFileConverter.convertToResourceV2(sharedReferencePoints, virtualFile);
+    file = (IFile) VirtualFileConverter.convertToResource(sharedReferencePoints, virtualFile);
 
     if (file == null || !sarosSession.isShared(file)) {
       if (log.isTraceEnabled()) {

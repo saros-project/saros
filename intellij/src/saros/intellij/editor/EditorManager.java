@@ -177,7 +177,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
             return calculationEditor;
           }
 
-          VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFileV2(file);
+          VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(file);
 
           if (virtualFile == null) {
             log.warn(
@@ -317,7 +317,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           Editor calcEditor = editor;
 
           if (calcEditor == null) {
-            VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFileV2(file);
+            VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(file);
 
             if (virtualFile == null) {
               log.warn(
@@ -566,7 +566,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
       setLocalViewPortChangeHandlersEnabled(false);
 
       for (VirtualFile openFile : ProjectAPI.getOpenFiles(intellijProject)) {
-        IFile file = (IFile) VirtualFileConverter.convertToResourceV2(openFile, project);
+        IFile file = (IFile) VirtualFileConverter.convertToResource(openFile, project);
 
         if (file == null) {
           continue;
@@ -596,7 +596,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     Set<String> selectedFiles = new HashSet<>();
 
     for (VirtualFile selectedFile : ProjectAPI.getSelectedFiles(intellijProject)) {
-      if (VirtualFileConverter.convertToResourceV2(selectedFile, project) != null) {
+      if (VirtualFileConverter.convertToResource(selectedFile, project) != null) {
         selectedFiles.add(selectedFile.getPath());
       }
     }
@@ -749,7 +749,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   public String getContent(final IFile file) {
     return FilesystemRunner.runReadAction(
         () -> {
-          VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFileV2(file);
+          VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(file);
 
           if (virtualFile == null || !virtualFile.exists() || virtualFile.isDirectory()) {
 
@@ -1144,7 +1144,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
       visibleFilePaths.add(virtualFile.getPath());
     }
 
-    VirtualFile passedFile = VirtualFileConverter.convertToVirtualFileV2(file);
+    VirtualFile passedFile = VirtualFileConverter.convertToVirtualFile(file);
 
     if (passedFile == null) {
       log.warn(
