@@ -36,7 +36,7 @@ is not acceptable to make a member part of a package's API
 *   For local variables and parameters: In principle, the same rule
     applies as for class variables. But since local variables and
     parameters have a limited scope, the additional information gained
-    through the presence of a final modifer is not tremendous.
+    through the presence of a final modifier is not tremendous.
     Therefore, we tend to not use the final keyword here.
 *   For methods: By default, don't make them final, unless you have good
     reason not to. After all, we want to use
@@ -277,7 +277,7 @@ running operation to the user
 * The name of the sub-task, as set using `subTask(String)`
 
 This information is typically presented to the user as a Dialog with a
-message being equal to the taskname of the top level progress monitor, a
+message being equal to the task name of the top level progress monitor, a
 progress bar showing the growing amount of work already done and a label
 for the current sub-task which switches every time the sub-task is being
 set.

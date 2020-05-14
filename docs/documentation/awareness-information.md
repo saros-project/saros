@@ -12,7 +12,7 @@ If you are following another participant you see something like:
 
 ![followee list](images/awareness/eclipse_session_list_followee_view.png)
 
-## File Navigations
+## File Navigation
 
 In the package explorer:
 - ![active file](how-tos/images/icons-e/active_file.png) A colored dot decorates the file that a participant has currently
@@ -32,7 +32,7 @@ In the Saros view's session list shows which participant has which editor focuse
 
 The position of a participant's cursor appears in the file and
 the character behind the cursor is highlighted with the
-corrsponding color.
+corresponding color.
 
 ## Selections
 

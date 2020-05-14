@@ -109,7 +109,7 @@ attribute on your own: Just right-click on the respective directory,
 select "Properties", and check the attribute "Derived".
 
 **Git:** To make completely sure that Saros won't mess with your
-precious versioning data, you might consider a folder layout where your
+versioning data, you might consider a folder layout where your
 Eclipse project(s) reside on a level below the .git folder (see below).
 That's the way we organize our own source code (even though we do so for
 other reasons).
@@ -303,7 +303,7 @@ bugs look into our [issue tracker](https://github.com/saros-project/saros/issues
     when accepting a session invitation.
 
 *   Refactoring operations can produce a huge number of events to be
-    transfered by Saros, which may take very long and can thus be
+    transferred by Saros, which may take very long and can thus be
     confusing for participants.
 
 *   In particular, on-the-fly refactorings such as 'rename' perform one

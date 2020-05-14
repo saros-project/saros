@@ -57,7 +57,7 @@ or from within Eclipse:
 
 1.  Download the [latest *saros-dropin-\*.zip*
     from GitHub](https://github.com/saros-project/saros/releases).
-2.  Uncompress the archives into the dropins folder of your
+2.  Decompress the archives into the dropins folder of your
     Eclipse installation.
 3.  Restart Eclipse.
 

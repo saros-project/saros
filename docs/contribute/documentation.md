@@ -128,7 +128,7 @@ Example:
 #### Compile and Show Documentation
 
 * Execute `bundle exec jekyll serve`
-  * This command spawns a webserver on port 4000
+  * This command spawns a web server on port 4000
 * Open you browser and open `localhost:4000`
 * Use `bundle exec jekyll serve -i` for the interactive mode that reloads the page after content changes.
 
