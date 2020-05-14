@@ -83,8 +83,8 @@ public abstract class ServerContainerImpl extends ServerResourceImpl implements 
   }
 
   @Override
-  public boolean exists(IPath path) {
-    IPath childLocation = getLocation().append(path);
+  public boolean exists(IPath relativePath) {
+    IPath childLocation = getLocation().append(relativePath);
     return childLocation.toFile().exists();
   }
 }

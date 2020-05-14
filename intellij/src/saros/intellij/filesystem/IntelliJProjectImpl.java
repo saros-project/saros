@@ -110,8 +110,8 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
    * @see #isIgnored()
    */
   @Override
-  public boolean exists(final IPath path) {
-    final VirtualFile file = findVirtualFile(path);
+  public boolean exists(final IPath relativePath) {
+    final VirtualFile file = findVirtualFile(relativePath);
 
     return file != null && file.exists();
   }

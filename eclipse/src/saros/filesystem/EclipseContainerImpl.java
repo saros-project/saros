@@ -14,8 +14,8 @@ public class EclipseContainerImpl extends EclipseResourceImpl implements IContai
   }
 
   @Override
-  public boolean exists(IPath path) {
-    return getDelegate().exists(((EclipsePathImpl) path).getDelegate());
+  public boolean exists(IPath relativePath) {
+    return getDelegate().exists(((EclipsePathImpl) relativePath).getDelegate());
   }
 
   @Override
