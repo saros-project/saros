@@ -168,11 +168,11 @@ in the Saros instances of your invited contacts (with synchronizing files, copyi
 {% alert info %}
 ##### Current restrictions
 
-**Number of Participants**
+###### **Number of Participants**
 
 Currently, Saros/I is restricted to two-participant sessions, meaning you can only create session containing the host and a single client.
 
-**Share only a single module**
+###### **Share only a single module**
 
 You can currently only share a single module. A module has to adhere to the following restrictions to be shareable through Saros:
 
@@ -181,14 +181,14 @@ You can currently only share a single module. A module has to adhere to the foll
 Sharing a module will only share resources belonging to that module, not resources belonging to sub-module located inside a content root of the module.
 Creating such a sub-module during a session will lead to an inconsistent state that can not be resolved by Saros. See [Known Bugs](/releases/saros-i_0.2.2.html#known-bugs).
 
-**Working With Newly Created Modules**
+###### **Working With Newly Created Modules**
 
 To share a newly created module, you will have to have saved your project at least once before trying to start a session.
 This is necessary as the module file for a new module is only written to disk the first time the module is saved.
 
 You can check if the module file was written to disk by looking at the base directory of the module. It should contain a `*.iml` file with the same name as the module.
 
-**Sharing Complex Modules**
+###### **Sharing Complex Modules**
 
 Even though Saros offers the option to create the module on the client side as part of the session, this should only be used for relatively simple modules.
 For more complex modules, it is advised to share the module structure some other way (e.g. a VCS) before starting a session. Saros currently does not set up things like libraries or module dependencies, meaning they would have to be configured by hand.
