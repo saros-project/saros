@@ -14,7 +14,7 @@ import saros.editor.text.LineRange;
 import saros.editor.text.TextSelection;
 import saros.filesystem.IFile;
 import saros.intellij.editor.annotations.AnnotationManager;
-import saros.intellij.filesystem.IntelliJProjectImpl;
+import saros.intellij.filesystem.IntellijReferencePointImpl;
 import saros.intellij.filesystem.VirtualFileConverter;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.util.NotificationPanel;
@@ -66,7 +66,7 @@ public class LocalEditorManipulator {
       return null;
     }
 
-    VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(file);
+    VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFileV2(file);
 
     if (virtualFile == null || !virtualFile.exists()) {
       log.warn(
@@ -78,7 +78,7 @@ public class LocalEditorManipulator {
       return null;
     }
 
-    Project project = ((IntelliJProjectImpl) file.getProject()).getModule().getProject();
+    Project project = ((IntellijReferencePointImpl) file.getProject()).getIntellijProject();
 
     Editor editor = ProjectAPI.openEditor(project, virtualFile, activate);
 
@@ -106,7 +106,7 @@ public class LocalEditorManipulator {
 
     log.debug("Removed editor for file " + file + " from EditorPool");
 
-    VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(file);
+    VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFileV2(file);
 
     if (virtualFile == null || !virtualFile.exists()) {
       log.warn(
@@ -118,7 +118,7 @@ public class LocalEditorManipulator {
       return;
     }
 
-    Project project = ((IntelliJProjectImpl) file.getProject()).getModule().getProject();
+    Project project = ((IntellijReferencePointImpl) file.getProject()).getIntellijProject();
 
     if (ProjectAPI.isOpen(project, virtualFile)) {
       ProjectAPI.closeEditor(project, virtualFile);
@@ -225,7 +225,7 @@ public class LocalEditorManipulator {
    * @see Document
    */
   public void handleContentRecovery(IFile file, byte[] content, String encoding, User source) {
-    VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(file);
+    VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFileV2(file);
     if (virtualFile == null) {
       log.warn(
           "Could not recover file content of "
@@ -235,7 +235,7 @@ public class LocalEditorManipulator {
       return;
     }
 
-    Project project = ((IntelliJProjectImpl) file.getProject()).getModule().getProject();
+    Project project = ((IntellijReferencePointImpl) file.getProject()).getIntellijProject();
 
     Document document = DocumentAPI.getDocument(virtualFile);
     if (document == null) {
