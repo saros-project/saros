@@ -59,11 +59,15 @@ public class PreexistingSelectionDispatcher extends AbstractLocalEditorStatusCha
    * @param virtualFile the file to send the current selection information for
    */
   private void sendExistingSelection(@NotNull VirtualFile virtualFile) {
-    Editor editor = localEditorHandler.openEditor(project, virtualFile, false);
-
     IFile file = (IFile) VirtualFileConverter.convertToResource(project, virtualFile);
 
-    if (file != null && sarosSession.isShared(file) && editor != null) {
+    if (file == null || !sarosSession.isShared(file)) {
+      return;
+    }
+
+    Editor editor = localEditorHandler.openEditor(file, virtualFile, false);
+
+    if (editor != null) {
       editorManager.sendExistingSelection(file, editor);
     }
   }

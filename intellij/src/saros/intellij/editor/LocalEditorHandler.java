@@ -4,12 +4,13 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import java.util.Set;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import saros.filesystem.IFile;
 import saros.filesystem.IProject;
-import saros.intellij.filesystem.IntelliJProjectImpl;
+import saros.intellij.filesystem.IntellijReferencePointImpl;
 import saros.intellij.filesystem.VirtualFileConverter;
 import saros.session.ISarosSession;
 
@@ -40,7 +41,7 @@ public class LocalEditorHandler {
    *
    * <p><b>Note:</b> This only works for shared resources.
    *
-   * @param project the project in which to open the editor
+   * @param file the Saros file for the editor to open
    * @param virtualFile the file to open
    * @param activate activate editor after opening
    * @return the opened <code>Editor</code> or <code>null</code> if the given file does not belong
@@ -48,11 +49,9 @@ public class LocalEditorHandler {
    */
   @Nullable
   public Editor openEditor(
-      @NotNull Project project, @NotNull VirtualFile virtualFile, boolean activate) {
+      @NotNull IFile file, @NotNull VirtualFile virtualFile, boolean activate) {
 
-    IFile file = (IFile) VirtualFileConverter.convertToResource(project, virtualFile);
-
-    if (file == null || !sarosSession.isShared(file)) {
+    if (!sarosSession.isShared(file)) {
       log.debug(
           "Ignored open editor request for file "
               + virtualFile
@@ -82,7 +81,7 @@ public class LocalEditorHandler {
   public Editor openEditor(
       @NotNull VirtualFile virtualFile, @NotNull IProject project, boolean activate) {
 
-    IFile file = (IFile) VirtualFileConverter.convertToResource(virtualFile, project);
+    IFile file = (IFile) VirtualFileConverter.convertToResourceV2(virtualFile, project);
 
     if (file == null || !sarosSession.isShared(file)) {
       log.debug(
@@ -129,7 +128,7 @@ public class LocalEditorHandler {
       return null;
     }
 
-    Project project = ((IntelliJProjectImpl) file.getProject()).getModule().getProject();
+    Project project = ((IntellijReferencePointImpl) file.getProject()).getIntellijProject();
 
     Editor editor = ProjectAPI.openEditor(project, virtualFile, activate);
 
@@ -152,11 +151,12 @@ public class LocalEditorHandler {
    *
    * <p>Does nothing if the file is not shared.
    *
-   * @param project the project in which to close the editor
    * @param virtualFile the file for which to close the editor
    */
-  public void closeEditor(@NotNull Project project, @NotNull VirtualFile virtualFile) {
-    IFile file = (IFile) VirtualFileConverter.convertToResource(project, virtualFile);
+  public void closeEditor(@NotNull VirtualFile virtualFile) {
+    Set<IProject> sharedProjects = sarosSession.getProjects();
+
+    IFile file = (IFile) VirtualFileConverter.convertToResourceV2(sharedProjects, virtualFile);
 
     if (file == null || !sarosSession.isShared(file)) {
       return;
@@ -188,7 +188,7 @@ public class LocalEditorHandler {
       return;
     }
 
-    VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(file);
+    VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFileV2(file);
 
     if (virtualFile == null || !virtualFile.exists()) {
       log.warn("Failed to save document for " + file + " - could not get a valid VirtualFile");
@@ -219,19 +219,19 @@ public class LocalEditorHandler {
    * outside the editor package. If you still need to access this method, please consider whether
    * your class should rather be located in the editor package.
    *
-   * @param project the project in which to activate the editor
    * @param virtualFile the file whose editor was activated or <code>null</code> if there is no
    *     editor open
    */
-  public void activateEditor(@NotNull Project project, @Nullable VirtualFile virtualFile) {
+  public void activateEditor(@Nullable VirtualFile virtualFile) {
     if (virtualFile == null) {
-
       manager.generateEditorActivated(null);
 
       return;
     }
 
-    IFile file = (IFile) VirtualFileConverter.convertToResource(project, virtualFile);
+    Set<IProject> sharedProjects = sarosSession.getProjects();
+
+    IFile file = (IFile) VirtualFileConverter.convertToResourceV2(sharedProjects, virtualFile);
 
     if (file != null && sarosSession.isShared(file)) {
       manager.generateEditorActivated(file);
@@ -255,7 +255,7 @@ public class LocalEditorHandler {
       return false;
     }
 
-    Project project = ((IntelliJProjectImpl) file.getProject()).getModule().getProject();
+    Project project = ((IntellijReferencePointImpl) file.getProject()).getIntellijProject();
 
     return ProjectAPI.isOpen(project, doc);
   }
