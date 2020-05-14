@@ -23,6 +23,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -36,6 +37,7 @@ import saros.activities.IActivity;
 import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
 import saros.filesystem.IPath;
+import saros.filesystem.IProject;
 import saros.filesystem.IResource;
 import saros.intellij.editor.DocumentAPI;
 import saros.intellij.editor.EditorManager;
@@ -60,6 +62,7 @@ import saros.session.User;
  *
  * @see VirtualFileListener
  */
+// TODO remove module-specific logic
 public class LocalFilesystemModificationHandler extends AbstractActivityProducer
     implements IApplicationEventHandler {
 
@@ -213,7 +216,10 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       log.trace("Reacting before resource contents changed: " + virtualFile);
     }
 
-    IFile file = (IFile) VirtualFileConverter.convertToResource(project, virtualFile);
+    Set<IProject> sharedReferencePoints = session.getProjects();
+
+    IFile file =
+        (IFile) VirtualFileConverter.convertToResourceV2(sharedReferencePoints, virtualFile);
 
     if (file == null || !session.isShared(file)) {
       if (log.isTraceEnabled()) {
@@ -273,7 +279,10 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       log.trace("Reacting to resource creation: " + createdVirtualFile);
     }
 
-    IResource resource = VirtualFileConverter.convertToResource(project, createdVirtualFile);
+    Set<IProject> sharedReferencePoints = session.getProjects();
+
+    IResource resource =
+        VirtualFileConverter.convertToResourceV2(sharedReferencePoints, createdVirtualFile);
 
     if (resource == null || !session.isShared(resource)) {
       if (log.isTraceEnabled()) {
@@ -339,7 +348,10 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
               + copy);
     }
 
-    IFile copyWrapper = (IFile) VirtualFileConverter.convertToResource(project, copy);
+    Set<IProject> sharedReferencePoints = session.getProjects();
+
+    IFile copyWrapper =
+        (IFile) VirtualFileConverter.convertToResourceV2(sharedReferencePoints, copy);
 
     if (copyWrapper == null || !session.isShared(copyWrapper)) {
       if (log.isTraceEnabled()) {
@@ -398,7 +410,10 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
    * @param deletedFolder the folder that was deleted
    */
   private void generateFolderDeletionActivity(@NotNull VirtualFile deletedFolder) {
-    IFolder folder = (IFolder) VirtualFileConverter.convertToResource(project, deletedFolder);
+    Set<IProject> sharedReferencePoints = session.getProjects();
+
+    IFolder folder =
+        (IFolder) VirtualFileConverter.convertToResourceV2(sharedReferencePoints, deletedFolder);
 
     if (folder == null || !session.isShared(folder)) {
       if (log.isTraceEnabled()) {
@@ -429,7 +444,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
           }
 
           IFolder childFolder =
-              (IFolder) VirtualFileConverter.convertToResource(project, fileOrDir);
+              (IFolder) VirtualFileConverter.convertToResourceV2(sharedReferencePoints, fileOrDir);
 
           if (childFolder == null) {
             log.debug("Skipping deleted folder as no IFile could be obtained " + fileOrDir);
@@ -464,7 +479,10 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
    * @param deletedFile the file that was deleted
    */
   private void generateFileDeletionActivity(VirtualFile deletedFile) {
-    IFile file = (IFile) VirtualFileConverter.convertToResource(project, deletedFile);
+    Set<IProject> sharedReferencePoints = session.getProjects();
+
+    IFile file =
+        (IFile) VirtualFileConverter.convertToResourceV2(sharedReferencePoints, deletedFile);
 
     if (file == null || !session.isShared(file)) {
       if (log.isTraceEnabled()) {
@@ -566,8 +584,12 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     String folderName = newFolderName != null ? newFolderName : oldFile.getName();
 
-    IFolder oldFolderWrapper = (IFolder) VirtualFileConverter.convertToResource(project, oldFile);
-    IFolder newParentWrapper = (IFolder) VirtualFileConverter.convertToResource(project, newParent);
+    Set<IProject> sharedReferencePoints = session.getProjects();
+
+    IFolder oldFolderWrapper =
+        (IFolder) VirtualFileConverter.convertToResourceV2(sharedReferencePoints, oldFile);
+    IFolder newParentWrapper =
+        (IFolder) VirtualFileConverter.convertToResourceV2(sharedReferencePoints, newParent);
 
     User user = session.getLocalUser();
 
@@ -735,9 +757,12 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     String encoding = oldFile.getCharset().name();
 
-    IFile oldFileWrapper = (IFile) VirtualFileConverter.convertToResource(project, oldFile);
+    Set<IProject> sharedReferencePoints = session.getProjects();
+
+    IFile oldFileWrapper =
+        (IFile) VirtualFileConverter.convertToResourceV2(sharedReferencePoints, oldFile);
     IFolder newParentWrapper =
-        (IFolder) VirtualFileConverter.convertToResource(project, newBaseParent);
+        (IFolder) VirtualFileConverter.convertToResourceV2(sharedReferencePoints, newBaseParent);
 
     User user = session.getLocalUser();
 
@@ -920,8 +945,10 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
         VirtualFile parent = file.getParent();
 
         if (parent == null) {
+          Set<IProject> sharedReferencePoints = session.getProjects();
 
-          IResource resource = VirtualFileConverter.convertToResource(project, file);
+          IResource resource =
+              VirtualFileConverter.convertToResourceV2(sharedReferencePoints, file);
 
           if (resource != null && session.isShared(resource)) {
             log.error(
