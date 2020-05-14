@@ -4,6 +4,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import java.util.Collection;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -33,7 +34,9 @@ public class VirtualFileConverter {
    *     file does not exist, no module could be found for the file or the found module can not be
    *     shared through saros, or the relative path between the module root and the file could not
    *     be constructed
+   * @deprecated use {@link #convertToResourceV2(Collection, VirtualFile)} instead
    */
+  @Deprecated
   @Nullable
   public static IResource convertToResource(
       @NotNull Project project, @NotNull VirtualFile virtualFile) {
@@ -68,6 +71,34 @@ public class VirtualFileConverter {
   }
 
   /**
+   * Returns an <code>IResource</code> representing the given <code>VirtualFile</code>. Uses the
+   * given reference points to try to obtain a resource for the virtual file.
+   *
+   * <p>If the given virtual file is represented by one of the given reference points, the reference
+   * point object is returned.
+   *
+   * @param referencePoints the list of shared reference points
+   * @param virtualFile the virtual file get an <code>IResource</code> object for
+   * @return an <code>IResource</code> representing the given <code>VirtualFile</code> or <code>null
+   *     </code> if no such representation could be obtained from the given reference points
+   */
+  @Nullable
+  // TODO rename to 'convertToResource'
+  public static IResource convertToResourceV2(
+      @NotNull Collection<IProject> referencePoints, @NotNull VirtualFile virtualFile) {
+
+    for (IProject referencePoint : referencePoints) {
+      IResource resource = convertToResourceV2(virtualFile, referencePoint);
+
+      if (resource != null) {
+        return resource;
+      }
+    }
+
+    return null;
+  }
+
+  /**
    * Returns an <code>IResource</code> representing the given <code>VirtualFile</code>.
    *
    * @param virtualFile file to get the <code>IResource</code> for
@@ -75,7 +106,9 @@ public class VirtualFileConverter {
    * @return an <code>IResource</code> for the given file or <code>null</code> if the given file
    *     does not exist, does not belong to the passed module, or the relative path between the
    *     module root and the file could not be constructed
+   * @deprecated use {@link #convertToResourceV2(VirtualFile, IProject)} instead
    */
+  @Deprecated
   @Nullable
   public static IResource convertToResource(
       @NotNull VirtualFile virtualFile, @NotNull IProject project) {
@@ -86,14 +119,42 @@ public class VirtualFileConverter {
   }
 
   /**
+   * Returns an <code>IResource</code> representing the given <code>VirtualFile</code>.
+   *
+   * <p>If the given virtual file is represented by the given reference point, the reference point
+   * object is returned.
+   *
+   * @param virtualFile file to get the <code>IResource</code> for
+   * @param referencePoint reference point the file belongs to
+   * @return an <code>IResource</code> for the given file or <code>null</code> if the given file
+   *     does not exist or the relative path between the reference point and the file could not be
+   *     constructed
+   */
+  @Nullable
+  // TODO rename 'convertToResource'
+  public static IResource convertToResourceV2(
+      @NotNull VirtualFile virtualFile, @NotNull IProject referencePoint) {
+
+    IntellijReferencePointImpl intellijReferencePoint = (IntellijReferencePointImpl) referencePoint;
+
+    if (virtualFile.equals(intellijReferencePoint.getVirtualFile())) {
+      return referencePoint;
+    }
+
+    return intellijReferencePoint.getResource(virtualFile);
+  }
+
+  /**
    * Returns a <code>VirtualFile</code> for the given resource.
    *
    * @param resource the resource to get a VirtualFile for
    * @return a VirtualFile for the given resource or <code>null</code> if the given resource does
    *     not exists in the VFS snapshot, is ignored, or belongs to a sub-module
    * @see IntelliJResourceImpl#isIgnored()
+   * @deprecated use {@link #convertToVirtualFileV2(IResource)} instead
    */
   @Nullable
+  @Deprecated
   public static VirtualFile convertToVirtualFile(@NotNull IResource resource) {
 
     if (resource instanceof IProject) {
@@ -104,5 +165,23 @@ public class VirtualFileConverter {
     IntelliJProjectImpl wrappedModule = (IntelliJProjectImpl) resource.getProject();
 
     return wrappedModule.findVirtualFile(resource.getProjectRelativePath());
+  }
+
+  /**
+   * Returns a <code>VirtualFile</code> for the given resource.
+   *
+   * @param resource the resource to get a VirtualFile for
+   * @return a VirtualFile for the given resource or <code>null</code> if the given resource could
+   *     not be found in the current VFS snapshot
+   */
+  @Nullable
+  // TODO rename to 'convertToVirtualFile'
+  public static VirtualFile convertToVirtualFileV2(@NotNull IResource resource) {
+    if (resource instanceof IProject) {
+      throw new IllegalArgumentException(
+          "The given resource must be a file or a folder. resource: " + resource);
+    }
+
+    return ((IntellijResourceImplV2) resource).getVirtualFile();
   }
 }
