@@ -23,6 +23,8 @@ import saros.filesystem.IResource;
 import saros.intellij.project.filesystem.IntelliJPathImpl;
 import saros.intellij.runtime.FilesystemRunner;
 
+/** @deprecated use {@link IntellijFolderImplV2} instead */
+@Deprecated
 public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IFolder {
   private static final Logger log = Logger.getLogger(IntelliJFolderImpl.class);
 

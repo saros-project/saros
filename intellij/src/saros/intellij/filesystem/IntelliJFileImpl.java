@@ -23,6 +23,8 @@ import saros.filesystem.IProject;
 import saros.filesystem.IResource;
 import saros.intellij.runtime.FilesystemRunner;
 
+/** @deprecated use {@link IntellijFileImplV2} instead */
+@Deprecated
 public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFile {
   private static final Logger log = Logger.getLogger(IntelliJFileImpl.class);
 
