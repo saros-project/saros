@@ -3,16 +3,13 @@ package saros.intellij.ui.menu;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.LangDataKeys;
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.project.Project;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.vfs.VirtualFile;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import saros.SarosPluginContext;
-import saros.intellij.filesystem.IntelliJProjectImpl;
 import saros.net.xmpp.contact.XMPPContact;
 import saros.net.xmpp.contact.XMPPContactsService;
 import saros.repackaged.picocontainer.annotations.Inject;
@@ -20,8 +17,6 @@ import saros.session.ISarosSessionManager;
 
 /** Saros action group for the pop-up menu when right-clicking on a module. */
 public class SarosFileShareGroup extends ActionGroup {
-  private static final Logger log = Logger.getLogger(SarosFileShareGroup.class);
-
   @Inject private ISarosSessionManager sessionManager;
 
   @Inject private XMPPContactsService contactsService;
@@ -63,37 +58,17 @@ public class SarosFileShareGroup extends ActionGroup {
     return list.toArray(new AnAction[0]);
   }
 
+  /**
+   * Returns whether the selected element is a sharable resource.
+   *
+   * <p>Any directory is sharable.
+   *
+   * @param e the action event
+   * @return whether the selected element is a sharable resource
+   */
   private boolean isSharableResource(AnActionEvent e) {
-    // FIXME also returns null when a module with multiple roots is selected
-    // Don't allow to share any file or folder other than a module
-    if (e.getDataContext().getData(LangDataKeys.MODULE_CONTEXT.getName()) == null) {
-      return false;
-    }
+    VirtualFile virtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE);
 
-    Project project = e.getData(LangDataKeys.PROJECT);
-    Module module = e.getData(LangDataKeys.MODULE);
-
-    if (project == null || module == null || project.getName().equalsIgnoreCase(module.getName())) {
-
-      return false;
-    }
-
-    String moduleName = module.getName();
-
-    try {
-      new IntelliJProjectImpl(module);
-
-    } catch (IllegalArgumentException exception) {
-      if (log.isTraceEnabled()) {
-        log.trace(
-            "Ignoring module "
-                + moduleName
-                + " as it does not meet the current release restrictions.");
-      }
-
-      return false;
-    }
-
-    return true;
+    return virtualFile != null && virtualFile.isDirectory();
   }
 }
