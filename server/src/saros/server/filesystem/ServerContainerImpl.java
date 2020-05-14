@@ -11,7 +11,6 @@ import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
 import saros.filesystem.IPath;
 import saros.filesystem.IResource;
-import saros.filesystem.IWorkspace;
 
 /**
  * Server implementation of the {@link IContainer} interface. Every type of container is implemented
@@ -25,7 +24,7 @@ public abstract class ServerContainerImpl extends ServerResourceImpl implements 
    * @param workspace the containing workspace
    * @param path the container's path relative to the workspace's root
    */
-  public ServerContainerImpl(IWorkspace workspace, IPath path) {
+  public ServerContainerImpl(ServerWorkspaceImpl workspace, IPath path) {
     super(workspace, path);
   }
 

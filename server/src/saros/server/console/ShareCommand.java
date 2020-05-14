@@ -6,18 +6,18 @@ import java.util.List;
 import java.util.Set;
 import org.apache.log4j.Logger;
 import saros.filesystem.IProject;
-import saros.filesystem.IWorkspace;
 import saros.server.filesystem.ServerProjectImpl;
+import saros.server.filesystem.ServerWorkspaceImpl;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
 
 public class ShareCommand extends ConsoleCommand {
   private static final Logger log = Logger.getLogger(ShareCommand.class);
   private final ISarosSessionManager sessionManager;
-  private final IWorkspace workspace;
+  private final ServerWorkspaceImpl workspace;
 
   public ShareCommand(
-      ISarosSessionManager sessionManager, IWorkspace workspace, ServerConsole console) {
+      ISarosSessionManager sessionManager, ServerWorkspaceImpl workspace, ServerConsole console) {
     this.sessionManager = sessionManager;
     this.workspace = workspace;
     console.registerCommand(this);

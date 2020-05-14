@@ -16,14 +16,13 @@ import org.junit.Test;
 import saros.exceptions.OperationCanceledException;
 import saros.filesystem.IPath;
 import saros.filesystem.IProject;
-import saros.filesystem.IWorkspace;
 import saros.filesystem.IWorkspaceRunnable;
 import saros.monitoring.IProgressMonitor;
 
 public class ServerWorkspaceImplTest extends EasyMockSupport {
 
   private IPath workspaceLocation;
-  private IWorkspace workspace;
+  private ServerWorkspaceImpl workspace;
 
   @Before
   public void setUp() throws Exception {

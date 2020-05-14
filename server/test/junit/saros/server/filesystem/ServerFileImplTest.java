@@ -24,17 +24,16 @@ import org.junit.Test.None;
 import saros.filesystem.IFile;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
-import saros.filesystem.IWorkspace;
 
 public class ServerFileImplTest extends EasyMockSupport {
 
   private IFile file;
-  private IWorkspace workspace;
+  private ServerWorkspaceImpl workspace;
   private IProject project;
 
   @Before
   public void setUp() throws Exception {
-    workspace = createMock(IWorkspace.class);
+    workspace = createMock(ServerWorkspaceImpl.class);
     project = createMock(IProject.class);
 
     expect(workspace.getLocation()).andStubReturn(createWorkspaceFolder());

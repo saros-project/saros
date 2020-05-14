@@ -10,7 +10,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.apache.commons.io.FileUtils;
 import saros.filesystem.IPath;
-import saros.filesystem.IWorkspace;
 
 /**
  * Provides utility methods for the server file system implementation tests. These methods are meant
@@ -64,7 +63,7 @@ class FileSystemTestUtils {
    * @param path workspace-relative path of the file to create
    * @throws IOException
    */
-  public static void createFile(IWorkspace workspace, String path) throws IOException {
+  public static void createFile(ServerWorkspaceImpl workspace, String path) throws IOException {
 
     createFile(workspace, path, null);
   }
@@ -78,7 +77,7 @@ class FileSystemTestUtils {
    * @param content the created file's text content, or <code>null</code> to create an empty file
    * @throws IOException if the file creation fails
    */
-  public static void createFile(IWorkspace workspace, String path, String content)
+  public static void createFile(ServerWorkspaceImpl workspace, String path, String content)
       throws IOException {
 
     IPath absolutePath = workspace.getLocation().append(path);
@@ -100,7 +99,7 @@ class FileSystemTestUtils {
    * @param path workspace-relative path of the folder to create
    * @throws IOException if the folder creation fails
    */
-  public static void createFolder(IWorkspace workspace, String path) throws IOException {
+  public static void createFolder(ServerWorkspaceImpl workspace, String path) throws IOException {
 
     IPath absolutePath = workspace.getLocation().append(path);
     Files.createDirectories(nioPath(absolutePath));
@@ -112,7 +111,7 @@ class FileSystemTestUtils {
    * @param workspace the workspace to do the check in
    * @param path the path to check
    */
-  public static void assertResourceExists(IWorkspace workspace, String path) {
+  public static void assertResourceExists(ServerWorkspaceImpl workspace, String path) {
     assertTrue(resourceLocation(workspace, path).toFile().exists());
   }
 
@@ -122,7 +121,7 @@ class FileSystemTestUtils {
    * @param workspace the workspace to do the check in
    * @param path the path to check
    */
-  public static void assertResourceNotExists(IWorkspace workspace, String path) {
+  public static void assertResourceNotExists(ServerWorkspaceImpl workspace, String path) {
     assertFalse(resourceLocation(workspace, path).toFile().exists());
   }
 
@@ -132,7 +131,7 @@ class FileSystemTestUtils {
    * @param workspace the workspace to do the check in
    * @param path the path to check
    */
-  public static void assertIsFolder(IWorkspace workspace, String path) {
+  public static void assertIsFolder(ServerWorkspaceImpl workspace, String path) {
     assertTrue(resourceLocation(workspace, path).toFile().isDirectory());
   }
 
@@ -144,8 +143,8 @@ class FileSystemTestUtils {
    * @param expectedContent the text content that the file should have
    * @throws IOException if reading the file fails
    */
-  public static void assertFileHasContent(IWorkspace workspace, String path, String expectedContent)
-      throws IOException {
+  public static void assertFileHasContent(
+      ServerWorkspaceImpl workspace, String path, String expectedContent) throws IOException {
 
     IPath location = resourceLocation(workspace, path);
     byte[] actualContent = Files.readAllBytes(nioPath(location));
@@ -156,7 +155,7 @@ class FileSystemTestUtils {
     return ((ServerPathImpl) path).getDelegate();
   }
 
-  private static IPath resourceLocation(IWorkspace workspace, String path) {
+  private static IPath resourceLocation(ServerWorkspaceImpl workspace, String path) {
     return workspace.getLocation().append(path);
   }
 }

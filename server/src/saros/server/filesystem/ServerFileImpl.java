@@ -15,7 +15,6 @@ import java.nio.file.StandardCopyOption;
 import org.apache.log4j.Logger;
 import saros.filesystem.IFile;
 import saros.filesystem.IPath;
-import saros.filesystem.IWorkspace;
 
 /** Server implementation of the {@link IFile} interface. */
 public class ServerFileImpl extends ServerResourceImpl implements IFile {
@@ -32,7 +31,7 @@ public class ServerFileImpl extends ServerResourceImpl implements IFile {
    * @param workspace the containing workspace
    * @param path the file's path relative to the workspace's root
    */
-  public ServerFileImpl(IWorkspace workspace, IPath path) {
+  public ServerFileImpl(ServerWorkspaceImpl workspace, IPath path) {
     super(workspace, path);
   }
 

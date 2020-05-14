@@ -5,7 +5,6 @@ import static saros.filesystem.IResource.Type.PROJECT;
 import java.io.IOException;
 import java.nio.file.Files;
 import saros.filesystem.IProject;
-import saros.filesystem.IWorkspace;
 
 /** Server implementation of the {@link IProject} interface. */
 public class ServerProjectImpl extends ServerContainerImpl implements IProject {
@@ -15,7 +14,7 @@ public class ServerProjectImpl extends ServerContainerImpl implements IProject {
    * @param workspace the containing workspace
    * @param name the project's name
    */
-  public ServerProjectImpl(IWorkspace workspace, String name) {
+  public ServerProjectImpl(ServerWorkspaceImpl workspace, String name) {
     super(workspace, ServerPathImpl.fromString(name));
   }
 

@@ -14,16 +14,15 @@ import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
-import saros.filesystem.IWorkspace;
 
 public class ServerProjectImplTest extends EasyMockSupport {
 
   private IProject project;
-  private IWorkspace workspace;
+  private ServerWorkspaceImpl workspace;
 
   @Before
   public void setUp() throws Exception {
-    workspace = createMock(IWorkspace.class);
+    workspace = createMock(ServerWorkspaceImpl.class);
     expect(workspace.getLocation()).andStubReturn(createWorkspaceFolder());
 
     replayAll();

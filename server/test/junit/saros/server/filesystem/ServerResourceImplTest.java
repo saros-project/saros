@@ -19,13 +19,12 @@ import saros.filesystem.IFolder;
 import saros.filesystem.IPath;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
-import saros.filesystem.IWorkspace;
 
 public class ServerResourceImplTest extends EasyMockSupport {
 
   private static class ExampleResource extends ServerResourceImpl {
 
-    public ExampleResource(IPath path, IWorkspace workspace) {
+    public ExampleResource(IPath path, ServerWorkspaceImpl workspace) {
       super(workspace, path);
     }
 
@@ -41,13 +40,13 @@ public class ServerResourceImplTest extends EasyMockSupport {
   }
 
   private IResource resource;
-  private IWorkspace workspace;
+  private ServerWorkspaceImpl workspace;
   private IProject project;
   private IFolder parent;
 
   @Before
   public void setUp() throws Exception {
-    workspace = createMock(IWorkspace.class);
+    workspace = createMock(ServerWorkspaceImpl.class);
     project = createMock(IProject.class);
     parent = createMock(IFolder.class);
 

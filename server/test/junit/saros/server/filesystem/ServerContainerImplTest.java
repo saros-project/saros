@@ -23,13 +23,12 @@ import saros.filesystem.IContainer;
 import saros.filesystem.IPath;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
-import saros.filesystem.IWorkspace;
 
 public class ServerContainerImplTest extends EasyMockSupport {
 
   private static class ExampleContainer extends ServerContainerImpl {
 
-    public ExampleContainer(IPath path, IWorkspace workspace) {
+    public ExampleContainer(IPath path, ServerWorkspaceImpl workspace) {
       super(workspace, path);
     }
 
@@ -42,12 +41,12 @@ public class ServerContainerImplTest extends EasyMockSupport {
   private static final String CONTAINER_PATH = "project/folder";
 
   private IContainer container;
-  private IWorkspace workspace;
+  private ServerWorkspaceImpl workspace;
   private IProject project;
 
   @Before
   public void setUp() throws Exception {
-    workspace = createMock(IWorkspace.class);
+    workspace = createMock(ServerWorkspaceImpl.class);
     project = createMock(IProject.class);
 
     expect(workspace.getLocation()).andStubReturn(createWorkspaceFolder());

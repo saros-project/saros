@@ -6,7 +6,6 @@ import saros.filesystem.IContainer;
 import saros.filesystem.IPath;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
-import saros.filesystem.IWorkspace;
 
 /**
  * Server implementation of the {@link IResource} interface. It represents each resource directly as
@@ -14,7 +13,7 @@ import saros.filesystem.IWorkspace;
  */
 public abstract class ServerResourceImpl implements IResource {
 
-  private IWorkspace workspace;
+  private ServerWorkspaceImpl workspace;
   private IPath path;
 
   /**
@@ -23,7 +22,7 @@ public abstract class ServerResourceImpl implements IResource {
    * @param workspace the containing workspace
    * @param path the resource's path relative to the workspace's root
    */
-  public ServerResourceImpl(IWorkspace workspace, IPath path) {
+  public ServerResourceImpl(ServerWorkspaceImpl workspace, IPath path) {
     this.path = path;
     this.workspace = workspace;
   }
@@ -33,7 +32,7 @@ public abstract class ServerResourceImpl implements IResource {
    *
    * @return the containing workspace
    */
-  public IWorkspace getWorkspace() {
+  public ServerWorkspaceImpl getWorkspace() {
     return workspace;
   }
 
