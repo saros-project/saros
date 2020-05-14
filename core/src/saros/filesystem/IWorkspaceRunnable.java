@@ -5,9 +5,19 @@ import saros.exceptions.OperationCanceledException;
 import saros.monitoring.IProgressMonitor;
 
 /**
- * This interface is under development. It currently equals its Eclipse counterpart. If not
- * mentioned otherwise all offered methods are equivalent to their Eclipse counterpart.
+ * A task than can be run in the local workspace.
+ *
+ * @see IWorkspace
  */
 public interface IWorkspaceRunnable {
-  public void run(IProgressMonitor monitor) throws IOException, OperationCanceledException;
+
+  /**
+   * Runs the contained task, reporting to the given progress monitor.
+   *
+   * @param monitor the progress monitor to report to or <code>null</code> if progress reporting and
+   *     cancellation support is not needed
+   * @throws IOException if the execution of the contained task failed
+   * @throws OperationCanceledException if the execution of the contained task was canceled
+   */
+  void run(IProgressMonitor monitor) throws IOException, OperationCanceledException;
 }
