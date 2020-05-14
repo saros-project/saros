@@ -72,6 +72,10 @@ public interface IProject extends IContainer {
     return this;
   }
 
+  default Type getType() {
+    return Type.PROJECT;
+  }
+
   /**
    * Returns <code>false</code>.
    *

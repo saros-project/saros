@@ -72,4 +72,8 @@ public interface IFile extends IResource {
    * @throws IOException if an I/O error occurred
    */
   public long getSize() throws IOException;
+
+  default Type getType() {
+    return Type.FILE;
+  }
 }
