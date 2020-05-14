@@ -4,10 +4,7 @@ import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ModuleFileIndex;
-import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.LocalFileSystem;
@@ -39,7 +36,7 @@ import saros.intellij.context.SharedIDEContext;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.eventhandler.IProjectEventHandler.ProjectEventHandlerType;
 import saros.intellij.eventhandler.editor.editorstate.ViewportAdjustmentExecutor;
-import saros.intellij.filesystem.IntelliJProjectImpl;
+import saros.intellij.filesystem.IntellijReferencePointImpl;
 import saros.intellij.filesystem.VirtualFileConverter;
 import saros.intellij.runtime.EDTExecutor;
 import saros.intellij.runtime.FilesystemRunner;
@@ -180,7 +177,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
             return calculationEditor;
           }
 
-          VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(file);
+          VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFileV2(file);
 
           if (virtualFile == null) {
             log.warn(
@@ -223,7 +220,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
             @NotNull String replacedText,
             @NotNull String newText) {
 
-          Project project = ((IntelliJProjectImpl) file.getProject()).getModule().getProject();
+          Project project = ((IntellijReferencePointImpl) file.getProject()).getIntellijProject();
 
           if (!replacedText.isEmpty()) {
             String documentReplacedText = document.getText(new TextRange(start, oldEnd));
@@ -320,7 +317,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           Editor calcEditor = editor;
 
           if (calcEditor == null) {
-            VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(file);
+            VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFileV2(file);
 
             if (virtualFile == null) {
               log.warn(
@@ -556,17 +553,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    * @param project the added project
    */
   private void addProjectResources(IProject project) {
-    Module module = ((IntelliJProjectImpl) project).getModule();
-    ModuleFileIndex moduleFileIndex = ModuleRootManager.getInstance(module).getFileIndex();
-    Project intellijProject = module.getProject();
-
-    Set<VirtualFile> openFiles = new HashSet<>();
-
-    for (VirtualFile openFile : ProjectAPI.getOpenFiles(intellijProject)) {
-      if (FilesystemRunner.runReadAction(() -> moduleFileIndex.isInContent(openFile))) {
-        openFiles.add(openFile);
-      }
-    }
+    IntellijReferencePointImpl referencePoint = (IntellijReferencePointImpl) project;
+    Project intellijProject = referencePoint.getIntellijProject();
 
     Map<IFile, Editor> openFileMapping = new HashMap<>();
 
@@ -577,12 +565,11 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
       setLocalEditorStatusChangeHandlersEnabled(false);
       setLocalViewPortChangeHandlersEnabled(false);
 
-      for (VirtualFile openFile : openFiles) {
-        IFile file = (IFile) VirtualFileConverter.convertToResource(intellijProject, openFile);
+      for (VirtualFile openFile : ProjectAPI.getOpenFiles(intellijProject)) {
+        IFile file = (IFile) VirtualFileConverter.convertToResourceV2(openFile, project);
 
         if (file == null) {
-          throw new IllegalStateException(
-              "Could not create IFile for resource that is known to be shared: " + openFile);
+          continue;
 
         } else if (file.isIgnored()) {
           log.debug("Skipping editor for ignored open file " + file);
@@ -609,7 +596,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     Set<String> selectedFiles = new HashSet<>();
 
     for (VirtualFile selectedFile : ProjectAPI.getSelectedFiles(intellijProject)) {
-      if (moduleFileIndex.isInContent(selectedFile)) {
+      if (VirtualFileConverter.convertToResourceV2(selectedFile, project) != null) {
         selectedFiles.add(selectedFile.getPath());
       }
     }
@@ -762,7 +749,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   public String getContent(final IFile file) {
     return FilesystemRunner.runReadAction(
         () -> {
-          VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(file);
+          VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFileV2(file);
 
           if (virtualFile == null || !virtualFile.exists() || virtualFile.isDirectory()) {
 
@@ -1151,13 +1138,13 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
     Set<String> visibleFilePaths = new HashSet<>();
 
-    Project project = ((IntelliJProjectImpl) file.getProject()).getModule().getProject();
+    Project project = ((IntellijReferencePointImpl) file.getProject()).getIntellijProject();
 
     for (VirtualFile virtualFile : ProjectAPI.getSelectedFiles(project)) {
       visibleFilePaths.add(virtualFile.getPath());
     }
 
-    VirtualFile passedFile = VirtualFileConverter.convertToVirtualFile(file);
+    VirtualFile passedFile = VirtualFileConverter.convertToVirtualFileV2(file);
 
     if (passedFile == null) {
       log.warn(
