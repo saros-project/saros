@@ -34,20 +34,4 @@ public interface IWorkspace {
    */
   public void run(IWorkspaceRunnable runnable, IResource[] resources)
       throws IOException, OperationCanceledException;
-
-  /**
-   * @deprecated the concept of a central workspace for the IDE instance does not apply to all IDE
-   *     models (see the IntelliJ project/module model). This method will be removed from the
-   *     interface in a future patch.
-   */
-  @Deprecated
-  public IProject getProject(String project);
-
-  /**
-   * @deprecated the concept of a central workspace for the IDE instance does not apply to all IDE
-   *     models (see the IntelliJ project/module model). This method will be removed from the
-   *     interface in a future patch.
-   */
-  @Deprecated
-  public IPath getLocation();
 }
