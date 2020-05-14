@@ -108,18 +108,4 @@ public class EclipseWorkspaceImpl implements IWorkspace {
       throw new OperationCanceledException(e);
     }
   }
-
-  /** @deprecated See {@link IWorkspace}. */
-  @Override
-  @Deprecated
-  public IProject getProject(String project) {
-    return ResourceAdapterFactory.create(delegate.getRoot().getProject(project));
-  }
-
-  /** @deprecated See {@link IWorkspace}. */
-  @Override
-  @Deprecated
-  public IPath getLocation() {
-    return ResourceAdapterFactory.create(delegate.getRoot().getLocation());
-  }
 }
