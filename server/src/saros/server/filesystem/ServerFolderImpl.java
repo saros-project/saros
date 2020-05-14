@@ -8,7 +8,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import saros.filesystem.IFolder;
 import saros.filesystem.IPath;
-import saros.filesystem.IWorkspace;
 
 /** Server implementation of the {@link IFolder} interface. */
 public class ServerFolderImpl extends ServerContainerImpl implements IFolder {
@@ -19,7 +18,7 @@ public class ServerFolderImpl extends ServerContainerImpl implements IFolder {
    * @param workspace the containing workspace
    * @param path the folder's path relative to the workspace's root
    */
-  public ServerFolderImpl(IWorkspace workspace, IPath path) {
+  public ServerFolderImpl(ServerWorkspaceImpl workspace, IPath path) {
     super(workspace, path);
   }
 

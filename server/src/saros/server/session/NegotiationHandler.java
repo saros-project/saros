@@ -8,7 +8,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 import saros.filesystem.IProject;
-import saros.filesystem.IWorkspace;
 import saros.monitoring.NullProgressMonitor;
 import saros.negotiation.AbstractIncomingProjectNegotiation;
 import saros.negotiation.AbstractOutgoingProjectNegotiation;
@@ -21,6 +20,7 @@ import saros.negotiation.SessionNegotiation;
 import saros.net.xmpp.JID;
 import saros.server.ServerConfig;
 import saros.server.filesystem.ServerProjectImpl;
+import saros.server.filesystem.ServerWorkspaceImpl;
 import saros.server.progress.ConsoleProgressIndicator;
 import saros.session.INegotiationHandler;
 import saros.session.ISarosSessionManager;
@@ -31,7 +31,7 @@ public class NegotiationHandler implements INegotiationHandler {
   private static final Logger log = Logger.getLogger(NegotiationHandler.class);
 
   private final ISarosSessionManager sessionManager;
-  private final IWorkspace workspace;
+  private final ServerWorkspaceImpl workspace;
   private final ThreadPoolExecutor sessionExecutor =
       new ThreadPoolExecutor(
           0,
@@ -49,7 +49,7 @@ public class NegotiationHandler implements INegotiationHandler {
           new LinkedBlockingQueue<Runnable>(),
           new NamedThreadFactory("ServerProjectNegotiation-"));
 
-  public NegotiationHandler(ISarosSessionManager sessionManager, IWorkspace workspace) {
+  public NegotiationHandler(ISarosSessionManager sessionManager, ServerWorkspaceImpl workspace) {
     sessionManager.setNegotiationHandler(this);
     this.sessionManager = sessionManager;
     this.workspace = workspace;
