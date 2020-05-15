@@ -25,9 +25,9 @@ A clear and concise description of what you expected to happen.
 Please provide the corresponding log files, but be sure to **remove or obfuscate sensitive data** you don't want to publish. Please also make sure only to include the log files concerning the session you encountered the bug in.
 
 You can find the log files in the following locations:
-* IntelliJ IDEA:
-  The log files for JetBrains IDEs are located in the IDE system directory (here called `IDE_SYSTEM_DIR`).
-  An overview over all configurations is given  on https://intellij-support.jetbrains.com/hc/en-us/articles/206544519-Directories-used-by-the-IDE-to-store-settings-caches-plugins-and-logs
+* IntelliJ platform based IDEs:
+  The log files for IntelliJ platform based IDEs are located in the IDE system directory (here called `IDE_SYSTEM_DIR`).
+  An overview over all configurations is given on https://intellij-support.jetbrains.com/hc/en-us/articles/206544519-Directories-used-by-the-IDE-to-store-settings-caches-plugins-and-logs
 
   For releases 2019.3 and earlier, see https://www.jetbrains.com/help/idea/2019.3/tuning-the-ide.html#system-directory
   For release 2020.1 and later, see https://www.jetbrains.com/help/idea/2020.1/tuning-the-ide.html#system-directory
@@ -44,7 +44,7 @@ If applicable, add screenshots to help explain your problem.
 
 **Environment (please complete the following information):**
  - OS: [e.g. Windows 10, Linux Debian Jessie]
- - IDE [e.g. Eclipse 2018-09, IntelliJ IDEA 2019.1.3]
+ - IDE [e.g. Eclipse 2018-09, IntelliJ IDEA 2019.2.3]
  - Saros Version [e.g. 15.0.0]
 
 **Additional context**

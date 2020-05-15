@@ -20,9 +20,9 @@ Saros is an Open Source plugin for connecting multiple IDEs for distributed coll
 - Or add this update-site: https://www.saros-project.org/update-site/eclipse
 
 ### IntelliJ alpha release
-Please read the [details about restrictions](https://www.saros-project.org/documentation/getting-started.html?tab=intellij#restrictions) first, because Saros for IntelliJ is still a first alpha release!
+Please read the [details about restrictions](https://www.saros-project.org/documentation/getting-started.html?tab=intellij#restrictions) first, because Saros for IntelliJ is still an alpha release!
 
-- Search for "Saros" in the IntelliJ Marketplace (this requires the `alpha` release channel; more information on this is given on the [installation](https://www.saros-project.org/documentation/installation.html?tab=intellij) page)
+- Search for "Saros" in the JetBrains Plugin Repository (this requires the `alpha` release channel; more information on this is given on the [installation](https://www.saros-project.org/documentation/installation.html?tab=intellij) page)
 - Or Download the plugin zip from our [release page](https://github.com/saros-project/saros/releases)
 
 ## How to use Saros

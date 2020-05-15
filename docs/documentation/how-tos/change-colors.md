@@ -25,7 +25,7 @@ contributions. Therefore, the preferences are not located at the Saros preferenc
 {% endcapture %}
 {% capture intellij %}
 
-* Open the [IntelliJ settings/preferences menu](https://www.jetbrains.com/help/idea/settings-preferences-dialog.html).
+* Open the [settings/preferences menu](https://www.jetbrains.com/help/idea/settings-preferences-dialog.html).
 * Navigate to `"Editor" > "Color Scheme" > "Saros"`.
 * Select the color scheme to change the colors for.
 * Expand the user whose colors to change.

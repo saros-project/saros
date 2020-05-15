@@ -236,7 +236,7 @@ For more complex modules, it is advised to share the module structure some other
     project with your own copy, Saros will automatically add, change, or
     delete all files as necessary.
 -   Saros will share all files which are not marked as *derived* by
-    Eclipse or *excluded* by IntelliJ, because it should be possible to recreate such files
+    Eclipse or *excluded* by [IntelliJ platform based IDEs](https://www.jetbrains.org/intellij/sdk/docs/intro/intellij_platform.html#ides-based-on-the-intellij-platform), because it should be possible to recreate such files
     (`.class` files for instance) at the client's side. If you use a
     build tool such as Maven, it might be necessary to manually set the
     resulting files or folders to *derived* or *excluded* on both the host's side (so they won't be copied to the client) and the client's side (otherwise
