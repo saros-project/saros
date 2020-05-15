@@ -3,15 +3,13 @@ title: Saros Documentation
 toc: false
 ---
 
-## What is Saros? What is it not?
+Saros is an Open Source IDE plugin for distributed collaborative software development.
 
-### Saros is an Open Source IDE plugin for distributed collaborative software development.
+It works with and within **Eclipse**. Saros users can use all Eclipse functionality as usual.<br/>
+We are working on an **IntelliJ** version as well. See the [release notes](/releases) of our
+latest alpha release for more information.
 
-*   Currently, it works only with and within Eclipse. Saros users can
-    use all Eclipse functionality as usual.
-*   We are working on an IntelliJ version as well.
-
-### Saros is a real-time collaborative editor for eclipse projects.
+## Saros is a real-time collaborative editor.
 
 *   All collaborators have an **identical copy of Eclipse projects.**
 *   Two or more users can **jointly edit files** in the project.
@@ -20,17 +18,16 @@ toc: false
 *   Saros **keeps these copies in sync** by transmitting each change to
     all of the other collaborators.
 
-### Saros supports up to 5 participants at once.
+## Saros supports up to 5 participants at once.
 
 *   Saros is designed to at least work with two participants in a
     session - as inherent for pair programming.
 *   But it supports **up to 5 distributed parties** in a session.
 *   The initiator of a session, the **host**, has a **privileged role**.
-    To get familiar with this concept check out our comic:
 
 {% include host-warning.html %}
 
-### Saros is not screen sharing, desktop sharing, or application sharing.
+## Saros is not screen sharing, desktop sharing, or application sharing.
 
 *   That means for instance that it does not support joint
     interactive testing.

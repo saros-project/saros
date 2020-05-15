@@ -2,6 +2,10 @@
 name: Build JDK 11
 
 on:
+  push:
+    branches:
+      - 'pr/build/11/**'
+
   schedule:
     # Monday at 8:00
     - cron: '0 8 * * 1'

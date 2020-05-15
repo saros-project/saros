@@ -23,6 +23,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.easymock.PowerMock;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import saros.filesystem.IFile;
@@ -44,6 +45,7 @@ import saros.session.User;
   AnnotationStore.class,
   AnnotationQueue.class
 })
+@PowerMockIgnore("javax.swing.JComponent")
 public class AnnotationManagerTest {
 
   /** Selection annotation store held in the annotation manager. */

@@ -4,20 +4,32 @@
 - title: Getting Started
   url: /documentation/getting-started.html?tab=eclipse
 
-- title: Setup XMPP Server
-  url: /documentation/setup-xmpp.html
+- title: Awareness Information
+  url: /documentation/awareness-information.html 
 
-- title: Setup Saros Server
-  url: /documentation/saros-server.html
+- title: How-Tos
+  sublinks:
 
-- title: Screenshots
-  url: /documentation/screenshots.html?tab=eclipse
+  - title: Change Colors
+    url: /documentation/how-tos/change-colors.html
+
+  - title: Follow Mode
+    url: /documentation/how-tos/follow-mode.html
+
+  - title: Hostless Sessions (alpha)
+    url: /documentation/how-tos/hostless-sessions.html
+
+  - title: Manage XMPP Accounts
+    url: /documentation/how-tos/manage-xmpp-accounts.html
+
+  - title: Resolve Desynchronization
+    url: /documentation/how-tos/resolve-desynchronization.html
+
+  - title: Setup XMPP Server
+    url: /documentation/how-tos/setup-xmpp.html
 
 - title: Features
   url: /documentation/features.html
-
-- title: Troubleshooting
-  url: /documentation/troubleshooting.html
 
 - title: FAQ
   url: /documentation/faq.html

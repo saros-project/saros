@@ -1,8 +1,12 @@
 ---
-title: Saros-Server
+title: Hostless Sessions
 ---
 
-**Note**: This is an *alpha* feature and not intended for general use yet. However please feel free to play around and give some initial feedback. Contributors to the Saros-Server project are very welcome and might want to take a look at [contribution wiki](../contribute/saros-server.md) for further information.
+{% alert warning %}
+## Note
+
+This is an *alpha* feature and not intended for general use yet. However please feel free to play around and give some initial feedback. Contributors to the Saros-Server project are very welcome and might want to take a look at [contribution wiki](../../contribute/saros-server.html) for further information.
+{% endalert %}
 
 ## Use-case
 
@@ -14,7 +18,7 @@ The Saros-Server is currently not available for download, but is scheduled to be
 
 If you would like to use the server in the meantime, you will have to build it yourself.
 Furthermore, you will also have to build the Saros/E versions you want to use with the server yourself to avoid incompatibilities.
-A guide on how to build Saros (and its different components) is given [here](../contribute/development-environment.md).
+A guide on how to build Saros (and its different components) is given [here](../../contribute/development-environment.md).
 
 The server needs it's own XMPP account and can then be started via:
 `java -Dsaros.server.jid=max@mustermann.de -Dsaros.server.password=1234 -jar saros.server.jar`
