@@ -11,7 +11,8 @@
   <change-notes>
     <![CDATA[
         <ul>
-            <li>Bumped minimal required IntelliJ version to 2019.2.3</li>
+            <li>Bumped minimal required version to 2019.2.3.</li>
+            <li>Enables support for all <a href="https://www.jetbrains.org/intellij/sdk/docs/intro/intellij_platform.html#ides-based-on-the-intellij-platform">IDEs based on the IntelliJ platform.</a></li>
             <li>Adds support for caret/cursor annotations.</li>
             <li>Adjusts the selection annotation logic to correctly display backwards selections.</li>
             <li>Fixed <a href="https://github.com/saros-project/saros/pull/223">#223</a> - Re-creating a file deleted during a session now no longer leads to a desynchronization.</li>
@@ -37,10 +38,8 @@
   <idea-version since-build="192.6817.14"/>
 
   <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html on how to target different products -->
-  <!-- ATTENTION: the following "depends" tags are automatically uncommented by nightly-rel.yml. Make sure that changes do not break the logic. -->
-  <!-- uncomment to enable plugin in all products -->
-  <!--depends>com.intellij.modules.platform</depends-->
-  <!--depends>com.intellij.modules.lang</depends-->
+  <depends>com.intellij.modules.platform</depends>
+  <depends>com.intellij.modules.lang</depends>
 
   <application-components>
     <component>
