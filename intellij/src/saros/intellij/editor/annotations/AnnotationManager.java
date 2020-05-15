@@ -47,9 +47,15 @@ public class AnnotationManager implements Disposable {
    * @param start the starting position of the annotation
    * @param end the ending position of the annotation
    * @param editor the editor the annotation is applied to
+   * @param isBackwardsSelection whether the selection annotation represents a backwards selection
    */
   public void addSelectionAnnotation(
-      @NotNull User user, @NotNull IFile file, int start, int end, @Nullable Editor editor) {
+      @NotNull User user,
+      @NotNull IFile file,
+      int start,
+      int end,
+      @Nullable Editor editor,
+      boolean isBackwardsSelection) {
 
     removeSelectionAnnotation(user, file);
 
@@ -59,7 +65,8 @@ public class AnnotationManager implements Disposable {
 
     SelectionAnnotation selectionAnnotation;
     try {
-      selectionAnnotation = new SelectionAnnotation(user, file, start, end, editor);
+      selectionAnnotation =
+          new SelectionAnnotation(user, file, start, end, editor, isBackwardsSelection);
     } catch (IllegalStateException e) {
       log.warn(
           "Failed to add contribution annotation for file "
