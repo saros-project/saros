@@ -17,7 +17,7 @@ A clear and concise description of what you want to happen.
 A clear and concise description of any alternative solutions or features you've considered.
 
 **IDE**
-Are you talking about the IntelliJ IDEA or Eclipse plug-in?
+Are you talking about the IntelliJ IDEA (or other IntelliJ platform based IDEs) or Eclipse plug-in?
 
 **Additional context**
 Add any other context or screenshots about the feature request here.

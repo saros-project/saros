@@ -20,6 +20,7 @@ Saros/E requires
 Saros/I requires
  - `JDK 8` or newer
  - `IntelliJ 2019.2.3` or newer (download [here](https://www.jetbrains.com/idea/download/))
+   - Other [IDEs based on the IntelliJ platform](https://www.jetbrains.org/intellij/sdk/docs/intro/intellij_platform.html#ides-based-on-the-intellij-platform) version `2019.2.3` or newer are supported as well
 
 {% endcapture %}
 {% include ide-tabs.html eclipse=eclipse intellij=intellij %}
@@ -72,26 +73,26 @@ Saros/I can be installed from the JetBrains plugin repository or from disk.
 
 Saros/I is currently released through the `alpha` release channel. To be able find the plugin on the market place, you will first have to add the `alpha` release channel to your list of plugin repositories. A guide on how to do this is given [here](https://plugins.jetbrains.com/docs/marketplace/custom-release-channels.html#CustomReleaseChannels-ConfiguringaCustomChannelinIntelliJPlatformBasedIDEs).
 
-- Open the [IntelliJ settings/preferences menu](https://www.jetbrains.com/help/idea/settings-preferences-dialog.html).
+- Open the [settings/preferences menu](https://www.jetbrains.com/help/idea/settings-preferences-dialog.html).
 - Select the "Plugins" section.
 - Select the tab "Marketplace".
 - Search for "Saros" in the search bar and select the entry from the list.
 - Click the "Install" button.
 - Close the settings menu.
-- Restart IntelliJ.
+- Restart the IDE.
 
 
 ### From Disk
 The zip file containing the plugin can be downloaded from our [release page](https://github.com/saros-project/saros/releases).
 
 
-- Open the [IntelliJ settings/preferences menu](https://www.jetbrains.com/help/idea/settings-preferences-dialog.html).
+- Open the [settings/preferences menu](https://www.jetbrains.com/help/idea/settings-preferences-dialog.html).
 - Select the "Plugins" section.
 - Click the settings icon (gear/cog) and choose "Install plugin from disk...".
 - Navigate to the directory containing the plugin zip.
 - Select the zip file.
 - Click OK.
-- Restart IntelliJ.
+- Restart the IDE.
 
 {% endcapture %}
 

@@ -9,7 +9,7 @@ If you want to execute the STF tests it is recommended to use Eclipse. Otherwise
 
 * You have to [clone](https://help.github.com/articles/cloning-a-repository/) the Saros repository with [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
 * You need a **Java 8 JDK**.
-* *Optional:* You can use a local **IntelliJ IDEA** installation (version `2018.2.7` or newer) for dependency resolution by setting the **system-wide environment variable `INTELLIJ_HOME`** to the IntelliJ installation directory that contains the directory `lib`.
+* *Optional:* You can use a local **IntelliJ IDEA** installation (version `2019.2.3` or newer) for dependency resolution by setting the **system-wide environment variable `INTELLIJ_HOME`** to the IntelliJ installation directory that contains the directory `lib`.
 If the `INTELLIJ_HOME` variable is not set, the intellij-gradle-plugin will download and use the IntelliJ version specified in the `build.gradle` file of the 'intellij' project.
 * *Optional:* You can also set the **system-wide environment variable `SAROS_INTELLIJ_SANDBOX`** to specify the base directory in which the IntelliJ sandboxes will be created. Otherwise, the directory `intellij/build` in the repository will be used by default.
 

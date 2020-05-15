@@ -6,8 +6,8 @@ toc: false
 Saros is an Open Source IDE plugin for distributed collaborative software development.
 
 It works with and within **Eclipse**. Saros users can use all Eclipse functionality as usual.<br/>
-We are working on an **IntelliJ** version as well. See the [release notes](/releases) of our
-latest alpha release for more information.
+We are working on a version for **IntelliJ** (and [IDEs based on the IntelliJ platform](https://www.jetbrains.org/intellij/sdk/docs/intro/intellij_platform.html#ides-based-on-the-intellij-platform)) as well. See
+the [release notes](/releases) of our latest alpha release for more information.
 
 ## Saros is a real-time collaborative editor.
 

@@ -19,6 +19,7 @@ Furthermore, there are still some known bugs in the current release. Please have
 Saros/I 0.3.0 requires
  - `JDK 8` or newer
  - `IntelliJ 2019.2.3` or newer
+   - Other [IDEs based on the IntelliJ platform](https://www.jetbrains.org/intellij/sdk/docs/intro/intellij_platform.html#ides-based-on-the-intellij-platform) version `2019.2.3` or newer are supported as well
 
 Saros/I can be installed from the JetBrains plugin repository or from disk. A detailed guide is given [here](../documentation/installation.html?tab=intellij).
 
@@ -28,7 +29,8 @@ The current release `0.3.0` is not compatible with the previous Saros/I releases
 
 ## Changes
 
-- Bumped minimal required IntelliJ version to `2019.2.3`.
+- Bumped minimal required version to `2019.2.3`.
+- Enable support for all [IDEs based on the IntelliJ platform](https://www.jetbrains.org/intellij/sdk/docs/intro/intellij_platform.html#ides-based-on-the-intellij-platform).
 - Adds support for caret/cursor annotations.
 - Adjusts the selection annotation logic to correctly display backwards selections.
 - Fixed [#223](https://github.com/saros-project/saros/pull/223) - Re-creating a file deleted during a session now no longer leads to a desynchronization.
@@ -129,13 +131,13 @@ Please make it clear that the issue is dealing with Saros/I.
 
 When reporting a bug that concerns the plugin behavior, please provide the Saros log file (or all relevant excerpts) for a session where the bug was encountered.
 
-The log files for JetBrains IDEs are located in the IDE system directory (here called`IDE_SYSTEM_DIR`).
+The log files for [IntelliJ platform based IDEs](https://www.jetbrains.org/intellij/sdk/docs/intro/intellij_platform.html#ides-based-on-the-intellij-platform) are located in the IDE system directory (here called`IDE_SYSTEM_DIR`).
 An overview over all configurations is given on [the support forum](https://intellij-support.jetbrains.com/hc/en-us/articles/206544519-Directories-used-by-the-IDE-to-store-settings-caches-plugins-and-logs).
 For specific releases, see the information for [2019.3 and earlier](https://www.jetbrains.com/help/idea/2019.3/tuning-the-ide.html#system-directory) or [2020.1 and later](https://www.jetbrains.com/help/idea/2020.1/tuning-the-ide.html#system-directory).
 
 The Saros log files are located in `[IDE_SYSTEM_DIR]/log/SarosLogs/*.log`.
 
-If you are encountering IntelliJ IDEA errors connected to Saros (which will be displayed by a red, blinking symbol in the bottom right corner of the IntelliJ project view; the error can be viewed in more detail by clicking the symbol), please also include the IntelliJ IDEA logs.
+If you are encountering IDE errors connected to Saros (which will be displayed by a red, blinking symbol in the bottom right corner of the project view; the error can be viewed in more detail by clicking the symbol), please also include the IDE logs.
 They are located in `[IDE_SYSTEM_DIR]/log/` and are named `idea.log` (the log will be truncated at some point and older logs will be moved to `idea.log.1`, etc.).
 Please have a look at the contained timestamps to provide the correct file.
 
