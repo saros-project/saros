@@ -43,13 +43,6 @@ jobs:
         echo "::set-env name=SHORT_SHA::$short_sha"
       shell: 'bash'
 
-    # Uncomment <depends> entries in order to make Saros/I installable in all JetBrains IDEs
-    - name: Prepare Saros/I plugin.xml
-      if: github.ref == 'refs/heads/master'
-      run: |
-        sed -i 's/<!--depends/<depends/g' intellij/resources/META-INF/plugin.xml
-        sed -i 's/depends-->/depends>/g' intellij/resources/META-INF/plugin.xml
-
     # Build
     - name: Build and test with Gradle
       run: |
