@@ -4,7 +4,9 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.util.Pair;
+import com.intellij.openapi.vfs.VirtualFile;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -23,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
 import saros.core.ui.util.CollaborationUtils;
 import saros.filesystem.IProject;
 import saros.intellij.context.SharedIDEContext;
-import saros.intellij.filesystem.IntelliJProjectImpl;
+import saros.intellij.filesystem.IntellijReferencePointImpl;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.util.IconManager;
 import saros.intellij.ui.util.NotificationPanel;
@@ -158,8 +160,17 @@ class ContactPopMenu extends JPopupMenu {
       String moduleName = module.getName();
       String fullModuleName = project.getName() + File.separator + moduleName;
 
+      // TODO adjust once sharing multiple reference points is supported
       try {
-        IProject wrappedModule = new IntelliJProjectImpl(module);
+        VirtualFile[] contentRoots = ModuleRootManager.getInstance(module).getContentRoots();
+
+        if (contentRoots.length != 1) {
+          throw new IllegalArgumentException("Unsupported number of content roots");
+        }
+
+        VirtualFile contentRoot = contentRoots[0];
+
+        IProject wrappedModule = new IntellijReferencePointImpl(project, contentRoot);
 
         JMenuItem moduleItem = new JMenuItem(moduleName);
         moduleItem.setToolTipText(Messages.ContactPopMenu_menu_tooltip_share_module);
@@ -171,7 +182,7 @@ class ContactPopMenu extends JPopupMenu {
         log.debug(
             "Ignoring module "
                 + fullModuleName
-                + " as it does not meet the current release restrictions.");
+                + " as it has multiple content roots and can't necessarily be completely shared.");
 
         JMenuItem invalidModuleEntry = new JMenuItem(moduleName);
         invalidModuleEntry.setEnabled(false);
@@ -188,19 +199,19 @@ class ContactPopMenu extends JPopupMenu {
   private class ShareDirectoryAction implements ActionListener {
     private final Project project;
     private final String moduleName;
-    private final IProject module;
+    private final IProject referencePoint;
 
     private ShareDirectoryAction(
-        @NotNull Project project, @NotNull String moduleName, @Nullable IProject module) {
+        @NotNull Project project, @NotNull String moduleName, @Nullable IProject referencePoint) {
 
       this.project = project;
       this.moduleName = moduleName;
-      this.module = module;
+      this.referencePoint = referencePoint;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-      if (module == null || !module.exists()) {
+      if (referencePoint == null || !referencePoint.exists()) {
         log.error(
             "The IProject object for the module "
                 + moduleName
@@ -217,7 +228,7 @@ class ContactPopMenu extends JPopupMenu {
         return;
       }
 
-      Set<IProject> projects = Collections.singleton(module);
+      Set<IProject> projects = Collections.singleton(referencePoint);
       List<JID> contacts = Collections.singletonList(contactInfo.getJid());
 
       SharedIDEContext.preregisterProject(project);
