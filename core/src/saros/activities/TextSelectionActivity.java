@@ -78,6 +78,24 @@ public class TextSelectionActivity extends AbstractResourceActivity {
    * @return the text selection contained in the activity
    */
   public TextSelection getSelection() {
+    if (startLine == -1 && startInLineOffset == -1 && endLine == -1 && endInLineOffset == -1) {
+      return TextSelection.EMPTY_SELECTION;
+
+    } else if (startLine == -1
+        || startInLineOffset == -1
+        || endLine == -1
+        || endInLineOffset == -1) {
+      throw new IllegalStateException(
+          "Encountered illegal selection values - sl: "
+              + startLine
+              + ", so: "
+              + startInLineOffset
+              + ", el: "
+              + endLine
+              + ", eo: "
+              + endInLineOffset);
+    }
+
     TextPosition startPosition = new TextPosition(startLine, startInLineOffset);
     TextPosition endPosition = new TextPosition(endLine, endInLineOffset);
 
