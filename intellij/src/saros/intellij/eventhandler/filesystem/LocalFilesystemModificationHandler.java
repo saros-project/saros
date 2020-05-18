@@ -308,8 +308,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     dispatchActivity(activity);
 
-    // TODO check whether the editor is actually open locally
-    if (!createdVirtualFile.isDirectory()) {
+    if (!createdVirtualFile.isDirectory() && ProjectAPI.isOpen(project, createdVirtualFile)) {
       setUpCreatedFileState((IFile) resource);
     }
   }
