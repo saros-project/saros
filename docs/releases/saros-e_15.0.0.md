@@ -1,5 +1,5 @@
 ---
-title: Saros Release Notes
+title: Saros for Eclipse 15.0.0 Release Notes
 ---
 
 The Saros Team is happy to announce Saros for Eclipse 15.0.0
