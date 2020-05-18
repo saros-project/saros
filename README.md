@@ -3,6 +3,7 @@
 [![STF Tests](https://github.com/saros-project/saros/workflows/STF%20Tests/badge.svg?branch=master&event=push)](https://github.com/saros-project/saros/actions?query=workflow%3A%22STF+Tests%22+branch%3Amaster)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/297b67607a5f4b5b8d00d0446615849b)](https://www.codacy.com/manual/Saros/saros)
 [![Gitter](https://img.shields.io/gitter/room/saros-project/saros?color=%2346BC99&logo=gitter)](https://gitter.im/saros-project/saros)
+[![Financial Contributors on Open Collective](https://opencollective.com/saros/all/badge.svg?label=financial+contributors)](https://opencollective.com/saros) [![Gitter](https://badges.gitter.im/saros-project/saros.svg)](https://gitter.im/saros-project/saros)
 [![Release Saros/E](https://img.shields.io/badge/Saros%2FE-15.0.0-blue?logo=eclipse)](https://github.com/saros-project/saros/releases/tag/saros-eclipse-15.0.0)
 [![Release Saros/I](https://img.shields.io/badge/Saros%2FI-0.3.0-blue?logo=intellij-idea)](https://github.com/saros-project/saros/releases/tag/saros-intellij-0.3.0)
 
@@ -46,3 +47,33 @@ Please make sure to adhere to the guidelines provided by the issue templates.
 If you are interested in contributing to the Saros project or have questions on a more technical level, you can have a look at our [contribution documentation](https://www.saros-project.org/contribute) or directly talk to us on
 - our developer [Gitter chat](https://gitter.im/saros-project/saros)
 - out [developer mailing list](https://groups.google.com/group/saros-devel)
+
+## Contributors
+
+### Code Contributors
+
+This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
+<a href="https://github.com/saros-project/saros/graphs/contributors"><img src="https://opencollective.com/saros/contributors.svg?width=890&button=false" /></a>
+
+### Financial Contributors
+
+Become a financial contributor and help us sustain our community. [[Contribute](https://opencollective.com/saros/contribute)]
+
+#### Individuals
+
+<a href="https://opencollective.com/saros"><img src="https://opencollective.com/saros/individuals.svg?width=890"></a>
+
+#### Organizations
+
+Support this project with your organization. Your logo will show up here with a link to your website. [[Contribute](https://opencollective.com/saros/contribute)]
+
+<a href="https://opencollective.com/saros/organization/0/website"><img src="https://opencollective.com/saros/organization/0/avatar.svg"></a>
+<a href="https://opencollective.com/saros/organization/1/website"><img src="https://opencollective.com/saros/organization/1/avatar.svg"></a>
+<a href="https://opencollective.com/saros/organization/2/website"><img src="https://opencollective.com/saros/organization/2/avatar.svg"></a>
+<a href="https://opencollective.com/saros/organization/3/website"><img src="https://opencollective.com/saros/organization/3/avatar.svg"></a>
+<a href="https://opencollective.com/saros/organization/4/website"><img src="https://opencollective.com/saros/organization/4/avatar.svg"></a>
+<a href="https://opencollective.com/saros/organization/5/website"><img src="https://opencollective.com/saros/organization/5/avatar.svg"></a>
+<a href="https://opencollective.com/saros/organization/6/website"><img src="https://opencollective.com/saros/organization/6/avatar.svg"></a>
+<a href="https://opencollective.com/saros/organization/7/website"><img src="https://opencollective.com/saros/organization/7/avatar.svg"></a>
+<a href="https://opencollective.com/saros/organization/8/website"><img src="https://opencollective.com/saros/organization/8/avatar.svg"></a>
+<a href="https://opencollective.com/saros/organization/9/website"><img src="https://opencollective.com/saros/organization/9/avatar.svg"></a>
