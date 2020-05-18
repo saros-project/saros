@@ -24,6 +24,7 @@ defaults:
 
 plugins:
   - jekyll-relative-links
+  - jemoji
 
 # custom properties
 
