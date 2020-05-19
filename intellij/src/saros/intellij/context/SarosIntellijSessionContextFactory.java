@@ -8,7 +8,6 @@ import saros.intellij.eventhandler.ApplicationEventHandlersFactory;
 import saros.intellij.eventhandler.ProjectEventHandlersFactory;
 import saros.intellij.eventhandler.project.ProjectClosedHandler;
 import saros.intellij.followmode.FollowModeNotificationDispatcher;
-import saros.intellij.negotiation.ModuleConfigurationInitializer;
 import saros.intellij.project.SharedResourcesManager;
 import saros.repackaged.picocontainer.MutablePicoContainer;
 import saros.session.ISarosSession;
@@ -37,9 +36,6 @@ public class SarosIntellijSessionContextFactory extends SarosCoreSessionContextF
     container.addComponent(AnnotationManager.class);
 
     // Other
-    if (!session.isHost()) {
-      container.addComponent(ModuleConfigurationInitializer.class);
-    }
     container.addComponent(SharedResourcesManager.class);
 
     // User notifications

@@ -5,7 +5,6 @@ import static saros.intellij.test.IntellijMocker.mockStaticGetInstance;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.module.ModuleTypeManager;
 import com.intellij.util.messages.MessageBus;
 import com.intellij.util.messages.MessageBusConnection;
 import org.easymock.EasyMock;
@@ -20,7 +19,6 @@ import saros.test.mocks.ContextMocker;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({
   PropertiesComponent.class,
-  ModuleTypeManager.class,
   IntelliJVersionProvider.class,
   ApplicationManager.class
 })
@@ -34,7 +32,6 @@ public class AbstractContextTest {
 
     // mock IntelliJ dependencies
     mockStaticGetInstance(PropertiesComponent.class, null);
-    mockStaticGetInstance(ModuleTypeManager.class, null);
 
     // mock IntelliJ dependent calls to get current IDE and plugin version
     PowerMock.mockStaticPartial(

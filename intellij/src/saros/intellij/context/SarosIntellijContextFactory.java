@@ -13,7 +13,6 @@ import saros.filesystem.IWorkspace;
 import saros.filesystem.checksum.IChecksumCache;
 import saros.filesystem.checksum.NullChecksumCache;
 import saros.intellij.editor.EditorManager;
-import saros.intellij.negotiation.ModuleConfigurationProvider;
 import saros.intellij.preferences.IntelliJPreferences;
 import saros.intellij.preferences.PropertiesComponentAdapter;
 import saros.intellij.project.filesystem.IntelliJWorkspaceImpl;
@@ -44,9 +43,6 @@ public class SarosIntellijContextFactory extends AbstractContextFactory {
       // Core Managers
       Component.create(IEditorManager.class, EditorManager.class),
       Component.create(ISarosSessionContextFactory.class, SarosIntellijSessionContextFactory.class),
-
-      // additional project negotiation data providers
-      Component.create(ModuleConfigurationProvider.class),
 
       // UI handlers
       Component.create(NegotiationHandler.class),
