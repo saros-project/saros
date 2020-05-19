@@ -1,23 +1,15 @@
 package saros.intellij.ui.wizards;
 
-import com.intellij.ide.highlighter.ModuleFileType;
 import com.intellij.openapi.application.ModalityState;
-import com.intellij.openapi.module.ModifiableModuleModel;
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleManager;
-import com.intellij.openapi.module.ModuleWithNameAlreadyExists;
 import com.intellij.openapi.progress.PerformInBackgroundOption;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ModifiableRootModel;
-import com.intellij.openapi.roots.ModuleRootManager;
-import com.intellij.openapi.util.ThrowableComputable;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import java.awt.Dimension;
 import java.awt.Window;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.text.MessageFormat;
@@ -33,9 +25,8 @@ import saros.filesystem.IProject;
 import saros.filesystem.checksum.IChecksumCache;
 import saros.intellij.context.SharedIDEContext;
 import saros.intellij.editor.DocumentAPI;
-import saros.intellij.filesystem.IntelliJProjectImpl;
-import saros.intellij.negotiation.ModuleConfiguration;
-import saros.intellij.negotiation.ModuleConfigurationInitializer;
+import saros.intellij.editor.ProjectAPI;
+import saros.intellij.filesystem.IntellijReferencePointImpl;
 import saros.intellij.runtime.FilesystemRunner;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.util.NotificationPanel;
@@ -76,7 +67,7 @@ import saros.util.ThreadUtils;
  *       displays the files necessary to modify.
  *       <p>
  */
-
+// TODO adjust remaining javadoc, variable/method names, user messages, and log messages
 //  FIXME: Add facility for more than one project.
 public class AddProjectToSessionWizard extends Wizard {
   private static final Logger log = Logger.getLogger(AddProjectToSessionWizard.class);
@@ -115,7 +106,6 @@ public class AddProjectToSessionWizard extends Wizard {
          */
         @Override
         public void next() {
-
           DocumentAPI.saveAllDocuments();
 
           ModuleSelectionResult moduleSelectionResult;
@@ -125,14 +115,15 @@ public class AddProjectToSessionWizard extends Wizard {
                 selectLocalModuleRepresentationPage.getModuleSelectionResult(remoteProjectName);
 
           } catch (IllegalStateException e) {
-            noisyCancel("Request to get module selection result failed: " + e.getMessage(), e);
+            noisyCancel("Request to get directory selection result failed: " + e.getMessage(), e);
 
             return;
           }
 
           if (moduleSelectionResult == null) {
             noisyCancel(
-                "Could not find a module selection result for the module " + remoteProjectName,
+                "Could not find a directory selection result for the reference point "
+                    + remoteProjectName,
                 null);
 
             return;
@@ -144,202 +135,199 @@ public class AddProjectToSessionWizard extends Wizard {
 
           switch (moduleSelectionResult.getLocalRepresentationOption()) {
             case CREATE_NEW_MODULE:
-              String newModuleName = moduleSelectionResult.getNewModuleName();
-              Path newModuleBasePath = moduleSelectionResult.getNewModuleBasePath();
+              String newDirectoryName = moduleSelectionResult.getNewModuleName();
+              Path newDirectoryBasePath = moduleSelectionResult.getNewModuleBasePath();
 
-              if (newModuleName == null || newModuleBasePath == null) {
-                noisyCancel("No valid new module name or base path was given", null);
+              if (newDirectoryName == null || newDirectoryBasePath == null) {
+                noisyCancel("No valid new directory name or base path was given", null);
 
                 return;
               }
 
-              doNewModule(project, newModuleName, newModuleBasePath);
+              doNewDirectory(project, newDirectoryName, newDirectoryBasePath);
               break;
 
             case USE_EXISTING_MODULE:
-              Module existingModule = moduleSelectionResult.getExistingModule();
+              // TODO replace with moduleSelectionResult.getExistingBaseResource(); once migrated
+              VirtualFile existingDirectory = null;
 
-              if (existingModule == null) {
-                noisyCancel("No valid existing module was given", null);
+              if (existingDirectory == null) {
+                noisyCancel("No valid existing directory was given", null);
 
                 return;
               }
 
-              doExistingModule(existingModule);
+              doExistingDirectory(project, existingDirectory);
               break;
 
             default:
-              noisyCancel("No valid option on how to represent the shared module was given", null);
+              noisyCancel(
+                  "No valid option on how to represent the shared reference point was given", null);
           }
         }
 
         /**
-         * Creates a stub module and starts the project negotiation with the newly created module.
+         * Creates a new directory for the reference point and starts the project negotiation with
+         * it.
          *
-         * @param project the project to create the module in
-         * @param moduleName the name for the new module
-         * @param moduleBasePath the base path for the new module
-         * @see AddProjectToSessionWizard#createBaseModule(String, String, Path, Project)
+         * @param project the project to bind the reference point to
+         * @param directoryName the name for the new directory
+         * @param directoryBasePath the base path for the new directory
          */
-        private void doNewModule(
-            @NotNull Project project, @NotNull String moduleName, @NotNull Path moduleBasePath) {
+        private void doNewDirectory(
+            @NotNull Project project,
+            @NotNull String directoryName,
+            @NotNull Path directoryBasePath) {
 
-          Map<String, String> moduleParameters =
-              negotiation.getProjectNegotiationData(remoteProjectID).getAdditionalProjectData();
+          VirtualFile baseFile =
+              FilesystemRunner.runWriteAction(
+                  () -> LocalFileSystem.getInstance().findFileByIoFile(directoryBasePath.toFile()),
+                  ModalityState.defaultModalityState());
 
-          ModuleConfiguration moduleConfiguration =
-              new ModuleConfiguration(moduleParameters, false);
+          VirtualFile existingResource = baseFile.findChild(directoryName);
 
-          String moduleType = moduleConfiguration.getModuleType();
+          if (existingResource != null) {
+            log.warn(
+                "Directory '"
+                    + directoryName
+                    + "' could not be created as a resource with the same name already exists: "
+                    + existingResource);
 
-          if (moduleType == null) {
-            log.error("Aborted module creation as no module type was received.");
-
-            cancelNegotiation("Failed to create shared module");
+            cancelNegotiation("Failed to create reference point " + remoteProjectName);
 
             NotificationPanel.showError(
-                Messages.AddProjectToSessionWizard_no_module_type_received_message,
-                Messages.AddProjectToSessionWizard_no_module_type_received_title);
+                MessageFormat.format(
+                    Messages.Contact_saros_message_conditional,
+                    MessageFormat.format(
+                        Messages
+                            .AddProjectToSessionWizard_directory_already_exists_message_condition,
+                        directoryName)),
+                Messages.AddProjectToSessionWizard_directory_already_exists_title);
 
             return;
           }
 
-          Module module;
+          VirtualFile referencePointFile;
 
           try {
-            module = createBaseModule(moduleName, moduleType, moduleBasePath, project);
+            referencePointFile =
+                FilesystemRunner.runWriteAction(
+                    () -> baseFile.createChildDirectory(this, directoryName),
+                    ModalityState.defaultModalityState());
 
           } catch (IOException e) {
-            log.error("Could not create the shared module " + moduleName + ".", e);
+            log.error(
+                "Failed to create the directory "
+                    + directoryName
+                    + " for reference point "
+                    + remoteProjectName,
+                e);
 
-            cancelNegotiation("Failed to create shared module");
-
-            NotificationPanel.showError(
-                MessageFormat.format(
-                    Messages.Contact_saros_message_conditional,
-                    MessageFormat.format(
-                            Messages
-                                .AddProjectToSessionWizard_module_creation_failed_message_condition,
-                            moduleName)
-                        + "\n"
-                        + e),
-                Messages.AddProjectToSessionWizard_module_creation_failed_title);
-
-            return;
-
-          } catch (ModuleWithNameAlreadyExists e) {
-            log.warn("Could not create the shared module " + moduleName + ".", e);
-
-            cancelNegotiation("Failed to create shared module");
+            cancelNegotiation("Failed to create reference point " + remoteProjectName);
 
             NotificationPanel.showError(
                 MessageFormat.format(
                     Messages.Contact_saros_message_conditional,
                     MessageFormat.format(
-                        Messages.AddProjectToSessionWizard_module_already_exists_message_condition,
-                        moduleName)),
-                Messages.AddProjectToSessionWizard_module_already_exists_title);
+                        Messages
+                            .AddProjectToSessionWizard_directory_creation_failed_message_condition,
+                        directoryName,
+                        e.getMessage())),
+                Messages.AddProjectToSessionWizard_directory_creation_failed_title);
 
             return;
           }
 
-          queueModuleConfigurationChange(module, moduleConfiguration);
+          if (ProjectAPI.isExcluded(project, referencePointFile)) {
+            log.warn(
+                "Could not share created directory "
+                    + referencePointFile
+                    + "  as it is excluded from the project scope.");
 
-          IProject sharedProject = new IntelliJProjectImpl(module);
+            cancelNegotiation("Failed to create reference point " + remoteProjectName);
 
-          localProjects.put(remoteProjectID, sharedProject);
+            NotificationPanel.showError(
+                MessageFormat.format(
+                    Messages.AddProjectToSessionWizard_directory_excluded_message,
+                    referencePointFile,
+                    remoteProjectName),
+                Messages.AddProjectToSessionWizard_directory_excluded_title);
+
+            return;
+          }
+
+          IProject sharedReferencePoint;
+
+          try {
+            sharedReferencePoint = new IntellijReferencePointImpl(project, referencePointFile);
+
+          } catch (IllegalArgumentException e) {
+            log.error(
+                "Failed to instantiate reference point '"
+                    + remoteProjectName
+                    + "' using the created directory "
+                    + referencePointFile,
+                e);
+
+            cancelNegotiation("Failed to create reference point " + remoteProjectName);
+
+            NotificationPanel.showError(
+                MessageFormat.format(
+                    Messages
+                        .AddProjectToSessionWizard_new_reference_point_instantiation_error_message,
+                    referencePointFile,
+                    remoteProjectName,
+                    e.getMessage()),
+                Messages.AddProjectToSessionWizard_new_reference_point_instantiation_error_title);
+
+            return;
+          }
+
+          localProjects.put(remoteProjectID, sharedReferencePoint);
 
           triggerProjectNegotiation();
         }
 
         /**
-         * Checks if the chosen module is valid and then starts the project negotiation with the
-         * module.
+         * Checks if the directory is valid and then starts the project negotiation with it.
          *
-         * @param existingModule the existing module to use for the project negotiation
+         * @param existingDirectory the existing directory to use for the project negotiation
          */
-        private void doExistingModule(@NotNull Module existingModule) {
-          String moduleName = existingModule.getName();
+        private void doExistingDirectory(
+            @NotNull Project project, @NotNull VirtualFile existingDirectory) {
 
-          IProject sharedProject;
+          IProject referencePoint;
 
           try {
-            sharedProject = new IntelliJProjectImpl(existingModule);
+            referencePoint = new IntellijReferencePointImpl(project, existingDirectory);
 
           } catch (IllegalArgumentException e) {
-            log.debug("No session is started as an invalid module was chosen");
+            log.error(
+                "Failed to instantiate reference point '"
+                    + remoteProjectName
+                    + "' using existing directory "
+                    + existingDirectory,
+                e);
 
-            cancelNegotiation("Invalid module chosen by client");
+            cancelNegotiation("Invalid local representation chosen for " + remoteProjectName);
 
             NotificationPanel.showError(
                 MessageFormat.format(
-                    Messages.Contact_saros_message_conditional,
-                    MessageFormat.format(
-                        Messages.AddProjectToSessionWizard_invalid_module_message_condition,
-                        moduleName)),
-                Messages.AddProjectToSessionWizard_invalid_module_title);
+                    Messages
+                        .AddProjectToSessionWizard_new_reference_point_instantiation_error_message,
+                    existingDirectory,
+                    remoteProjectName,
+                    e.getMessage()),
+                Messages.AddProjectToSessionWizard_new_reference_point_instantiation_error_title);
 
             return;
           }
 
-          Map<String, String> moduleParameters =
-              negotiation.getProjectNegotiationData(remoteProjectID).getAdditionalProjectData();
-
-          ModuleConfiguration moduleConfiguration = new ModuleConfiguration(moduleParameters, true);
-
-          /*
-           * TODO move to finish of FilesChangedPage iff back button is configured to function as
-           *  the module might change in that case
-           */
-          queueModuleConfigurationChange(existingModule, moduleConfiguration);
-
-          localProjects.put(remoteProjectID, sharedProject);
+          localProjects.put(remoteProjectID, referencePoint);
 
           prepareFilesChangedPage(localProjects);
 
           setTopPanelText(Messages.AddProjectToSessionWizard_description_changed_files);
-        }
-
-        /**
-         * Adds the given module configuration to the {@link ModuleConfigurationInitializer}.
-         *
-         * <p>Cancels the negotiation if the session or session context is no longer valid.
-         *
-         * @param module the module the configuration belongs to
-         * @param moduleConfiguration the module configuration
-         */
-        private void queueModuleConfigurationChange(
-            @NotNull Module module, @NotNull ModuleConfiguration moduleConfiguration) {
-
-          ISarosSession session = sessionManager.getSession();
-
-          if (session == null) {
-            log.error("Encountered project negotiation without running session");
-
-            NotificationPanel.showError(
-                Messages.AddProjectToSessionWizard_no_session_message,
-                Messages.AddProjectToSessionWizard_no_session_title);
-
-            return;
-          }
-
-          ModuleConfigurationInitializer moduleConfigurationInitializer =
-              session.getComponent(ModuleConfigurationInitializer.class);
-
-          if (moduleConfigurationInitializer == null) {
-            log.error(
-                "Could not obtain class from session context - "
-                    + ModuleConfigurationInitializer.class.getSimpleName());
-
-            NotificationPanel.showError(
-                Messages.AddProjectToSessionWizard_context_teardown_message,
-                Messages.AddProjectToSessionWizard_context_teardown_title);
-
-            return;
-          }
-
-          moduleConfigurationInitializer.enqueueModuleConfigurationChange(
-              module, moduleConfiguration);
         }
 
         /**
@@ -392,102 +380,6 @@ public class AddProjectToSessionWizard extends Wizard {
         });
 
     close();
-  }
-
-  /**
-   * Creates an empty base module with the given name, base path, and module type in the given
-   * project.
-   *
-   * <p>The created module does not contain any further configuration. The needed configuration
-   * options will be added through {@link ModuleConfigurationInitializer}.
-   *
-   * @param moduleName name of the module
-   * @param moduleType the type of the module
-   * @param targetBasePath the base path of the created module
-   * @param targetProject the project to create the module in
-   * @return a <code>Module</code> object with the given parameters
-   * @throws ModuleWithNameAlreadyExists if a module with the given name already exists in the given
-   *     project
-   * @throws FileNotFoundException if the base directory or module file of the created module could
-   *     not be found in the local filesystem
-   * @throws IOException if the creation of the module did not return a valid <code>Module</code>
-   *     object
-   */
-  @NotNull
-  private Module createBaseModule(
-      @NotNull String moduleName,
-      @NotNull String moduleType,
-      @NotNull Path targetBasePath,
-      @NotNull Project targetProject)
-      throws FileNotFoundException, IOException, ModuleWithNameAlreadyExists {
-
-    for (Module module : ModuleManager.getInstance(targetProject).getModules()) {
-      if (moduleName.equals(module.getName()))
-        throw new ModuleWithNameAlreadyExists(
-            "Could not create stub module as a module with the chosen name already exists",
-            moduleName);
-    }
-
-    Module module =
-        FilesystemRunner.runWriteAction(
-            new ThrowableComputable<Module, IOException>() {
-
-              @Override
-              public Module compute() throws IOException {
-                Path moduleBasePath = targetBasePath.resolve(moduleName);
-
-                Path moduleFilePath =
-                    moduleBasePath.resolve(moduleName + ModuleFileType.DOT_DEFAULT_EXTENSION);
-
-                ModifiableModuleModel modifiableModuleModel =
-                    ModuleManager.getInstance(targetProject).getModifiableModel();
-
-                Module module =
-                    modifiableModuleModel.newModule(moduleFilePath.toString(), moduleType);
-
-                modifiableModuleModel.commit();
-                targetProject.save();
-
-                VirtualFile moduleFile = module.getModuleFile();
-
-                if (moduleFile == null) {
-                  throw new FileNotFoundException(
-                      "Could not find module file for module " + module + " after creating it.");
-                }
-
-                VirtualFile moduleRoot = moduleFile.getParent();
-
-                if (moduleRoot == null) {
-                  throw new FileNotFoundException(
-                      "Could not  find base directory for module " + module + ".");
-                }
-
-                ModifiableRootModel modifiableRootModel =
-                    ModuleRootManager.getInstance(module).getModifiableModel();
-
-                try {
-                  modifiableRootModel.addContentEntry(moduleRoot);
-                  modifiableRootModel.commit();
-
-                } finally {
-                  if (!modifiableRootModel.isDisposed()) {
-                    modifiableRootModel.dispose();
-                  }
-                }
-
-                return module;
-              }
-            },
-            ModalityState.defaultModalityState());
-
-    if (module == null) {
-      throw new IOException(
-          "The creation of the module "
-              + moduleName
-              + " did not return a valid reference to the new module.");
-    }
-
-    return module;
   }
 
   private final PageActionListener fileListPageListener =

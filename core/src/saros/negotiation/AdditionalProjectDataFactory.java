@@ -22,6 +22,7 @@ import saros.filesystem.IProject;
  * providers are disjoint. If multiple providers use the same key, the mapping of the provider added
  * last will be used.
  */
+// TODO remove as no longer used?
 public class AdditionalProjectDataFactory {
   private static final Logger log = Logger.getLogger(AdditionalProjectDataFactory.class);
 

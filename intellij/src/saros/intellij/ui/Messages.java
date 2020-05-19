@@ -12,23 +12,19 @@ public class Messages {
   }
 
   public static String AddProjectToSessionWizard_title;
-  public static String AddProjectToSessionWizard_module_creation_failed_title;
-  public static String AddProjectToSessionWizard_module_creation_failed_message_condition;
-  public static String AddProjectToSessionWizard_module_already_exists_title;
-  public static String AddProjectToSessionWizard_module_already_exists_message_condition;
-  public static String AddProjectToSessionWizard_invalid_module_title;
-  public static String AddProjectToSessionWizard_invalid_module_message_condition;
+  public static String AddProjectToSessionWizard_directory_creation_failed_title;
+  public static String AddProjectToSessionWizard_directory_creation_failed_message_condition;
+  public static String AddProjectToSessionWizard_directory_already_exists_title;
+  public static String AddProjectToSessionWizard_directory_already_exists_message_condition;
+  public static String AddProjectToSessionWizard_directory_excluded_title;
+  public static String AddProjectToSessionWizard_directory_excluded_message;
+  public static String AddProjectToSessionWizard_new_reference_point_instantiation_error_title;
+  public static String AddProjectToSessionWizard_new_reference_point_instantiation_error_message;
   public static String AddProjectToSessionWizard_error_reading_module_selection_result_title;
   public static String AddProjectToSessionWizard_error_reading_module_selection_result_message;
   public static String AddProjectToSessionWizard_title2;
   public static String AddProjectToSessionWizard_description;
   public static String AddProjectToSessionWizard_description_changed_files;
-  public static String AddProjectToSessionWizard_no_module_type_received_title;
-  public static String AddProjectToSessionWizard_no_module_type_received_message;
-  public static String AddProjectToSessionWizard_no_session_title;
-  public static String AddProjectToSessionWizard_no_session_message;
-  public static String AddProjectToSessionWizard_context_teardown_title;
-  public static String AddProjectToSessionWizard_context_teardown_message;
   public static String AddProjectToSessionWizard_negotiation_progress_title;
   public static String AddProjectToSessionWizard_negotiation_error_title;
   public static String AddProjectToSessionWizard_negotiation_error_message;
@@ -213,9 +209,6 @@ public class Messages {
   public static String ColorPreferences_user_description;
   public static String ColorPreferences_user_example_text_contribution;
   public static String ColorPreferences_user_example_text_selection;
-
-  public static String ModuleConfigurationInitializer_override_module_config_title;
-  public static String ModuleConfigurationInitializer_override_module_config_message;
 
   private Messages() {}
 }
