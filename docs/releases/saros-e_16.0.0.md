@@ -29,10 +29,10 @@ It was to brittle and does not fit into our plan to support further Editors/IDEs
 * The `.git` directory is now ignored by default during a session ([#922](https://github.com/saros-project/saros/issues/922)).
 * Add Contacts Context Menu Item is enabled for Offline Contacts ([#19](https://github.com/saros-project/saros/issues/19))
 * Choose only one "XMPP ID" vs "Jabber ID" ([#22](https://github.com/saros-project/saros/issues/22))
-* Reusing existing project requires cumbersome manual selection ([#66](https://github.com/saros-project/saros/issues/66))
+* Simplify reuse of existing projects ([#66](https://github.com/saros-project/saros/issues/66))
 * Add XStream security framework setup ([#209](https://github.com/saros-project/saros/issues/209))
 
-### Bug fixes
+### Fixed Bugs
 * Removing a file and re-creating it leads to an error ([#223](https://github.com/saros-project/saros/issues/922))
 * Dirty editor is not always closed when file is deleted ([#758](https://github.com/saros-project/saros/issues/758))
 * "Finish" button of "Start Saros Configuration" is unresponsive ([#676](https://github.com/saros-project/saros/issues/676))
