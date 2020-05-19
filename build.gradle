@@ -18,6 +18,15 @@ if (project.hasProperty('useBuildScan') && useBuildScan.equalsIgnoreCase("true")
   }
 }
 
+// Adjust Intellij module configuration for main project
+apply plugin: 'idea'
+
+idea{
+  module{
+    excludeDirs += [ file("docs/.jekyll-cache"), file("docs/_site"), file("docs/node_modules")]
+  }
+}
+
 // Adjust Intellij module configuration for all sub-projects
 configure(subprojects) {projectToConf->
   apply plugin: 'idea'
