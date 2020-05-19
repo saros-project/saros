@@ -3,7 +3,7 @@
 [![STF Tests](https://github.com/saros-project/saros/workflows/STF%20Tests/badge.svg?branch=master&event=push)](https://github.com/saros-project/saros/actions?query=workflow%3A%22STF+Tests%22+branch%3Amaster)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/297b67607a5f4b5b8d00d0446615849b)](https://www.codacy.com/manual/Saros/saros)
 [![Gitter](https://img.shields.io/gitter/room/saros-project/saros?color=%2346BC99&logo=gitter)](https://gitter.im/saros-project/saros)
-[![Release Saros/E](https://img.shields.io/badge/Saros%2FE-16.0.0-blue?logo=eclipse)](https://github.com/saros-project/saros/releases/tag/saros-eclipse-15.0.0)
+[![Release Saros/E](https://img.shields.io/badge/Saros%2FE-16.0.0-blue?logo=eclipse)](https://github.com/saros-project/saros/releases/tag/saros-eclipse-16.0.0)
 [![Release Saros/I](https://img.shields.io/badge/Saros%2FI-0.3.0-blue?logo=intellij-idea)](https://github.com/saros-project/saros/releases/tag/saros-intellij-0.3.0)
 
 
