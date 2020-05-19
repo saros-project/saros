@@ -10,6 +10,7 @@ and [improvements](#improvements).
 ## Installation
 Saros for Eclipse 16.0.0 requires
  - `JDK 8` or newer
+ - Eclipse 4.6 (Neon) or newer
 
 ## Compatibility
 Saros for Eclipse 16.0.0 is not compatible with other Saros versions.
