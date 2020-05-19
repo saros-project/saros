@@ -156,7 +156,7 @@ in the Saros instances of your invited contacts (with synchronizing files, copyi
 - Choose the section "Contacts" in the window on the left side of the Saros view.
 - Choose a friend that is online.
 - Right-click the name of that friend. This will open a list of all open projects. Each project contains a list of its shareable modules.
-  - If the module you would like to share is not listed, it most likely does not adhere to the mentioned restrictions (see [module restrictions](/releases/saros-i_0.2.2.html#module-restrictions)).
+  - If the module you would like to share is not listed, it most likely does not adhere to the mentioned restrictions (see [module restrictions](/releases/saros-i_0.3.0.html#module-restrictions)).
 - Choose the module that is supposed to be shared from the displayed list of modules.
 
 *Alternatively:*
@@ -179,7 +179,7 @@ You can currently only share a single module. A module has to adhere to the foll
 - The module must have exactly one content root.
 
 Sharing a module will only share resources belonging to that module, not resources belonging to sub-module located inside a content root of the module.
-Creating such a sub-module during a session will lead to an inconsistent state that can not be resolved by Saros. See [Known Bugs](/releases/saros-i_0.2.2.html#known-bugs).
+Creating such a sub-module during a session will lead to an inconsistent state that can not be resolved by Saros. See [Known Bugs](/releases/saros-i_0.3.0.html#known-bugs).
 
 ###### **Working With Newly Created Modules**
 
@@ -220,7 +220,7 @@ For more complex modules, it is advised to share the module structure some other
     - Specify the module base path.
   - *To use an existing module:* Choose "Use existing module"
     - Select a module from the drop-down menu.
-      - If the module you would like to share is not listed, it most likely does not adhere to the mentioned restrictions (see [module restrictions](/releases/saros-i_0.2.2.html#module-restrictions)).
+      - If the module you would like to share is not listed, it most likely does not adhere to the mentioned restrictions (see [module restrictions](/releases/saros-i_0.3.0.html#module-restrictions)).
 - Click "Next".
   - If an existing local module was chosen, a list of local file changes that will be made during the negotiation will be shown. These are the differences between the local version of the module and the version held by the host. The shown actions are the actions necessary to align the local module with the host module.
   - **Warning:** Any local differences will be removed during the project negotiation. These adjustments will only be done if the "Finish" button is selected. If the project negotiation is aborted at this stage, no local files are changed.
@@ -236,7 +236,7 @@ For more complex modules, it is advised to share the module structure some other
     project with your own copy, Saros will automatically add, change, or
     delete all files as necessary.
 -   Saros will share all files which are not marked as *derived* by
-    Eclipse or *excluded* by IntelliJ, because it should be possible to recreate such files
+    Eclipse or *excluded* by [IntelliJ platform based IDEs](https://www.jetbrains.org/intellij/sdk/docs/intro/intellij_platform.html#ides-based-on-the-intellij-platform), because it should be possible to recreate such files
     (`.class` files for instance) at the client's side. If you use a
     build tool such as Maven, it might be necessary to manually set the
     resulting files or folders to *derived* or *excluded* on both the host's side (so they won't be copied to the client) and the client's side (otherwise

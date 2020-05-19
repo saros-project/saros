@@ -106,7 +106,7 @@ public class VersionManagerTest {
   @Test
   public void testlocalVersionOlder() {
     Version local = Version.parseVersion("1.1.1.r1");
-    Version remote = Version.parseVersion("1.1.2.r1");
+    Version remote = Version.parseVersion("1.2.1.r1");
 
     init(local, remote);
 
@@ -118,7 +118,7 @@ public class VersionManagerTest {
 
   @Test
   public void testlocalVersionNewer() {
-    Version local = Version.parseVersion("1.1.2.r1");
+    Version local = Version.parseVersion("1.2.1.r1");
     Version remote = Version.parseVersion("1.1.1.r1");
 
     init(local, remote);
@@ -127,5 +127,18 @@ public class VersionManagerTest {
         versionManagerLocal.determineVersionCompatibility(bobContact);
 
     assertEquals(Compatibility.NEWER, result.getCompatibility());
+  }
+
+  @Test
+  public void testlocalVersionNewerMicro() {
+    Version local = Version.parseVersion("1.1.2.r1");
+    Version remote = Version.parseVersion("1.1.1.r1");
+
+    init(local, remote);
+
+    VersionCompatibilityResult result =
+        versionManagerLocal.determineVersionCompatibility(bobContact);
+
+    assertEquals(Compatibility.OK, result.getCompatibility());
   }
 }

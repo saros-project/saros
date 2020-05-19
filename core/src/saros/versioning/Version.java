@@ -131,10 +131,6 @@ public class Version implements Comparable<Version> {
 
     result = minor - other.minor;
 
-    if (result != 0) return result;
-
-    result = micro - other.micro;
-
     return result;
   }
 

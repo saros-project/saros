@@ -59,7 +59,7 @@ Therefore the current workaround is to execute the Gradle task `generateLibAll` 
 
 ## IntelliJ
 
-We are currently working on an version of STF that work with the HTML-GUI and therefore with both IDEs, but for now it is not possible to run the Eclipse STF tests from within IntelliJ or execute STF tests for IntelliJ.
+It is not possible to run the Eclipse STF tests from within IntelliJ or execute STF tests for IntelliJ.
 However IntelliJ/Gradle supports to run multiple IntelliJ instances from within IntelliJ in order to test Saros by hand.
 
 ### Run Multiple IntelliJ Instances for Testing
