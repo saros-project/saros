@@ -146,6 +146,23 @@ public class ProjectAPI {
   }
 
   /**
+   * Returns whether the given virtual file is part of the content of the given project.
+   *
+   * <p>A resource is seen as part of the content of a project if it is located under the content
+   * root of any of the modules of the project.
+   *
+   * @param project the project for which to check
+   * @param virtualFile the virtual file to check
+   * @return whether the given virtual file is part of the content of the given project
+   * @see ProjectFileIndex#isInContent(VirtualFile)
+   */
+  public static boolean isInProjectContent(
+      @NotNull Project project, @NotNull VirtualFile virtualFile) {
+    ProjectFileIndex projectFileIndex = ProjectFileIndex.getInstance(project);
+    return FilesystemRunner.runReadAction(() -> projectFileIndex.isInContent(virtualFile));
+  }
+
+  /**
    * Returns whether the given virtual file is seen as excluded for the given project.
    *
    * @param project the project to check for
