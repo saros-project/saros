@@ -18,6 +18,10 @@ Please make sure before creating the artifacts that **all unit and stf tests are
 * Update Site
 * Drop-in
 
+#### Prerequisite
+If there were any changes to the Saros core since the last release, make sure to also increase the version number of the `saros.core` osgi bundle.
+If only the `saros.eclipse` version is increased, a Saros update (via the update-site) would lead to a corrupted Saros installation that consists of the new `saros.eclipse` bundle and the `saros.core` version of the previous release.
+
 #### Update Site
 
 * Open an eclipse instance which contains a working [Saros development setup](https://www.saros-project.org/contribute/development-environment.html)

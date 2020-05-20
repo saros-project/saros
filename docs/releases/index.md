@@ -5,7 +5,7 @@ title: Get Saros
 See the installation documentation for [Eclipse](../documentation/installation.html?tab=eclipse) and [IntelliJ (and IntelliJ platform based IDEs)](../documentation/installation.html?tab=intellij) for more information about prerequisites and more detailed installation instructions.
 
 See **latest release notes** about the current release:
-* **Saros for Eclipse (Saros/E)**: [15.0.0](saros-e_15.0.0.md)
+* **Saros for Eclipse (Saros/E)**: [16.0.0](saros-e_16.0.0.md)
 * **Saros for IntelliJ (Saros/I)**: [0.3.0](saros-i_0.3.0.md)
 
 ## Eclipse Update Site
