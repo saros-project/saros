@@ -27,8 +27,8 @@ It was to brittle and does not fit into our plan to support further Editors/IDEs
 
 ### Improvements
 * The `.git` directory is now ignored by default during a session ([#922](https://github.com/saros-project/saros/issues/922)).
-* Add Contacts Context Menu Item is enabled for Offline Contacts ([#19](https://github.com/saros-project/saros/issues/19))
-* Choose only one "XMPP ID" vs "Jabber ID" ([#22](https://github.com/saros-project/saros/issues/22))
+* Disable the "Add Contacts" Context Menu Item for Offline Contacts ([#19](https://github.com/saros-project/saros/issues/19))
+* Rename "Jabber ID" to "XMPP Account" ([#22](https://github.com/saros-project/saros/issues/22))
 * Simplify reuse of existing projects ([#66](https://github.com/saros-project/saros/issues/66))
 * Add XStream security framework setup ([#209](https://github.com/saros-project/saros/issues/209))
 
