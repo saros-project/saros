@@ -46,7 +46,7 @@ import saros.intellij.editor.ProjectAPI;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.eventhandler.IApplicationEventHandler;
 import saros.intellij.eventhandler.editor.document.LocalDocumentModificationHandler;
-import saros.intellij.filesystem.IntelliJPathImpl;
+import saros.intellij.filesystem.IntellijPath;
 import saros.intellij.filesystem.VirtualFileConverter;
 import saros.intellij.runtime.EDTExecutor;
 import saros.intellij.runtime.FilesystemRunner;
@@ -793,12 +793,12 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     if (newBaseName != null) {
       relativePath =
-          IntelliJPathImpl.fromString(newBaseName).append(relativePath.removeFirstSegments(1));
+          IntellijPath.fromString(newBaseName).append(relativePath.removeFirstSegments(1));
     }
 
     if (newFileName != null) {
       relativePath =
-          relativePath.removeLastSegments(1).append(IntelliJPathImpl.fromString(newFileName));
+          relativePath.removeLastSegments(1).append(IntellijPath.fromString(newFileName));
     }
 
     IActivity activity;
@@ -992,7 +992,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
     try {
       Path relativePath = Paths.get(root.getPath()).relativize(Paths.get(file.getPath()));
 
-      return IntelliJPathImpl.fromString(relativePath.toString());
+      return IntellijPath.fromString(relativePath.toString());
 
     } catch (IllegalArgumentException e) {
       log.warn(

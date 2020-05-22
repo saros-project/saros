@@ -13,13 +13,13 @@ import org.junit.Ignore;
 import org.junit.Test;
 import saros.filesystem.IPath;
 
-public class IntelliJPathImplTest {
+public class IntellijPathTest {
 
   @Test
   public void parsesLinuxPathCorrectly() {
     String stringPath = "/home/user/saros/project";
 
-    IPath path = IntelliJPathImpl.fromString(stringPath);
+    IPath path = IntellijPath.fromString(stringPath);
 
     String[] expected = {"home", "user", "saros", "project"};
 
@@ -29,7 +29,7 @@ public class IntelliJPathImplTest {
   @Test
   public void parsesLinuxPathWithTrailingSlashCorrectly() {
     String stringPath = "/home/user/saros/project";
-    IPath path = IntelliJPathImpl.fromString(stringPath);
+    IPath path = IntellijPath.fromString(stringPath);
 
     String[] expected = {"home", "user", "saros", "project"};
 
@@ -39,7 +39,7 @@ public class IntelliJPathImplTest {
   private IPath absolutePath(String pathString) {
     Path root = Paths.get("").toAbsolutePath().getRoot();
     Path relative = Paths.get(pathString);
-    return IntelliJPathImpl.fromString(root.resolve(relative).toString());
+    return IntellijPath.fromString(root.resolve(relative).toString());
   }
 
   private IPath nativePath(String pathString) {
@@ -48,7 +48,7 @@ public class IntelliJPathImplTest {
 
   @Test
   public void emptyPath() {
-    assertSame(IntelliJPathImpl.EMPTY, path(""));
+    assertSame(IntellijPath.EMPTY, path(""));
   }
 
   @Test
@@ -321,6 +321,6 @@ public class IntelliJPathImplTest {
   }
 
   private static IPath path(String pathString) {
-    return IntelliJPathImpl.fromString(pathString);
+    return IntellijPath.fromString(pathString);
   }
 }
