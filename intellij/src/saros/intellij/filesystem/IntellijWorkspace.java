@@ -7,7 +7,7 @@ import saros.filesystem.IWorkspace;
 import saros.filesystem.IWorkspaceRunnable;
 import saros.monitoring.NullProgressMonitor;
 
-public class IntelliJWorkspaceImpl implements IWorkspace {
+public class IntellijWorkspace implements IWorkspace {
   @Override
   public void run(IWorkspaceRunnable procedure) throws IOException, OperationCanceledException {
     procedure.run(new NullProgressMonitor());

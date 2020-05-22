@@ -83,7 +83,7 @@ public class IntellijReferencePoint implements IProject {
     VirtualFile[] children = virtualFile.getChildren();
 
     for (VirtualFile child : children) {
-      IPath childPath = IntelliJPathImpl.fromString(child.getName());
+      IPath childPath = IntellijPath.fromString(child.getName());
 
       result.add(
           child.isDirectory()
@@ -108,7 +108,7 @@ public class IntellijReferencePoint implements IProject {
   @Override
   @NotNull
   public IPath getProjectRelativePath() {
-    return IntelliJPathImpl.EMPTY;
+    return IntellijPath.EMPTY;
   }
 
   /**
@@ -134,7 +134,7 @@ public class IntellijReferencePoint implements IProject {
     try {
       Path relativePath = Paths.get(referencePointPath).relativize(Paths.get(filePath));
 
-      return IntelliJPathImpl.fromString(relativePath.toString());
+      return IntellijPath.fromString(relativePath.toString());
 
     } catch (IllegalArgumentException e) {
       log.warn(
@@ -151,7 +151,7 @@ public class IntellijReferencePoint implements IProject {
   @Override
   @NotNull
   public IFile getFile(@NotNull String pathString) {
-    return getFile(IntelliJPathImpl.fromString(pathString));
+    return getFile(IntellijPath.fromString(pathString));
   }
 
   @Override
@@ -185,7 +185,7 @@ public class IntellijReferencePoint implements IProject {
   @Override
   @NotNull
   public IFolder getFolder(@NotNull String pathString) {
-    return getFolder(IntelliJPathImpl.fromString(pathString));
+    return getFolder(IntellijPath.fromString(pathString));
   }
 
   @Override

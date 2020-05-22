@@ -9,19 +9,19 @@ import saros.filesystem.IPath;
  * TODO: This is a copy of the server implementation of the path interface. As soon as the core is
  * Java 7 we can merge the two.
  */
-public class IntelliJPathImpl implements IPath {
+public class IntellijPath implements IPath {
   private final Path delegate;
 
-  public static final IPath EMPTY = new IntelliJPathImpl(Paths.get(""));
+  public static final IPath EMPTY = new IntellijPath(Paths.get(""));
 
   public static IPath fromString(String pathString) {
     if (pathString == null || pathString.isEmpty()) {
       return EMPTY;
     }
-    return new IntelliJPathImpl(Paths.get(pathString));
+    return new IntellijPath(Paths.get(pathString));
   }
 
-  private IntelliJPathImpl(Path delegate) {
+  private IntellijPath(Path delegate) {
     /*
      * OpenJDK 7 on Linux has a bug which causes normalize() to throw an
      * ArrayIndexOutOfBoundsException if called on the empty path.
@@ -61,7 +61,7 @@ public class IntelliJPathImpl implements IPath {
       return EMPTY;
     }
     Path newDelegate = delegate.subpath(count, delegate.getNameCount());
-    return new IntelliJPathImpl(newDelegate);
+    return new IntellijPath(newDelegate);
   }
 
   @Override
@@ -83,7 +83,7 @@ public class IntelliJPathImpl implements IPath {
       newDelegate = delegate.getRoot().resolve(newDelegate);
     }
 
-    return new IntelliJPathImpl(newDelegate);
+    return new IntellijPath(newDelegate);
   }
 
   @Override
@@ -98,7 +98,7 @@ public class IntelliJPathImpl implements IPath {
     }
     Path root = delegate.toAbsolutePath().getRoot();
     Path newDelegate = root.resolve(delegate);
-    return new IntelliJPathImpl(newDelegate);
+    return new IntellijPath(newDelegate);
   }
 
   @Override
@@ -124,12 +124,12 @@ public class IntelliJPathImpl implements IPath {
     }
 
     Path newDelegate = delegate.resolve(other);
-    return new IntelliJPathImpl(newDelegate);
+    return new IntellijPath(newDelegate);
   }
 
   @Override
   public IPath append(String pathString) {
-    return append(IntelliJPathImpl.fromString(pathString));
+    return append(IntellijPath.fromString(pathString));
   }
 
   @Override
@@ -157,11 +157,11 @@ public class IntelliJPathImpl implements IPath {
 
     if (this == obj) return true;
 
-    if (!(obj instanceof IntelliJPathImpl)) {
+    if (!(obj instanceof IntellijPath)) {
       return false;
     }
 
-    IntelliJPathImpl other = (IntelliJPathImpl) obj;
+    IntellijPath other = (IntellijPath) obj;
     return delegate.equals(other.delegate);
   }
 

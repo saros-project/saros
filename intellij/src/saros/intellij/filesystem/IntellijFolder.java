@@ -73,7 +73,7 @@ public class IntellijFolder extends AbstractIntellijResource implements IFolder 
     VirtualFile[] children = folder.getChildren();
 
     for (VirtualFile child : children) {
-      IPath childPath = relativePath.append(IntelliJPathImpl.fromString(child.getName()));
+      IPath childPath = relativePath.append(IntellijPath.fromString(child.getName()));
 
       result.add(
           child.isDirectory()
@@ -87,7 +87,7 @@ public class IntellijFolder extends AbstractIntellijResource implements IFolder 
   @Override
   @NotNull
   public IFile getFile(@NotNull String pathString) {
-    return getFile(IntelliJPathImpl.fromString(pathString));
+    return getFile(IntellijPath.fromString(pathString));
   }
 
   @Override
@@ -105,7 +105,7 @@ public class IntellijFolder extends AbstractIntellijResource implements IFolder 
   @Override
   @NotNull
   public IFolder getFolder(@NotNull String pathString) {
-    return getFolder(IntelliJPathImpl.fromString(pathString));
+    return getFolder(IntellijPath.fromString(pathString));
   }
 
   @Override

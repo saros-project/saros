@@ -13,7 +13,7 @@ import saros.filesystem.IWorkspace;
 import saros.filesystem.checksum.IChecksumCache;
 import saros.filesystem.checksum.NullChecksumCache;
 import saros.intellij.editor.EditorManager;
-import saros.intellij.filesystem.IntelliJWorkspaceImpl;
+import saros.intellij.filesystem.IntellijWorkspace;
 import saros.intellij.filesystem.PathFactory;
 import saros.intellij.preferences.IntelliJPreferences;
 import saros.intellij.preferences.PropertiesComponentAdapter;
@@ -73,7 +73,7 @@ public class SarosIntellijContextFactory extends AbstractContextFactory {
     // Saros Core Path Support
     container.addComponent(IPathFactory.class, new PathFactory());
 
-    container.addComponent(IWorkspace.class, IntelliJWorkspaceImpl.class);
+    container.addComponent(IWorkspace.class, IntellijWorkspace.class);
 
     for (Component component : getContextComponents()) {
       container.addComponent(component.getBindKey(), component.getImplementation());

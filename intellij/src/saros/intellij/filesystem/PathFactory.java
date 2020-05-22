@@ -23,7 +23,7 @@ public class PathFactory implements IPathFactory {
       throw new NullPointerException("Given string must not be null.");
     }
 
-    IPath path = IntelliJPathImpl.fromString(pathString);
+    IPath path = IntellijPath.fromString(pathString);
 
     if (path.isAbsolute()) {
       throw new IllegalArgumentException(
