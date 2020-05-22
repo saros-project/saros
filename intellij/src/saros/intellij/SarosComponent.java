@@ -10,8 +10,8 @@ import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.helpers.LogLog;
 
 /**
- * Component that is initialized when a project is loaded. It initializes the logging, shortcuts and
- * the {@link IntellijApplicationLifecycle} singleton.
+ * Component that is initialized when a application is loaded. It initializes the logging, shortcuts
+ * and the {@link IntellijApplicationLifecycle} singleton.
  */
 public class SarosComponent {
 
