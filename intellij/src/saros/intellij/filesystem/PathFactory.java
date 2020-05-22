@@ -1,4 +1,4 @@
-package saros.intellij.project.filesystem;
+package saros.intellij.filesystem;
 
 import saros.filesystem.IPath;
 import saros.filesystem.IPathFactory;

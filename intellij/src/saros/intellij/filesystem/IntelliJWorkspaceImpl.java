@@ -1,4 +1,4 @@
-package saros.intellij.project.filesystem;
+package saros.intellij.filesystem;
 
 import java.io.IOException;
 import saros.exceptions.OperationCanceledException;

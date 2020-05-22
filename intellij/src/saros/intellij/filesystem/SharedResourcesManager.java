@@ -1,4 +1,4 @@
-package saros.intellij.project;
+package saros.intellij.filesystem;
 
 import com.intellij.openapi.application.ModalityState;
 import java.io.ByteArrayInputStream;
@@ -30,7 +30,7 @@ import saros.session.IActivityConsumer;
 import saros.session.IActivityConsumer.Priority;
 import saros.session.ISarosSession;
 
-/** The SharedResourcesManager creates and handles file and folder activities. */
+/** The SharedResourcesManager handles file and folder activities. */
 public class SharedResourcesManager implements Startable {
 
   private static final Logger log = Logger.getLogger(SharedResourcesManager.class);
@@ -342,13 +342,13 @@ public class SharedResourcesManager implements Startable {
    * Applies the given FolderDeletedActivity.
    *
    * <p><b>NOTE:</b> This currently does not check whether the deleted folder contains resources
-   * outside the session scope. As a result, submodules of the shared module that are not present
-   * for a different participant can be deleted accidentally through remote activities.
+   * outside the session scope. As a result, excluded resources can be deleted accidentally through
+   * remote activities.
    *
    * @param activity the FolderDeletedActivity to execute
    * @throws IOException if the folder deletion fails
    */
-  // TODO deal with children that are not part of the current session (submodules)
+  // TODO deal with children that are not part of the current session (excluded resources)
   private void handleFolderDeletion(@NotNull FolderDeletedActivity activity) throws IOException {
 
     IFolder folder = activity.getResource();

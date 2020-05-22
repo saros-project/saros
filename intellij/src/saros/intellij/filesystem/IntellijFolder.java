@@ -15,7 +15,6 @@ import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
 import saros.filesystem.IPath;
 import saros.filesystem.IResource;
-import saros.intellij.project.filesystem.IntelliJPathImpl;
 import saros.intellij.runtime.FilesystemRunner;
 
 /** Intellij implementation of the Saros folder interface. */

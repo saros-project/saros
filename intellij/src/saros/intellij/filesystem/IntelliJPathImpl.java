@@ -1,4 +1,4 @@
-package saros.intellij.project.filesystem;
+package saros.intellij.filesystem;
 
 import java.io.File;
 import java.nio.file.Path;
