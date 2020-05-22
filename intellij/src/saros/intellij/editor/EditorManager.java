@@ -393,22 +393,22 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
         }
 
         @Override
-        public void resourcesAdded(final IProject project) {
-          executeInUIThreadSynchronous(() -> addProjectResources(project));
+        public void resourcesAdded(final IProject referencePoint) {
+          executeInUIThreadSynchronous(() -> addReferencePointResources(referencePoint));
         }
 
         /**
          * Sends the awareness information for all open shared editors. This is done to populate the
-         * UserEditorState of the participant that finished the project negotiation.
+         * UserEditorState of the participant that finished the reference point negotiation.
          *
          * <p>This is done by first sending the needed state for all locally open editors. After the
          * awareness information for all locally open editors (including the active editor) has been
          * transmitted, a second editor activated activity is send for the locally active editor to
          * correctly set the active editor in the remote user editor state for the local user.
          *
-         * <p>This will not be executed for the user that finished the project negotiation as their
-         * user editor state will be propagated through {@link #resourcesAdded(IProject)} when the
-         * shared resources are initially added.
+         * <p>This will not be executed for the user that finished the reference point negotiation
+         * as their user editor state will be propagated through {@link #resourcesAdded(IProject)}
+         * when the shared resources are initially added.
          */
         private void sendAwarenessInformation(@NotNull User user) {
           User localUser = session.getLocalUser();
@@ -547,14 +547,14 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   }
 
   /**
-   * Adds all currently open text editors belonging to the passed project to the pool of open
-   * editors.
+   * Adds all currently open text editors belonging to the passed reference point to the pool of
+   * open editors.
    *
-   * @param project the added project
+   * @param referencePoint the added reference point
    */
-  private void addProjectResources(IProject project) {
-    IntellijReferencePoint referencePoint = (IntellijReferencePoint) project;
-    Project intellijProject = referencePoint.getIntellijProject();
+  private void addReferencePointResources(IProject referencePoint) {
+    IntellijReferencePoint intellijReferencePoint = (IntellijReferencePoint) referencePoint;
+    Project intellijProject = intellijReferencePoint.getIntellijProject();
 
     Map<IFile, Editor> openFileMapping = new HashMap<>();
 
@@ -566,7 +566,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
       setLocalViewPortChangeHandlersEnabled(false);
 
       for (VirtualFile openFile : ProjectAPI.getOpenFiles(intellijProject)) {
-        IFile file = (IFile) VirtualFileConverter.convertToResource(openFile, project);
+        IFile file = (IFile) VirtualFileConverter.convertToResource(openFile, referencePoint);
 
         if (file == null) {
           continue;
@@ -577,7 +577,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           continue;
         }
 
-        Editor editor = localEditorHandler.openEditor(openFile, project, false);
+        Editor editor = localEditorHandler.openEditor(openFile, referencePoint, false);
 
         if (editor != null) {
           openFileMapping.put(file, editor);
@@ -596,7 +596,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     Set<String> selectedFiles = new HashSet<>();
 
     for (VirtualFile selectedFile : ProjectAPI.getSelectedFiles(intellijProject)) {
-      if (VirtualFileConverter.convertToResource(selectedFile, project) != null) {
+      if (VirtualFileConverter.convertToResource(selectedFile, referencePoint) != null) {
         selectedFiles.add(selectedFile.getPath());
       }
     }
@@ -958,7 +958,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
     /*
      * hack to avoid sending activities for changes caused by received
-     * activities during the project negotiation
+     * activities during the reference point negotiation
      */
     if (fileReplacementInProgressObservable.isReplacementInProgress()) {
       if (log.isTraceEnabled()) {
@@ -1102,7 +1102,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   }
 
   @Override
-  public void saveEditors(final IProject project) {
+  public void saveEditors(final IProject referencePoint) {
     DocumentAPI.saveAllDocuments();
   }
 
@@ -1181,7 +1181,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   }
 
   /**
-   * Starts the listeners for the given editor and adds it to the editor pool with the given file.
+   * Adds the given editor to the editor pool with the given file.
    *
    * <p><b>NOTE:</b> This method should only be used when adding editors for files that are not yet
    * part of the session scope. This can be the case when an open file is moved into the session
