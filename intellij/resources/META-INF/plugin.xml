@@ -54,7 +54,7 @@
       id="saros.ShareWith"
       icon="/icons/famfamfam/session_tsk.png" text="_Share With..."
       description="Share this module using Saros"
-      class="saros.intellij.ui.menu.SarosFileShareGroup">
+      class="saros.intellij.ui.menu.SarosResourceShareGroup">
       <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
     </group>
   </actions>

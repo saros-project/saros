@@ -32,9 +32,14 @@ import saros.intellij.ui.util.NotificationPanel;
 import saros.net.xmpp.JID;
 
 /**
- * Contact pop-up menu for selecting a project and module to share. Opened when right-clicking on a
- * contact.
+ * Contact pop-up menu for selecting a project and reference point to share. Opened when
+ * right-clicking on a contact.
+ *
+ * <p>With the current implementation, only reference points representing a module with a single
+ * content root are displayed.
  */
+// TODO add menu point to open dialog to choose directory to share once added
+//  TODO move project module to separate section listed first
 class ContactPopMenu extends JPopupMenu {
 
   private static final Logger log = Logger.getLogger(ContactPopMenu.class);
@@ -126,9 +131,8 @@ class ContactPopMenu extends JPopupMenu {
   }
 
   /**
-   * Creates the menu entries for the modules contained in the project, excluding the project
-   * module. Returns the created entries grouped by whether the described module is shareable or
-   * not.
+   * Creates the menu entries for the modules contained in the project. Returns the created entries
+   * grouped by whether the described module is shareable or not.
    *
    * <p>Shareable module entries trigger the session negotiation when interacted with. Non-shareable
    * module entries are disabled and carry a tooltip explaining why the module can not be shared.
@@ -213,7 +217,7 @@ class ContactPopMenu extends JPopupMenu {
     public void actionPerformed(ActionEvent e) {
       if (referencePoint == null || !referencePoint.exists()) {
         log.error(
-            "The IProject object for the module "
+            "The reference point object for the content root of the module "
                 + moduleName
                 + " could not be created. This most likely means that the local Intellij instance "
                 + "does not know any module with the given name.");

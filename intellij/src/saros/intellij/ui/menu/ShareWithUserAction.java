@@ -23,7 +23,7 @@ import saros.net.xmpp.JID;
 /**
  * An Action that starts a session when triggered.
  *
- * <p>Calls {@link CollaborationUtils#startSession(Set, List)} with the selected module as
+ * <p>Calls {@link CollaborationUtils#startSession(Set, List)} with the selected directory as
  * parameter.
  */
 public class ShareWithUserAction extends AnAction {
@@ -47,13 +47,13 @@ public class ShareWithUserAction extends AnAction {
     Project project = event.getProject();
     if (project == null) {
       throw new IllegalStateException(
-          "Unable to start session - could not determine project for highlighted resource.");
+          "Unable to start session - could not determine project for highlighted directory.");
     }
 
     VirtualFile virtualFile = event.getData(CommonDataKeys.VIRTUAL_FILE);
     if (virtualFile == null) {
       throw new IllegalStateException(
-          "Unable to start session - could not determine virtual file for highlighted resource.");
+          "Unable to start session - could not determine virtual file for highlighted directory.");
     }
 
     IProject referencePoint;
@@ -66,19 +66,19 @@ public class ShareWithUserAction extends AnAction {
 
       NotificationPanel.showError(
           MessageFormat.format(
-              Messages.ShareWithUserAction_failed_to_share_resource_message, e.getMessage()),
-          Messages.ShareWithUserAction_failed_to_share_resource_title);
+              Messages.ShareWithUserAction_failed_to_share_directory_message, e.getMessage()),
+          Messages.ShareWithUserAction_failed_to_share_directory_title);
 
       return;
     }
 
-    Set<IProject> projects = new HashSet<>();
-    projects.add(referencePoint);
+    Set<IProject> referencePoints = new HashSet<>();
+    referencePoints.add(referencePoint);
 
     List<JID> contacts = Collections.singletonList(userJID);
 
     SharedIDEContext.preregisterProject(project);
-    CollaborationUtils.startSession(projects, contacts);
+    CollaborationUtils.startSession(referencePoints, contacts);
   }
 
   @Override

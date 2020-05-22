@@ -68,12 +68,12 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode implements Dispo
         }
 
         @Override
-        public void resourcesAdded(final IProject project) {
+        public void resourcesAdded(final IProject referencePoint) {
           UIUtil.invokeLaterIfNeeded(
               new Runnable() {
                 @Override
                 public void run() {
-                  addProjectNode(project);
+                  addProjectNode(referencePoint);
                 }
               });
         }
@@ -185,14 +185,14 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode implements Dispo
     treeView.expandRow(2);
   }
 
-  private void addProjectNode(IProject project) {
-    for (DefaultMutableTreeNode nSession : sessionNodeList.values()) {
-      ProjectInfo projInfo = new ProjectInfo(project);
+  private void addProjectNode(IProject referencePoint) {
+    for (DefaultMutableTreeNode sessionNode : sessionNodeList.values()) {
+      ReferencePointInfo referencePointInfo = new ReferencePointInfo(referencePoint);
 
-      DefaultMutableTreeNode nProject = new DefaultMutableTreeNode(projInfo);
-      treeModel.insertNodeInto(nProject, nSession, nSession.getChildCount());
+      DefaultMutableTreeNode referencePointNode = new DefaultMutableTreeNode(referencePointInfo);
+      treeModel.insertNodeInto(referencePointNode, sessionNode, sessionNode.getChildCount());
 
-      treeModel.reload(nSession);
+      treeModel.reload(sessionNode);
     }
   }
 
@@ -229,7 +229,7 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode implements Dispo
     private final ISarosSession session;
 
     private SessionInfo(ISarosSession session) {
-      super("Shared Modules and Projects");
+      super("Shared Reference Points");
       this.session = session;
     }
 
@@ -253,22 +253,21 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode implements Dispo
     }
   }
 
-  protected class ProjectInfo extends LeafInfo {
-    private final IProject project;
+  private static class ReferencePointInfo extends LeafInfo {
+    private final IProject referencePoint;
 
-    public ProjectInfo(IProject project) {
-      super(project.getName());
-      this.project = project;
+    public ReferencePointInfo(IProject referencePoint) {
+      super(referencePoint.getName());
+      this.referencePoint = referencePoint;
     }
 
-    public IProject getProject() {
-      return project;
+    public IProject getReferencePoint() {
+      return referencePoint;
     }
 
     @Override
     public String toString() {
-
-      return project.getName();
+      return referencePoint.getName();
     }
   }
 }

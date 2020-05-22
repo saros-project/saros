@@ -56,7 +56,7 @@ public class Messages {
   public static String ConsistencyButton_tooltip_functionality;
   public static String ConsistencyButton_tooltip_inconsistency_detected;
   public static String ConsistencyButton_tooltip_no_inconsistency;
-  public static String ConsistencyButton_inconsistent_list_module;
+  public static String ConsistencyButton_inconsistent_list_reference_point;
   public static String ConsistencyButton_inconsistent_list_file;
 
   public static String FollowButton_tooltip;
@@ -164,8 +164,8 @@ public class Messages {
   public static String ContactPopMenu_module_not_found_message_condition;
 
   public static String ShareWithUserAction_description;
-  public static String ShareWithUserAction_failed_to_share_resource_title;
-  public static String ShareWithUserAction_failed_to_share_resource_message;
+  public static String ShareWithUserAction_failed_to_share_directory_title;
+  public static String ShareWithUserAction_failed_to_share_directory_message;
 
   public static String SessionStatusChangeHandler_session_started_title;
   public static String SessionStatusChangeHandler_session_started_host_message;
