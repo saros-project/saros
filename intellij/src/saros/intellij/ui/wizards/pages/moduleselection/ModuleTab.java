@@ -7,6 +7,7 @@ import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.project.ProjectUtil;
+import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.vfs.LocalFileSystem;
@@ -266,28 +267,36 @@ class ModuleTab {
   }
 
   /**
-   * Checks all open projects if they contain a module with the given name. If such a module is
-   * found, the project containing the module is chosen as the default selection. If multiple of
-   * such projects exist, the first one found by the search is used. If not project is found, the
-   * first one of the list is selected instead.
+   * Checks all open projects if the name of its base directory or the name of one of the content
+   * roots of one of its modules matches the name of the shared reference point. If such a directory
+   * is found, the corresponding project is chosen as the default selection. If multiple of such
+   * projects exist, the first one found by the search is used. If no project is found, the first
+   * one of the list is selected instead.
    *
    * <p>Calls {@link #setInitialInputForProject(Project)} with the selected project to determine the
    * default values and selection for the other fields.
    */
-  // TODO update to no longer use modules
   private void setInitialInput() {
     int projectCount = projectComboBox.getItemCount();
 
     for (int i = 0; i < projectCount; i++) {
       Project project = projectComboBox.getItemAt(i);
 
+      VirtualFile projectBaseDir = ProjectUtil.guessProjectDir(project);
+      if (projectBaseDir != null && projectBaseDir.getName().equals(moduleName)) {
+        setInitialInputForProject(project);
+
+        return;
+      }
+
       Module[] modules = ModuleManager.getInstance(project).getModules();
-
       for (Module module : modules) {
-        if (module.getName().equals(moduleName)) {
-          setInitialInputForProject(project);
+        for (VirtualFile contentRoot : ModuleRootManager.getInstance(module).getContentRoots()) {
+          if (contentRoot.getName().equals(moduleName)) {
+            setInitialInputForProject(project);
 
-          return;
+            return;
+          }
         }
       }
     }
@@ -317,24 +326,46 @@ class ModuleTab {
   }
 
   /**
-   * Updates the contained fields for the given project. Sets the given module name as the new
-   * module name. Sets the base path of the chosen project as the base path for the new module. Adds
-   * all modules of the project to the combo-box for existing modules.
+   * Updates the contained fields for the given project. Sets the given reference point name as the
+   * new directory name. Sets the base path of the chosen project as the base path for the new
+   * directory.
    *
-   * <p>Also sets the default selection for the selected project. If the project contains a module
-   * with the given module name, the option to use it for the project negotiation is selected by
-   * default. Otherwise, the option to create a new module is selected by default and the selection
-   * in the existing module combo-box is cleared.
+   * <p>Also sets the default option for the selected project. If the name of the project root
+   * directory matches the name of the shared reference point or the project contains a module with
+   * a content root that matches the given reference point name, the option to use it for the
+   * project negotiation is selected by default. Otherwise, the option to create a new directory is
+   * selected by default.
    *
    * @param project the newly selected project to set the default values and selection for
    */
-  // TODO update to no longer use modules
   private void updateFieldsForProjectChange(@NotNull Project project) {
     newModuleNameTextField.setText(moduleName);
 
     VirtualFile projectBaseDir = ProjectUtil.guessProjectDir(project);
     if (projectBaseDir != null) {
       newModuleBasePathTextField.setText(projectBaseDir.getPath());
+
+      if (projectBaseDir.getName().equals(moduleName)) {
+        useExistingModuleRadioButton.doClick();
+
+        existingDirectoryPathTextField.setText(projectBaseDir.getPath());
+
+        return;
+      }
+    }
+
+    Module[] modules = ModuleManager.getInstance(project).getModules();
+
+    for (Module module : modules) {
+      for (VirtualFile contentRoot : ModuleRootManager.getInstance(module).getContentRoots()) {
+        if (contentRoot.getName().equals(moduleName)) {
+          useExistingModuleRadioButton.doClick();
+
+          existingDirectoryPathTextField.setText(contentRoot.getPath());
+
+          return;
+        }
+      }
     }
 
     createNewModuleRadioButton.doClick();
