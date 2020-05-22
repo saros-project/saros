@@ -17,9 +17,8 @@ import saros.filesystem.IResource;
 import saros.intellij.project.filesystem.IntelliJPathImpl;
 
 /** Intellij implementation of the Saros reference point interface. */
-// TODO rename to IntellijReferencePoint
-public class IntellijReferencePointImpl implements IProject {
-  private static final Logger log = Logger.getLogger(IntellijReferencePointImpl.class);
+public class IntellijReferencePoint implements IProject {
+  private static final Logger log = Logger.getLogger(IntellijReferencePoint.class);
 
   /** The project instance the reference point is bound to. */
   private final Project project;
@@ -27,7 +26,7 @@ public class IntellijReferencePointImpl implements IProject {
   /** The virtual file represented by this reference point. */
   private final VirtualFile virtualFile;
 
-  public IntellijReferencePointImpl(@NotNull Project project, @NotNull VirtualFile virtualFile) {
+  public IntellijReferencePoint(@NotNull Project project, @NotNull VirtualFile virtualFile) {
 
     if (!project.isInitialized()) {
       throw new IllegalArgumentException("The given project must be initialized - " + project);
@@ -89,8 +88,8 @@ public class IntellijReferencePointImpl implements IProject {
 
       result.add(
           child.isDirectory()
-              ? new IntellijFolderImplV2(this, childPath)
-              : new IntellijFileImplV2(this, childPath));
+              ? new IntellijFolder(this, childPath)
+              : new IntellijFile(this, childPath));
     }
 
     return result;
@@ -163,7 +162,7 @@ public class IntellijReferencePointImpl implements IProject {
       throw new IllegalArgumentException("Can not create file handle for an empty path");
     }
 
-    return new IntellijFileImplV2(this, path);
+    return new IntellijFile(this, path);
   }
 
   /**
@@ -181,7 +180,7 @@ public class IntellijReferencePointImpl implements IProject {
 
     IPath relativePath = getReferencePointRelativePath(file);
 
-    return relativePath != null ? new IntellijFileImplV2(this, relativePath) : null;
+    return relativePath != null ? new IntellijFile(this, relativePath) : null;
   }
 
   @Override
@@ -197,7 +196,7 @@ public class IntellijReferencePointImpl implements IProject {
       throw new IllegalArgumentException("Can not create folder handle for an empty path");
     }
 
-    return new IntellijFolderImplV2(this, path);
+    return new IntellijFolder(this, path);
   }
 
   /**
@@ -219,7 +218,7 @@ public class IntellijReferencePointImpl implements IProject {
 
     IPath relativePath = getReferencePointRelativePath(file);
 
-    return relativePath != null ? new IntellijFolderImplV2(this, relativePath) : null;
+    return relativePath != null ? new IntellijFolder(this, relativePath) : null;
   }
 
   /**
@@ -265,7 +264,7 @@ public class IntellijReferencePointImpl implements IProject {
     if (obj == null) return false;
     if (getClass() != obj.getClass()) return false;
 
-    IntellijReferencePointImpl other = (IntellijReferencePointImpl) obj;
+    IntellijReferencePoint other = (IntellijReferencePoint) obj;
 
     return this.virtualFile.equals(other.virtualFile);
   }

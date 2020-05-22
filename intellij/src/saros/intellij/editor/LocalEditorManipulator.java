@@ -14,7 +14,7 @@ import saros.editor.text.LineRange;
 import saros.editor.text.TextSelection;
 import saros.filesystem.IFile;
 import saros.intellij.editor.annotations.AnnotationManager;
-import saros.intellij.filesystem.IntellijReferencePointImpl;
+import saros.intellij.filesystem.IntellijReferencePoint;
 import saros.intellij.filesystem.VirtualFileConverter;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.util.NotificationPanel;
@@ -78,7 +78,7 @@ public class LocalEditorManipulator {
       return null;
     }
 
-    Project project = ((IntellijReferencePointImpl) file.getProject()).getIntellijProject();
+    Project project = ((IntellijReferencePoint) file.getProject()).getIntellijProject();
 
     Editor editor = ProjectAPI.openEditor(project, virtualFile, activate);
 
@@ -118,7 +118,7 @@ public class LocalEditorManipulator {
       return;
     }
 
-    Project project = ((IntellijReferencePointImpl) file.getProject()).getIntellijProject();
+    Project project = ((IntellijReferencePoint) file.getProject()).getIntellijProject();
 
     if (ProjectAPI.isOpen(project, virtualFile)) {
       ProjectAPI.closeEditor(project, virtualFile);
@@ -235,7 +235,7 @@ public class LocalEditorManipulator {
       return;
     }
 
-    Project project = ((IntellijReferencePointImpl) file.getProject()).getIntellijProject();
+    Project project = ((IntellijReferencePoint) file.getProject()).getIntellijProject();
 
     Document document = DocumentAPI.getDocument(virtualFile);
     if (document == null) {

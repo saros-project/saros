@@ -36,7 +36,7 @@ import saros.intellij.context.SharedIDEContext;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.eventhandler.IProjectEventHandler.ProjectEventHandlerType;
 import saros.intellij.eventhandler.editor.editorstate.ViewportAdjustmentExecutor;
-import saros.intellij.filesystem.IntellijReferencePointImpl;
+import saros.intellij.filesystem.IntellijReferencePoint;
 import saros.intellij.filesystem.VirtualFileConverter;
 import saros.intellij.runtime.EDTExecutor;
 import saros.intellij.runtime.FilesystemRunner;
@@ -220,7 +220,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
             @NotNull String replacedText,
             @NotNull String newText) {
 
-          Project project = ((IntellijReferencePointImpl) file.getProject()).getIntellijProject();
+          Project project = ((IntellijReferencePoint) file.getProject()).getIntellijProject();
 
           if (!replacedText.isEmpty()) {
             String documentReplacedText = document.getText(new TextRange(start, oldEnd));
@@ -553,7 +553,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    * @param project the added project
    */
   private void addProjectResources(IProject project) {
-    IntellijReferencePointImpl referencePoint = (IntellijReferencePointImpl) project;
+    IntellijReferencePoint referencePoint = (IntellijReferencePoint) project;
     Project intellijProject = referencePoint.getIntellijProject();
 
     Map<IFile, Editor> openFileMapping = new HashMap<>();
@@ -1138,7 +1138,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
     Set<String> visibleFilePaths = new HashSet<>();
 
-    Project project = ((IntellijReferencePointImpl) file.getProject()).getIntellijProject();
+    Project project = ((IntellijReferencePoint) file.getProject()).getIntellijProject();
 
     for (VirtualFile virtualFile : ProjectAPI.getSelectedFiles(project)) {
       visibleFilePaths.add(virtualFile.getPath());

@@ -20,13 +20,10 @@ import saros.filesystem.IResource;
 import saros.intellij.runtime.FilesystemRunner;
 
 /** Intellij implementation of the Saros file interface. */
-// TODO rename to IntellijFile
-public class IntellijFileImplV2 extends IntellijResourceImplV2 implements IFile {
-  private static final Logger log = Logger.getLogger(IntellijFileImplV2.class);
+public class IntellijFile extends AbstractIntellijResource implements IFile {
+  private static final Logger log = Logger.getLogger(IntellijFile.class);
 
-  public IntellijFileImplV2(
-      @NotNull IntellijReferencePointImpl referencePoint, @NotNull IPath relativePath) {
-
+  public IntellijFile(@NotNull IntellijReferencePoint referencePoint, @NotNull IPath relativePath) {
     super(referencePoint, relativePath);
   }
 

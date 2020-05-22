@@ -24,7 +24,7 @@ import saros.filesystem.checksum.IChecksumCache;
 import saros.intellij.context.SharedIDEContext;
 import saros.intellij.editor.DocumentAPI;
 import saros.intellij.editor.ProjectAPI;
-import saros.intellij.filesystem.IntellijReferencePointImpl;
+import saros.intellij.filesystem.IntellijReferencePoint;
 import saros.intellij.runtime.FilesystemRunner;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.util.NotificationPanel;
@@ -252,7 +252,7 @@ public class AddProjectToSessionWizard extends Wizard {
           IProject sharedReferencePoint;
 
           try {
-            sharedReferencePoint = new IntellijReferencePointImpl(project, referencePointFile);
+            sharedReferencePoint = new IntellijReferencePoint(project, referencePointFile);
 
           } catch (IllegalArgumentException e) {
             log.error(
@@ -292,7 +292,7 @@ public class AddProjectToSessionWizard extends Wizard {
           IProject referencePoint;
 
           try {
-            referencePoint = new IntellijReferencePointImpl(project, existingDirectory);
+            referencePoint = new IntellijReferencePoint(project, existingDirectory);
 
           } catch (IllegalArgumentException e) {
             log.error(

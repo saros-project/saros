@@ -7,7 +7,7 @@ import com.intellij.openapi.project.ProjectManagerListener;
 import com.intellij.util.messages.MessageBusConnection;
 import org.jetbrains.annotations.NotNull;
 import saros.filesystem.IProject;
-import saros.intellij.filesystem.IntellijReferencePointImpl;
+import saros.intellij.filesystem.IntellijReferencePoint;
 import saros.repackaged.picocontainer.Disposable;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
@@ -35,8 +35,7 @@ public class ProjectClosedHandler implements Disposable {
           boolean closedProjectContainedSharedResources = false;
 
           for (IProject referencePoint : sarosSession.getProjects()) {
-            IntellijReferencePointImpl intellijReferencePoint =
-                (IntellijReferencePointImpl) referencePoint;
+            IntellijReferencePoint intellijReferencePoint = (IntellijReferencePoint) referencePoint;
 
             if (intellijReferencePoint.getIntellijProject().equals(project)) {
               sarosSession.setActivityExecution(intellijReferencePoint, false);

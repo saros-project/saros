@@ -25,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
 import saros.core.ui.util.CollaborationUtils;
 import saros.filesystem.IProject;
 import saros.intellij.context.SharedIDEContext;
-import saros.intellij.filesystem.IntellijReferencePointImpl;
+import saros.intellij.filesystem.IntellijReferencePoint;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.util.IconManager;
 import saros.intellij.ui.util.NotificationPanel;
@@ -170,7 +170,7 @@ class ContactPopMenu extends JPopupMenu {
 
         VirtualFile contentRoot = contentRoots[0];
 
-        IProject wrappedModule = new IntellijReferencePointImpl(project, contentRoot);
+        IProject wrappedModule = new IntellijReferencePoint(project, contentRoot);
 
         JMenuItem moduleItem = new JMenuItem(moduleName);
         moduleItem.setToolTipText(Messages.ContactPopMenu_menu_tooltip_share_module);

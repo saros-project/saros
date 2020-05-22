@@ -19,12 +19,11 @@ import saros.intellij.project.filesystem.IntelliJPathImpl;
 import saros.intellij.runtime.FilesystemRunner;
 
 /** Intellij implementation of the Saros folder interface. */
-// TODO rename to IntellijFolder
-public class IntellijFolderImplV2 extends IntellijResourceImplV2 implements IFolder {
-  private static final Logger log = Logger.getLogger(IntellijFolderImplV2.class);
+public class IntellijFolder extends AbstractIntellijResource implements IFolder {
+  private static final Logger log = Logger.getLogger(IntellijFolder.class);
 
-  public IntellijFolderImplV2(
-      @NotNull IntellijReferencePointImpl referencePoint, @NotNull IPath relativePath) {
+  public IntellijFolder(
+      @NotNull IntellijReferencePoint referencePoint, @NotNull IPath relativePath) {
 
     super(referencePoint, relativePath);
   }
@@ -79,8 +78,8 @@ public class IntellijFolderImplV2 extends IntellijResourceImplV2 implements IFol
 
       result.add(
           child.isDirectory()
-              ? new IntellijFolderImplV2(referencePoint, childPath)
-              : new IntellijFileImplV2(referencePoint, childPath));
+              ? new IntellijFolder(referencePoint, childPath)
+              : new IntellijFile(referencePoint, childPath));
     }
 
     return result;
@@ -101,7 +100,7 @@ public class IntellijFolderImplV2 extends IntellijResourceImplV2 implements IFol
 
     IPath referencePointRelativeChildPath = relativePath.append(path);
 
-    return new IntellijFileImplV2(referencePoint, referencePointRelativeChildPath);
+    return new IntellijFile(referencePoint, referencePointRelativeChildPath);
   }
 
   @Override
@@ -119,7 +118,7 @@ public class IntellijFolderImplV2 extends IntellijResourceImplV2 implements IFol
 
     IPath referencePointRelativeChildPath = relativePath.append(path);
 
-    return new IntellijFolderImplV2(referencePoint, referencePointRelativeChildPath);
+    return new IntellijFolder(referencePoint, referencePointRelativeChildPath);
   }
 
   @Override
@@ -153,7 +152,7 @@ public class IntellijFolderImplV2 extends IntellijResourceImplV2 implements IFol
       throw new IOException("Failed to delete " + this + " as it is not a folder");
     }
 
-    virtualFile.delete(IntellijFolderImplV2.this);
+    virtualFile.delete(IntellijFolder.this);
   }
 
   @Override

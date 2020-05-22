@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import saros.filesystem.IFile;
 import saros.filesystem.IProject;
-import saros.intellij.filesystem.IntellijReferencePointImpl;
+import saros.intellij.filesystem.IntellijReferencePoint;
 import saros.intellij.filesystem.VirtualFileConverter;
 import saros.session.ISarosSession;
 
@@ -128,7 +128,7 @@ public class LocalEditorHandler {
       return null;
     }
 
-    Project project = ((IntellijReferencePointImpl) file.getProject()).getIntellijProject();
+    Project project = ((IntellijReferencePoint) file.getProject()).getIntellijProject();
 
     Editor editor = ProjectAPI.openEditor(project, virtualFile, activate);
 
@@ -255,7 +255,7 @@ public class LocalEditorHandler {
       return false;
     }
 
-    Project project = ((IntellijReferencePointImpl) file.getProject()).getIntellijProject();
+    Project project = ((IntellijReferencePoint) file.getProject()).getIntellijProject();
 
     return ProjectAPI.isOpen(project, doc);
   }
