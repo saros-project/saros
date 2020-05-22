@@ -79,6 +79,8 @@ public class JoinSessionWizard extends Wizard {
         new HeaderPanel(
             Messages.ShowDescriptionPage_title2, Messages.ShowDescriptionPage_description));
 
+    setModal(true);
+
     this.negotiation = negotiation;
     this.peer = negotiation.getPeer();
 

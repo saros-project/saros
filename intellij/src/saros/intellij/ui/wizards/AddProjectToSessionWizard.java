@@ -536,6 +536,8 @@ public class AddProjectToSessionWizard extends Wizard {
             Messages.AddProjectToSessionWizard_title2,
             Messages.AddProjectToSessionWizard_description));
 
+    setModal(true);
+
     SarosPluginContext.initComponent(this);
 
     this.negotiation = negotiation;

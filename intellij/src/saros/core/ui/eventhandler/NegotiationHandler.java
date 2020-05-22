@@ -82,7 +82,7 @@ public class NegotiationHandler implements INegotiationHandler {
         () -> {
           JoinSessionWizard wizard =
               new JoinSessionWizard(project, getWindow(project), negotiation);
-          wizard.setModal(true);
+
           wizard.open();
         },
         ModalityState.defaultModalityState());
@@ -96,7 +96,6 @@ public class NegotiationHandler implements INegotiationHandler {
           AddProjectToSessionWizard wizard =
               new AddProjectToSessionWizard(project, getWindow(project), negotiation);
 
-          wizard.setModal(false);
           wizard.open();
         },
         ModalityState.defaultModalityState());
