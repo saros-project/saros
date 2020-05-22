@@ -88,7 +88,7 @@ public class ReferencePointSelectionResult {
    * This value can be <code>null</code> if the mode {@link
    * LocalRepresentationOption#CREATE_NEW_DIRECTORY} is chosen.
    *
-   * @return the chosen existing module to use for the session
+   * @return the chosen existing virtual file to use for the session
    */
   @Nullable
   public VirtualFile getExistingDirectory() {

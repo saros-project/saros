@@ -241,7 +241,7 @@ public class CollaborationUtils {
 
         result.append(
             String.format(
-                "\nModule: %s, Files: %d, Size: %s",
+                "\nReference Point: %s, Files: %d, Size: %s",
                 project.getName(),
                 fileCountAndSize.getRight(),
                 format(fileCountAndSize.getLeft())));

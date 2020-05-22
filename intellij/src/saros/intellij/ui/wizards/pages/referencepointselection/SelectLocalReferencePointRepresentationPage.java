@@ -12,53 +12,57 @@ import saros.intellij.ui.wizards.pages.AbstractWizardPage;
 import saros.intellij.ui.wizards.pages.PageActionListener;
 
 /**
- * Wizard page to choose how the shared modules are represented locally. For each shared module, a
- * {@link ReferencePointTab} is created.
+ * Wizard page to choose how the shared reference points are represented locally. For each shared
+ * reference point, a {@link ReferencePointTab} is created.
  */
 public class SelectLocalReferencePointRepresentationPage extends AbstractWizardPage {
 
   private final JTabbedPane tabbedBasePane;
-  private final Map<String, ReferencePointTab> moduleTabs;
-  private final ModuleTabStateListener moduleTabStateListener;
+  private final Map<String, ReferencePointTab> referencePointTabs;
+  private final ReferencePointTabStateListener referencePointTabStateListener;
 
   public SelectLocalReferencePointRepresentationPage(
-      String id, PageActionListener pageActionListener, Set<String> moduleNames) {
+      String id, PageActionListener pageActionListener, Set<String> referencePointNames) {
+
     super(id, pageActionListener);
 
     tabbedBasePane = new JBTabbedPane();
-    moduleTabs = new HashMap<>();
-    moduleTabStateListener = new ModuleTabStateListener();
+    referencePointTabs = new HashMap<>();
+    referencePointTabStateListener = new ReferencePointTabStateListener();
 
-    moduleNames.forEach(this::addModuleTab);
+    referencePointNames.forEach(this::addReferencePointTab);
 
     add(tabbedBasePane);
   }
 
   /**
-   * Creates a module tab for the given module name and adds it to the tabbed module view.
+   * Creates a reference point tab for the given reference point name and adds it to the tabbed
+   * reference point view.
    *
-   * @param moduleName the name of a shared module contained in the project negotiation data
+   * @param referencePointName the name of a shared reference point contained in the reference point
+   *     negotiation data
    */
-  private void addModuleTab(@NotNull String moduleName) {
-    ReferencePointTab referencePointTab = new ReferencePointTab(moduleName, moduleTabStateListener);
+  private void addReferencePointTab(@NotNull String referencePointName) {
+    ReferencePointTab referencePointTab =
+        new ReferencePointTab(referencePointName, referencePointTabStateListener);
 
-    moduleTabs.put(referencePointTab.getModuleName(), referencePointTab);
+    referencePointTabs.put(referencePointTab.getReferencePointName(), referencePointTab);
 
-    tabbedBasePane.addTab(referencePointTab.getModuleName(), referencePointTab.getPanel());
+    tabbedBasePane.addTab(referencePointTab.getReferencePointName(), referencePointTab.getPanel());
   }
 
   /**
-   * Checks whether all contained module tabs have a valid input.
+   * Checks whether all contained reference point tabs have a valid input.
    *
-   * <p>Enables the 'Next' button if the input of <i>all</i> module tabs is valid, disables the
-   * button otherwise.
+   * <p>Enables the 'Next' button if the input of <i>all</i> tabs is valid, disables the button
+   * otherwise.
    */
-  private void checkModuleTabValidityState() {
+  private void checkReferencePointTabValidityState() {
     if (wizard == null) {
       return;
     }
 
-    for (ReferencePointTab referencePointTab : moduleTabs.values()) {
+    for (ReferencePointTab referencePointTab : referencePointTabs.values()) {
       boolean tabInputIsValid = referencePointTab.hasValidInput();
 
       if (!tabInputIsValid) {
@@ -71,21 +75,24 @@ public class SelectLocalReferencePointRepresentationPage extends AbstractWizardP
   }
 
   /**
-   * Returns the module selection results of the module tab for the given module name.
+   * Returns the reference point selection results of the tab for the given reference point name.
    *
-   * @param moduleName the name of the shared module contained in the project negotiation data
-   * @return the module selection results of the module tab for the given module name or <code>null
-   *     </code> if there is no module tab for the given name
+   * @param referencePointName the name of the shared reference point contained in the reference
+   *     point negotiation data
+   * @return the reference point selection results of the tab for the given reference point name or
+   *     <code>null</code> if there is no reference point tab for the given name
    */
   @Nullable
-  public ReferencePointSelectionResult getModuleSelectionResult(@NotNull String moduleName) {
-    ReferencePointTab referencePointTab = moduleTabs.get(moduleName);
+  public ReferencePointSelectionResult getReferencePointSelectionResult(
+      @NotNull String referencePointName) {
+
+    ReferencePointTab referencePointTab = referencePointTabs.get(referencePointName);
 
     if (referencePointTab == null) {
       return null;
     }
 
-    return referencePointTab.getModuleSelectionResult();
+    return referencePointTab.getReferencePointSelectionResult();
   }
 
   @Override
@@ -102,18 +109,19 @@ public class SelectLocalReferencePointRepresentationPage extends AbstractWizardP
   public void setWizard(@NotNull Wizard wizard) {
     super.setWizard(wizard);
 
-    checkModuleTabValidityState();
+    checkReferencePointTabValidityState();
   }
 
   /**
-   * A listener for changes in the validity state of input contained in the given module tab.
+   * A listener for changes in the validity state of input contained in the given reference point
+   * tab.
    *
-   * <p>The method {@link #moduleStateChanged()} is called by the registered module tab when its
-   * input validity state changes.
+   * <p>The method {@link #validityStateChanged()} is called by the registered reference point tab
+   * when its input validity state changes.
    */
-  class ModuleTabStateListener {
-    void moduleStateChanged() {
-      checkModuleTabValidityState();
+  class ReferencePointTabStateListener {
+    void validityStateChanged() {
+      checkReferencePointTabValidityState();
     }
   }
 }

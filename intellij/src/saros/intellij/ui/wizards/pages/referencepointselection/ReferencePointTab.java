@@ -43,38 +43,38 @@ import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import saros.intellij.editor.ProjectAPI;
 import saros.intellij.runtime.FilesystemRunner;
 import saros.intellij.ui.Messages;
-import saros.intellij.ui.wizards.pages.referencepointselection.SelectLocalReferencePointRepresentationPage.ModuleTabStateListener;
+import saros.intellij.ui.wizards.pages.referencepointselection.SelectLocalReferencePointRepresentationPage.ReferencePointTabStateListener;
 
 /**
- * Panel to specify how a shared module is represented locally. The available options are to create
- * a new module or to use an already existing module. The options specified by the user can be
- * requested from the module tab through {@link #getModuleSelectionResult()}.
+ * Panel to specify how a shared reference point is represented locally. The available options are
+ * to create a new directory or to use an already existing directory. The options specified by the
+ * user can be requested from the tab using {@link #getReferencePointSelectionResult()}.
  */
-// TODO adjust module references in javadoc, variable and method names, etc.
 class ReferencePointTab {
 
-  private final String moduleName;
-  private final ModuleTabStateListener moduleTabStateListener;
+  private final String referencePointName;
+  private final ReferencePointTabStateListener referencePointTabStateListener;
 
-  private final JPanel moduleTabPanel;
+  private final JPanel referencePointTabPanel;
 
   private final JComboBox<Project> projectComboBox;
-  private final JRadioButton createNewModuleRadioButton;
-  private final JTextField newModuleNameTextField;
-  private final TextFieldWithBrowseButton newModuleBasePathTextField;
-  private final JRadioButton useExistingModuleRadioButton;
+  private final JRadioButton createNewDirectoryRadioButton;
+  private final JTextField newDirectoryNameTextField;
+  private final TextFieldWithBrowseButton newDirectoryBasePathTextField;
+  private final JRadioButton useExistingDirectoryRadioButton;
   private final TextFieldWithBrowseButton existingDirectoryPathTextField;
 
-  private boolean moduleNameTextFieldShownAsValid;
-  private final Border moduleNameTextFieldDefaultBorder;
-  private final Border moduleNameTextFieldErrorBorder;
+  private boolean newDirectoryNameTextFieldShownAsValid;
+  private final Border newDirectoryNameTextFieldDefaultBorder;
+  private final Border newDirectoryNameTextFieldErrorBorder;
 
-  private boolean moduleBasePathTextFieldShownAsValid;
-  private final Border moduleBasePathTextFieldDefaultBorder;
-  private final Border moduleBasePathTextFieldErrorBorder;
+  private boolean newDirectoryBasePathTextFieldShownAsValid;
+  private final Border newDirectoryBasePathTextFieldDefaultBorder;
+  private final Border newDirectoryBasePathTextFieldErrorBorder;
 
   private boolean existingDirectoryPathTextFieldShownAsValid;
   private final Border existingDirectoryPathTextFieldDefaultBorder;
@@ -83,36 +83,40 @@ class ReferencePointTab {
   private boolean hasValidInput;
 
   /**
-   * Creates a panel to specify how a shared module is represented locally.
+   * Creates a panel to specify how a shared reference point is represented locally.
    *
-   * @param moduleName the name of the shared module contained in the project negotiation data
+   * @param referencePointName the name of the shared reference point contained in the reference
+   *     point negotiation data
    */
   ReferencePointTab(
-      @NotNull String moduleName, @NotNull ModuleTabStateListener moduleTabStateListener) {
-    this.moduleName = moduleName;
-    this.moduleTabStateListener = moduleTabStateListener;
+      @NotNull String referencePointName,
+      @NotNull ReferencePointTabStateListener referencePointTabStateListener) {
 
-    this.moduleTabPanel = new JPanel();
+    this.referencePointName = referencePointName;
+    this.referencePointTabStateListener = referencePointTabStateListener;
+
+    this.referencePointTabPanel = new JPanel();
     this.projectComboBox = new ComboBox<>();
-    this.createNewModuleRadioButton = new JBRadioButton();
-    this.useExistingModuleRadioButton = new JBRadioButton();
+    this.createNewDirectoryRadioButton = new JBRadioButton();
+    this.useExistingDirectoryRadioButton = new JBRadioButton();
 
-    this.newModuleNameTextField = new JBTextField();
-    this.newModuleBasePathTextField = new TextFieldWithBrowseButton();
+    this.newDirectoryNameTextField = new JBTextField();
+    this.newDirectoryBasePathTextField = new TextFieldWithBrowseButton();
     this.existingDirectoryPathTextField = new TextFieldWithBrowseButton();
 
-    this.moduleNameTextFieldShownAsValid = true;
-    this.moduleNameTextFieldDefaultBorder = newModuleNameTextField.getBorder();
-    this.moduleNameTextFieldErrorBorder =
+    this.newDirectoryNameTextFieldShownAsValid = true;
+    this.newDirectoryNameTextFieldDefaultBorder = newDirectoryNameTextField.getBorder();
+    this.newDirectoryNameTextFieldErrorBorder =
         BorderFactory.createCompoundBorder(
-            moduleNameTextFieldDefaultBorder, BorderFactory.createLineBorder(JBColor.RED));
+            newDirectoryNameTextFieldDefaultBorder, BorderFactory.createLineBorder(JBColor.RED));
 
-    this.moduleBasePathTextFieldShownAsValid = true;
-    this.moduleBasePathTextFieldDefaultBorder =
-        newModuleBasePathTextField.getTextField().getBorder();
-    this.moduleBasePathTextFieldErrorBorder =
+    this.newDirectoryBasePathTextFieldShownAsValid = true;
+    this.newDirectoryBasePathTextFieldDefaultBorder =
+        newDirectoryBasePathTextField.getTextField().getBorder();
+    this.newDirectoryBasePathTextFieldErrorBorder =
         BorderFactory.createCompoundBorder(
-            moduleBasePathTextFieldDefaultBorder, BorderFactory.createLineBorder(JBColor.RED));
+            newDirectoryBasePathTextFieldDefaultBorder,
+            BorderFactory.createLineBorder(JBColor.RED));
 
     this.existingDirectoryPathTextFieldShownAsValid = true;
     this.existingDirectoryPathTextFieldDefaultBorder =
@@ -133,8 +137,8 @@ class ReferencePointTab {
     setInitialInput();
 
     addProjectComboBoxListener();
-    addCreateNewModuleFieldListeners();
-    addUseExistingModuleFieldListeners();
+    addCreateNewDirectoryFieldListeners();
+    addUseExistingDirectoryFieldListeners();
   }
 
   /**
@@ -156,30 +160,30 @@ class ReferencePointTab {
   }
 
   /**
-   * Sets up the radio buttons used to choose whether to create a new module or use and existing
-   * module for the project negotiation.
+   * Sets up the radio buttons used to choose whether to create a new directory or use and existing
+   * directory for the reference point negotiation.
    */
   private void setUpRadioButtons() {
-    final String CREATE_NEW_MODULE_ACTION_COMMAND = "create new";
-    final String USE_EXISTING_MODULE_ACTION_COMMAND = "use existing";
+    final String CREATE_NEW_DIRECTORY_ACTION_COMMAND = "create new";
+    final String USE_EXISTING_DIRECTORY_ACTION_COMMAND = "use existing";
 
-    createNewModuleRadioButton.setActionCommand(CREATE_NEW_MODULE_ACTION_COMMAND);
-    useExistingModuleRadioButton.setActionCommand(USE_EXISTING_MODULE_ACTION_COMMAND);
+    createNewDirectoryRadioButton.setActionCommand(CREATE_NEW_DIRECTORY_ACTION_COMMAND);
+    useExistingDirectoryRadioButton.setActionCommand(USE_EXISTING_DIRECTORY_ACTION_COMMAND);
 
     ButtonGroup buttonGroup = new ButtonGroup();
-    buttonGroup.add(createNewModuleRadioButton);
-    buttonGroup.add(useExistingModuleRadioButton);
+    buttonGroup.add(createNewDirectoryRadioButton);
+    buttonGroup.add(useExistingDirectoryRadioButton);
 
     ActionListener radioButtonActionListener =
         actionEvent -> {
           switch (actionEvent.getActionCommand()) {
-            case CREATE_NEW_MODULE_ACTION_COMMAND:
-              setCreateNewModuleFieldsEnabled(true);
+            case CREATE_NEW_DIRECTORY_ACTION_COMMAND:
+              setCreateNewDirectoryFieldsEnabled(true);
               setUseExistingDirectoryFieldsEnabled(false);
               break;
 
-            case USE_EXISTING_MODULE_ACTION_COMMAND:
-              setCreateNewModuleFieldsEnabled(false);
+            case USE_EXISTING_DIRECTORY_ACTION_COMMAND:
+              setCreateNewDirectoryFieldsEnabled(false);
               setUseExistingDirectoryFieldsEnabled(true);
               break;
 
@@ -187,31 +191,31 @@ class ReferencePointTab {
               throw new IllegalStateException("Encountered unknown radio button selection.");
           }
 
-          updateNewModuleNameValidityIndicator();
-          updateNewBasePathValidityIndicator();
-          updateExistingModuleValidityIndicator();
+          updateNewDirectoryNameValidityIndicator();
+          updateNewBaseDirectoryValidityIndicator();
+          updateExistingDirectoryValidityIndicator();
 
           updateInputValidity();
         };
 
-    createNewModuleRadioButton.addActionListener(radioButtonActionListener);
-    useExistingModuleRadioButton.addActionListener(radioButtonActionListener);
+    createNewDirectoryRadioButton.addActionListener(radioButtonActionListener);
+    useExistingDirectoryRadioButton.addActionListener(radioButtonActionListener);
   }
 
   /**
-   * Enables or disables all fields belonging to the option to create a new module as part of the
-   * project negotiation.
+   * Enables or disables all fields belonging to the option to create a new directory as part of the
+   * reference point negotiation.
    *
    * @param enabled whether ot not the fields should be set to enabled
    */
-  private void setCreateNewModuleFieldsEnabled(boolean enabled) {
-    newModuleNameTextField.setEnabled(enabled);
-    newModuleBasePathTextField.setEnabled(enabled);
+  private void setCreateNewDirectoryFieldsEnabled(boolean enabled) {
+    newDirectoryNameTextField.setEnabled(enabled);
+    newDirectoryBasePathTextField.setEnabled(enabled);
   }
 
   /**
-   * Enables or disables all fields belonging to the option to use an existing module as part of the
-   * project negotiation.
+   * Enables or disables all fields belonging to the option to use an existing directory as part of
+   * the reference point negotiation.
    *
    * @param enabled whether ot not the fields should be set to enabled
    */
@@ -230,27 +234,27 @@ class ReferencePointTab {
    * is opened instead when the text field is clicked.
    */
   private void setUpFolderChooser() {
-    newModuleBasePathTextField.addBrowseFolderListener(
-        Messages.ModuleTab_module_base_path_file_chooser_title,
-        Messages.ModuleTab_module_base_path_file_chooser_description,
+    newDirectoryBasePathTextField.addBrowseFolderListener(
+        Messages.ReferencePointTab_directory_base_path_file_chooser_title,
+        Messages.ReferencePointTab_directory_base_path_file_chooser_description,
         null,
         FileChooserDescriptorFactory.createSingleFolderDescriptor());
 
-    newModuleBasePathTextField.setEditable(false);
-    newModuleBasePathTextField
+    newDirectoryBasePathTextField.setEditable(false);
+    newDirectoryBasePathTextField
         .getTextField()
         .addMouseListener(
             (MouseClickedListener)
                 e -> {
                   // only act on left click and filter out events where browse button was clicked
                   if (e.getButton() == MouseEvent.BUTTON1 && e.getComponent().hasFocus()) {
-                    newModuleBasePathTextField.getButton().doClick();
+                    newDirectoryBasePathTextField.getButton().doClick();
                   }
                 });
 
     existingDirectoryPathTextField.addBrowseFolderListener(
-        Messages.ModuleTab_existing_directory_path_file_chooser_title,
-        Messages.ModuleTab_existing_directory_path_file_chooser_description,
+        Messages.ReferencePointTab_existing_directory_path_file_chooser_title,
+        Messages.ReferencePointTab_existing_directory_path_file_chooser_description,
         null,
         FileChooserDescriptorFactory.createSingleFolderDescriptor());
 
@@ -284,7 +288,7 @@ class ReferencePointTab {
       Project project = projectComboBox.getItemAt(i);
 
       VirtualFile projectBaseDir = ProjectUtil.guessProjectDir(project);
-      if (projectBaseDir != null && projectBaseDir.getName().equals(moduleName)) {
+      if (projectBaseDir != null && projectBaseDir.getName().equals(referencePointName)) {
         setInitialInputForProject(project);
 
         return;
@@ -293,7 +297,7 @@ class ReferencePointTab {
       Module[] modules = ModuleManager.getInstance(project).getModules();
       for (Module module : modules) {
         for (VirtualFile contentRoot : ModuleRootManager.getInstance(module).getContentRoots()) {
-          if (contentRoot.getName().equals(moduleName)) {
+          if (contentRoot.getName().equals(referencePointName)) {
             setInitialInputForProject(project);
 
             return;
@@ -309,7 +313,7 @@ class ReferencePointTab {
 
   /**
    * Selects the given project in the project combo-box, updates the other fields of the dialogs
-   * accordingly and updates the validity state of the module tab.
+   * accordingly and updates the validity state of the reference point tab.
    *
    * @param project the newly selected project
    * @see #updateFieldsForProjectChange(Project)
@@ -319,16 +323,16 @@ class ReferencePointTab {
     projectComboBox.setSelectedItem(project);
     updateFieldsForProjectChange(project);
 
-    updateNewModuleNameValidityIndicator();
-    updateNewBasePathValidityIndicator();
-    updateExistingModuleValidityIndicator();
+    updateNewDirectoryNameValidityIndicator();
+    updateNewBaseDirectoryValidityIndicator();
+    updateExistingDirectoryValidityIndicator();
 
     updateInputValidity();
   }
 
   /**
    * Updates the contained fields for the given project. Sets the given reference point name as the
-   * new directory name. Sets the base path of the chosen project as the base path for the new
+   * new directory name. Sets the base path of the chosen project as the base directory for the new
    * directory.
    *
    * <p>Also sets the default option for the selected project. If the name of the project root
@@ -340,14 +344,14 @@ class ReferencePointTab {
    * @param project the newly selected project to set the default values and selection for
    */
   private void updateFieldsForProjectChange(@NotNull Project project) {
-    newModuleNameTextField.setText(moduleName);
+    newDirectoryNameTextField.setText(referencePointName);
 
     VirtualFile projectBaseDir = ProjectUtil.guessProjectDir(project);
     if (projectBaseDir != null) {
-      newModuleBasePathTextField.setText(projectBaseDir.getPath());
+      newDirectoryBasePathTextField.setText(projectBaseDir.getPath());
 
-      if (projectBaseDir.getName().equals(moduleName)) {
-        useExistingModuleRadioButton.doClick();
+      if (projectBaseDir.getName().equals(referencePointName)) {
+        useExistingDirectoryRadioButton.doClick();
 
         existingDirectoryPathTextField.setText(projectBaseDir.getPath());
 
@@ -356,11 +360,10 @@ class ReferencePointTab {
     }
 
     Module[] modules = ModuleManager.getInstance(project).getModules();
-
     for (Module module : modules) {
       for (VirtualFile contentRoot : ModuleRootManager.getInstance(module).getContentRoots()) {
-        if (contentRoot.getName().equals(moduleName)) {
-          useExistingModuleRadioButton.doClick();
+        if (contentRoot.getName().equals(referencePointName)) {
+          useExistingDirectoryRadioButton.doClick();
 
           existingDirectoryPathTextField.setText(contentRoot.getPath());
 
@@ -369,13 +372,13 @@ class ReferencePointTab {
       }
     }
 
-    createNewModuleRadioButton.doClick();
+    createNewDirectoryRadioButton.doClick();
   }
 
   /**
    * Registers a listener with the project combo box that sets default values for all other fields
-   * when a new project is selected. After the new values are set, the validity state of the module
-   * tab input is updated.
+   * when a new project is selected. After the new values are set, the validity state of the
+   * reference point tab input is updated.
    *
    * @see #updateFieldsForProjectChange(Project)
    * @see #updateInputValidity()
@@ -396,11 +399,11 @@ class ReferencePointTab {
   }
 
   /**
-   * Adds listeners which update the module tab validity state on input changes to the fields used
-   * when creating a new module as part of the project negotiation.
+   * Adds listeners which update the reference point tab validity state on input changes to the
+   * fields used when creating a new directory as part of the reference point negotiation.
    */
-  private void addCreateNewModuleFieldListeners() {
-    DocumentListener moduleNameDocumentListener =
+  private void addCreateNewDirectoryFieldListeners() {
+    DocumentListener newDirectoryNameDocumentListener =
         new DocumentListener() {
           @Override
           public void insertUpdate(DocumentEvent e) {
@@ -418,14 +421,13 @@ class ReferencePointTab {
           }
 
           private void updateValidity() {
-            updateNewModuleNameValidityIndicator();
+            updateNewDirectoryNameValidityIndicator();
             updateInputValidity();
           }
         };
+    newDirectoryNameTextField.getDocument().addDocumentListener(newDirectoryNameDocumentListener);
 
-    newModuleNameTextField.getDocument().addDocumentListener(moduleNameDocumentListener);
-
-    DocumentListener moduleBasePathDocumentListener =
+    DocumentListener newDirectoryBasePathDocumentListener =
         new DocumentListener() {
           @Override
           public void insertUpdate(DocumentEvent e) {
@@ -443,22 +445,21 @@ class ReferencePointTab {
           }
 
           private void updateValidity() {
-            updateNewBasePathValidityIndicator();
+            updateNewBaseDirectoryValidityIndicator();
             updateInputValidity();
           }
         };
-
-    newModuleBasePathTextField
+    newDirectoryBasePathTextField
         .getTextField()
         .getDocument()
-        .addDocumentListener(moduleBasePathDocumentListener);
+        .addDocumentListener(newDirectoryBasePathDocumentListener);
   }
 
   /**
-   * Adds listeners which update the module tab validity state on input changes to the fields used
-   * when using an existing directory as part of the project negotiation.
+   * Adds listeners which update the reference point tab validity state on input changes to the
+   * fields used when using an existing directory as part of the reference point negotiation.
    */
-  private void addUseExistingModuleFieldListeners() {
+  private void addUseExistingDirectoryFieldListeners() {
     DocumentListener existingDirectoryPathDocumentListener =
         new DocumentListener() {
           @Override
@@ -477,7 +478,7 @@ class ReferencePointTab {
           }
 
           private void updateValidity() {
-            updateExistingModuleValidityIndicator();
+            updateExistingDirectoryValidityIndicator();
             updateInputValidity();
           }
         };
@@ -489,7 +490,7 @@ class ReferencePointTab {
   }
 
   /**
-   * Updates the held flag of whether the current input of the module tab is valid.
+   * Updates the held flag of whether the current input of the reference point tab is valid.
    *
    * <p>This method should be called by all change listeners of the panel components.
    */
@@ -499,12 +500,12 @@ class ReferencePointTab {
     if (projectComboBox.getSelectedItem() == null) {
       newInputValidityState = false;
 
-    } else if (createNewModuleRadioButton.isSelected()) {
-      newInputValidityState = hasValidNewModuleName() && hasValidNewBasePath();
+    } else if (createNewDirectoryRadioButton.isSelected()) {
+      newInputValidityState = hasValidNewDirectoryName() && hasValidNewBasePath();
 
-    } else if (useExistingModuleRadioButton.isSelected()) {
+    } else if (useExistingDirectoryRadioButton.isSelected()) {
 
-      newInputValidityState = hasValidExistingModule();
+      newInputValidityState = hasValidExistingDirectory();
 
     } else {
       newInputValidityState = false;
@@ -513,31 +514,31 @@ class ReferencePointTab {
     if (newInputValidityState != hasValidInput) {
       hasValidInput = newInputValidityState;
 
-      moduleTabStateListener.moduleStateChanged();
+      referencePointTabStateListener.validityStateChanged();
     }
   }
 
   /**
-   * Returns whether the entered module name is valid for the selected project.
+   * Returns whether the entered directory name is valid for the selected project.
    *
-   * <p>A module name is seen as valid if it
+   * <p>A reference point name is seen as valid if it
    *
    * <ul>
    *   <li>is not empty,
-   *   <li>is a valid path,
-   *   <li>only contains a single path element, and
-   *   <li>does not match any existing module name in the chosen project.
+   *   <li>is a valid path, and
+   *   <li>only contains a single path element.
    * </ul>
    *
-   * @return whether the entered module name is valid for the selected project
+   * @return whether the entered directory name is valid for the selected project
    * @see Paths#get(String, String...)
    */
   /*
    * TODO check for other separators? Intellij also sees '\' as a separator on unix but this is not
    *  detected by the Java Unix path implementation
    */
-  private boolean hasValidNewModuleName() {
-    String enteredName = newModuleNameTextField.getText();
+  // TODO check whether resource with same name already exists in chosen base directory
+  private boolean hasValidNewDirectoryName() {
+    String enteredName = newDirectoryNameTextField.getText();
     if (enteredName.isEmpty()) {
       return false;
     }
@@ -551,17 +552,19 @@ class ReferencePointTab {
       return false;
     }
 
-    // TODO check whether resource with same name already exists in chosen base directory
     return true;
   }
 
   /**
-   * Returns whether the entered path points to a valid (existing) directory.
+   * Returns whether the entered path points to a valid (existing) directory that has a valid
+   * matching reference point in the local VFS.
    *
-   * @return whether the entered path points to a valid (existing) directory
+   * @return whether the entered path points to a valid (existing) directory that has a valid
+   *     matching reference point in the local VFS
+   * @see #representsValidVirtualFile(File)
    */
   private boolean hasValidNewBasePath() {
-    File newBasePathFile = new File(newModuleBasePathTextField.getText());
+    File newBasePathFile = new File(newDirectoryBasePathTextField.getText());
 
     if (!newBasePathFile.exists() || !newBasePathFile.isDirectory()) {
       return false;
@@ -571,12 +574,14 @@ class ReferencePointTab {
   }
 
   /**
-   * Returns whether a valid existing module is chosen.
+   * Returns whether the entered path points to a valid (existing) directory that has a valid
+   * matching reference point in the local VFS.
    *
-   * @return whether a valid existing module is chosen
-   * @see Module#isDisposed()
+   * @return whether the entered path points to a valid (existing) directory that has a valid
+   *     matching reference point in the local VFS
+   * @see #representsValidVirtualFile(File)
    */
-  private boolean hasValidExistingModule() {
+  private boolean hasValidExistingDirectory() {
     File directoryFile = new File(existingDirectoryPathTextField.getText());
 
     if (!directoryFile.exists() || !directoryFile.isDirectory()) {
@@ -621,70 +626,71 @@ class ReferencePointTab {
   }
 
   /**
-   * Updates whether the field for the new module name is marked as invalid. The new state is based
-   * on the returned value of {@link #hasValidNewModuleName()}.
+   * Updates whether the field for the new directory name is marked as invalid. The new state is
+   * based on the returned value of {@link #hasValidNewDirectoryName()}.
    */
-  private void updateNewModuleNameValidityIndicator() {
-    boolean showFieldAsValid = hasValidNewModuleName() || !createNewModuleRadioButton.isSelected();
-
-    if (showFieldAsValid == moduleNameTextFieldShownAsValid) {
-      return;
-    }
-
-    moduleNameTextFieldShownAsValid = showFieldAsValid;
-
-    Border border;
-    String toolTip;
-
-    if (showFieldAsValid) {
-      border = moduleNameTextFieldDefaultBorder;
-      toolTip = "";
-
-    } else {
-      border = moduleNameTextFieldErrorBorder;
-      toolTip = Messages.ModuleTab_create_new_module_name_invalid_tooltip;
-    }
-
-    newModuleNameTextField.setBorder(border);
-    newModuleNameTextField.setToolTipText(toolTip);
-  }
-
-  /**
-   * Updates whether the field for the new module base path is marked as invalid. The new state is
-   * based on the returned value of {@link #hasValidNewBasePath()}.
-   */
-  private void updateNewBasePathValidityIndicator() {
-    boolean showFieldAsValid = hasValidNewBasePath() || !createNewModuleRadioButton.isSelected();
-
-    if (showFieldAsValid == moduleBasePathTextFieldShownAsValid) {
-      return;
-    }
-
-    moduleBasePathTextFieldShownAsValid = showFieldAsValid;
-
-    Border border;
-    String toolTip;
-
-    if (showFieldAsValid) {
-      border = moduleBasePathTextFieldDefaultBorder;
-      toolTip = "";
-
-    } else {
-      border = moduleBasePathTextFieldErrorBorder;
-      toolTip = Messages.ModuleTab_create_new_module_base_path_invalid_tooltip;
-    }
-
-    newModuleBasePathTextField.getTextField().setBorder(border);
-    newModuleBasePathTextField.getTextField().setToolTipText(toolTip);
-  }
-
-  /**
-   * Updates whether the field to select an existing module is marked as invalid. The new state is
-   * based on the returned value of {@link #hasValidExistingModule()}.
-   */
-  private void updateExistingModuleValidityIndicator() {
+  private void updateNewDirectoryNameValidityIndicator() {
     boolean showFieldAsValid =
-        hasValidExistingModule() || !useExistingModuleRadioButton.isSelected();
+        hasValidNewDirectoryName() || !createNewDirectoryRadioButton.isSelected();
+
+    if (showFieldAsValid == newDirectoryNameTextFieldShownAsValid) {
+      return;
+    }
+
+    newDirectoryNameTextFieldShownAsValid = showFieldAsValid;
+
+    Border border;
+    String toolTip;
+
+    if (showFieldAsValid) {
+      border = newDirectoryNameTextFieldDefaultBorder;
+      toolTip = "";
+
+    } else {
+      border = newDirectoryNameTextFieldErrorBorder;
+      toolTip = Messages.ReferencePointTab_create_new_directory_name_invalid_tooltip;
+    }
+
+    newDirectoryNameTextField.setBorder(border);
+    newDirectoryNameTextField.setToolTipText(toolTip);
+  }
+
+  /**
+   * Updates whether the field for the new directory base path is marked as invalid. The new state
+   * is based on the returned value of {@link #hasValidNewBasePath()}.
+   */
+  private void updateNewBaseDirectoryValidityIndicator() {
+    boolean showFieldAsValid = hasValidNewBasePath() || !createNewDirectoryRadioButton.isSelected();
+
+    if (showFieldAsValid == newDirectoryBasePathTextFieldShownAsValid) {
+      return;
+    }
+
+    newDirectoryBasePathTextFieldShownAsValid = showFieldAsValid;
+
+    Border border;
+    String toolTip;
+
+    if (showFieldAsValid) {
+      border = newDirectoryBasePathTextFieldDefaultBorder;
+      toolTip = "";
+
+    } else {
+      border = newDirectoryBasePathTextFieldErrorBorder;
+      toolTip = Messages.ReferencePointTab_create_new_directory_base_path_invalid_tooltip;
+    }
+
+    newDirectoryBasePathTextField.getTextField().setBorder(border);
+    newDirectoryBasePathTextField.getTextField().setToolTipText(toolTip);
+  }
+
+  /**
+   * Updates whether the field to select an existing directory is marked as invalid. The new state
+   * is based on the returned value of {@link #hasValidExistingDirectory()}.
+   */
+  private void updateExistingDirectoryValidityIndicator() {
+    boolean showFieldAsValid =
+        hasValidExistingDirectory() || !useExistingDirectoryRadioButton.isSelected();
 
     if (showFieldAsValid == existingDirectoryPathTextFieldShownAsValid) {
       return;
@@ -701,7 +707,7 @@ class ReferencePointTab {
 
     } else {
       border = existingDirectoryPathTextFieldErrorBorder;
-      toolTip = Messages.ModuleTab_use_existing_module_local_module_invalid_tooltip;
+      toolTip = Messages.ReferencePointTab_use_existing_directory_local_directory_invalid_tooltip;
     }
 
     existingDirectoryPathTextField.getTextField().setBorder(border);
@@ -709,20 +715,20 @@ class ReferencePointTab {
   }
 
   /**
-   * Returns the current input of the module tab.
+   * Returns the current input of the reference point tab.
    *
-   * @return the current input of the module tab
-   * @throws IllegalStateException if neither of the two radio buttons is selected or if there is no
+   * @return the current input of the reference point tab
+   * @throws IllegalStateException if neither of the two radio buttons is selected or there is no
    *     project selected
    * @see ReferencePointSelectionResult
    */
   @NotNull
-  ReferencePointSelectionResult getModuleSelectionResult() {
+  ReferencePointSelectionResult getReferencePointSelectionResult() {
     LocalRepresentationOption chosenLocalRepresentationOption;
 
-    if (createNewModuleRadioButton.isSelected()) {
+    if (createNewDirectoryRadioButton.isSelected()) {
       chosenLocalRepresentationOption = LocalRepresentationOption.CREATE_NEW_DIRECTORY;
-    } else if (useExistingModuleRadioButton.isSelected()) {
+    } else if (useExistingDirectoryRadioButton.isSelected()) {
       chosenLocalRepresentationOption = LocalRepresentationOption.USE_EXISTING_DIRECTORY;
     } else {
       throw new IllegalStateException(
@@ -735,18 +741,26 @@ class ReferencePointTab {
       throw new IllegalStateException("Encountered a state where no project was selected.");
     }
 
-    String newModuleName = newModuleNameTextField.getText();
-    VirtualFile newDirectoryBaseDirectory = getVirtualFile(newModuleBasePathTextField.getText());
+    String newDirectoryName = newDirectoryNameTextField.getText();
+    VirtualFile newDirectoryBaseDirectory = getVirtualFile(newDirectoryBasePathTextField.getText());
     VirtualFile existingDirectory = getVirtualFile(existingDirectoryPathTextField.getText());
 
     return new ReferencePointSelectionResult(
         chosenLocalRepresentationOption,
         project,
-        newModuleName,
+        newDirectoryName,
         newDirectoryBaseDirectory,
         existingDirectory);
   }
 
+  /**
+   * Returns the virtual file for the given path.
+   *
+   * @param path the path whose virtual file to get
+   * @return the virtual file for the given path or <code>null</code> if no such virtual file could
+   *     be found
+   */
+  @Nullable
   private VirtualFile getVirtualFile(String path) {
     File file = new File(path);
 
@@ -756,29 +770,31 @@ class ReferencePointTab {
   }
 
   /**
-   * Returns the panel representing by the module tab.
+   * Returns the panel representing by the reference point tab.
    *
-   * @return the panel representing by the module tab
+   * @return the panel representing by the reference point tab
    */
   @NotNull
   JPanel getPanel() {
-    return moduleTabPanel;
+    return referencePointTabPanel;
   }
 
   /**
-   * Returns the name of the shared module contained in the project negotiation data.
+   * Returns the name of the shared reference point contained in the reference point negotiation
+   * data.
    *
-   * @return the name of the shared module contained in the project negotiation data
+   * @return the name of the shared reference point contained in the reference point negotiation
+   *     data
    */
   @NotNull
-  String getModuleName() {
-    return moduleName;
+  String getReferencePointName() {
+    return referencePointName;
   }
 
   /**
-   * Returns whether the current input of the module tab is valid.
+   * Returns whether the current input of the reference point tab is valid.
    *
-   * @return whether the current input of the module tab is valid
+   * @return whether the current input of the reference point tab is valid
    */
   boolean hasValidInput() {
     return hasValidInput;
@@ -790,15 +806,15 @@ class ReferencePointTab {
   private void initPanel() {
     GridBagConstraints gbc = new GridBagConstraints();
 
-    moduleTabPanel.setLayout(new GridBagLayout());
+    referencePointTabPanel.setLayout(new GridBagLayout());
     gbc.gridy = 0;
     gbc.fill = GridBagConstraints.HORIZONTAL;
     gbc.insets = new JBInsets(0, 8, 0, 8);
     gbc.anchor = GridBagConstraints.LINE_START;
 
     initProjectComboBox(gbc);
-    initCreateNewModuleFields(gbc);
-    initUseExistingModuleFields(gbc);
+    initCreateNewDirectoryFields(gbc);
+    initUseExistingDirectoryFields(gbc);
     initSpacers(gbc);
   }
 
@@ -811,9 +827,9 @@ class ReferencePointTab {
     gbc.gridwidth = 2;
 
     JLabel projectLabel = new JBLabel();
-    projectLabel.setText(Messages.ModuleTab_project_label);
+    projectLabel.setText(Messages.ReferencePointTab_project_label);
 
-    moduleTabPanel.add(projectLabel, gbc);
+    referencePointTabPanel.add(projectLabel, gbc);
 
     gbc.gridwidth = 1;
 
@@ -829,76 +845,77 @@ class ReferencePointTab {
           }
         });
 
-    moduleTabPanel.add(projectComboBox, gbc);
+    referencePointTabPanel.add(projectComboBox, gbc);
 
     gbc.gridy++;
 
-    moduleTabPanel.add(Box.createVerticalStrut(5), gbc);
-
-    gbc.gridy++;
-  }
-
-  /**
-   * Initializes the fields to create a new module as part of the project negotiation.
-   *
-   * @param gbc the basic grid bag constraints object used to define the layout
-   */
-  private void initCreateNewModuleFields(@NotNull GridBagConstraints gbc) {
-    gbc.gridwidth = 3;
-
-    createNewModuleRadioButton.setText(Messages.ModuleTab_create_new_module);
-
-    moduleTabPanel.add(createNewModuleRadioButton, gbc);
-
-    gbc.gridwidth = 1;
-    gbc.gridy++;
-
-    moduleTabPanel.add(Box.createHorizontalStrut(5), gbc);
-
-    JLabel moduleNameLabel = new JBLabel();
-    moduleNameLabel.setText(Messages.ModuleTab_create_new_module_name);
-
-    moduleTabPanel.add(moduleNameLabel, gbc);
-
-    moduleTabPanel.add(newModuleNameTextField, gbc);
-
-    gbc.gridy++;
-
-    moduleTabPanel.add(Box.createHorizontalStrut(5), gbc);
-
-    JLabel moduleBasePathLabel = new JBLabel();
-    moduleBasePathLabel.setText(Messages.ModuleTab_create_new_module_base_path);
-
-    moduleTabPanel.add(moduleBasePathLabel, gbc);
-
-    moduleTabPanel.add(newModuleBasePathTextField, gbc);
+    referencePointTabPanel.add(Box.createVerticalStrut(5), gbc);
 
     gbc.gridy++;
   }
 
   /**
-   * Initializes the fields to chose an existing module to use for the project negotiation.
+   * Initializes the fields to create a new directory as part of the reference point negotiation.
    *
    * @param gbc the basic grid bag constraints object used to define the layout
    */
-  private void initUseExistingModuleFields(@NotNull GridBagConstraints gbc) {
+  private void initCreateNewDirectoryFields(@NotNull GridBagConstraints gbc) {
     gbc.gridwidth = 3;
 
-    useExistingModuleRadioButton.setText(Messages.ModuleTab_use_existing_module);
+    createNewDirectoryRadioButton.setText(Messages.ReferencePointTab_create_new_directory);
 
-    moduleTabPanel.add(useExistingModuleRadioButton, gbc);
+    referencePointTabPanel.add(createNewDirectoryRadioButton, gbc);
 
     gbc.gridwidth = 1;
     gbc.gridy++;
 
-    moduleTabPanel.add(Box.createHorizontalStrut(5), gbc);
+    referencePointTabPanel.add(Box.createHorizontalStrut(5), gbc);
 
-    JLabel localModuleLabel = new JBLabel();
-    localModuleLabel.setText(Messages.ModuleTab_use_existing_module_local_module);
+    JLabel directoryNameLabel = new JBLabel();
+    directoryNameLabel.setText(Messages.ReferencePointTab_create_new_directory_name);
 
-    moduleTabPanel.add(localModuleLabel, gbc);
+    referencePointTabPanel.add(directoryNameLabel, gbc);
 
-    moduleTabPanel.add(existingDirectoryPathTextField, gbc);
+    referencePointTabPanel.add(newDirectoryNameTextField, gbc);
+
+    gbc.gridy++;
+
+    referencePointTabPanel.add(Box.createHorizontalStrut(5), gbc);
+
+    JLabel directoryBasePathLabel = new JBLabel();
+    directoryBasePathLabel.setText(Messages.ReferencePointTab_create_new_directory_base_path);
+
+    referencePointTabPanel.add(directoryBasePathLabel, gbc);
+
+    referencePointTabPanel.add(newDirectoryBasePathTextField, gbc);
+
+    gbc.gridy++;
+  }
+
+  /**
+   * Initializes the fields to chose an existing directory to use for the reference point
+   * negotiation.
+   *
+   * @param gbc the basic grid bag constraints object used to define the layout
+   */
+  private void initUseExistingDirectoryFields(@NotNull GridBagConstraints gbc) {
+    gbc.gridwidth = 3;
+
+    useExistingDirectoryRadioButton.setText(Messages.ReferencePointTab_use_existing_directory);
+
+    referencePointTabPanel.add(useExistingDirectoryRadioButton, gbc);
+
+    gbc.gridwidth = 1;
+    gbc.gridy++;
+
+    referencePointTabPanel.add(Box.createHorizontalStrut(5), gbc);
+
+    JLabel localDirectoryLabel = new JBLabel();
+    localDirectoryLabel.setText(Messages.ReferencePointTab_use_existing_directory_local_directory);
+
+    referencePointTabPanel.add(localDirectoryLabel, gbc);
+
+    referencePointTabPanel.add(existingDirectoryPathTextField, gbc);
 
     gbc.gridy++;
   }
@@ -910,7 +927,7 @@ class ReferencePointTab {
    */
   private void initSpacers(@NotNull GridBagConstraints gbc) {
     gbc.gridwidth = 3;
-    moduleTabPanel.add(Box.createHorizontalStrut(600), gbc);
+    referencePointTabPanel.add(Box.createHorizontalStrut(600), gbc);
   }
 
   /** Interface extension adding stubs for all methods besides {@link #mouseClicked(MouseEvent)}. */
