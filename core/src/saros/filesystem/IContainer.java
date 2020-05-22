@@ -51,24 +51,20 @@ public interface IContainer extends IResource {
   /**
    * Returns a handle for the folder with the given relative path to this resource.
    *
-   * <p>Returns this container if the given string represents an empty path.
-   *
    * @param pathString a string representation of the path relative to this resource
    * @return a handle for the folder with the given relative path to this resource
    * @throws NullPointerException if the given string is <code>null</code>
-   * @throws IllegalArgumentException if the given string represents an absolute path
+   * @throws IllegalArgumentException if the given string represents an absolute or an empty path
    */
   IFolder getFolder(String pathString);
 
   /**
    * Returns a handle for the folder with the given relative path to this resource.
    *
-   * <p>Returns this container if the given path is empty.
-   *
    * @param path a path relative to this resource
    * @return a handle for the folder with the given relative path to this resource
    * @throws NullPointerException if the given path is <code>null</code>
-   * @throws IllegalArgumentException if the given path is absolute
+   * @throws IllegalArgumentException if the given path is absolute or empty
    */
   IFolder getFolder(IPath path);
 }
