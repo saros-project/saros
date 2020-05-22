@@ -10,7 +10,6 @@ import com.intellij.openapi.roots.ModuleFileIndex;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -703,10 +702,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
           session.addActivityProducer(EditorManager.this);
           session.addActivityConsumer(consumer, Priority.ACTIVE);
-
-          // TODO: Test, whether this leads to problems because it is not called
-          // from the UI thread.
-          LocalFileSystem.getInstance().refresh(true);
         }
 
         /** Resets all local components for the session. */
