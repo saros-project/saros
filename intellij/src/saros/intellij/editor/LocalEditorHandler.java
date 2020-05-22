@@ -45,7 +45,7 @@ public class LocalEditorHandler {
    * @param virtualFile the file to open
    * @param activate activate editor after opening
    * @return the opened <code>Editor</code> or <code>null</code> if the given file does not belong
-   *     to a shared module
+   *     to a shared reference point
    */
   @Nullable
   public Editor openEditor(
@@ -55,7 +55,7 @@ public class LocalEditorHandler {
       log.debug(
           "Ignored open editor request for file "
               + virtualFile
-              + " as it does not belong to a shared module");
+              + " as it does not belong to a shared reference point");
 
       return null;
     }
@@ -69,26 +69,26 @@ public class LocalEditorHandler {
    * <p>If the editor is a text editor, it is also added to the pool of currently open editors and
    * {@link EditorManager#startEditor(Editor)} is called with it.
    *
-   * <p><b>Note:</b> This only works for shared resources that belong to the given module.
+   * <p><b>Note:</b> This only works for shared resources that belong to the given reference point.
    *
    * @param virtualFile the file to open
-   * @param project module the file belongs to
+   * @param referencePoint reference point the file belongs to
    * @param activate activate editor after opening
    * @return the opened <code>Editor</code> or <code>null</code> if the given file does not belong
-   *     to a shared module or can not be represented by a text editor
+   *     to a shared reference point or can not be represented by a text editor
    */
   @Nullable
   public Editor openEditor(
-      @NotNull VirtualFile virtualFile, @NotNull IProject project, boolean activate) {
+      @NotNull VirtualFile virtualFile, @NotNull IProject referencePoint, boolean activate) {
 
-    IFile file = (IFile) VirtualFileConverter.convertToResource(virtualFile, project);
+    IFile file = (IFile) VirtualFileConverter.convertToResource(virtualFile, referencePoint);
 
     if (file == null || !sarosSession.isShared(file)) {
       log.debug(
           "Could not open Editor for file "
               + virtualFile
-              + " as it does not belong to the given module "
-              + project);
+              + " as it does not belong to the given reference point "
+              + referencePoint);
 
       return null;
     }
@@ -111,7 +111,7 @@ public class LocalEditorHandler {
    * @param file saros resource representation of the file
    * @param activate activate editor after opening
    * @return the opened <code>Editor</code> or <code>null</code> if the given file does not exist or
-   *     does not belong to a shared module or can not be represented by a text editor
+   *     does not belong to a shared reference point or can not be represented by a text editor
    */
   @Nullable
   private Editor openEditor(
@@ -154,9 +154,9 @@ public class LocalEditorHandler {
    * @param virtualFile the file for which to close the editor
    */
   public void closeEditor(@NotNull VirtualFile virtualFile) {
-    Set<IProject> sharedProjects = sarosSession.getProjects();
+    Set<IProject> sharedReferencePoints = sarosSession.getProjects();
 
-    IFile file = (IFile) VirtualFileConverter.convertToResource(sharedProjects, virtualFile);
+    IFile file = (IFile) VirtualFileConverter.convertToResource(sharedReferencePoints, virtualFile);
 
     if (file == null || !sarosSession.isShared(file)) {
       return;
@@ -176,7 +176,6 @@ public class LocalEditorHandler {
    * @see Document
    */
   public void saveDocument(@NotNull IFile file) {
-
     Document document = editorPool.getDocument(file);
 
     if (document != null) {
@@ -191,7 +190,7 @@ public class LocalEditorHandler {
     VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(file);
 
     if (virtualFile == null || !virtualFile.exists()) {
-      log.warn("Failed to save document for " + file + " - could not get a valid VirtualFile");
+      log.warn("Failed to save document for " + file + " - could not get a valid virtual file");
 
       return;
     }
@@ -204,7 +203,7 @@ public class LocalEditorHandler {
 
     if (document == null) {
       log.warn(
-          "Failed to save document for " + virtualFile + " - could not get a matching Document");
+          "Failed to save document for " + virtualFile + " - could not get a matching document");
 
       return;
     }
@@ -229,9 +228,9 @@ public class LocalEditorHandler {
       return;
     }
 
-    Set<IProject> sharedProjects = sarosSession.getProjects();
+    Set<IProject> sharedReferencePoints = sarosSession.getProjects();
 
-    IFile file = (IFile) VirtualFileConverter.convertToResource(sharedProjects, virtualFile);
+    IFile file = (IFile) VirtualFileConverter.convertToResource(sharedReferencePoints, virtualFile);
 
     if (file != null && sarosSession.isShared(file)) {
       manager.generateEditorActivated(file);

@@ -72,8 +72,7 @@ public class LocalEditorManipulator {
       log.warn(
           "Could not open Editor for file "
               + file
-              + " as a "
-              + "matching VirtualFile does not exist or could not be found");
+              + " as a matching virtual file does not exist or could not be found");
 
       return null;
     }
@@ -112,8 +111,7 @@ public class LocalEditorManipulator {
       log.warn(
           "Could not close Editor for file "
               + file
-              + " as a "
-              + "matching VirtualFile does not exist or could not be found");
+              + " as a matching virtual file does not exist or could not be found");
 
       return;
     }
@@ -199,8 +197,8 @@ public class LocalEditorManipulator {
   /**
    * Returns the center file of the given line range.
    *
-   * <p>Intellij sets the center position of an editor at 1/3 of the visible line range. This is
-   * taken into account for the calculations.
+   * <p>From experimentation, it looks like Intellij sets the center position of an editor at 1/3 of
+   * the visible line range. This is taken into account for the calculations.
    *
    * @param startLine the first line of the section
    * @param endLine the last line of the section
@@ -230,7 +228,7 @@ public class LocalEditorManipulator {
       log.warn(
           "Could not recover file content of "
               + file
-              + " as it could not be converted to a VirtualFile.");
+              + " as it could not be converted to a virtual file.");
 
       return;
     }
@@ -242,7 +240,7 @@ public class LocalEditorManipulator {
       log.warn(
           "Could not recover file content of "
               + file
-              + " as no valid Document representation was returned by the Intellij API.");
+              + " as no valid document representation was returned by the Intellij API.");
 
       return;
     }
