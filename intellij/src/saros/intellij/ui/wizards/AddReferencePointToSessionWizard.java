@@ -53,36 +53,38 @@ import saros.session.ISarosSessionManager;
 import saros.util.ThreadUtils;
 
 /**
- * Wizard for adding projects to a session.
+ * Wizard for adding reference points to a session.
  *
- * <p>It consists of a selection page, where the user can select how to handle the incoming project:
+ * <p>The wizard consists of a selection page where the user can select how to represent the shared
+ * reference points in the local environment.
  *
  * <ul>
- *   <li>create a new project
- *   <li reuse an existing project
+ *   <li>A new directory can be created to represent the reference point.
+ *   <li>An existing directory can be used to represent the reference point.
  * </ul>
- *       <p>If the option to reuse an existing project is chosen, a second page is displayed, that
- *       displays the files necessary to modify.
- *       <p>
+ *
+ * <p>If the option to reuse an existing reference point is chosen, a second page is displayed to
+ * show the necessary modification that will be made by Saros to match the state of the remote
+ * reference point.
  */
-// TODO adjust remaining javadoc, variable/method names, user messages, and log messages
-//  FIXME: Add facility for more than one project.
+//  FIXME: Add facility for more than one reference point.
 public class AddReferencePointToSessionWizard extends Wizard {
   private static final Logger log = Logger.getLogger(AddReferencePointToSessionWizard.class);
 
-  public static final String SELECT_MODULE_REPRESENTATION_PAGE_ID = "selectModuleRepresentation";
+  public static final String SELECT_REFERENCE_POINT_REPRESENTATION_PAGE_ID =
+      "selectReferencePointRepresentation";
   public static final String FILE_LIST_PAGE_ID = "fileListPage";
 
-  private final String remoteProjectID;
-  private final String remoteProjectName;
+  private final String remoteReferencePointID;
+  private final String remoteReferencePointName;
 
   private final AbstractIncomingProjectNegotiation negotiation;
   private final JID peer;
 
   private boolean triggered = false;
 
-  /** projectID => Project */
-  private final Map<String, IProject> localProjects;
+  /** reference point ID => reference point */
+  private final Map<String, IProject> localReferencePoints;
 
   @Inject private IChecksumCache checksumCache;
 
@@ -90,9 +92,9 @@ public class AddReferencePointToSessionWizard extends Wizard {
 
   private final SelectLocalReferencePointRepresentationPage
       selectLocalReferencePointRepresentationPage;
-  private final TextAreaPage fileListPage;
+  private final TextAreaPage modifiedResourcesListPage;
 
-  private final PageActionListener selectProjectsPageListener =
+  private final PageActionListener selectReferencePointsPageListener =
       new PageActionListener() {
         @Override
         public void back() {
@@ -100,8 +102,9 @@ public class AddReferencePointToSessionWizard extends Wizard {
         }
 
         /**
-         * Extracts the local project's name (currently it has to be the same as the original
-         * project) and either displays the filesChangedPage or triggers the project negotiation
+         * Extracts the local reference point's name and either displays the {@link
+         * AddReferencePointToSessionWizard#modifiedResourcesListPage} or triggers the reference
+         * point negotiation.
          */
         @Override
         public void next() {
@@ -111,19 +114,20 @@ public class AddReferencePointToSessionWizard extends Wizard {
 
           try {
             referencePointSelectionResult =
-                selectLocalReferencePointRepresentationPage.getModuleSelectionResult(
-                    remoteProjectName);
+                selectLocalReferencePointRepresentationPage.getReferencePointSelectionResult(
+                    remoteReferencePointName);
 
           } catch (IllegalStateException e) {
-            noisyCancel("Request to get directory selection result failed: " + e.getMessage(), e);
+            noisyCancel(
+                "Request to get reference point selection result failed: " + e.getMessage(), e);
 
             return;
           }
 
           if (referencePointSelectionResult == null) {
             noisyCancel(
-                "Could not find a directory selection result for the reference point "
-                    + remoteProjectName,
+                "Could not find a reference point selection result for the reference point "
+                    + remoteReferencePointName,
                 null);
 
             return;
@@ -167,8 +171,8 @@ public class AddReferencePointToSessionWizard extends Wizard {
         }
 
         /**
-         * Creates a new directory for the reference point and starts the project negotiation with
-         * it.
+         * Creates a new directory for the reference point and starts the reference point
+         * negotiation with it.
          *
          * @param project the project to bind the reference point to
          * @param directoryName the name for the new directory
@@ -188,16 +192,16 @@ public class AddReferencePointToSessionWizard extends Wizard {
                     + "' could not be created as a resource with the same name already exists: "
                     + existingResource);
 
-            cancelNegotiation("Failed to create reference point " + remoteProjectName);
+            cancelNegotiation("Failed to create reference point " + remoteReferencePointName);
 
             NotificationPanel.showError(
                 MessageFormat.format(
                     Messages.Contact_saros_message_conditional,
                     MessageFormat.format(
                         Messages
-                            .AddProjectToSessionWizard_directory_already_exists_message_condition,
+                            .AddReferencePointToSessionWizard_directory_already_exists_message_condition,
                         directoryName)),
-                Messages.AddProjectToSessionWizard_directory_already_exists_title);
+                Messages.AddReferencePointToSessionWizard_directory_already_exists_title);
 
             return;
           }
@@ -215,20 +219,20 @@ public class AddReferencePointToSessionWizard extends Wizard {
                 "Failed to create the directory "
                     + directoryName
                     + " for reference point "
-                    + remoteProjectName,
+                    + remoteReferencePointName,
                 e);
 
-            cancelNegotiation("Failed to create reference point " + remoteProjectName);
+            cancelNegotiation("Failed to create reference point " + remoteReferencePointName);
 
             NotificationPanel.showError(
                 MessageFormat.format(
                     Messages.Contact_saros_message_conditional,
                     MessageFormat.format(
                         Messages
-                            .AddProjectToSessionWizard_directory_creation_failed_message_condition,
+                            .AddReferencePointToSessionWizard_directory_creation_failed_message_condition,
                         directoryName,
                         e.getMessage())),
-                Messages.AddProjectToSessionWizard_directory_creation_failed_title);
+                Messages.AddReferencePointToSessionWizard_directory_creation_failed_title);
 
             return;
           }
@@ -239,14 +243,14 @@ public class AddReferencePointToSessionWizard extends Wizard {
                     + referencePointFile
                     + "  as it is excluded from the project scope.");
 
-            cancelNegotiation("Failed to create reference point " + remoteProjectName);
+            cancelNegotiation("Failed to create reference point " + remoteReferencePointName);
 
             NotificationPanel.showError(
                 MessageFormat.format(
-                    Messages.AddProjectToSessionWizard_directory_excluded_message,
+                    Messages.AddReferencePointToSessionWizard_directory_excluded_message,
                     referencePointFile,
-                    remoteProjectName),
-                Messages.AddProjectToSessionWizard_directory_excluded_title);
+                    remoteReferencePointName),
+                Messages.AddReferencePointToSessionWizard_directory_excluded_title);
 
             return;
           }
@@ -259,34 +263,36 @@ public class AddReferencePointToSessionWizard extends Wizard {
           } catch (IllegalArgumentException e) {
             log.error(
                 "Failed to instantiate reference point '"
-                    + remoteProjectName
+                    + remoteReferencePointName
                     + "' using the created directory "
                     + referencePointFile,
                 e);
 
-            cancelNegotiation("Failed to create reference point " + remoteProjectName);
+            cancelNegotiation("Failed to create reference point " + remoteReferencePointName);
 
             NotificationPanel.showError(
                 MessageFormat.format(
                     Messages
-                        .AddProjectToSessionWizard_new_reference_point_instantiation_error_message,
+                        .AddReferencePointToSessionWizard_new_reference_point_instantiation_error_message,
                     referencePointFile,
-                    remoteProjectName,
+                    remoteReferencePointName,
                     e.getMessage()),
-                Messages.AddProjectToSessionWizard_new_reference_point_instantiation_error_title);
+                Messages
+                    .AddReferencePointToSessionWizard_new_reference_point_instantiation_error_title);
 
             return;
           }
 
-          localProjects.put(remoteProjectID, sharedReferencePoint);
+          localReferencePoints.put(remoteReferencePointID, sharedReferencePoint);
 
-          triggerProjectNegotiation();
+          triggerReferencePointNegotiation();
         }
 
         /**
-         * Checks if the directory is valid and then starts the project negotiation with it.
+         * Checks if the directory is valid and then starts the reference point negotiation with it.
          *
-         * @param existingDirectory the existing directory to use for the project negotiation
+         * @param existingDirectory the existing directory to use for the reference point
+         *     negotiation
          */
         private void doExistingDirectory(
             @NotNull Project project, @NotNull VirtualFile existingDirectory) {
@@ -299,52 +305,59 @@ public class AddReferencePointToSessionWizard extends Wizard {
           } catch (IllegalArgumentException e) {
             log.error(
                 "Failed to instantiate reference point '"
-                    + remoteProjectName
+                    + remoteReferencePointName
                     + "' using existing directory "
                     + existingDirectory,
                 e);
 
-            cancelNegotiation("Invalid local representation chosen for " + remoteProjectName);
+            cancelNegotiation(
+                "Invalid local representation chosen for " + remoteReferencePointName);
 
             NotificationPanel.showError(
                 MessageFormat.format(
                     Messages
-                        .AddProjectToSessionWizard_new_reference_point_instantiation_error_message,
+                        .AddReferencePointToSessionWizard_new_reference_point_instantiation_error_message,
                     existingDirectory,
-                    remoteProjectName,
+                    remoteReferencePointName,
                     e.getMessage()),
-                Messages.AddProjectToSessionWizard_new_reference_point_instantiation_error_title);
+                Messages
+                    .AddReferencePointToSessionWizard_new_reference_point_instantiation_error_title);
 
             return;
           }
 
-          localProjects.put(remoteProjectID, referencePoint);
+          localReferencePoints.put(remoteReferencePointID, referencePoint);
 
-          prepareFilesChangedPage(localProjects);
+          prepareResourcesChangedPage(localReferencePoints);
 
-          setTopPanelText(Messages.AddProjectToSessionWizard_description_changed_files);
+          setTopPanelText(Messages.AddReferencePointToSessionWizard_description_changed_files);
         }
 
         /**
-         * Cancels the project negotiation. Informs all channels of this cancellation by logging an
-         * error and showing an error notification to the local user.
+         * Cancels the reference point negotiation. Informs all channels of this cancellation by
+         * logging an error and showing an error notification to the local user.
          *
          * @param reason the reason for the cancellation
          */
         private void noisyCancel(@NotNull String reason, @Nullable Throwable throwable) {
           if (throwable != null) {
-            log.error("Encountered error reading module selection results: " + reason, throwable);
+            log.error(
+                "Encountered error reading reference point selection results: " + reason,
+                throwable);
+
           } else {
-            log.error("Encountered error reading module selection results: " + reason);
+            log.error("Encountered error reading reference point selection results: " + reason);
           }
 
           NotificationPanel.showError(
               MessageFormat.format(
-                  Messages.AddProjectToSessionWizard_error_reading_module_selection_result_message,
+                  Messages
+                      .AddReferencePointToSessionWizard_error_reading_reference_point_selection_result_message,
                   reason),
-              Messages.AddProjectToSessionWizard_error_reading_module_selection_result_title);
+              Messages
+                  .AddReferencePointToSessionWizard_error_reading_reference_point_selection_result_title);
 
-          cancelNegotiation("Encountered an error during project negotiation");
+          cancelNegotiation("Encountered an error during reference point negotiation");
         }
 
         @Override
@@ -354,8 +367,8 @@ public class AddReferencePointToSessionWizard extends Wizard {
       };
 
   /**
-   * Cancels the project negotiation, notifies the host using the given reason, and closes the
-   * wizard.
+   * Cancels the reference point negotiation, notifies the host using the given reason, and closes
+   * the wizard.
    *
    * <p><b>Note:</b> This is an asynchronous action. It is not guaranteed that the negotiation is
    * canceled when this method returns.
@@ -386,7 +399,7 @@ public class AddReferencePointToSessionWizard extends Wizard {
 
         @Override
         public void next() {
-          triggerProjectNegotiation();
+          triggerReferencePointNegotiation();
         }
 
         @Override
@@ -408,7 +421,7 @@ public class AddReferencePointToSessionWizard extends Wizard {
   /**
    * Instantiates the wizard and its pages.
    *
-   * @param project the Intellij project to use for the wizard
+   * @param project the project to use for the wizard
    * @param parent the parent window relative to which the dialog is positioned
    * @param negotiation The IPN this wizard handles
    */
@@ -418,10 +431,10 @@ public class AddReferencePointToSessionWizard extends Wizard {
     super(
         project,
         parent,
-        Messages.AddProjectToSessionWizard_title,
+        Messages.AddReferencePointToSessionWizard_title,
         new HeaderPanel(
-            Messages.AddProjectToSessionWizard_title2,
-            Messages.AddProjectToSessionWizard_description));
+            Messages.AddReferencePointToSessionWizard_title2,
+            Messages.AddReferencePointToSessionWizard_description));
 
     setModal(true);
 
@@ -434,23 +447,23 @@ public class AddReferencePointToSessionWizard extends Wizard {
 
     List<ProjectNegotiationData> data = negotiation.getProjectNegotiationData();
 
-    localProjects = new HashMap<String, IProject>();
+    localReferencePoints = new HashMap<String, IProject>();
 
-    remoteProjectID = data.get(0).getProjectID();
-    remoteProjectName = data.get(0).getProjectName();
+    remoteReferencePointID = data.get(0).getProjectID();
+    remoteReferencePointName = data.get(0).getProjectName();
 
     selectLocalReferencePointRepresentationPage =
         new SelectLocalReferencePointRepresentationPage(
-            SELECT_MODULE_REPRESENTATION_PAGE_ID,
-            selectProjectsPageListener,
-            Collections.singleton(remoteProjectName));
+            SELECT_REFERENCE_POINT_REPRESENTATION_PAGE_ID,
+            selectReferencePointsPageListener,
+            Collections.singleton(remoteReferencePointName));
 
     registerPage(selectLocalReferencePointRepresentationPage);
 
-    fileListPage =
+    modifiedResourcesListPage =
         new TextAreaPage(
-            FILE_LIST_PAGE_ID, "Changes applied to local modules:", fileListPageListener);
-    registerPage(fileListPage);
+            FILE_LIST_PAGE_ID, "Changes applied to local reference points:", fileListPageListener);
+    registerPage(modifiedResourcesListPage);
 
     create();
 
@@ -461,7 +474,7 @@ public class AddReferencePointToSessionWizard extends Wizard {
   public void cancelWizard(
       final JID peer, final String errorMsg, NegotiationTools.CancelLocation type) {
     final String message =
-        "Project negotiation canceled "
+        "Reference point negotiation canceled "
             + (type.equals(NegotiationTools.CancelLocation.LOCAL)
                 ? "locally "
                 : "remotely by " + peer);
@@ -483,7 +496,7 @@ public class AddReferencePointToSessionWizard extends Wizard {
    *
    * <p>On success, a success notification is displayed, on error, a dialog is shown.
    */
-  private void triggerProjectNegotiation() {
+  private void triggerReferencePointNegotiation() {
 
     if (triggered) return;
 
@@ -493,38 +506,40 @@ public class AddReferencePointToSessionWizard extends Wizard {
         .run(
             new Task.Backgroundable(
                 project,
-                Messages.AddProjectToSessionWizard_negotiation_progress_title,
+                Messages.AddReferencePointToSessionWizard_negotiation_progress_title,
                 true,
                 PerformInBackgroundOption.DEAF) {
 
               @Override
               public void run(@NotNull ProgressIndicator indicator) {
                 final ProjectNegotiation.Status status =
-                    negotiation.run(localProjects, new ProgressMonitorAdapter(indicator));
+                    negotiation.run(localReferencePoints, new ProgressMonitorAdapter(indicator));
 
                 indicator.stop();
 
                 if (status == ProjectNegotiation.Status.ERROR) {
                   NotificationPanel.showError(
                       MessageFormat.format(
-                          Messages.AddProjectToSessionWizard_negotiation_error_message,
+                          Messages.AddReferencePointToSessionWizard_negotiation_error_message,
                           negotiation.getErrorMessage()),
-                      Messages.AddProjectToSessionWizard_negotiation_error_title);
+                      Messages.AddReferencePointToSessionWizard_negotiation_error_title);
+
                 } else if (status == ProjectNegotiation.Status.OK) {
                   NotificationPanel.showInformation(
-                      Messages.AddProjectToSessionWizard_negotiation_successful_message,
-                      Messages.AddProjectToSessionWizard_negotiation_successful_title);
+                      Messages.AddReferencePointToSessionWizard_negotiation_successful_message,
+                      Messages.AddReferencePointToSessionWizard_negotiation_successful_title);
+
                 } else
                   NotificationPanel.showError(
-                      Messages.AddProjectToSessionWizard_negotiation_aborted_message,
-                      Messages.AddProjectToSessionWizard_negotiation_aborted_title);
+                      Messages.AddReferencePointToSessionWizard_negotiation_aborted_message,
+                      Messages.AddReferencePointToSessionWizard_negotiation_aborted_title);
               }
             });
 
     close();
   }
 
-  private void prepareFilesChangedPage(final Map<String, IProject> projectMapping) {
+  private void prepareResourcesChangedPage(final Map<String, IProject> referencePointMapping) {
 
     final Map<String, FileListDiff> modifiedResources = new HashMap<String, FileListDiff>();
 
@@ -533,81 +548,84 @@ public class AddReferencePointToSessionWizard extends Wizard {
           @Override
           public void run() {
             modifiedResources.putAll(
-                getModifiedResourcesFromMofifiableProjects(
-                    projectMapping, new NullProgressMonitor()));
+                getModifiedResourcesForReferencePoints(
+                    referencePointMapping, new NullProgressMonitor()));
           }
         },
         "Gathering files that have to be modified...");
-    fillFileListPage(modifiedResources);
+    fillModifiedResourcesListPage(modifiedResources);
   }
 
-  private void fillFileListPage(Map<String, FileListDiff> modifiedResources) {
+  private void fillModifiedResourcesListPage(Map<String, FileListDiff> modifiedResources) {
     boolean empty = true;
     for (Map.Entry<String, FileListDiff> key : modifiedResources.entrySet()) {
-      fileListPage.addLine("Project [" + key.getKey() + "]:");
+      modifiedResourcesListPage.addLine("Reference Point [" + key.getKey() + "]:");
       FileListDiff diff = modifiedResources.get(key.getKey());
 
       /// TODO folders
 
       for (String path : diff.getAlteredFiles()) {
-        fileListPage.addLine("changed: " + path);
+        modifiedResourcesListPage.addLine("changed: " + path);
         empty = false;
       }
 
       for (String path : diff.getRemovedFiles()) {
-        fileListPage.addLine("removed: " + path);
+        modifiedResourcesListPage.addLine("removed: " + path);
         empty = false;
       }
 
       for (String path : diff.getAddedFiles()) {
-        fileListPage.addLine("added: " + path);
+        modifiedResourcesListPage.addLine("added: " + path);
         empty = false;
       }
     }
 
     if (empty) {
-      fileListPage.addLine("No files have to be modified.");
+      modifiedResourcesListPage.addLine("No files have to be modified.");
     }
   }
 
-  /** Creates a FileListDiff for all projects that will be modified. */
-  private Map<String, FileListDiff> getModifiedResourcesFromMofifiableProjects(
-      Map<String, IProject> projectMapping, IProgressMonitor monitor) {
-    monitor.setTaskName("Calculating changed files...");
+  /** Creates a FileListDiff for all reference points that will be modified. */
+  private Map<String, FileListDiff> getModifiedResourcesForReferencePoints(
+      Map<String, IProject> referencePointMapping, IProgressMonitor monitor) {
+
+    monitor.setTaskName("Calculating changed resources...");
 
     final Map<String, FileListDiff> modifiedResources = new HashMap<String, FileListDiff>();
-    final Map<String, IProject> modifiedProjects = new HashMap<String, IProject>();
+    final Map<String, IProject> modifiedReferencePoints = new HashMap<String, IProject>();
 
-    modifiedProjects.putAll(getModifiedProjects(projectMapping));
-    modifiedResources.putAll(getModifiedResources(modifiedProjects, monitor));
+    modifiedReferencePoints.putAll(getModifiedReferencePoints(referencePointMapping));
+    modifiedResources.putAll(getModifiedResources(modifiedReferencePoints, monitor));
     return modifiedResources;
   }
 
   /**
-   * Returns a project mapping that contains all projects that will be modified on synchronization.
+   * Returns a reference point mapping that contains all reference points that will be modified on
+   * synchronization.
    *
-   * <p>Currently these are simply all projects from projectMapping.
-   *
-   * <p>FIXME: Add a check for non-overwritable projects.
+   * <p>Currently these are simply all reference points from the given reference point mapping.
    */
-  private Map<String, IProject> getModifiedProjects(Map<String, IProject> projectMapping) {
-    Map<String, IProject> modifiedProjects = new HashMap<String, IProject>();
+  private Map<String, IProject> getModifiedReferencePoints(
+      Map<String, IProject> referencePointMapping) {
 
-    for (Map.Entry<String, IProject> entry : projectMapping.entrySet()) {
-      // TODO: Add check for non-overwritable projects
-      modifiedProjects.put(entry.getKey(), entry.getValue());
+    Map<String, IProject> modifiedReferencePoints = new HashMap<String, IProject>();
+
+    for (Map.Entry<String, IProject> entry : referencePointMapping.entrySet()) {
+      modifiedReferencePoints.put(entry.getKey(), entry.getValue());
     }
 
-    return modifiedProjects;
+    return modifiedReferencePoints;
   }
 
   /**
-   * Returns all modified resources (either changed or deleted) for the current project mapping.
+   * Returns all modified resources (either changed or deleted) for the current reference point
+   * mapping.
    *
-   * <p><b>Important:</b> Do not call this inside the UI Thread. This is a long running operation !
+   * <p><b>Important:</b> Do not call this inside the UI Thread. This is a long running operation!
    */
   private Map<String, FileListDiff> getModifiedResources(
-      Map<String, IProject> projectMapping, IProgressMonitor monitor) {
+      Map<String, IProject> referencePointMapping, IProgressMonitor monitor) {
+
     Map<String, FileListDiff> modifiedResources = new HashMap<String, FileListDiff>();
 
     final ISarosSession session = sessionManager.getSession();
@@ -619,22 +637,21 @@ public class AddReferencePointToSessionWizard extends Wizard {
       throw new IllegalStateException("no session running");
     }
 
-    SubProgressMonitor subMonitor = new SubProgressMonitor(monitor, projectMapping.size());
+    SubProgressMonitor subMonitor = new SubProgressMonitor(monitor, referencePointMapping.size());
 
     subMonitor.setTaskName("\"Searching for files that will be modified...\",");
 
-    for (Map.Entry<String, IProject> entry : projectMapping.entrySet()) {
+    for (Map.Entry<String, IProject> entry : referencePointMapping.entrySet()) {
 
-      String projectID = entry.getKey();
-      IProject project = entry.getValue();
+      String referencePointID = entry.getKey();
+      IProject referencePoint = entry.getValue();
 
       try {
-
-        final ProjectNegotiationData data = negotiation.getProjectNegotiationData(projectID);
+        final ProjectNegotiationData data = negotiation.getProjectNegotiationData(referencePointID);
 
         FileList localFileList =
             FileListFactory.createFileList(
-                project,
+                referencePoint,
                 checksumCache,
                 new SubProgressMonitor(monitor, 1, SubProgressMonitor.SUPPRESS_SETTASKNAME));
 
@@ -646,11 +663,11 @@ public class AddReferencePointToSessionWizard extends Wizard {
             || !diff.getAddedFiles().isEmpty()
             || !diff.getAddedFolders().isEmpty()) {
 
-          modifiedResources.put(project.getName(), diff);
+          modifiedResources.put(referencePoint.getName(), diff);
         }
 
       } catch (IOException e) {
-        log.warn("could not refresh project: " + project, e);
+        log.warn("could not calculate local file list for reference point " + referencePoint, e);
       }
     }
     return modifiedResources;

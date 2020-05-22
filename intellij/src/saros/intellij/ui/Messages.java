@@ -11,27 +11,31 @@ public class Messages {
     MessageUtils.initializeMessages(BUNDLE_NAME, Messages.class);
   }
 
-  public static String AddProjectToSessionWizard_title;
-  public static String AddProjectToSessionWizard_directory_creation_failed_title;
-  public static String AddProjectToSessionWizard_directory_creation_failed_message_condition;
-  public static String AddProjectToSessionWizard_directory_already_exists_title;
-  public static String AddProjectToSessionWizard_directory_already_exists_message_condition;
-  public static String AddProjectToSessionWizard_directory_excluded_title;
-  public static String AddProjectToSessionWizard_directory_excluded_message;
-  public static String AddProjectToSessionWizard_new_reference_point_instantiation_error_title;
-  public static String AddProjectToSessionWizard_new_reference_point_instantiation_error_message;
-  public static String AddProjectToSessionWizard_error_reading_module_selection_result_title;
-  public static String AddProjectToSessionWizard_error_reading_module_selection_result_message;
-  public static String AddProjectToSessionWizard_title2;
-  public static String AddProjectToSessionWizard_description;
-  public static String AddProjectToSessionWizard_description_changed_files;
-  public static String AddProjectToSessionWizard_negotiation_progress_title;
-  public static String AddProjectToSessionWizard_negotiation_error_title;
-  public static String AddProjectToSessionWizard_negotiation_error_message;
-  public static String AddProjectToSessionWizard_negotiation_successful_title;
-  public static String AddProjectToSessionWizard_negotiation_successful_message;
-  public static String AddProjectToSessionWizard_negotiation_aborted_title;
-  public static String AddProjectToSessionWizard_negotiation_aborted_message;
+  public static String AddReferencePointToSessionWizard_title;
+  public static String AddReferencePointToSessionWizard_directory_creation_failed_title;
+  public static String AddReferencePointToSessionWizard_directory_creation_failed_message_condition;
+  public static String AddReferencePointToSessionWizard_directory_already_exists_title;
+  public static String AddReferencePointToSessionWizard_directory_already_exists_message_condition;
+  public static String AddReferencePointToSessionWizard_directory_excluded_title;
+  public static String AddReferencePointToSessionWizard_directory_excluded_message;
+  public static String
+      AddReferencePointToSessionWizard_new_reference_point_instantiation_error_title;
+  public static String
+      AddReferencePointToSessionWizard_new_reference_point_instantiation_error_message;
+  public static String
+      AddReferencePointToSessionWizard_error_reading_reference_point_selection_result_title;
+  public static String
+      AddReferencePointToSessionWizard_error_reading_reference_point_selection_result_message;
+  public static String AddReferencePointToSessionWizard_title2;
+  public static String AddReferencePointToSessionWizard_description;
+  public static String AddReferencePointToSessionWizard_description_changed_files;
+  public static String AddReferencePointToSessionWizard_negotiation_progress_title;
+  public static String AddReferencePointToSessionWizard_negotiation_error_title;
+  public static String AddReferencePointToSessionWizard_negotiation_error_message;
+  public static String AddReferencePointToSessionWizard_negotiation_successful_title;
+  public static String AddReferencePointToSessionWizard_negotiation_successful_message;
+  public static String AddReferencePointToSessionWizard_negotiation_aborted_title;
+  public static String AddReferencePointToSessionWizard_negotiation_aborted_message;
 
   public static String CollaborationUtils_confirm_closing_title;
   public static String CollaborationUtils_confirm_closing_message;
@@ -188,19 +192,19 @@ public class Messages {
   public static String FollowModeNotificationDispatcher_end_reason_FOLLOWER_STOPPED;
   public static String FollowModeNotificationDispatcher_end_reason_FOLLOWER_SWITCHES_FOLLOWEE;
 
-  public static String ModuleTab_project_label;
-  public static String ModuleTab_create_new_module;
-  public static String ModuleTab_create_new_module_name;
-  public static String ModuleTab_create_new_module_base_path;
-  public static String ModuleTab_module_base_path_file_chooser_title;
-  public static String ModuleTab_module_base_path_file_chooser_description;
-  public static String ModuleTab_use_existing_module;
-  public static String ModuleTab_use_existing_module_local_module;
-  public static String ModuleTab_create_new_module_name_invalid_tooltip;
-  public static String ModuleTab_create_new_module_base_path_invalid_tooltip;
-  public static String ModuleTab_existing_directory_path_file_chooser_title;
-  public static String ModuleTab_existing_directory_path_file_chooser_description;
-  public static String ModuleTab_use_existing_module_local_module_invalid_tooltip;
+  public static String ReferencePointTab_project_label;
+  public static String ReferencePointTab_create_new_directory;
+  public static String ReferencePointTab_create_new_directory_name;
+  public static String ReferencePointTab_create_new_directory_base_path;
+  public static String ReferencePointTab_directory_base_path_file_chooser_title;
+  public static String ReferencePointTab_directory_base_path_file_chooser_description;
+  public static String ReferencePointTab_use_existing_directory;
+  public static String ReferencePointTab_use_existing_directory_local_directory;
+  public static String ReferencePointTab_create_new_directory_name_invalid_tooltip;
+  public static String ReferencePointTab_create_new_directory_base_path_invalid_tooltip;
+  public static String ReferencePointTab_existing_directory_path_file_chooser_title;
+  public static String ReferencePointTab_existing_directory_path_file_chooser_description;
+  public static String ReferencePointTab_use_existing_directory_local_directory_invalid_tooltip;
 
   public static String ColorPreferences_display_name;
   public static String ColorPreferences_text_selection_attribute_display_name;
