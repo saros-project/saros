@@ -14,7 +14,6 @@ import saros.filesystem.IFolder;
 import saros.filesystem.IPath;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
-import saros.intellij.project.filesystem.IntelliJPathImpl;
 
 /** Intellij implementation of the Saros reference point interface. */
 public class IntellijReferencePoint implements IProject {

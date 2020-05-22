@@ -1,4 +1,4 @@
-package saros.intellij.project.filesystem;
+package saros.intellij.filesystem;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;

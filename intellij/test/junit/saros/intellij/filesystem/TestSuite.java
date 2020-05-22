@@ -1,4 +1,4 @@
-package saros.intellij.project.filesystem;
+package saros.intellij.filesystem;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
