@@ -14,7 +14,7 @@ import saros.intellij.runtime.UIMonitoredJob;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.util.NotificationPanel;
 import saros.intellij.ui.util.UIProjectUtils;
-import saros.intellij.ui.wizards.AddProjectToSessionWizard;
+import saros.intellij.ui.wizards.AddReferencePointToSessionWizard;
 import saros.intellij.ui.wizards.JoinSessionWizard;
 import saros.monitoring.IProgressMonitor;
 import saros.negotiation.AbstractIncomingProjectNegotiation;
@@ -93,8 +93,8 @@ public class NegotiationHandler implements INegotiationHandler {
 
     EDTExecutor.invokeLater(
         () -> {
-          AddProjectToSessionWizard wizard =
-              new AddProjectToSessionWizard(project, getWindow(project), negotiation);
+          AddReferencePointToSessionWizard wizard =
+              new AddReferencePointToSessionWizard(project, getWindow(project), negotiation);
 
           wizard.open();
         },

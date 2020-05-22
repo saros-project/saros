@@ -1,13 +1,12 @@
-package saros.intellij.ui.wizards.pages.moduleselection;
+package saros.intellij.ui.wizards.pages.referencepointselection;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-// TODO rename to ReferencePointSelectionResult
-/** Data holder class representing the input of a {@link ModuleTab}. */
-public class ModuleSelectionResult {
+/** Data holder class representing the input of a {@link ReferencePointTab}. */
+public class ReferencePointSelectionResult {
   private final LocalRepresentationOption localRepresentationOption;
   private final Project project;
   private final String newDirectoryName;
@@ -17,7 +16,7 @@ public class ModuleSelectionResult {
   /**
    * Initializes a ReferencePointSelectionResult object.
    *
-   * <p>Depending of the chose sharing mode, different values can be null.
+   * <p>Depending on the chosen sharing mode, different values can be null.
    *
    * @param localRepresentationOption the mode that was chosen
    * @param project the project to use
@@ -25,7 +24,7 @@ public class ModuleSelectionResult {
    * @param newDirectoryBaseDirectory the chose base directory of the new directory to create
    * @param existingDirectory the existing directory to use
    */
-  ModuleSelectionResult(
+  ReferencePointSelectionResult(
       @NotNull LocalRepresentationOption localRepresentationOption,
       @NotNull Project project,
       @Nullable String newDirectoryName,

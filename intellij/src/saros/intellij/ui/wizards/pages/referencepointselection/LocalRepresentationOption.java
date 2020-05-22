@@ -1,4 +1,4 @@
-package saros.intellij.ui.wizards.pages.moduleselection;
+package saros.intellij.ui.wizards.pages.referencepointselection;
 
 /** The different options on how to locally represent a shared reference point. */
 public enum LocalRepresentationOption {

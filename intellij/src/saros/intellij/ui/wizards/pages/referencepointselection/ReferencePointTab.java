@@ -1,4 +1,4 @@
-package saros.intellij.ui.wizards.pages.moduleselection;
+package saros.intellij.ui.wizards.pages.referencepointselection;
 
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
@@ -46,15 +46,15 @@ import org.jetbrains.annotations.NotNull;
 import saros.intellij.editor.ProjectAPI;
 import saros.intellij.runtime.FilesystemRunner;
 import saros.intellij.ui.Messages;
-import saros.intellij.ui.wizards.pages.moduleselection.SelectLocalModuleRepresentationPage.ModuleTabStateListener;
+import saros.intellij.ui.wizards.pages.referencepointselection.SelectLocalReferencePointRepresentationPage.ModuleTabStateListener;
 
 /**
  * Panel to specify how a shared module is represented locally. The available options are to create
  * a new module or to use an already existing module. The options specified by the user can be
  * requested from the module tab through {@link #getModuleSelectionResult()}.
  */
-// TODO rename and adjust module references in javadoc, variable and method names, etc.
-class ModuleTab {
+// TODO adjust module references in javadoc, variable and method names, etc.
+class ReferencePointTab {
 
   private final String moduleName;
   private final ModuleTabStateListener moduleTabStateListener;
@@ -87,7 +87,8 @@ class ModuleTab {
    *
    * @param moduleName the name of the shared module contained in the project negotiation data
    */
-  ModuleTab(@NotNull String moduleName, @NotNull ModuleTabStateListener moduleTabStateListener) {
+  ReferencePointTab(
+      @NotNull String moduleName, @NotNull ModuleTabStateListener moduleTabStateListener) {
     this.moduleName = moduleName;
     this.moduleTabStateListener = moduleTabStateListener;
 
@@ -713,10 +714,10 @@ class ModuleTab {
    * @return the current input of the module tab
    * @throws IllegalStateException if neither of the two radio buttons is selected or if there is no
    *     project selected
-   * @see ModuleSelectionResult
+   * @see ReferencePointSelectionResult
    */
   @NotNull
-  ModuleSelectionResult getModuleSelectionResult() {
+  ReferencePointSelectionResult getModuleSelectionResult() {
     LocalRepresentationOption chosenLocalRepresentationOption;
 
     if (createNewModuleRadioButton.isSelected()) {
@@ -738,7 +739,7 @@ class ModuleTab {
     VirtualFile newDirectoryBaseDirectory = getVirtualFile(newModuleBasePathTextField.getText());
     VirtualFile existingDirectory = getVirtualFile(existingDirectoryPathTextField.getText());
 
-    return new ModuleSelectionResult(
+    return new ReferencePointSelectionResult(
         chosenLocalRepresentationOption,
         project,
         newModuleName,
