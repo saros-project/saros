@@ -31,14 +31,8 @@ import saros.session.User;
 import saros.session.internal.SarosSession;
 import saros.util.ThreadUtils;
 
-/**
- * Offers convenient methods for collaboration actions like sharing a project resources.
- *
- * @author bkahlert
- * @author kheld
- */
+/** Offers convenient methods for collaboration actions like sharing a reference point. */
 public class CollaborationUtils {
-
   private static final Logger log = Logger.getLogger(CollaborationUtils.class);
 
   @Inject private static ISarosSessionManager sessionManager;
@@ -47,17 +41,19 @@ public class CollaborationUtils {
     SarosPluginContext.initComponent(new CollaborationUtils());
   }
 
-  private CollaborationUtils() {}
+  private CollaborationUtils() {
+    // NOP
+  }
 
   /**
-   * Starts a new session and shares the given projects with given contacts.<br>
-   * Does nothing if a {@link ISarosSession session} is already running.
+   * Starts a new session and shares the given reference points with given contacts.
    *
-   * @param projects the projects to share
+   * <p>Does nothing if a {@link ISarosSession session} is already running.
+   *
+   * @param referencePoints the reference points to share
    * @param contacts the contacts to share the projects with
-   * @nonBlocking
    */
-  public static void startSession(Set<IProject> projects, final List<JID> contacts) {
+  public static void startSession(Set<IProject> referencePoints, final List<JID> contacts) {
 
     UIMonitoredJob sessionStartupJob =
         new UIMonitoredJob("Session Startup") {
@@ -66,7 +62,7 @@ public class CollaborationUtils {
           protected IStatus run(IProgressMonitor monitor) {
             monitor.beginTask("Starting session...", IProgressMonitor.UNKNOWN);
             try {
-              sessionManager.startSession(projects);
+              sessionManager.startSession(referencePoints);
               Set<JID> participantsToAdd = new HashSet<JID>(contacts);
 
               monitor.worked(50);
@@ -77,7 +73,7 @@ public class CollaborationUtils {
                 return Status.CANCEL_STATUS;
               }
               monitor.setTaskName("Inviting participants...");
-              sessionManager.invite(participantsToAdd, getShareProjectDescription(session));
+              sessionManager.invite(participantsToAdd, getShareReferencePointsDescription(session));
 
               monitor.done();
 
@@ -95,11 +91,11 @@ public class CollaborationUtils {
   }
 
   /**
-   * Leaves the currently running {@link SarosSession}<br>
-   * Does nothing if no {@link SarosSession} is running.
+   * Leaves the currently running {@link SarosSession}.
+   *
+   * <p>Does nothing if no {@link SarosSession} is running.
    */
   public static void leaveSession(Project project) {
-
     ISarosSession sarosSession = sessionManager.getSession();
 
     if (sarosSession == null) {
@@ -144,13 +140,14 @@ public class CollaborationUtils {
   }
 
   /**
-   * Adds the given projects to the session.<br>
-   * Does nothing if no {@link SarosSession session} is running.
+   * Adds the given reference points to the session.
    *
-   * @param projectsToAdd the projects to add to the session
+   * <p>Does nothing if no {@link SarosSession session} is running.
+   *
+   * @param referencePoints the reference points to add to the session
    * @nonBlocking
    */
-  public static void addResourcesToSession(Set<IProject> projectsToAdd) {
+  public static void addResourcesToSession(Set<IProject> referencePoints) {
 
     final ISarosSession sarosSession = sessionManager.getSession();
 
@@ -159,7 +156,7 @@ public class CollaborationUtils {
       return;
     }
 
-    if (projectsToAdd.isEmpty()) {
+    if (referencePoints.isEmpty()) {
       return;
     }
 
@@ -171,7 +168,7 @@ public class CollaborationUtils {
           public void run() {
 
             if (sarosSession.hasWriteAccess()) {
-              sessionManager.addProjectsToSession(projectsToAdd);
+              sessionManager.addProjectsToSession(referencePoints);
               return;
             }
 
@@ -183,11 +180,11 @@ public class CollaborationUtils {
   }
 
   /**
-   * Adds the given contacts to the session.<br>
-   * Does nothing if no {@link ISarosSession session} is running.
+   * Adds the given contacts to the session.
    *
-   * @param contacts
-   * @nonBlocking
+   * <p>Does nothing if no {@link ISarosSession session} is running.
+   *
+   * @param contacts the contacts to add to the session
    */
   public static void addContactsToSession(final List<JID> contacts) {
 
@@ -212,37 +209,37 @@ public class CollaborationUtils {
             }
 
             if (participantsToAdd.size() > 0) {
-              sessionManager.invite(participantsToAdd, getShareProjectDescription(sarosSession));
+              sessionManager.invite(
+                  participantsToAdd, getShareReferencePointsDescription(sarosSession));
             }
           }
         });
   }
 
   /**
-   * Creates the message that invitees see on an incoming project share request. Currently it
-   * contains the project names along with the number of shared files and total file size for each
-   * shared project.
+   * Creates the message that invitees see on an incoming reference point negotiation request.
    *
-   * @param sarosSession
-   * @return
+   * <p>Currently it contains the reference point names along with the number of shared files and
+   * total file size for each shared reference point.
+   *
+   * @param sarosSession the session fot which to get the descriptions
+   * @return the message that invitees see on an incoming reference point negotiation request
    */
-  private static String getShareProjectDescription(ISarosSession sarosSession) {
-
-    Set<IProject> projects = sarosSession.getProjects();
+  private static String getShareReferencePointsDescription(ISarosSession sarosSession) {
+    Set<IProject> referencePoints = sarosSession.getProjects();
 
     StringBuilder result = new StringBuilder();
 
     try {
-      for (IProject project : projects) {
-
+      for (IProject referencePoint : referencePoints) {
         Pair<Long, Long> fileCountAndSize;
 
-        fileCountAndSize = getFileCountAndSize(project.members());
+        fileCountAndSize = getFileCountAndSize(referencePoint.members());
 
         result.append(
             String.format(
                 "\nReference Point: %s, Files: %d, Size: %s",
-                project.getName(),
+                referencePoint.getName(),
                 fileCountAndSize.getRight(),
                 format(fileCountAndSize.getLeft())));
       }
@@ -255,7 +252,6 @@ public class CollaborationUtils {
   }
 
   private static String format(long size) {
-
     if (size < 1000) {
       return "< 1 KB";
     }

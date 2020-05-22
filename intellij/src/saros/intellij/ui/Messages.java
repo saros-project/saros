@@ -120,10 +120,10 @@ public class Messages {
   public static String NegotiationHandler_session_remote_error_title;
   public static String NegotiationHandler_session_remote_error_message;
   public static String NegotiationHandler_session_processing;
-  public static String NegotiationHandler_project_sharing_canceled_message;
-  public static String NegotiationHandler_sharing_project;
-  public static String NegotiationHandler_sharing_project_canceled_remotely_title;
-  public static String NegotiationHandler_sharing_project_canceled_remotely_message;
+  public static String NegotiationHandler_reference_point_negotiation_canceled_message;
+  public static String NegotiationHandler_sharing_reference_point;
+  public static String NegotiationHandler_sharing_reference_point_canceled_remotely_title;
+  public static String NegotiationHandler_sharing_reference_point_canceled_remotely_message;
 
   public static String ShowDescriptionPage_description;
   public static String ShowDescriptionPage_title2;
