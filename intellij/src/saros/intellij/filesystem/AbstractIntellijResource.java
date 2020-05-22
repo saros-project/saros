@@ -12,11 +12,10 @@ import saros.filesystem.IResource;
 import saros.intellij.editor.ProjectAPI;
 
 /** Abstract Intellij implementation of the Saros resource interface. */
-// TODO rename to AbstractIntellijResource
-public abstract class IntellijResourceImplV2 implements IResource {
+public abstract class AbstractIntellijResource implements IResource {
 
   /** Reference point to which this resource belongs. */
-  protected final IntellijReferencePointImpl referencePoint;
+  protected final IntellijReferencePoint referencePoint;
 
   /** Relative path from the given reference point. */
   protected final IPath relativePath;
@@ -28,8 +27,8 @@ public abstract class IntellijResourceImplV2 implements IResource {
    * @param relativePath the relative path from the reference point
    * @throws IllegalArgumentException if the given path is absolute or empty
    */
-  public IntellijResourceImplV2(
-      @NotNull IntellijReferencePointImpl referencePoint, @NotNull IPath relativePath) {
+  public AbstractIntellijResource(
+      @NotNull IntellijReferencePoint referencePoint, @NotNull IPath relativePath) {
 
     if (relativePath.segmentCount() == 0) {
       throw new IllegalArgumentException("Given path must not be empty");
@@ -66,7 +65,7 @@ public abstract class IntellijResourceImplV2 implements IResource {
       return referencePoint;
     }
 
-    return new IntellijFolderImplV2(referencePoint, relativePath.removeLastSegments(1));
+    return new IntellijFolder(referencePoint, relativePath.removeLastSegments(1));
   }
 
   @Override
@@ -127,7 +126,7 @@ public abstract class IntellijResourceImplV2 implements IResource {
     if (obj == null) return false;
     if (getClass() != obj.getClass()) return false;
 
-    IntellijResourceImplV2 other = (IntellijResourceImplV2) obj;
+    AbstractIntellijResource other = (AbstractIntellijResource) obj;
 
     return this.referencePoint.equals(other.referencePoint)
         && this.relativePath.equals(other.relativePath);

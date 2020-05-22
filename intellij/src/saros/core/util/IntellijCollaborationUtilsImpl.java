@@ -8,7 +8,7 @@ import saros.core.ui.util.CollaborationUtils;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
 import saros.intellij.context.SharedIDEContext;
-import saros.intellij.filesystem.IntellijReferencePointImpl;
+import saros.intellij.filesystem.IntellijReferencePoint;
 import saros.intellij.ui.util.UIProjectUtils;
 import saros.net.xmpp.JID;
 import saros.ui.util.ICollaborationUtils;
@@ -31,7 +31,7 @@ public class IntellijCollaborationUtilsImpl implements ICollaborationUtils {
     Set<Project> sharedProjects = new HashSet<>();
 
     for (IResource resource : projects) {
-      sharedProjects.add(((IntellijReferencePointImpl) resource.getProject()).getIntellijProject());
+      sharedProjects.add(((IntellijReferencePoint) resource.getProject()).getIntellijProject());
     }
 
     // Workaround while we only allow a single module (-> single project) to be shared

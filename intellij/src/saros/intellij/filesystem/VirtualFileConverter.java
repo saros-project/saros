@@ -60,7 +60,7 @@ public class VirtualFileConverter {
   public static IResource convertToResource(
       @NotNull VirtualFile virtualFile, @NotNull IProject referencePoint) {
 
-    IntellijReferencePointImpl intellijReferencePoint = (IntellijReferencePointImpl) referencePoint;
+    IntellijReferencePoint intellijReferencePoint = (IntellijReferencePoint) referencePoint;
 
     if (virtualFile.equals(intellijReferencePoint.getVirtualFile())) {
       return referencePoint;
@@ -83,6 +83,6 @@ public class VirtualFileConverter {
           "The given resource must be a file or a folder. resource: " + resource);
     }
 
-    return ((IntellijResourceImplV2) resource).getVirtualFile();
+    return ((AbstractIntellijResource) resource).getVirtualFile();
   }
 }

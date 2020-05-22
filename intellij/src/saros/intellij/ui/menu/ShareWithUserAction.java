@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
 import saros.core.ui.util.CollaborationUtils;
 import saros.filesystem.IProject;
 import saros.intellij.context.SharedIDEContext;
-import saros.intellij.filesystem.IntellijReferencePointImpl;
+import saros.intellij.filesystem.IntellijReferencePoint;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.util.IconManager;
 import saros.intellij.ui.util.NotificationPanel;
@@ -59,7 +59,7 @@ public class ShareWithUserAction extends AnAction {
     IProject referencePoint;
 
     try {
-      referencePoint = new IntellijReferencePointImpl(project, virtualFile);
+      referencePoint = new IntellijReferencePoint(project, virtualFile);
 
     } catch (IllegalArgumentException e) {
       log.error("Failed to create reference point for " + virtualFile + " in " + project, e);
