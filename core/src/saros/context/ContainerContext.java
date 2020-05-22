@@ -14,7 +14,6 @@ import saros.communication.extensions.InvitationAcknowledgedExtension;
 import saros.communication.extensions.InvitationCompletedExtension;
 import saros.communication.extensions.InvitationOfferingExtension;
 import saros.communication.extensions.InvitationParameterExchangeExtension;
-import saros.communication.extensions.JoinSessionRejectedExtension;
 import saros.communication.extensions.JoinSessionRequestExtension;
 import saros.communication.extensions.KickUserExtension;
 import saros.communication.extensions.LeaveSessionExtension;
@@ -146,7 +145,6 @@ public class ContainerContext implements IContainerContext {
 
       // Server extensions
       Class.forName(JoinSessionRequestExtension.class.getName());
-      Class.forName(JoinSessionRejectedExtension.class.getName());
     } catch (ClassNotFoundException e) {
       throw new RuntimeException(e);
     }
