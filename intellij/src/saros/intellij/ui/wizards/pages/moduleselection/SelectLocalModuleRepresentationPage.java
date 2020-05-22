@@ -15,6 +15,7 @@ import saros.intellij.ui.wizards.pages.PageActionListener;
  * Wizard page to choose how the shared modules are represented locally. For each shared module, a
  * {@link ModuleTab} is created.
  */
+// TODO rename to SelectLocalReferencePointRepresentationPage
 public class SelectLocalModuleRepresentationPage extends AbstractWizardPage {
 
   private final JTabbedPane tabbedBasePane;
