@@ -1,4 +1,4 @@
-package saros.intellij.ui.wizards.pages.moduleselection;
+package saros.intellij.ui.wizards.pages.referencepointselection;
 
 import com.intellij.ui.components.JBTabbedPane;
 import java.util.HashMap;
@@ -13,16 +13,15 @@ import saros.intellij.ui.wizards.pages.PageActionListener;
 
 /**
  * Wizard page to choose how the shared modules are represented locally. For each shared module, a
- * {@link ModuleTab} is created.
+ * {@link ReferencePointTab} is created.
  */
-// TODO rename to SelectLocalReferencePointRepresentationPage
-public class SelectLocalModuleRepresentationPage extends AbstractWizardPage {
+public class SelectLocalReferencePointRepresentationPage extends AbstractWizardPage {
 
   private final JTabbedPane tabbedBasePane;
-  private final Map<String, ModuleTab> moduleTabs;
+  private final Map<String, ReferencePointTab> moduleTabs;
   private final ModuleTabStateListener moduleTabStateListener;
 
-  public SelectLocalModuleRepresentationPage(
+  public SelectLocalReferencePointRepresentationPage(
       String id, PageActionListener pageActionListener, Set<String> moduleNames) {
     super(id, pageActionListener);
 
@@ -41,11 +40,11 @@ public class SelectLocalModuleRepresentationPage extends AbstractWizardPage {
    * @param moduleName the name of a shared module contained in the project negotiation data
    */
   private void addModuleTab(@NotNull String moduleName) {
-    ModuleTab moduleTab = new ModuleTab(moduleName, moduleTabStateListener);
+    ReferencePointTab referencePointTab = new ReferencePointTab(moduleName, moduleTabStateListener);
 
-    moduleTabs.put(moduleTab.getModuleName(), moduleTab);
+    moduleTabs.put(referencePointTab.getModuleName(), referencePointTab);
 
-    tabbedBasePane.addTab(moduleTab.getModuleName(), moduleTab.getPanel());
+    tabbedBasePane.addTab(referencePointTab.getModuleName(), referencePointTab.getPanel());
   }
 
   /**
@@ -59,8 +58,8 @@ public class SelectLocalModuleRepresentationPage extends AbstractWizardPage {
       return;
     }
 
-    for (ModuleTab moduleTab : moduleTabs.values()) {
-      boolean tabInputIsValid = moduleTab.hasValidInput();
+    for (ReferencePointTab referencePointTab : moduleTabs.values()) {
+      boolean tabInputIsValid = referencePointTab.hasValidInput();
 
       if (!tabInputIsValid) {
         wizard.disableNextButton();
@@ -79,14 +78,14 @@ public class SelectLocalModuleRepresentationPage extends AbstractWizardPage {
    *     </code> if there is no module tab for the given name
    */
   @Nullable
-  public ModuleSelectionResult getModuleSelectionResult(@NotNull String moduleName) {
-    ModuleTab moduleTab = moduleTabs.get(moduleName);
+  public ReferencePointSelectionResult getModuleSelectionResult(@NotNull String moduleName) {
+    ReferencePointTab referencePointTab = moduleTabs.get(moduleName);
 
-    if (moduleTab == null) {
+    if (referencePointTab == null) {
       return null;
     }
 
-    return moduleTab.getModuleSelectionResult();
+    return referencePointTab.getModuleSelectionResult();
   }
 
   @Override

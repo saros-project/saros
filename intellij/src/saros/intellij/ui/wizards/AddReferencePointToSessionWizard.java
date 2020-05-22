@@ -32,8 +32,8 @@ import saros.intellij.ui.widgets.progress.ProgressMonitorAdapter;
 import saros.intellij.ui.wizards.pages.HeaderPanel;
 import saros.intellij.ui.wizards.pages.PageActionListener;
 import saros.intellij.ui.wizards.pages.TextAreaPage;
-import saros.intellij.ui.wizards.pages.moduleselection.ModuleSelectionResult;
-import saros.intellij.ui.wizards.pages.moduleselection.SelectLocalModuleRepresentationPage;
+import saros.intellij.ui.wizards.pages.referencepointselection.ReferencePointSelectionResult;
+import saros.intellij.ui.wizards.pages.referencepointselection.SelectLocalReferencePointRepresentationPage;
 import saros.monitoring.IProgressMonitor;
 import saros.monitoring.NullProgressMonitor;
 import saros.monitoring.SubProgressMonitor;
@@ -67,8 +67,8 @@ import saros.util.ThreadUtils;
  */
 // TODO adjust remaining javadoc, variable/method names, user messages, and log messages
 //  FIXME: Add facility for more than one project.
-public class AddProjectToSessionWizard extends Wizard {
-  private static final Logger log = Logger.getLogger(AddProjectToSessionWizard.class);
+public class AddReferencePointToSessionWizard extends Wizard {
+  private static final Logger log = Logger.getLogger(AddReferencePointToSessionWizard.class);
 
   public static final String SELECT_MODULE_REPRESENTATION_PAGE_ID = "selectModuleRepresentation";
   public static final String FILE_LIST_PAGE_ID = "fileListPage";
@@ -88,7 +88,8 @@ public class AddProjectToSessionWizard extends Wizard {
 
   @Inject private ISarosSessionManager sessionManager;
 
-  private final SelectLocalModuleRepresentationPage selectLocalModuleRepresentationPage;
+  private final SelectLocalReferencePointRepresentationPage
+      selectLocalReferencePointRepresentationPage;
   private final TextAreaPage fileListPage;
 
   private final PageActionListener selectProjectsPageListener =
@@ -106,11 +107,12 @@ public class AddProjectToSessionWizard extends Wizard {
         public void next() {
           DocumentAPI.saveAllDocuments();
 
-          ModuleSelectionResult moduleSelectionResult;
+          ReferencePointSelectionResult referencePointSelectionResult;
 
           try {
-            moduleSelectionResult =
-                selectLocalModuleRepresentationPage.getModuleSelectionResult(remoteProjectName);
+            referencePointSelectionResult =
+                selectLocalReferencePointRepresentationPage.getModuleSelectionResult(
+                    remoteProjectName);
 
           } catch (IllegalStateException e) {
             noisyCancel("Request to get directory selection result failed: " + e.getMessage(), e);
@@ -118,7 +120,7 @@ public class AddProjectToSessionWizard extends Wizard {
             return;
           }
 
-          if (moduleSelectionResult == null) {
+          if (referencePointSelectionResult == null) {
             noisyCancel(
                 "Could not find a directory selection result for the reference point "
                     + remoteProjectName,
@@ -127,15 +129,15 @@ public class AddProjectToSessionWizard extends Wizard {
             return;
           }
 
-          Project project = moduleSelectionResult.getProject();
+          Project project = referencePointSelectionResult.getProject();
 
           sessionManager.getSession().getComponent(SharedIDEContext.class).setProject(project);
 
-          switch (moduleSelectionResult.getLocalRepresentationOption()) {
+          switch (referencePointSelectionResult.getLocalRepresentationOption()) {
             case CREATE_NEW_DIRECTORY:
-              String newDirectoryName = moduleSelectionResult.getNewDirectoryName();
+              String newDirectoryName = referencePointSelectionResult.getNewDirectoryName();
               VirtualFile newDirectoryBaseDirectory =
-                  moduleSelectionResult.getNewDirectoryBaseDirectory();
+                  referencePointSelectionResult.getNewDirectoryBaseDirectory();
 
               if (newDirectoryName == null || newDirectoryBaseDirectory == null) {
                 noisyCancel("No valid new directory name or base path was given", null);
@@ -147,7 +149,7 @@ public class AddProjectToSessionWizard extends Wizard {
               break;
 
             case USE_EXISTING_DIRECTORY:
-              VirtualFile existingDirectory = moduleSelectionResult.getExistingDirectory();
+              VirtualFile existingDirectory = referencePointSelectionResult.getExistingDirectory();
 
               if (existingDirectory == null) {
                 noisyCancel("No valid existing directory was given", null);
@@ -410,7 +412,7 @@ public class AddProjectToSessionWizard extends Wizard {
    * @param parent the parent window relative to which the dialog is positioned
    * @param negotiation The IPN this wizard handles
    */
-  public AddProjectToSessionWizard(
+  public AddReferencePointToSessionWizard(
       Project project, Window parent, AbstractIncomingProjectNegotiation negotiation) {
 
     super(
@@ -437,13 +439,13 @@ public class AddProjectToSessionWizard extends Wizard {
     remoteProjectID = data.get(0).getProjectID();
     remoteProjectName = data.get(0).getProjectName();
 
-    selectLocalModuleRepresentationPage =
-        new SelectLocalModuleRepresentationPage(
+    selectLocalReferencePointRepresentationPage =
+        new SelectLocalReferencePointRepresentationPage(
             SELECT_MODULE_REPRESENTATION_PAGE_ID,
             selectProjectsPageListener,
             Collections.singleton(remoteProjectName));
 
-    registerPage(selectLocalModuleRepresentationPage);
+    registerPage(selectLocalReferencePointRepresentationPage);
 
     fileListPage =
         new TextAreaPage(
