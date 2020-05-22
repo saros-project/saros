@@ -15,8 +15,8 @@ import saros.net.xmpp.contact.XMPPContactsService;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.ISarosSessionManager;
 
-/** Saros action group for the pop-up menu when right-clicking on a module. */
-public class SarosFileShareGroup extends ActionGroup {
+/** Saros action group for the pop-up menu when right-clicking on a resource. */
+public class SarosResourceShareGroup extends ActionGroup {
   @Inject private ISarosSessionManager sessionManager;
 
   @Inject private XMPPContactsService contactsService;
@@ -66,6 +66,7 @@ public class SarosFileShareGroup extends ActionGroup {
    * @param e the action event
    * @return whether the selected element is a sharable resource
    */
+  // TODO exclude excluded resources
   private boolean isSharableResource(AnActionEvent e) {
     VirtualFile virtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE);
 
