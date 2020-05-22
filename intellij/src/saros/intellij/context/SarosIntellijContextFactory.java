@@ -81,10 +81,10 @@ public class SarosIntellijContextFactory extends AbstractContextFactory {
 
     container.addComponent(
         BindKey.bindKey(String.class, IContextKeyBindings.SarosVersion.class),
-        IntelliJVersionProvider.getPluginVersion());
+        IntellijVersionProvider.getPluginVersion());
 
     container.addComponent(
         BindKey.bindKey(String.class, IContextKeyBindings.PlatformVersion.class),
-        IntelliJVersionProvider.getBuildNumber());
+        IntellijVersionProvider.getBuildNumber());
   }
 }
