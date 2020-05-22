@@ -6,12 +6,10 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import java.awt.Dimension;
 import java.awt.Window;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashMap;
@@ -134,22 +132,22 @@ public class AddProjectToSessionWizard extends Wizard {
           sessionManager.getSession().getComponent(SharedIDEContext.class).setProject(project);
 
           switch (moduleSelectionResult.getLocalRepresentationOption()) {
-            case CREATE_NEW_MODULE:
-              String newDirectoryName = moduleSelectionResult.getNewModuleName();
-              Path newDirectoryBasePath = moduleSelectionResult.getNewModuleBasePath();
+            case CREATE_NEW_DIRECTORY:
+              String newDirectoryName = moduleSelectionResult.getNewDirectoryName();
+              VirtualFile newDirectoryBaseDirectory =
+                  moduleSelectionResult.getNewDirectoryBaseDirectory();
 
-              if (newDirectoryName == null || newDirectoryBasePath == null) {
+              if (newDirectoryName == null || newDirectoryBaseDirectory == null) {
                 noisyCancel("No valid new directory name or base path was given", null);
 
                 return;
               }
 
-              doNewDirectory(project, newDirectoryName, newDirectoryBasePath);
+              doNewDirectory(project, newDirectoryName, newDirectoryBaseDirectory);
               break;
 
-            case USE_EXISTING_MODULE:
-              // TODO replace with moduleSelectionResult.getExistingBaseResource(); once migrated
-              VirtualFile existingDirectory = null;
+            case USE_EXISTING_DIRECTORY:
+              VirtualFile existingDirectory = moduleSelectionResult.getExistingDirectory();
 
               if (existingDirectory == null) {
                 noisyCancel("No valid existing directory was given", null);
@@ -172,19 +170,14 @@ public class AddProjectToSessionWizard extends Wizard {
          *
          * @param project the project to bind the reference point to
          * @param directoryName the name for the new directory
-         * @param directoryBasePath the base path for the new directory
+         * @param baseDirectory the base directory for the new directory
          */
         private void doNewDirectory(
             @NotNull Project project,
             @NotNull String directoryName,
-            @NotNull Path directoryBasePath) {
+            @NotNull VirtualFile baseDirectory) {
 
-          VirtualFile baseFile =
-              FilesystemRunner.runWriteAction(
-                  () -> LocalFileSystem.getInstance().findFileByIoFile(directoryBasePath.toFile()),
-                  ModalityState.defaultModalityState());
-
-          VirtualFile existingResource = baseFile.findChild(directoryName);
+          VirtualFile existingResource = baseDirectory.findChild(directoryName);
 
           if (existingResource != null) {
             log.warn(
@@ -212,7 +205,7 @@ public class AddProjectToSessionWizard extends Wizard {
           try {
             referencePointFile =
                 FilesystemRunner.runWriteAction(
-                    () -> baseFile.createChildDirectory(this, directoryName),
+                    () -> baseDirectory.createChildDirectory(this, directoryName),
                     ModalityState.defaultModalityState());
 
           } catch (IOException e) {

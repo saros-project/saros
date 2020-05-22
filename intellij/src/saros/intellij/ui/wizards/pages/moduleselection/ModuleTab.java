@@ -1,5 +1,6 @@
 package saros.intellij.ui.wizards.pages.moduleselection;
 
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
@@ -8,6 +9,7 @@ import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.project.ProjectUtil;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.SimpleListCellRenderer;
@@ -19,6 +21,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
@@ -38,6 +42,8 @@ import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.jetbrains.annotations.NotNull;
+import saros.intellij.editor.ProjectAPI;
+import saros.intellij.runtime.FilesystemRunner;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.wizards.pages.moduleselection.SelectLocalModuleRepresentationPage.ModuleTabStateListener;
 
@@ -46,6 +52,7 @@ import saros.intellij.ui.wizards.pages.moduleselection.SelectLocalModuleRepresen
  * a new module or to use an already existing module. The options specified by the user can be
  * requested from the module tab through {@link #getModuleSelectionResult()}.
  */
+// TODO rename and adjust module references in javadoc, variable and method names, etc.
 class ModuleTab {
 
   private final String moduleName;
@@ -58,7 +65,7 @@ class ModuleTab {
   private final JTextField newModuleNameTextField;
   private final TextFieldWithBrowseButton newModuleBasePathTextField;
   private final JRadioButton useExistingModuleRadioButton;
-  private final JComboBox<Module> existingModuleComboBox;
+  private final TextFieldWithBrowseButton existingDirectoryPathTextField;
 
   private boolean moduleNameTextFieldShownAsValid;
   private final Border moduleNameTextFieldDefaultBorder;
@@ -68,9 +75,9 @@ class ModuleTab {
   private final Border moduleBasePathTextFieldDefaultBorder;
   private final Border moduleBasePathTextFieldErrorBorder;
 
-  private boolean existingModuleComboBoxShownAsValid;
-  private final Border existingModuleComboBoxDefaultBorder;
-  private final Border existingModuleComboBoxErrorBorder;
+  private boolean existingDirectoryPathTextFieldShownAsValid;
+  private final Border existingDirectoryPathTextFieldDefaultBorder;
+  private final Border existingDirectoryPathTextFieldErrorBorder;
 
   private boolean hasValidInput;
 
@@ -90,7 +97,7 @@ class ModuleTab {
 
     this.newModuleNameTextField = new JBTextField();
     this.newModuleBasePathTextField = new TextFieldWithBrowseButton();
-    this.existingModuleComboBox = new ComboBox<>();
+    this.existingDirectoryPathTextField = new TextFieldWithBrowseButton();
 
     this.moduleNameTextFieldShownAsValid = true;
     this.moduleNameTextFieldDefaultBorder = newModuleNameTextField.getBorder();
@@ -105,11 +112,13 @@ class ModuleTab {
         BorderFactory.createCompoundBorder(
             moduleBasePathTextFieldDefaultBorder, BorderFactory.createLineBorder(JBColor.RED));
 
-    this.existingModuleComboBoxShownAsValid = true;
-    this.existingModuleComboBoxDefaultBorder = existingModuleComboBox.getBorder();
-    this.existingModuleComboBoxErrorBorder =
+    this.existingDirectoryPathTextFieldShownAsValid = true;
+    this.existingDirectoryPathTextFieldDefaultBorder =
+        existingDirectoryPathTextField.getTextField().getBorder();
+    this.existingDirectoryPathTextFieldErrorBorder =
         BorderFactory.createCompoundBorder(
-            existingModuleComboBoxDefaultBorder, BorderFactory.createLineBorder(JBColor.RED));
+            existingDirectoryPathTextFieldDefaultBorder,
+            BorderFactory.createLineBorder(JBColor.RED));
 
     this.hasValidInput = false;
 
@@ -164,12 +173,12 @@ class ModuleTab {
           switch (actionEvent.getActionCommand()) {
             case CREATE_NEW_MODULE_ACTION_COMMAND:
               setCreateNewModuleFieldsEnabled(true);
-              setUseExistingModuleFieldsEnabled(false);
+              setUseExistingDirectoryFieldsEnabled(false);
               break;
 
             case USE_EXISTING_MODULE_ACTION_COMMAND:
               setCreateNewModuleFieldsEnabled(false);
-              setUseExistingModuleFieldsEnabled(true);
+              setUseExistingDirectoryFieldsEnabled(true);
               break;
 
             default:
@@ -204,13 +213,19 @@ class ModuleTab {
    *
    * @param enabled whether ot not the fields should be set to enabled
    */
-  private void setUseExistingModuleFieldsEnabled(boolean enabled) {
-    existingModuleComboBox.setEnabled(enabled);
+  private void setUseExistingDirectoryFieldsEnabled(boolean enabled) {
+    existingDirectoryPathTextField.setEnabled(enabled);
   }
 
   /**
-   * Adds a directory chooser to the base path text field. The current path entered in the text
+   * Sets up the directory choosers used as part of the dialog.
+   *
+   * <p>Adds a directory chooser to the displayed text fields. The current path entered in the text
    * field is used as the default selection when the folder chooser is opened by the user.
+   *
+   * <p>Sets the text fields to not be editable to avoid issues with {@link
+   * #representsValidVirtualFile(File)}. Adds a mouse listener to ensure that the directory chooser
+   * is opened instead when the text field is clicked.
    */
   private void setUpFolderChooser() {
     newModuleBasePathTextField.addBrowseFolderListener(
@@ -218,6 +233,36 @@ class ModuleTab {
         Messages.ModuleTab_module_base_path_file_chooser_description,
         null,
         FileChooserDescriptorFactory.createSingleFolderDescriptor());
+
+    newModuleBasePathTextField.setEditable(false);
+    newModuleBasePathTextField
+        .getTextField()
+        .addMouseListener(
+            (MouseClickedListener)
+                e -> {
+                  // only act on left click and filter out events where browse button was clicked
+                  if (e.getButton() == MouseEvent.BUTTON1 && e.getComponent().hasFocus()) {
+                    newModuleBasePathTextField.getButton().doClick();
+                  }
+                });
+
+    existingDirectoryPathTextField.addBrowseFolderListener(
+        Messages.ModuleTab_existing_directory_path_file_chooser_title,
+        Messages.ModuleTab_existing_directory_path_file_chooser_description,
+        null,
+        FileChooserDescriptorFactory.createSingleFolderDescriptor());
+
+    existingDirectoryPathTextField.setEditable(false);
+    existingDirectoryPathTextField
+        .getTextField()
+        .addMouseListener(
+            (MouseClickedListener)
+                e -> {
+                  // only act on left click and filter out events where browse button was clicked
+                  if (e.getButton() == MouseEvent.BUTTON1 && e.getComponent().hasFocus()) {
+                    existingDirectoryPathTextField.getButton().doClick();
+                  }
+                });
   }
 
   /**
@@ -229,6 +274,7 @@ class ModuleTab {
    * <p>Calls {@link #setInitialInputForProject(Project)} with the selected project to determine the
    * default values and selection for the other fields.
    */
+  // TODO update to no longer use modules
   private void setInitialInput() {
     int projectCount = projectComboBox.getItemCount();
 
@@ -282,6 +328,7 @@ class ModuleTab {
    *
    * @param project the newly selected project to set the default values and selection for
    */
+  // TODO update to no longer use modules
   private void updateFieldsForProjectChange(@NotNull Project project) {
     newModuleNameTextField.setText(moduleName);
 
@@ -290,31 +337,7 @@ class ModuleTab {
       newModuleBasePathTextField.setText(projectBaseDir.getPath());
     }
 
-    Module[] modules = ModuleManager.getInstance(project).getModules();
-    Arrays.sort(modules, Comparator.comparing(Module::getName));
-
-    existingModuleComboBox.removeAllItems();
-
-    Module preselectedModule = null;
-
-    for (Module module : modules) {
-      existingModuleComboBox.addItem(module);
-
-      if (module.getName().equals(moduleName)) {
-        preselectedModule = module;
-      }
-    }
-
-    if (preselectedModule != null) {
-      useExistingModuleRadioButton.doClick();
-
-      existingModuleComboBox.setSelectedItem(preselectedModule);
-
-      return;
-    }
-
     createNewModuleRadioButton.doClick();
-    existingModuleComboBox.setSelectedIndex(-1);
   }
 
   /**
@@ -401,16 +424,36 @@ class ModuleTab {
 
   /**
    * Adds listeners which update the module tab validity state on input changes to the fields used
-   * when using an existing module as part of the project negotiation.
+   * when using an existing directory as part of the project negotiation.
    */
   private void addUseExistingModuleFieldListeners() {
-    existingModuleComboBox.addItemListener(
-        itemEvent -> {
-          if (itemEvent.getStateChange() == ItemEvent.SELECTED) {
+    DocumentListener existingDirectoryPathDocumentListener =
+        new DocumentListener() {
+          @Override
+          public void insertUpdate(DocumentEvent e) {
+            updateValidity();
+          }
+
+          @Override
+          public void removeUpdate(DocumentEvent e) {
+            updateValidity();
+          }
+
+          @Override
+          public void changedUpdate(DocumentEvent e) {
+            updateValidity();
+          }
+
+          private void updateValidity() {
             updateExistingModuleValidityIndicator();
             updateInputValidity();
           }
-        });
+        };
+
+    existingDirectoryPathTextField
+        .getTextField()
+        .getDocument()
+        .addDocumentListener(existingDirectoryPathDocumentListener);
   }
 
   /**
@@ -421,7 +464,10 @@ class ModuleTab {
   private void updateInputValidity() {
     boolean newInputValidityState;
 
-    if (createNewModuleRadioButton.isSelected()) {
+    if (projectComboBox.getSelectedItem() == null) {
+      newInputValidityState = false;
+
+    } else if (createNewModuleRadioButton.isSelected()) {
       newInputValidityState = hasValidNewModuleName() && hasValidNewBasePath();
 
     } else if (useExistingModuleRadioButton.isSelected()) {
@@ -473,14 +519,8 @@ class ModuleTab {
       return false;
     }
 
-    Project project = (Project) projectComboBox.getSelectedItem();
-
-    if (project == null) {
-      return false;
-    }
-
-    return Arrays.stream(ModuleManager.getInstance(project).getModules())
-        .noneMatch(module -> module.getName().equals(enteredName));
+    // TODO check whether resource with same name already exists in chosen base directory
+    return true;
   }
 
   /**
@@ -489,19 +529,13 @@ class ModuleTab {
    * @return whether the entered path points to a valid (existing) directory
    */
   private boolean hasValidNewBasePath() {
-    boolean hasValidNewBasePath;
+    File newBasePathFile = new File(newModuleBasePathTextField.getText());
 
-    try {
-      Path newBasePath = Paths.get(newModuleBasePathTextField.getText());
-      File newBasePathFile = newBasePath.toFile();
-
-      hasValidNewBasePath = newBasePathFile.exists() && newBasePathFile.isDirectory();
-
-    } catch (InvalidPathException | UnsupportedOperationException e) {
-      hasValidNewBasePath = false;
+    if (!newBasePathFile.exists() || !newBasePathFile.isDirectory()) {
+      return false;
     }
 
-    return hasValidNewBasePath;
+    return representsValidVirtualFile(newBasePathFile);
   }
 
   /**
@@ -511,9 +545,47 @@ class ModuleTab {
    * @see Module#isDisposed()
    */
   private boolean hasValidExistingModule() {
-    Module selectedExistingModule = (Module) existingModuleComboBox.getSelectedItem();
+    File directoryFile = new File(existingDirectoryPathTextField.getText());
 
-    return selectedExistingModule != null && !selectedExistingModule.isDisposed();
+    if (!directoryFile.exists() || !directoryFile.isDirectory()) {
+      return false;
+    }
+
+    return representsValidVirtualFile(directoryFile);
+  }
+
+  /**
+   * Returns whether the given file represents a valid virtual file in the local VFS.
+   *
+   * <p>A valid virtual file
+   *
+   * <ul>
+   *   <li>exists in the local VFS,
+   *   <li>is part of the content of the selected project, and
+   *   <li>is not excluded from the project content.
+   * </ul>
+   *
+   * <b>NOTE:</b> As this is a long-running operation that queries the local VFS snapshot, it should
+   * not be called too frequently.
+   *
+   * @param file the file to check
+   * @return whether the given file represents a valid virtual file in the local VFS
+   */
+  private boolean representsValidVirtualFile(File file) {
+    Project selectedProject = (Project) projectComboBox.getSelectedItem();
+
+    if (selectedProject == null) {
+      return false;
+    }
+
+    VirtualFile baseFile =
+        FilesystemRunner.runWriteAction(
+            () -> LocalFileSystem.getInstance().findFileByIoFile(file),
+            ModalityState.defaultModalityState());
+
+    return baseFile != null
+        && ProjectAPI.isInProjectContent(selectedProject, baseFile)
+        && !ProjectAPI.isExcluded(selectedProject, baseFile);
   }
 
   /**
@@ -582,26 +654,26 @@ class ModuleTab {
     boolean showFieldAsValid =
         hasValidExistingModule() || !useExistingModuleRadioButton.isSelected();
 
-    if (showFieldAsValid == existingModuleComboBoxShownAsValid) {
+    if (showFieldAsValid == existingDirectoryPathTextFieldShownAsValid) {
       return;
     }
 
-    existingModuleComboBoxShownAsValid = showFieldAsValid;
+    existingDirectoryPathTextFieldShownAsValid = showFieldAsValid;
 
     Border border;
     String toolTip;
 
     if (showFieldAsValid) {
-      border = existingModuleComboBoxDefaultBorder;
+      border = existingDirectoryPathTextFieldDefaultBorder;
       toolTip = "";
 
     } else {
-      border = existingModuleComboBoxErrorBorder;
+      border = existingDirectoryPathTextFieldErrorBorder;
       toolTip = Messages.ModuleTab_use_existing_module_local_module_invalid_tooltip;
     }
 
-    existingModuleComboBox.setBorder(border);
-    existingModuleComboBox.setToolTipText(toolTip);
+    existingDirectoryPathTextField.getTextField().setBorder(border);
+    existingDirectoryPathTextField.getTextField().setToolTipText(toolTip);
   }
 
   /**
@@ -617,9 +689,9 @@ class ModuleTab {
     LocalRepresentationOption chosenLocalRepresentationOption;
 
     if (createNewModuleRadioButton.isSelected()) {
-      chosenLocalRepresentationOption = LocalRepresentationOption.CREATE_NEW_MODULE;
+      chosenLocalRepresentationOption = LocalRepresentationOption.CREATE_NEW_DIRECTORY;
     } else if (useExistingModuleRadioButton.isSelected()) {
-      chosenLocalRepresentationOption = LocalRepresentationOption.USE_EXISTING_MODULE;
+      chosenLocalRepresentationOption = LocalRepresentationOption.USE_EXISTING_DIRECTORY;
     } else {
       throw new IllegalStateException(
           "Encountered a state where neither of the two radio buttons was selected.");
@@ -632,11 +704,23 @@ class ModuleTab {
     }
 
     String newModuleName = newModuleNameTextField.getText();
-    Path newModuleBasePath = Paths.get(newModuleBasePathTextField.getText());
-    Module existingModule = (Module) existingModuleComboBox.getSelectedItem();
+    VirtualFile newDirectoryBaseDirectory = getVirtualFile(newModuleBasePathTextField.getText());
+    VirtualFile existingDirectory = getVirtualFile(existingDirectoryPathTextField.getText());
 
     return new ModuleSelectionResult(
-        chosenLocalRepresentationOption, project, newModuleName, newModuleBasePath, existingModule);
+        chosenLocalRepresentationOption,
+        project,
+        newModuleName,
+        newDirectoryBaseDirectory,
+        existingDirectory);
+  }
+
+  private VirtualFile getVirtualFile(String path) {
+    File file = new File(path);
+
+    return FilesystemRunner.runWriteAction(
+        () -> LocalFileSystem.getInstance().findFileByIoFile(file),
+        ModalityState.defaultModalityState());
   }
 
   /**
@@ -782,19 +866,7 @@ class ModuleTab {
 
     moduleTabPanel.add(localModuleLabel, gbc);
 
-    existingModuleComboBox.setRenderer(
-        new SimpleListCellRenderer<Module>() {
-          @Override
-          public void customize(
-              @NotNull JList list, Module value, int index, boolean selected, boolean hasFocus) {
-
-            if (value != null) {
-              setText(value.getName());
-            }
-          }
-        });
-
-    moduleTabPanel.add(existingModuleComboBox, gbc);
+    moduleTabPanel.add(existingDirectoryPathTextField, gbc);
 
     gbc.gridy++;
   }
@@ -807,5 +879,28 @@ class ModuleTab {
   private void initSpacers(@NotNull GridBagConstraints gbc) {
     gbc.gridwidth = 3;
     moduleTabPanel.add(Box.createHorizontalStrut(600), gbc);
+  }
+
+  /** Interface extension adding stubs for all methods besides {@link #mouseClicked(MouseEvent)}. */
+  private interface MouseClickedListener extends MouseListener {
+    @Override
+    default void mousePressed(MouseEvent e) {
+      // NOP
+    }
+
+    @Override
+    default void mouseReleased(MouseEvent e) {
+      // NOP
+    }
+
+    @Override
+    default void mouseEntered(MouseEvent e) {
+      // NOP
+    }
+
+    @Override
+    default void mouseExited(MouseEvent e) {
+      // NOP
+    }
   }
 }
