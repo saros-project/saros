@@ -7,11 +7,11 @@ import com.intellij.openapi.extensions.PluginId;
 import saros.intellij.SarosComponent;
 
 /**
- * Methods in this class can be used to access version information about the running IntelliJ IDEA
- * version and Saros plugin version
+ * Methods in this class can be used to access version information about the running Intellij IDEA
+ * version and Saros plugin version.
  */
-public class IntelliJVersionProvider {
-  private IntelliJVersionProvider() {
+public class IntellijVersionProvider {
+  private IntellijVersionProvider() {
     // NOP
   }
 
@@ -33,12 +33,12 @@ public class IntelliJVersionProvider {
   }
 
   /**
-   * Returns the build number of the used IntelliJ IDEA version.
+   * Returns the build number of the used Intellij IDEA version.
    *
    * <p><b>NOTE:</b> This is <b>not</b> the version number but the number of the build used for the
    * release.
    *
-   * @return the build number of the used IntelliJ IDEA version
+   * @return the build number of the used Intellij IDEA version
    */
   public static String getBuildNumber() {
     return ApplicationInfo.getInstance().getBuild().toString();
