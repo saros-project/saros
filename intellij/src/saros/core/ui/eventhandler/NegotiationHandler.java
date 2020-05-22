@@ -29,8 +29,8 @@ import saros.session.INegotiationHandler;
 import saros.session.ISarosSessionManager;
 
 /**
- * This handler is responsible for presenting and running the session and project negotiations that
- * are received by the Saros Session Manager component.
+ * This handler is responsible for presenting and running the session and reference point
+ * negotiations that are received by the Saros Session Manager component.
  */
 public class NegotiationHandler implements INegotiationHandler {
 
@@ -52,7 +52,6 @@ public class NegotiationHandler implements INegotiationHandler {
 
   @Override
   public void handleOutgoingSessionNegotiation(OutgoingSessionNegotiation negotiation) {
-
     OutgoingInvitationJob outgoingInvitationJob = new OutgoingInvitationJob(negotiation);
 
     outgoingInvitationJob.schedule();
@@ -65,14 +64,14 @@ public class NegotiationHandler implements INegotiationHandler {
 
   @Override
   public void handleOutgoingProjectNegotiation(AbstractOutgoingProjectNegotiation negotiation) {
-
     OutgoingProjectJob job = new OutgoingProjectJob(negotiation);
     job.schedule();
   }
 
   @Override
   public void handleIncomingProjectNegotiation(AbstractIncomingProjectNegotiation negotiation) {
-    projectUtils.runWithProject(project -> showIncomingProjectUI(project, negotiation));
+    projectUtils.runWithProject(
+        project -> showIncomingReferencePointNegotiationUI(project, negotiation));
   }
 
   private void showIncomingInvitationUI(
@@ -88,7 +87,7 @@ public class NegotiationHandler implements INegotiationHandler {
         ModalityState.defaultModalityState());
   }
 
-  private void showIncomingProjectUI(
+  private void showIncomingReferencePointNegotiationUI(
       Project project, final AbstractIncomingProjectNegotiation negotiation) {
 
     EDTExecutor.invokeLater(
@@ -186,7 +185,7 @@ public class NegotiationHandler implements INegotiationHandler {
     private final String peer;
 
     OutgoingProjectJob(AbstractOutgoingProjectNegotiation outgoingProjectNegotiation) {
-      super(Messages.NegotiationHandler_sharing_project);
+      super(Messages.NegotiationHandler_sharing_reference_point);
       negotiation = outgoingProjectNegotiation;
       peer = negotiation.getPeer().getBase();
     }
@@ -210,20 +209,22 @@ public class NegotiationHandler implements INegotiationHandler {
           case REMOTE_CANCEL:
             message =
                 MessageFormat.format(
-                    Messages.NegotiationHandler_project_sharing_canceled_message, peerName);
+                    Messages.NegotiationHandler_reference_point_negotiation_canceled_message,
+                    peerName);
 
-            NotificationPanel.showInformation(message, "Project sharing canceled remotely");
+            NotificationPanel.showInformation(message, "Reference point sharing canceled remotely");
 
             return new Status(IStatus.CANCEL, SarosComponent.PLUGIN_ID, message);
 
           case REMOTE_ERROR:
             message =
                 MessageFormat.format(
-                    Messages.NegotiationHandler_sharing_project_canceled_remotely_message,
+                    Messages.NegotiationHandler_sharing_reference_point_canceled_remotely_message,
                     peerName,
                     negotiation.getErrorMessage());
             NotificationPanel.showError(
-                message, Messages.NegotiationHandler_sharing_project_canceled_remotely_title);
+                message,
+                Messages.NegotiationHandler_sharing_reference_point_canceled_remotely_title);
 
             return new Status(IStatus.ERROR, SarosComponent.PLUGIN_ID, message);
         }
