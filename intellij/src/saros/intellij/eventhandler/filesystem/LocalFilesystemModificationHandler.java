@@ -251,13 +251,22 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       return;
     }
 
-    // TODO figure out if this can happen
-    log.warn(
-        "Detected unhandled content change on the virtual file level "
-            + "for "
-            + virtualFile
-            + ", requested by: "
-            + virtualFileEvent.getRequestor());
+    if (!virtualFile.getFileType().isBinary()) {
+      // modification already handled by document modification handler
+      log.debug(
+          "Ignoring content change on the virtual file level for text resource "
+              + virtualFile
+              + ", requested by: "
+              + virtualFileEvent.getRequestor());
+
+    } else {
+      // TODO handle content changes for non-text resources; see #996
+      log.warn(
+          "Detected unhandled content change on the virtual file level for non-text resource "
+              + virtualFile
+              + ", requested by: "
+              + virtualFileEvent.getRequestor());
+    }
   }
 
   /**
