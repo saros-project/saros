@@ -460,8 +460,12 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
           IFolder childFolder =
               (IFolder) VirtualFileConverter.convertToResource(fileOrDir, baseReferencePoint);
 
-          if (childFolder == null) {
-            log.debug("Skipping deleted folder as no IFile could be obtained " + fileOrDir);
+          if (childFolder == null || !session.isShared(childFolder)) {
+            log.debug(
+                "Ignoring non-shared child folder deletion: "
+                    + fileOrDir
+                    + ", parent folder: "
+                    + container);
 
             return true;
           }
