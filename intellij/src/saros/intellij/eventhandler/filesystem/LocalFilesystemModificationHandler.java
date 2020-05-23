@@ -1,13 +1,12 @@
 package saros.intellij.eventhandler.filesystem;
 
+import static saros.filesystem.IResource.Type.FOLDER;
+
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ContentIterator;
-import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -20,9 +19,7 @@ import com.intellij.openapi.vfs.VirtualFilePropertyEvent;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Deque;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import org.apache.log4j.Logger;
@@ -49,7 +46,6 @@ import saros.intellij.eventhandler.editor.document.LocalDocumentModificationHand
 import saros.intellij.filesystem.IntellijPath;
 import saros.intellij.filesystem.VirtualFileConverter;
 import saros.intellij.runtime.EDTExecutor;
-import saros.intellij.runtime.FilesystemRunner;
 import saros.observables.FileReplacementInProgressObservable;
 import saros.session.AbstractActivityProducer;
 import saros.session.ISarosSession;
@@ -62,7 +58,6 @@ import saros.session.User;
  *
  * @see VirtualFileListener
  */
-// TODO remove module-specific logic
 public class LocalFilesystemModificationHandler extends AbstractActivityProducer
     implements IApplicationEventHandler {
 
@@ -136,8 +131,6 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
          *     <p>Triggers the create listener for the new path of the contained directories in
          *     right order. Then triggers the move listener for the contained files. Then triggers
          *     the delete listener for the old path of the contained directories.
-         *
-         * @param event
          */
         @Override
         public void beforeFileMovement(@NotNull VirtualFileMoveEvent event) {
@@ -399,11 +392,11 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
   /**
    * Generates and dispatches a folder deletion activity for the deleted folder.
    *
-   * <p>Also explicitly creates deletion activities for all contained resources belonging to the
-   * same module. Contained files are processed first (in ascending depth order), followed by the
-   * contained folders in descending depth order. This ensures that deletion activities for folders
-   * are only send once the activities for all contained resources were sent, allowing the receiver
-   * to also explicitly handle all resource deletions.
+   * <p>Also explicitly creates deletion activities for all contained (non-excluded) resources.
+   * Contained files are processed first (in ascending depth order), followed by the contained
+   * folders in descending depth order. This ensures that deletion activities for folders are only
+   * send once the activities for all contained resources were sent, allowing the receiver to also
+   * explicitly handle all resource deletions.
    *
    * @param deletedFolder the folder that was deleted
    */
@@ -421,11 +414,13 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       return;
     }
 
+    IProject baseReferencePoint = folder.getProject();
+
     User user = session.getLocalUser();
 
     Deque<IActivity> queuedDeletionActivities = new ConcurrentLinkedDeque<>();
 
-    VirtualFileFilter virtualFileFilter = getVirtualFileFilter(deletedFolder);
+    VirtualFileFilter virtualFileFilter = getVirtualFileFilter();
 
     /*
      * Defines the actions executed on the base directory and every valid
@@ -442,7 +437,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
           }
 
           IFolder childFolder =
-              (IFolder) VirtualFileConverter.convertToResource(sharedReferencePoints, fileOrDir);
+              (IFolder) VirtualFileConverter.convertToResource(fileOrDir, baseReferencePoint);
 
           if (childFolder == null) {
             log.debug("Skipping deleted folder as no IFile could be obtained " + fileOrDir);
@@ -458,10 +453,9 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
         };
 
     /*
-     * Calls the above defined contentIterator on the base directory and
-     * every contained resource.
-     * Directories are only stepped into if they match the above defined
-     * virtualFileFilter. This also applies to the base directory.
+     * Calls the above defined contentIterator on the base directory and every contained resource.
+     * Directories are only stepped into if they match the above defined virtualFileFilter. This
+     * also applies to the base directory.
      */
     VfsUtilCore.iterateChildrenRecursively(deletedFolder, virtualFileFilter, contentIterator);
 
@@ -539,14 +533,14 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
    * Generates and dispatches matching creation and deletion activities replicating moving the given
    * directory.
    *
-   * <p>Also explicitly creates activities to move all contained resources belonging to the same
-   * module. When creating the new resources, the creation/move activities are created in ascending
-   * depth order. This ensures that creation/move activities are only send once the creation
-   * activities for all parent resources were sent. When creating the deletion activities, the
-   * contained files are processed first (in ascending depth order), followed by the contained
-   * folders in descending depth order. This ensures that move activities for folders are only send
-   * once the activities for all contained resources were sent, allowing the receiver to also
-   * explicitly handle all resource deletions.
+   * <p>Also explicitly creates activities to move all contained (non-excluded) resources. When
+   * creating the new resources, the creation/move activities are created in ascending depth order.
+   * This ensures that creation/move activities are only send once the creation activities for all
+   * parent resources were sent. When creating the deletion activities, the contained files are
+   * processed first (in ascending depth order), followed by the contained folders in descending
+   * depth order. This ensures that move activities for folders are only send once the activities
+   * for all contained resources were sent, allowing the receiver to also explicitly handle all
+   * resource deletions.
    *
    * <p>How the resources (including the given directory) are handled depends on whether the source
    * and target directory is shared.
@@ -590,10 +584,10 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     User user = session.getLocalUser();
 
-    boolean oldFileIsShared = oldFolderWrapper != null && session.isShared(oldFolderWrapper);
-    boolean newFileIsShared = newParentWrapper != null && session.isShared(newParentWrapper);
+    boolean oldFolderIsShared = oldFolderWrapper != null && session.isShared(oldFolderWrapper);
+    boolean newFolderIsShared = newParentWrapper != null && session.isShared(newParentWrapper);
 
-    if (!oldFileIsShared && !newFileIsShared) {
+    if (!oldFolderIsShared && !newFolderIsShared) {
       if (log.isTraceEnabled()) {
         log.trace(
             "Ignoring non-shared folder move - folder: "
@@ -606,9 +600,10 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
       return;
 
-    } else if (oldFileIsShared && isContentRootDirectory(oldFile)) {
+    } else if (oldFolderIsShared && oldFolderWrapper.getProjectRelativePath().segmentCount() == 0) {
+
       if (log.isTraceEnabled()) {
-        log.trace("Ignoring move of content root " + oldFolderWrapper);
+        log.trace("Ignoring move of reference point base directory " + oldFolderWrapper);
       }
 
       return;
@@ -616,7 +611,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     Deque<IActivity> queuedDeletionActivities = new ConcurrentLinkedDeque<>();
 
-    VirtualFileFilter virtualFileFilter = getVirtualFileFilter(oldFile);
+    VirtualFileFilter virtualFileFilter = getVirtualFileFilter();
 
     /*
      * Defines the actions executed on the base directory and every valid
@@ -638,7 +633,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
             return true;
           }
 
-          if (newFileIsShared) {
+          if (newFolderIsShared) {
             IFolder newFolder =
                 newParentWrapper
                     .getProject()
@@ -653,7 +648,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
             dispatchActivity(newFolderCreatedActivity);
           }
 
-          if (oldFileIsShared) {
+          if (oldFolderIsShared) {
             IFolder oldFolder =
                 oldFolderWrapper
                     .getProject()
@@ -668,41 +663,15 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
         };
 
     /*
-     * Calls the above defined contentIterator on the base directory and
-     * every contained resource.
-     * Directories are only stepped into if they match the above defined
-     * virtualFileFilter. This also applies to the base directory.
+     * Calls the above defined contentIterator on the base directory and every contained resource.
+     * Directories are only stepped into if they match the above defined virtualFileFilter. This
+     * also applies to the base directory.
      */
     VfsUtilCore.iterateChildrenRecursively(oldFile, virtualFileFilter, contentIterator);
 
     while (!queuedDeletionActivities.isEmpty()) {
       dispatchActivity(queuedDeletionActivities.pop());
     }
-  }
-
-  /**
-   * Returns whether the given virtual file is a content root for the module it is associated with.
-   *
-   * @param virtualFile the virtual file to check
-   * @return <code>true</code> when the virtual file is one of the content roots of the module it is
-   *     associated with, <code>false</code> if it represents a file, does not match one of the
-   *     content roots or is not associated with a module
-   */
-  private boolean isContentRootDirectory(@NotNull VirtualFile virtualFile) {
-    if (!virtualFile.isDirectory()) {
-      return false;
-    }
-
-    Module module =
-        FilesystemRunner.runReadAction(() -> ModuleUtil.findModuleForFile(virtualFile, project));
-
-    if (module == null) {
-      return false;
-    }
-
-    VirtualFile[] contentRoots = ModuleRootManager.getInstance(module).getContentRoots();
-
-    return Arrays.asList(contentRoots).contains(virtualFile);
   }
 
   /**
@@ -740,11 +709,6 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
    * @param newFileName the new name for the file or null if it was not renamed
    * @see #generateFolderMoveActivity(VirtualFile, VirtualFile, VirtualFile, String)
    */
-  /*
-   * TODO adjust the logic ignoring module moves once multiple modules can be shared
-   *  Even though module files are ignored by their module, they won't be ignored when moved in/
-   *  between other shared modules.
-   */
   private void generateFileMoveActivity(
       @NotNull VirtualFile oldFile,
       @NotNull VirtualFile oldBaseParent,
@@ -766,28 +730,18 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
     boolean oldFileIsShared = oldFileWrapper != null && session.isShared(oldFileWrapper);
     boolean newFileIsShared = newParentWrapper != null && session.isShared(newParentWrapper);
 
-    if (newFileIsShared) {
-      Module targetModule =
-          FilesystemRunner.runReadAction(
-              () -> ModuleUtil.findModuleForFile(newBaseParent, project));
-
-      if (targetModule != null) {
-        VirtualFile moduleFile = targetModule.getModuleFile();
-        if (oldFile.equals(moduleFile)) {
-          if (log.isTraceEnabled()) {
-            log.trace("Ignoring move of module file " + oldFile + " for module " + targetModule);
-          }
-
-          return;
-        }
-      }
-    }
-
     boolean isOpenInTextEditor = ProjectAPI.isOpenInTextEditor(project, oldFile);
 
     IPath relativePath = getRelativePath(oldBaseParent, oldFile);
 
     if (relativePath == null) {
+      log.warn(
+          "Could not create file move activity for "
+              + oldFile
+              + " to "
+              + newBaseParent
+              + " an no relative path could be calculated for the file.");
+
       return;
     }
 
@@ -804,7 +758,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
     IActivity activity;
 
     if (oldFileIsShared && newFileIsShared) {
-      // moved file inside shared modules
+      // moved file inside/between shared reference point(s)
       IFile newFileWrapper =
           newParentWrapper
               .getProject()
@@ -824,7 +778,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       cleanUpBackgroundEditorPool(oldFileWrapper);
 
     } else if (newFileIsShared) {
-      // moved file into shared module
+      // moved file into shared reference point
       byte[] fileContent = getContent(oldFile);
 
       IFile newFileWrapper =
@@ -847,7 +801,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       }
 
     } else if (oldFileIsShared) {
-      // moved file out of shared module
+      // moved file out of shared reference point
       activity =
           new FileActivity(
               user, Type.REMOVED, FileActivity.Purpose.ACTIVITY, oldFileWrapper, null, null, null);
@@ -943,13 +897,22 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
         if (parent == null) {
           Set<IProject> sharedReferencePoints = session.getProjects();
-
           IResource resource = VirtualFileConverter.convertToResource(sharedReferencePoints, file);
 
           if (resource != null && session.isShared(resource)) {
-            log.error(
-                "Renamed resource is a root directory. "
-                    + "Such an activity can not be shared through Saros.");
+            if (resource.getType() == FOLDER
+                && resource.getProjectRelativePath().segmentCount() == 0) {
+
+              if (log.isTraceEnabled()) {
+                log.trace("Ignoring rename of reference point base directory " + resource);
+              }
+
+            } else {
+              log.error(
+                  "Renamed resource "
+                      + resource
+                      + " is a root directory but not a reference point. This should not be possible.");
+            }
           }
 
           return;
@@ -988,7 +951,6 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
    */
   @Nullable
   private IPath getRelativePath(@NotNull VirtualFile root, @NotNull VirtualFile file) {
-
     try {
       Path relativePath = Paths.get(root.getPath()).relativize(Paths.get(file.getPath()));
 
@@ -996,31 +958,22 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     } catch (IllegalArgumentException e) {
       log.warn(
-          "Could not find a relative path from the content root " + root + " to the file " + file,
-          e);
+          "Could not find a relative path from the base file " + root + " to the file " + file, e);
 
       return null;
     }
   }
 
   /**
-   * Returns a filter determining which child resources to iterate over. It only iterated over
-   * resources belonging to the same module as the base directory. This is needed to exclude
-   * submodules. Furthermore, this implicitly excludes resources marked as 'excluded' as the logic
-   * won't find a module for them.
+   * Returns a filter determining which child resources to iterate over.
    *
-   * @param baseFile the base file the iteration starts at
+   * <p>The filter only iterates over non-excluded resources.
+   *
    * @return a filter determining which child resources to iterate over
+   * @see ProjectAPI#isExcluded(Project, VirtualFile)
    */
-  // TODO once sharing multiple modules is possible, introduce logic to handle deleted submodules if
-  //  they are shared
-  private VirtualFileFilter getVirtualFileFilter(@NotNull VirtualFile baseFile) {
-    return (file) -> {
-      Module baseModule = ModuleUtil.findModuleForFile(baseFile, project);
-      Module module = ModuleUtil.findModuleForFile(file, project);
-
-      return Objects.equals(baseModule, module);
-    };
+  private VirtualFileFilter getVirtualFileFilter() {
+    return (fileOrDir) -> ProjectAPI.isExcluded(project, fileOrDir);
   }
 
   /**
@@ -1102,10 +1055,11 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
   /**
    * Explicitly handles the new editor mapping. This is necessary when the resource with an already
-   * open editor is "created" through a move into a shared module as this triggers before the
-   * resource move is executed, meaning the new resource does not exist yet. The editor for the old
-   * resource does however already exist. As the existing editor will be used for the new resource
-   * once it is moved, we have to add the mapping for the new file onto the "old" editor manually.
+   * open editor is "created" through a move into a shared reference point as this triggers before
+   * the resource move is executed, meaning the new resource does not exist yet. The editor for the
+   * old resource does however already exist. As the existing editor will be used for the new
+   * resource once it is moved, we have to add the mapping for the new file onto the "old" editor
+   * manually.
    *
    * <p>Does nothing besides opening the editor if the moved file is not represented by a text
    * editor.
@@ -1130,7 +1084,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
    * @see FileReplacementInProgressObservable
    */
   private void dispatchActivity(@NotNull IActivity activity) {
-    // HACK for now
+    // HACK for now; see issue #993
     if (fileReplacementInProgressObservable.isReplacementInProgress()) {
       if (log.isTraceEnabled()) {
         log.trace("File replacement in progress - Ignoring local activity " + activity);
