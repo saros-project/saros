@@ -1,6 +1,6 @@
 package saros.intellij.eventhandler.filesystem;
 
-import static saros.filesystem.IResource.Type.FOLDER;
+import static saros.filesystem.IResource.Type.PROJECT;
 
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Document;
@@ -19,6 +19,7 @@ import com.intellij.openapi.vfs.VirtualFilePropertyEvent;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.MessageFormat;
 import java.util.Deque;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -31,6 +32,8 @@ import saros.activities.FileActivity.Type;
 import saros.activities.FolderCreatedActivity;
 import saros.activities.FolderDeletedActivity;
 import saros.activities.IActivity;
+import saros.core.ui.util.CollaborationUtils;
+import saros.filesystem.IContainer;
 import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
 import saros.filesystem.IPath;
@@ -46,6 +49,8 @@ import saros.intellij.eventhandler.editor.document.LocalDocumentModificationHand
 import saros.intellij.filesystem.IntellijPath;
 import saros.intellij.filesystem.VirtualFileConverter;
 import saros.intellij.runtime.EDTExecutor;
+import saros.intellij.ui.Messages;
+import saros.intellij.ui.util.NotificationPanel;
 import saros.observables.FileReplacementInProgressObservable;
 import saros.session.AbstractActivityProducer;
 import saros.session.ISarosSession;
@@ -403,18 +408,34 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
   private void generateFolderDeletionActivity(@NotNull VirtualFile deletedFolder) {
     Set<IProject> sharedReferencePoints = session.getProjects();
 
-    IFolder folder =
-        (IFolder) VirtualFileConverter.convertToResource(sharedReferencePoints, deletedFolder);
+    IContainer container =
+        (IContainer) VirtualFileConverter.convertToResource(sharedReferencePoints, deletedFolder);
 
-    if (folder == null || !session.isShared(folder)) {
+    if (container == null || !session.isShared(container)) {
       if (log.isTraceEnabled()) {
         log.trace("Ignoring non-shared folder deletion: " + deletedFolder);
       }
 
       return;
+
+    } else if (container.getType() == PROJECT) {
+      log.error(
+          "Local representation of reference point "
+              + container
+              + " was deleted. Leaving the session.");
+
+      NotificationPanel.showError(
+          MessageFormat.format(
+              Messages.LocalFilesystemModificationHandler_deleted_reference_point_message,
+              deletedFolder.getPath()),
+          Messages.LocalFilesystemModificationHandler_deleted_reference_point_title);
+
+      CollaborationUtils.leaveSessionUnconditionally();
+
+      return;
     }
 
-    IProject baseReferencePoint = folder.getProject();
+    IProject baseReferencePoint = container.getProject();
 
     User user = session.getLocalUser();
 
@@ -577,10 +598,10 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     Set<IProject> sharedReferencePoints = session.getProjects();
 
-    IFolder oldFolderWrapper =
-        (IFolder) VirtualFileConverter.convertToResource(sharedReferencePoints, oldFile);
-    IFolder newParentWrapper =
-        (IFolder) VirtualFileConverter.convertToResource(sharedReferencePoints, newParent);
+    IContainer oldFolderWrapper =
+        (IContainer) VirtualFileConverter.convertToResource(sharedReferencePoints, oldFile);
+    IContainer newParentWrapper =
+        (IContainer) VirtualFileConverter.convertToResource(sharedReferencePoints, newParent);
 
     User user = session.getLocalUser();
 
@@ -600,7 +621,25 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
       return;
 
-    } else if (oldFolderIsShared && oldFolderWrapper.getProjectRelativePath().segmentCount() == 0) {
+    } else if (oldFolderIsShared && oldFolderWrapper.getType() == PROJECT) {
+      if (ProjectAPI.isExcluded(project, newParent)) {
+        log.error(
+            "Local representation of reference point "
+                + oldFolderWrapper
+                + " was deleted. Leaving the session.");
+
+        NotificationPanel.showError(
+            MessageFormat.format(
+                Messages
+                    .LocalFilesystemModificationHandler_moved_reference_point_into_exclusion_message,
+                oldFile.getPath(),
+                newParent.getPath()),
+            Messages.LocalFilesystemModificationHandler_moved_reference_point_into_exclusion_title);
+
+        CollaborationUtils.leaveSessionUnconditionally();
+
+        return;
+      }
 
       if (log.isTraceEnabled()) {
         log.trace("Ignoring move of reference point base directory " + oldFolderWrapper);
@@ -722,8 +761,8 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     IFile oldFileWrapper =
         (IFile) VirtualFileConverter.convertToResource(sharedReferencePoints, oldFile);
-    IFolder newParentWrapper =
-        (IFolder) VirtualFileConverter.convertToResource(sharedReferencePoints, newBaseParent);
+    IContainer newParentWrapper =
+        (IContainer) VirtualFileConverter.convertToResource(sharedReferencePoints, newBaseParent);
 
     User user = session.getLocalUser();
 
@@ -900,9 +939,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
           IResource resource = VirtualFileConverter.convertToResource(sharedReferencePoints, file);
 
           if (resource != null && session.isShared(resource)) {
-            if (resource.getType() == FOLDER
-                && resource.getProjectRelativePath().segmentCount() == 0) {
-
+            if (resource.getType() == PROJECT) {
               if (log.isTraceEnabled()) {
                 log.trace("Ignoring rename of reference point base directory " + resource);
               }
