@@ -216,5 +216,12 @@ public class Messages {
   public static String ColorPreferences_user_example_text_contribution;
   public static String ColorPreferences_user_example_text_selection;
 
+  public static String LocalFilesystemModificationHandler_deleted_reference_point_title;
+  public static String LocalFilesystemModificationHandler_deleted_reference_point_message;
+  public static String
+      LocalFilesystemModificationHandler_moved_reference_point_into_exclusion_title;
+  public static String
+      LocalFilesystemModificationHandler_moved_reference_point_into_exclusion_message;
+
   private Messages() {}
 }

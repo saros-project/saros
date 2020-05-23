@@ -128,15 +128,15 @@ public class CollaborationUtils {
       return;
     }
 
+    leaveSessionUnconditionally();
+  }
+
+  /**
+   * Leaves the session unconditionally. Does not check whether there is actually a running session.
+   */
+  public static void leaveSessionUnconditionally() {
     ThreadUtils.runSafeAsync(
-        "StopSession",
-        log,
-        new Runnable() {
-          @Override
-          public void run() {
-            sessionManager.stopSession(SessionEndReason.LOCAL_USER_LEFT);
-          }
-        });
+        "StopSession", log, () -> sessionManager.stopSession(SessionEndReason.LOCAL_USER_LEFT));
   }
 
   /**
