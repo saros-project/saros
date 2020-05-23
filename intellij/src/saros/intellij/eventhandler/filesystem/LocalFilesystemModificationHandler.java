@@ -684,7 +684,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
             return true;
           }
-
+          // TODO decide how to handle moved versions of ignored resources
           if (newFolderIsShared) {
             IFolder newFolder =
                 newParentWrapper
@@ -706,9 +706,20 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
                     .getProject()
                     .getFolder(oldFolderWrapper.getProjectRelativePath().append(relativePath));
 
-            IActivity newFolderDeletedActivity = new FolderDeletedActivity(user, oldFolder);
+            if (!session.isShared(oldFolder)) {
+              log.debug(
+                  "Ignoring non-shared child folder move - folder: "
+                      + oldFolder
+                      + ", old parent: "
+                      + oldFolderWrapper
+                      + ", new Parent: "
+                      + newParent);
 
-            queuedDeletionActivities.addFirst(newFolderDeletedActivity);
+            } else {
+              IActivity oldFolderDeletedActivity = new FolderDeletedActivity(user, oldFolder);
+
+              queuedDeletionActivities.addFirst(oldFolderDeletedActivity);
+            }
           }
 
           return true;
@@ -830,6 +841,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       cleanUpBackgroundEditorPool(oldFileWrapper);
 
     } else if (newFileIsShared) {
+      // TODO decide how to handle moved versions of ignored resources
       // moved file into shared reference point
       byte[] fileContent = getContent(oldFile);
 
