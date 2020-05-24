@@ -1,6 +1,6 @@
 package saros.intellij.ui;
 
-import saros.intellij.util.MessageUtils;
+import saros.util.MessageUtils;
 
 /** UI message bundle. */
 public class Messages {
