@@ -1,4 +1,4 @@
-package saros.intellij.util;
+package saros.util;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
