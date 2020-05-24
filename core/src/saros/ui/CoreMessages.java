@@ -13,5 +13,7 @@ public class CoreMessages {
     // NOP
   }
 
-  /** initial file */
+  public static String ConnectingFailureHandler_invalid_username_password_message;
+  public static String ConnectingFailureHandler_title;
+  public static String ConnectingFailureHandler_unknown_error_message;
 }
