@@ -39,7 +39,7 @@ public interface IChat {
    * @param message the message to send
    * @throws XMPPException
    */
-  public void sendMessage(Message message) throws XMPPException;
+  public void sendMessage(Message message) throws Exception;
 
   /**
    * Sends the specified text as a message to the other chat participants.
@@ -47,7 +47,7 @@ public interface IChat {
    * @param text the specified text as a message to the other chat participant.
    * @throws XMPPException
    */
-  public void sendMessage(String text) throws XMPPException;
+  public void sendMessage(String text) throws Exception;
 
   /**
    * Set this chat's {@link ChatState} and notify participants of the change.
@@ -55,7 +55,7 @@ public interface IChat {
    * @param newState {@link ChatState} to set
    * @throws XMPPException
    */
-  public void setCurrentState(ChatState newState) throws XMPPException;
+  public void setCurrentState(ChatState newState) throws Exception;
 
   /**
    * Add {@link ChatElement} to this chat's history.

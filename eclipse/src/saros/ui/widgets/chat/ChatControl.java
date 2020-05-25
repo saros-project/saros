@@ -25,7 +25,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.ChatState;
 import saros.SarosPluginContext;
 import saros.communication.chat.ChatElement;
@@ -700,7 +699,7 @@ public final class ChatControl extends Composite {
   private void determineCurrentState() {
     try {
       chat.setCurrentState(getInputText().isEmpty() ? ChatState.inactive : ChatState.composing);
-    } catch (XMPPException ex) {
+    } catch (Exception ex) {
       log.error(ex.getMessage(), ex);
     }
   }
