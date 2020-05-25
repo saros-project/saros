@@ -220,8 +220,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
             @NotNull String replacedText,
             @NotNull String newText) {
 
-          Project project =
-              ((IntellijReferencePoint) file.getReferencePoint()).getIntellijProject();
+          Project project = ((IntellijReferencePoint) file.getReferencePoint()).getProject();
 
           if (!replacedText.isEmpty()) {
             String documentReplacedText = document.getText(new TextRange(start, oldEnd));
@@ -555,7 +554,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    */
   private void addReferencePointResources(IReferencePoint referencePoint) {
     IntellijReferencePoint intellijReferencePoint = (IntellijReferencePoint) referencePoint;
-    Project intellijProject = intellijReferencePoint.getIntellijProject();
+    Project intellijProject = intellijReferencePoint.getProject();
 
     Map<IFile, Editor> openFileMapping = new HashMap<>();
 
@@ -1139,7 +1138,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
     Set<String> visibleFilePaths = new HashSet<>();
 
-    Project project = ((IntellijReferencePoint) file.getReferencePoint()).getIntellijProject();
+    Project project = ((IntellijReferencePoint) file.getReferencePoint()).getProject();
 
     for (VirtualFile virtualFile : ProjectAPI.getSelectedFiles(project)) {
       visibleFilePaths.add(virtualFile.getPath());

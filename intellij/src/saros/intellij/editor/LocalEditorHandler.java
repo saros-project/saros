@@ -128,7 +128,7 @@ public class LocalEditorHandler {
       return null;
     }
 
-    Project project = ((IntellijReferencePoint) file.getReferencePoint()).getIntellijProject();
+    Project project = ((IntellijReferencePoint) file.getReferencePoint()).getProject();
 
     Editor editor = ProjectAPI.openEditor(project, virtualFile, activate);
 
@@ -254,7 +254,7 @@ public class LocalEditorHandler {
       return false;
     }
 
-    Project project = ((IntellijReferencePoint) file.getReferencePoint()).getIntellijProject();
+    Project project = ((IntellijReferencePoint) file.getReferencePoint()).getProject();
 
     return ProjectAPI.isOpen(project, doc);
   }

@@ -19,7 +19,7 @@ import saros.session.SessionEndReason;
  * purposes.
  *
  * <p>To interact with the project of a shared reference point, please use {@link
- * IntellijReferencePoint#getIntellijProject()} instead.
+ * IntellijReferencePoint#getProject()} instead.
  */
 public class UIProjectUtils {
   private volatile ISarosSession sarosSession;
@@ -47,8 +47,8 @@ public class UIProjectUtils {
    * if there currently is no session.
    *
    * <p><b>NOTE:</b> This method should only be used to for UI purposes. To interact with the
-   * project of a shared reference point, please use {@link
-   * IntellijReferencePoint#getIntellijProject()} instead.
+   * project of a shared reference point, please use {@link IntellijReferencePoint#getProject()}
+   * instead.
    *
    * @return the <code>Project</code> object contained in the session context or <code>null</code>
    *     if there currently is no session.
@@ -79,8 +79,8 @@ public class UIProjectUtils {
    * can be <code>null</code> if the request fails.
    *
    * <p><b>NOTE:</b> This method should only be used to for UI purposes. To interact with the
-   * project of a shared reference point, please use {@link
-   * IntellijReferencePoint#getIntellijProject()} instead.
+   * project of a shared reference point, please use {@link IntellijReferencePoint#getProject()}
+   * instead.
    *
    * @param projectRunner the method to call with the currently focused project
    */
