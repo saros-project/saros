@@ -238,7 +238,7 @@ public class CollaborationUtils {
 
         result.append(
             String.format(
-                "\nReference Point: %s, Files: %d, Size: %s",
+                "\nShared Root Directory: %s, Files: %d, Size: %s",
                 referencePoint.getName(),
                 fileCountAndSize.getRight(),
                 format(fileCountAndSize.getLeft())));

@@ -119,14 +119,18 @@ public class AddReferencePointToSessionWizard extends Wizard {
 
           } catch (IllegalStateException e) {
             noisyCancel(
-                "Request to get reference point selection result failed: " + e.getMessage(), e);
+                "Request to get local representation selection result for "
+                    + remoteReferencePointName
+                    + " failed: "
+                    + e.getMessage(),
+                e);
 
             return;
           }
 
           if (referencePointSelectionResult == null) {
             noisyCancel(
-                "Could not find a reference point selection result for the reference point "
+                "Could not find a local representation selection result for the shared root directory "
                     + remoteReferencePointName,
                 null);
 
@@ -144,7 +148,10 @@ public class AddReferencePointToSessionWizard extends Wizard {
                   referencePointSelectionResult.getNewDirectoryBaseDirectory();
 
               if (newDirectoryName == null || newDirectoryBaseDirectory == null) {
-                noisyCancel("No valid new directory name or base path was given", null);
+                noisyCancel(
+                    "No valid new directory name or base path was given for "
+                        + remoteReferencePointName,
+                    null);
 
                 return;
               }
@@ -156,7 +163,8 @@ public class AddReferencePointToSessionWizard extends Wizard {
               VirtualFile existingDirectory = referencePointSelectionResult.getExistingDirectory();
 
               if (existingDirectory == null) {
-                noisyCancel("No valid existing directory was given", null);
+                noisyCancel(
+                    "No valid existing directory was given for " + remoteReferencePointName, null);
 
                 return;
               }
@@ -166,7 +174,10 @@ public class AddReferencePointToSessionWizard extends Wizard {
 
             default:
               noisyCancel(
-                  "No valid option on how to represent the shared reference point was given", null);
+                  "No valid option on how to represent the shared root directory "
+                      + remoteReferencePointName
+                      + " was given",
+                  null);
           }
         }
 
@@ -192,7 +203,9 @@ public class AddReferencePointToSessionWizard extends Wizard {
                     + "' could not be created as a resource with the same name already exists: "
                     + existingResource);
 
-            cancelNegotiation("Failed to create reference point " + remoteReferencePointName);
+            cancelNegotiation(
+                "Failed to create local representation of shared root directory "
+                    + remoteReferencePointName);
 
             NotificationPanel.showError(
                 MessageFormat.format(
@@ -222,7 +235,9 @@ public class AddReferencePointToSessionWizard extends Wizard {
                     + remoteReferencePointName,
                 e);
 
-            cancelNegotiation("Failed to create reference point " + remoteReferencePointName);
+            cancelNegotiation(
+                "Failed to create local representation of shared root directory "
+                    + remoteReferencePointName);
 
             NotificationPanel.showError(
                 MessageFormat.format(
@@ -243,7 +258,9 @@ public class AddReferencePointToSessionWizard extends Wizard {
                     + referencePointFile
                     + "  as it is excluded from the project scope.");
 
-            cancelNegotiation("Failed to create reference point " + remoteReferencePointName);
+            cancelNegotiation(
+                "Failed to create local representation of shared root directory "
+                    + remoteReferencePointName);
 
             NotificationPanel.showError(
                 MessageFormat.format(
@@ -268,7 +285,9 @@ public class AddReferencePointToSessionWizard extends Wizard {
                     + referencePointFile,
                 e);
 
-            cancelNegotiation("Failed to create reference point " + remoteReferencePointName);
+            cancelNegotiation(
+                "Failed to create local representation of shared root directory "
+                    + remoteReferencePointName);
 
             NotificationPanel.showError(
                 MessageFormat.format(
@@ -311,7 +330,8 @@ public class AddReferencePointToSessionWizard extends Wizard {
                 e);
 
             cancelNegotiation(
-                "Invalid local representation chosen for " + remoteReferencePointName);
+                "Invalid local representation chosen for shared root directory "
+                    + remoteReferencePointName);
 
             NotificationPanel.showError(
                 MessageFormat.format(
@@ -357,7 +377,7 @@ public class AddReferencePointToSessionWizard extends Wizard {
               Messages
                   .AddReferencePointToSessionWizard_error_reading_reference_point_selection_result_title);
 
-          cancelNegotiation("Encountered an error during reference point negotiation");
+          cancelNegotiation("Encountered an error during resource negotiation");
         }
 
         @Override
@@ -462,7 +482,9 @@ public class AddReferencePointToSessionWizard extends Wizard {
 
     modifiedResourcesListPage =
         new TextAreaPage(
-            FILE_LIST_PAGE_ID, "Changes applied to local reference points:", fileListPageListener);
+            FILE_LIST_PAGE_ID,
+            "Changes applied to local representation of shared root directories:",
+            fileListPageListener);
     registerPage(modifiedResourcesListPage);
 
     create();
@@ -474,7 +496,7 @@ public class AddReferencePointToSessionWizard extends Wizard {
   public void cancelWizard(
       final JID peer, final String errorMsg, NegotiationTools.CancelLocation type) {
     final String message =
-        "Reference point negotiation canceled "
+        "Resource negotiation canceled "
             + (type.equals(NegotiationTools.CancelLocation.LOCAL)
                 ? "locally "
                 : "remotely by " + peer);
@@ -559,7 +581,7 @@ public class AddReferencePointToSessionWizard extends Wizard {
   private void fillModifiedResourcesListPage(Map<String, FileListDiff> modifiedResources) {
     boolean empty = true;
     for (Map.Entry<String, FileListDiff> key : modifiedResources.entrySet()) {
-      modifiedResourcesListPage.addLine("Reference Point [" + key.getKey() + "]:");
+      modifiedResourcesListPage.addLine("Shared Root Directory [" + key.getKey() + "]:");
       FileListDiff diff = modifiedResources.get(key.getKey());
 
       /// TODO folders
