@@ -288,11 +288,11 @@ public class XMPPUtils {
   /**
    * Returns the service for multiuser chat.
    *
-   * @param connection the current XMPP connection
-   * @param service a service, normally the domain of a XMPP server
    * @return the service for the multiuser chat or <code>null</code> if it could not be determined
    */
-  public static String getMultiUserChatService(Connection connection, String service) {
+  public static String getMultiUserChatService() {
+    Connection connection = defaultConnectionService.getConnection();
+    String service = connection.getServiceName();
 
     ServiceDiscoveryManager manager = ServiceDiscoveryManager.getInstanceFor(connection);
 
