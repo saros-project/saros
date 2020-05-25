@@ -1,7 +1,5 @@
 package saros.intellij.ui.eventhandler;
 
-import java.text.MessageFormat;
-import org.jivesoftware.smack.XMPPException;
 import saros.account.XMPPAccount;
 import saros.communication.connection.ConnectionHandler;
 import saros.communication.connection.IConnectingFailureCallback;
@@ -18,21 +16,7 @@ public class ConnectingFailureHandler {
     connectionHandler.setCallback(connectingFailureCallback);
   }
 
-  private void handleConnectionFailed(XMPPAccount account, Exception exception) {
-    if (!(exception instanceof XMPPException)) {
-      NotificationPanel.showError(
-          MessageFormat.format(
-              CoreMessages.ConnectingFailureHandler_unknown_error_message,
-              account,
-              exception.getMessage()),
-          CoreMessages.ConnectingFailureHandler_title);
-
-      return;
-    }
-
-    final String errorMessage =
-        ConnectionHandler.generateHumanReadableErrorMessage(account, (XMPPException) exception);
-
+  private void handleConnectionFailed(XMPPAccount account, String errorMessage) {
     // TODO offer user possibility of adjusting settings and re-connect
     NotificationPanel.showError(errorMessage, CoreMessages.ConnectingFailureHandler_title);
   }

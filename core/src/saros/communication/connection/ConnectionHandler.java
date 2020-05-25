@@ -180,13 +180,17 @@ public class ConnectionHandler {
     this.callback = callback;
   }
 
-  // TODO make private, keep XMPPException in core, move messages to CoreMessages
-  public static String generateHumanReadableErrorMessage(
-      XMPPAccount account, XMPPException xmppException) {
+  // TODO move messages to CoreMessages
+  private static String generateConnectingFailureErrorMessage(
+      XMPPAccount account, Exception exception) {
+    if (!(exception instanceof XMPPException)) {
+      return MessageFormat.format(
+          CoreMessages.ConnectingFailureHandler_unknown_error_message,
+          account,
+          exception.getMessage());
+    }
 
-    // as of Smack 3.3.1 this is always null for connection attempts
-    // Throwable cause = e.getWrappedThrowable();
-
+    XMPPException xmppException = (XMPPException) exception;
     XMPPError error = xmppException.getXMPPError();
 
     if (error != null && error.getCode() == 504)
@@ -297,7 +301,7 @@ public class ConnectionHandler {
       }
 
       if (callbackTmp != null && !failSilently) {
-        callbackTmp.connectingFailed(account, e);
+        callbackTmp.connectingFailed(account, generateConnectingFailureErrorMessage(account, e));
       }
     }
   }
