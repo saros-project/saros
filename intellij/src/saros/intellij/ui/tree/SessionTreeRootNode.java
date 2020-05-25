@@ -73,7 +73,7 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode implements Dispo
               new Runnable() {
                 @Override
                 public void run() {
-                  addProjectNode(referencePoint);
+                  addReferencePointNode(referencePoint);
                 }
               });
         }
@@ -185,7 +185,7 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode implements Dispo
     treeView.expandRow(2);
   }
 
-  private void addProjectNode(IProject referencePoint) {
+  private void addReferencePointNode(IProject referencePoint) {
     for (DefaultMutableTreeNode sessionNode : sessionNodeList.values()) {
       ReferencePointInfo referencePointInfo = new ReferencePointInfo(referencePoint);
 
@@ -229,7 +229,7 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode implements Dispo
     private final ISarosSession session;
 
     private SessionInfo(ISarosSession session) {
-      super("Shared Reference Points");
+      super("Shared Root Directories");
       this.session = session;
     }
 
