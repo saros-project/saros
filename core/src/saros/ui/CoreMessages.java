@@ -14,6 +14,9 @@ public class CoreMessages {
   }
 
   public static String ConnectingFailureHandler_invalid_username_password_message;
+  public static String ConnectingFailureHandler_only_sasl_allowed;
+  public static String ConnectingFailureHandler_server_not_found;
+  public static String ConnectingFailureHandler_server_not_connect;
   public static String ConnectingFailureHandler_title;
   public static String ConnectingFailureHandler_unknown_error_message;
 }
