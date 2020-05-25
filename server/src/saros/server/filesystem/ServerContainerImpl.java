@@ -34,7 +34,7 @@ public abstract class ServerContainerImpl extends ServerResourceImpl implements 
   }
 
   @Override
-  public IResource[] members() throws IOException {
+  public List<IResource> members() throws IOException {
     List<IResource> members = new ArrayList<>();
 
     File[] memberFiles = getLocation().toFile().listFiles();
@@ -55,7 +55,7 @@ public abstract class ServerContainerImpl extends ServerResourceImpl implements 
       members.add(member);
     }
 
-    return members.toArray(new IResource[members.size()]);
+    return members;
   }
 
   @Override

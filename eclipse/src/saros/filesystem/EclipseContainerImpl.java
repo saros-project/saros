@@ -19,7 +19,7 @@ public class EclipseContainerImpl extends EclipseResourceImpl implements IContai
   }
 
   @Override
-  public IResource[] members() throws IOException {
+  public List<IResource> members() throws IOException {
     org.eclipse.core.resources.IResource[] resources;
 
     try {
@@ -28,7 +28,7 @@ public class EclipseContainerImpl extends EclipseResourceImpl implements IContai
       List<IResource> result = new ArrayList<IResource>(resources.length);
       ResourceAdapterFactory.convertTo(Arrays.asList(resources), result);
 
-      return result.toArray(new IResource[0]);
+      return result;
     } catch (CoreException e) {
       throw new IOException(e);
     }

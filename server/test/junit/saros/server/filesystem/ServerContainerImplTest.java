@@ -11,8 +11,8 @@ import static saros.server.filesystem.FileSystemTestUtils.createWorkspaceFolder;
 import static saros.server.filesystem.FileSystemTestUtils.path;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMockSupport;
 import org.junit.After;
@@ -90,23 +90,16 @@ public class ServerContainerImplTest extends EasyMockSupport {
     createFile(workspace, CONTAINER_PATH + "/file");
     createFolder(workspace, CONTAINER_PATH + "/subfolder");
 
-    IResource[] members = container.members();
-    assertEquals(2, members.length);
+    List<IResource> members = container.members();
+    assertEquals(2, members.size());
 
-    Arrays.sort(
-        members,
-        new Comparator<IResource>() {
-          @Override
-          public int compare(IResource r1, IResource r2) {
-            return r1.getName().compareTo(r2.getName());
-          }
-        });
+    members.sort(Comparator.comparing(IResource::getName));
 
-    ServerResourceImpl member0 = (ServerResourceImpl) members[0];
+    ServerResourceImpl member0 = (ServerResourceImpl) members.get(0);
     assertEquals(path(CONTAINER_PATH + "/file"), member0.getFullPath());
     assertEquals(IResource.Type.FILE, member0.getType());
 
-    ServerResourceImpl member1 = (ServerResourceImpl) members[1];
+    ServerResourceImpl member1 = (ServerResourceImpl) members.get(1);
     assertEquals(path(CONTAINER_PATH + "/subfolder"), member1.getFullPath());
     assertEquals(IResource.Type.FOLDER, member1.getType());
   }

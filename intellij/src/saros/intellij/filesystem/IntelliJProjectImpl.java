@@ -118,7 +118,7 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
 
   @NotNull
   @Override
-  public IResource[] members() {
+  public List<IResource> members() {
     final List<IResource> result = new ArrayList<>();
 
     final VirtualFile[] children = getModuleContentRoot(module).getChildren();
@@ -139,7 +139,7 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
               : new IntelliJFileImpl(this, childPath));
     }
 
-    return result.toArray(new IResource[0]);
+    return result;
   }
 
   @Override

@@ -43,7 +43,7 @@ public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IF
 
   @NotNull
   @Override
-  public IResource[] members() throws IOException {
+  public List<IResource> members() throws IOException {
     // TODO run as read action
 
     final VirtualFile folder = project.findVirtualFile(path);
@@ -75,7 +75,7 @@ public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IF
               : new IntelliJFileImpl(project, childPath));
     }
 
-    return result.toArray(new IResource[0]);
+    return result;
   }
 
   // TODO unify with IntelliJProjectImpl.getFile(...) and getFolder(...)
