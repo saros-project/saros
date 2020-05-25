@@ -112,7 +112,7 @@ public abstract class AbstractIntellijResource implements IResource {
       return true;
     }
 
-    return ProjectAPI.isExcluded(referencePoint.getIntellijProject(), virtualFile);
+    return ProjectAPI.isExcluded(referencePoint.getProject(), virtualFile);
   }
 
   @Override

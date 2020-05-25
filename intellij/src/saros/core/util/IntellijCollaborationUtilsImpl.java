@@ -31,8 +31,7 @@ public class IntellijCollaborationUtilsImpl implements ICollaborationUtils {
     Set<Project> sharedProjects = new HashSet<>();
 
     for (IResource resource : projects) {
-      sharedProjects.add(
-          ((IntellijReferencePoint) resource.getReferencePoint()).getIntellijProject());
+      sharedProjects.add(((IntellijReferencePoint) resource.getReferencePoint()).getProject());
     }
 
     // Workaround while we only allow a single reference point (-> single project) to be shared

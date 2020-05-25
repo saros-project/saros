@@ -77,7 +77,7 @@ public class LocalEditorManipulator {
       return null;
     }
 
-    Project project = ((IntellijReferencePoint) file.getReferencePoint()).getIntellijProject();
+    Project project = ((IntellijReferencePoint) file.getReferencePoint()).getProject();
 
     Editor editor = ProjectAPI.openEditor(project, virtualFile, activate);
 
@@ -116,7 +116,7 @@ public class LocalEditorManipulator {
       return;
     }
 
-    Project project = ((IntellijReferencePoint) file.getReferencePoint()).getIntellijProject();
+    Project project = ((IntellijReferencePoint) file.getReferencePoint()).getProject();
 
     if (ProjectAPI.isOpen(project, virtualFile)) {
       ProjectAPI.closeEditor(project, virtualFile);
@@ -233,7 +233,7 @@ public class LocalEditorManipulator {
       return;
     }
 
-    Project project = ((IntellijReferencePoint) file.getReferencePoint()).getIntellijProject();
+    Project project = ((IntellijReferencePoint) file.getReferencePoint()).getProject();
 
     Document document = DocumentAPI.getDocument(virtualFile);
     if (document == null) {

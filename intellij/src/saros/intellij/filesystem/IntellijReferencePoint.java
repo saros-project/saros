@@ -48,9 +48,8 @@ public class IntellijReferencePoint implements IReferencePoint {
    *
    * @return the project instance the reference point is bound to
    */
-  // TODO rename 'getProject' once Saros project has been renamed to reference point
   @NotNull
-  public Project getIntellijProject() {
+  public Project getProject() {
     return project;
   }
 
