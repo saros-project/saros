@@ -44,6 +44,7 @@ import org.eclipse.ui.IFileEditorInput;
 import saros.Saros;
 import saros.SarosPluginContext;
 import saros.editor.internal.EditorAPI;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.ResourceAdapterFactory;
 import saros.filesystem.checksum.IChecksumCache;
 import saros.monitoring.ProgressMonitorAdapterFactory;
@@ -329,8 +330,8 @@ public class AddProjectToSessionWizard extends Wizard {
                 }
               }
 
-              final Map<String, saros.filesystem.IProject> convertedMapping =
-                  new HashMap<String, saros.filesystem.IProject>();
+              final Map<String, IReferencePoint> convertedMapping =
+                  new HashMap<String, IReferencePoint>();
 
               for (final Entry<String, IProject> entry : targetProjectMapping.entrySet()) {
                 convertedMapping.put(
@@ -564,8 +565,7 @@ public class AddProjectToSessionWizard extends Wizard {
       final String projectID = entry.getKey();
       final IProject project = entry.getValue();
 
-      final saros.filesystem.IProject adaptedProject =
-          ResourceAdapterFactory.create(entry.getValue());
+      final IReferencePoint adaptedProject = ResourceAdapterFactory.create(entry.getValue());
 
       if (!session.isShared(adaptedProject)) project.refreshLocal(IResource.DEPTH_INFINITE, null);
 

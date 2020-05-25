@@ -13,7 +13,7 @@ public interface IResource {
   enum Type {
     FILE,
     FOLDER,
-    PROJECT,
+    REFERENCE_POINT,
     ROOT
   }
 
@@ -34,28 +34,28 @@ public interface IResource {
   /**
    * Returns the parent for the resource.
    *
-   * <p>Returns <code>null</code> if the resource is a project.
+   * <p>Returns <code>null</code> if the resource is a reference point.
    *
-   * @return the parent for the resource or <code>null</code> if the resource is a project
+   * @return the parent for the resource or <code>null</code> if the resource is a reference point
    */
   IContainer getParent();
 
   /**
-   * Returns the project for the resource.
+   * Returns the reference point for the resource.
    *
-   * @return the project for the resource
+   * @return the reference point for the resource
    */
-  IProject getProject();
+  IReferencePoint getReferencePoint();
 
   /**
-   * Returns the project-relative path for the resource.
+   * Returns the reference-point-relative path for the resource.
    *
-   * <p>Returns an empty path if the resource is a project.
+   * <p>Returns an empty path if the resource is a reference point.
    *
-   * @return the project-relative path for the resource or an empty path if the resource is a
-   *     project
+   * @return the reference-point-relative path for the resource or an empty path if the resource is
+   *     a reference point
    */
-  IPath getProjectRelativePath();
+  IPath getReferencePointRelativePath();
 
   /**
    * Returns the type of the resource.

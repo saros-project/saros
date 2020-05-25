@@ -11,7 +11,7 @@ import org.eclipse.jface.viewers.ILightweightLabelDecorator;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 import saros.SarosPluginContext;
 import saros.annotations.Component;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.ResourceAdapterFactory;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.ISarosSession;
@@ -80,7 +80,7 @@ public final class SharedProjectDecorator implements ILightweightLabelDecorator 
   private final ISessionListener sessionListener =
       new ISessionListener() {
         @Override
-        public void resourcesAdded(IProject project) {
+        public void resourcesAdded(IReferencePoint project) {
           log.debug("updating project decoration for all shared projects");
           updateDecoratorsAsync(null); // update all labels
         }

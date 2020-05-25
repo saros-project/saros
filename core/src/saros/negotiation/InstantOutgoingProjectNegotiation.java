@@ -20,7 +20,7 @@ import saros.editor.remote.UserEditorStateManager;
 import saros.exceptions.LocalCancellationException;
 import saros.exceptions.SarosCancellationException;
 import saros.filesystem.IFile;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IWorkspace;
 import saros.filesystem.checksum.IChecksumCache;
 import saros.monitoring.IProgressMonitor;
@@ -116,7 +116,7 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
       fileCount += list.getPaths().size();
 
       final String projectID = list.getProjectID();
-      final IProject project = projects.getProject(projectID);
+      final IReferencePoint project = projects.getProject(projectID);
 
       if (project == null)
         throw new LocalCancellationException(
@@ -189,7 +189,7 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
   private void createTransferList(List<FileList> fileLists, int fileCount) {
     List<IFile> files = new ArrayList<>(fileCount);
     for (final FileList list : fileLists) {
-      IProject project = projects.getProject(list.getProjectID());
+      IReferencePoint project = projects.getProject(list.getProjectID());
       for (String file : list.getPaths()) {
         files.add(project.getFile(file));
       }
@@ -201,8 +201,8 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
         new Comparator<IFile>() {
           @Override
           public int compare(IFile a, IFile b) {
-            int lenA = a.getProjectRelativePath().segmentCount();
-            int lenB = b.getProjectRelativePath().segmentCount();
+            int lenA = a.getReferencePointRelativePath().segmentCount();
+            int lenB = b.getReferencePointRelativePath().segmentCount();
             return Integer.valueOf(lenA).compareTo(Integer.valueOf(lenB));
           }
         });
@@ -231,7 +231,7 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
     };
 
     for (String string : eclipseProjFiles) {
-      for (IProject project : projects) {
+      for (IReferencePoint project : projects) {
         IFile file = project.getFile(string);
         sendIfRequired(osp, file);
       }
@@ -244,7 +244,7 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
       while (!openedFiles.isEmpty()) {
         IFile openFile = openedFiles.poll();
         /* open files could be changed meanwhile */
-        editorManager.saveEditors(openFile.getProject());
+        editorManager.saveEditors(openFile.getReferencePoint());
         sendIfRequired(osp, openFile);
       }
 

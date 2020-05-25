@@ -62,8 +62,8 @@ public class OutgoingStreamProtocol extends AbstractStreamProtocol {
   }
 
   private void writeHeader(IFile file, long fileSize) throws IOException {
-    String projectID = projectSharingData.getProjectID(file.getProject());
-    String fileName = file.getProjectRelativePath().toPortableString();
+    String projectID = projectSharingData.getProjectID(file.getReferencePoint());
+    String fileName = file.getReferencePointRelativePath().toPortableString();
 
     out.writeUTF(projectID);
     out.writeUTF(fileName);

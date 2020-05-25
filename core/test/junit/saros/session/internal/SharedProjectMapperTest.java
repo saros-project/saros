@@ -4,12 +4,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static saros.filesystem.IResource.Type.PROJECT;
+import static saros.filesystem.IResource.Type.REFERENCE_POINT;
 
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 
 public class SharedProjectMapperTest {
@@ -33,7 +33,7 @@ public class SharedProjectMapperTest {
 
   @Test
   public void testAddCompletelySharedProject() {
-    IProject projectMock = createProjectMock();
+    IReferencePoint projectMock = createProjectMock();
 
     mapper.addProject("0", projectMock);
 
@@ -42,7 +42,7 @@ public class SharedProjectMapperTest {
 
   @Test(expected = IllegalStateException.class)
   public void testAddCompletelySharedProjectTwice() {
-    IProject projectMock = createProjectMock();
+    IReferencePoint projectMock = createProjectMock();
 
     try {
       mapper.addProject("0", projectMock);
@@ -55,7 +55,7 @@ public class SharedProjectMapperTest {
 
   @Test(expected = IllegalStateException.class)
   public void testAddSameProjectWithDifferentID() {
-    IProject projectMock = createProjectMock();
+    IReferencePoint projectMock = createProjectMock();
 
     try {
       mapper.addProject("0", projectMock);
@@ -69,8 +69,8 @@ public class SharedProjectMapperTest {
 
   @Test(expected = IllegalStateException.class)
   public void testAddNewProjectWithIDAlreadyInUse() {
-    IProject projectMockA = createProjectMock();
-    IProject projectMockB = createProjectMock();
+    IReferencePoint projectMockA = createProjectMock();
+    IReferencePoint projectMockB = createProjectMock();
 
     try {
       mapper.addProject("0", projectMockA);
@@ -84,7 +84,7 @@ public class SharedProjectMapperTest {
 
   @Test
   public void testRemoveProjects() {
-    IProject projectMockA = createProjectMock();
+    IReferencePoint projectMockA = createProjectMock();
 
     mapper.addProject("0", projectMockA);
 
@@ -95,10 +95,10 @@ public class SharedProjectMapperTest {
 
   @Test
   public void testIgnoredResourcesOnCompletelySharedProject() {
-    IProject projectMock = createProjectMock();
+    IReferencePoint projectMock = createProjectMock();
 
     IResource resourceMock = EasyMock.createNiceMock(IResource.class);
-    EasyMock.expect(resourceMock.getProject()).andStubReturn(projectMock);
+    EasyMock.expect(resourceMock.getReferencePoint()).andStubReturn(projectMock);
     EasyMock.expect(resourceMock.isIgnored()).andReturn(true);
 
     EasyMock.replay(resourceMock);
@@ -113,10 +113,10 @@ public class SharedProjectMapperTest {
   @Test
   public void testIsShared() {
 
-    IProject projectMockA = createProjectMock();
+    IReferencePoint projectMockA = createProjectMock();
 
     IResource resourceMockA = EasyMock.createNiceMock(IResource.class);
-    EasyMock.expect(resourceMockA.getProject()).andStubReturn(projectMockA);
+    EasyMock.expect(resourceMockA.getReferencePoint()).andStubReturn(projectMockA);
 
     EasyMock.replay(resourceMockA);
 
@@ -129,8 +129,8 @@ public class SharedProjectMapperTest {
 
   @Test
   public void testGetProjects() {
-    IProject projectMockA = createProjectMock();
-    IProject projectMockB = createProjectMock();
+    IReferencePoint projectMockA = createProjectMock();
+    IReferencePoint projectMockB = createProjectMock();
 
     mapper.addProject("0", projectMockA);
     mapper.addProject("1", projectMockB);
@@ -141,7 +141,7 @@ public class SharedProjectMapperTest {
 
   @Test
   public void testIDToProjectMapping() {
-    IProject projectMock = createProjectMock();
+    IReferencePoint projectMock = createProjectMock();
     mapper.addProject("0", projectMock);
     assertEquals("0", mapper.getID(projectMock));
     assertEquals(projectMock, mapper.getProject("0"));
@@ -152,9 +152,9 @@ public class SharedProjectMapperTest {
    * IllegalArgumentExceptions as well which may lead to false positive
    * (passed) test cases
    */
-  private IProject createProjectMock() {
-    IProject projectMock = EasyMock.createNiceMock(IProject.class);
-    EasyMock.expect(projectMock.getType()).andStubReturn(PROJECT);
+  private IReferencePoint createProjectMock() {
+    IReferencePoint projectMock = EasyMock.createNiceMock(IReferencePoint.class);
+    EasyMock.expect(projectMock.getType()).andStubReturn(REFERENCE_POINT);
     EasyMock.replay(projectMock);
     return projectMock;
   }

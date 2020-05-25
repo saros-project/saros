@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import saros.core.ui.util.CollaborationUtils;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.intellij.context.SharedIDEContext;
 import saros.intellij.filesystem.IntellijReferencePoint;
@@ -27,11 +27,12 @@ public class IntellijCollaborationUtilsImpl implements ICollaborationUtils {
   }
 
   @Override
-  public void startSession(Set<IProject> projects, List<JID> contacts) {
+  public void startSession(Set<IReferencePoint> projects, List<JID> contacts) {
     Set<Project> sharedProjects = new HashSet<>();
 
     for (IResource resource : projects) {
-      sharedProjects.add(((IntellijReferencePoint) resource.getProject()).getIntellijProject());
+      sharedProjects.add(
+          ((IntellijReferencePoint) resource.getReferencePoint()).getIntellijProject());
     }
 
     // Workaround while we only allow a single reference point (-> single project) to be shared
@@ -51,7 +52,7 @@ public class IntellijCollaborationUtilsImpl implements ICollaborationUtils {
   }
 
   @Override
-  public void addProjectsToSession(Set<IProject> projects) {
+  public void addProjectsToSession(Set<IReferencePoint> projects) {
     CollaborationUtils.addResourcesToSession(projects);
   }
 

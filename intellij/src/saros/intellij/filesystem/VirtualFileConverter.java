@@ -4,7 +4,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import java.util.Collection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 
 /**
@@ -31,9 +31,9 @@ public class VirtualFileConverter {
    */
   @Nullable
   public static IResource convertToResource(
-      @NotNull Collection<IProject> referencePoints, @NotNull VirtualFile virtualFile) {
+      @NotNull Collection<IReferencePoint> referencePoints, @NotNull VirtualFile virtualFile) {
 
-    for (IProject referencePoint : referencePoints) {
+    for (IReferencePoint referencePoint : referencePoints) {
       IResource resource = convertToResource(virtualFile, referencePoint);
 
       if (resource != null) {
@@ -58,7 +58,7 @@ public class VirtualFileConverter {
    */
   @Nullable
   public static IResource convertToResource(
-      @NotNull VirtualFile virtualFile, @NotNull IProject referencePoint) {
+      @NotNull VirtualFile virtualFile, @NotNull IReferencePoint referencePoint) {
 
     IntellijReferencePoint intellijReferencePoint = (IntellijReferencePoint) referencePoint;
 
@@ -78,7 +78,7 @@ public class VirtualFileConverter {
    */
   @Nullable
   public static VirtualFile convertToVirtualFile(@NotNull IResource resource) {
-    if (resource instanceof IProject) {
+    if (resource instanceof IReferencePoint) {
       throw new IllegalArgumentException(
           "The given resource must be a file or a folder. resource: " + resource);
     }

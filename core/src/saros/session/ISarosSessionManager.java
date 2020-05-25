@@ -2,7 +2,7 @@ package saros.session;
 
 import java.util.Collection;
 import java.util.Set;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.net.xmpp.JID;
 import saros.preferences.IPreferenceStore;
 
@@ -20,7 +20,7 @@ public interface ISarosSessionManager {
    *
    * @param projects the local projects which should be shared
    */
-  void startSession(Set<IProject> projects);
+  void startSession(Set<IReferencePoint> projects);
 
   // FIXME this method is error prone and only used by the IPN, find a better
   // abstraction
@@ -86,7 +86,7 @@ public interface ISarosSessionManager {
    *
    * @param projects the projects to add
    */
-  void addProjectsToSession(Set<IProject> projects);
+  void addProjectsToSession(Set<IReferencePoint> projects);
 
   /**
    * Call this before a ISarosSession is started.

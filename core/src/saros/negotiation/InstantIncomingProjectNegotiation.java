@@ -9,7 +9,7 @@ import org.apache.commons.io.input.CountingInputStream;
 import org.apache.log4j.Logger;
 import saros.exceptions.LocalCancellationException;
 import saros.exceptions.SarosCancellationException;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IWorkspace;
 import saros.filesystem.checksum.IChecksumCache;
 import saros.monitoring.IProgressMonitor;
@@ -57,7 +57,9 @@ public class InstantIncomingProjectNegotiation extends AbstractIncomingProjectNe
 
   @Override
   protected void transfer(
-      IProgressMonitor monitor, Map<String, IProject> projectMapping, List<FileList> missingFiles)
+      IProgressMonitor monitor,
+      Map<String, IReferencePoint> projectMapping,
+      List<FileList> missingFiles)
       throws IOException, SarosCancellationException {
 
     /* only get files, if something is missing */

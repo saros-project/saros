@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import saros.filesystem.IContainer;
 import saros.filesystem.IPath;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.intellij.editor.ProjectAPI;
 
@@ -70,13 +70,13 @@ public abstract class AbstractIntellijResource implements IResource {
 
   @Override
   @NotNull
-  public IProject getProject() {
+  public IReferencePoint getReferencePoint() {
     return referencePoint;
   }
 
   @Override
   @NotNull
-  public IPath getProjectRelativePath() {
+  public IPath getReferencePointRelativePath() {
     return relativePath;
   }
 

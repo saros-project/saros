@@ -33,7 +33,7 @@ import saros.annotations.Component;
 import saros.communication.connection.ConnectionHandler;
 import saros.communication.connection.IConnectionStateListener;
 import saros.context.IContainerContext;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.negotiation.AbstractIncomingProjectNegotiation;
 import saros.negotiation.AbstractOutgoingProjectNegotiation;
 import saros.negotiation.IncomingSessionNegotiation;
@@ -140,7 +140,7 @@ public class SarosSessionManager implements ISarosSessionManager {
             ProjectSharingData projectSharingData = new ProjectSharingData();
             for (ProjectNegotiationData projectNegotiationData : ipn.getProjectNegotiationData()) {
               String projectID = projectNegotiationData.getProjectID();
-              IProject project = session.getProject(projectID);
+              IReferencePoint project = session.getProject(projectID);
 
               projectSharingData.addProject(project, projectID);
             }
@@ -205,7 +205,7 @@ public class SarosSessionManager implements ISarosSessionManager {
    * order to start a session.)
    */
   @Override
-  public void startSession(final Set<IProject> projects) {
+  public void startSession(final Set<IReferencePoint> projects) {
 
     /*
      * FIXME split the logic, start a session without anything and then add
@@ -263,7 +263,7 @@ public class SarosSessionManager implements ISarosSessionManager {
       session.start();
       sessionStarted(session);
 
-      for (IProject project : projects) {
+      for (IReferencePoint project : projects) {
         String projectID = String.valueOf(SESSION_ID_GENERATOR.nextInt(Integer.MAX_VALUE));
 
         session.addSharedProject(project, projectID);
@@ -502,7 +502,7 @@ public class SarosSessionManager implements ISarosSessionManager {
    * @param projects to projects to add
    */
   @Override
-  public synchronized void addProjectsToSession(Set<IProject> projects) {
+  public synchronized void addProjectsToSession(Set<IReferencePoint> projects) {
     if (projects == null) {
       return;
     }
@@ -570,7 +570,7 @@ public class SarosSessionManager implements ISarosSessionManager {
     }
 
     ProjectSharingData projectsToShare = new ProjectSharingData();
-    Set<IProject> projects = nextProjectNegotiation.getProjects();
+    Set<IReferencePoint> projects = nextProjectNegotiation.getProjects();
 
     /*
      * Put all information about which projects and resources to share into
@@ -578,7 +578,7 @@ public class SarosSessionManager implements ISarosSessionManager {
      * OutgoingProjectNegotiation. On the way, generate session-wide ID's
      * for the projects that don't have them yet.
      */
-    for (IProject project : projects) {
+    for (IReferencePoint project : projects) {
       String projectID = currentSession.getProjectID(project);
 
       if (projectID == null) {
@@ -680,7 +680,7 @@ public class SarosSessionManager implements ISarosSessionManager {
     }
 
     ProjectSharingData currentSharedProjects = new ProjectSharingData();
-    for (IProject project : currentSession.getProjects()) {
+    for (IReferencePoint project : currentSession.getProjects()) {
       currentSharedProjects.addProject(project, session.getProjectID(project));
     }
 

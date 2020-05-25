@@ -4,7 +4,7 @@ import java.util.Set;
 import saros.editor.text.LineRange;
 import saros.editor.text.TextSelection;
 import saros.filesystem.IFile;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.session.User;
 import saros.util.LineSeparatorNormalizationUtil;
 
@@ -76,7 +76,7 @@ public interface IEditorManager {
    * @param project the project whose editors should be saved, or <code>null</code> to save all
    *     editors
    */
-  void saveEditors(IProject project);
+  void saveEditors(IReferencePoint project);
 
   /**
    * Close the editor of given {@link IFile}.

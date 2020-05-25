@@ -16,7 +16,7 @@ import saros.activities.FileActivity;
 import saros.activities.IActivity;
 import saros.activities.IResourceActivity;
 import saros.filesystem.IFile;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.session.AbstractActivityConsumer;
 import saros.session.IActivityConsumer;
@@ -118,12 +118,12 @@ class ResourceActivityFilter {
         }
 
         @Override
-        public void projectRemoved(IProject project) {
+        public void projectRemoved(IReferencePoint project) {
           Iterator<Entry<IFile, List<User>>> iterator = deletedFileFilter.entrySet().iterator();
           while (iterator.hasNext()) {
             IFile file = iterator.next().getKey();
 
-            if (file.getProject().equals(project)) {
+            if (file.getReferencePoint().equals(project)) {
               log.debug(
                   "Dropping activity filter for "
                       + file

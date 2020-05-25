@@ -17,8 +17,8 @@ public class ResourceAdapterFactory {
     return new EclipsePathImpl(path);
   }
 
-  public static IProject create(org.eclipse.core.resources.IProject project) {
-    return (IProject) adapt(project);
+  public static IReferencePoint create(org.eclipse.core.resources.IProject project) {
+    return (IReferencePoint) adapt(project);
   }
 
   public static IFile create(org.eclipse.core.resources.IFile file) {

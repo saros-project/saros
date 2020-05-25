@@ -12,12 +12,12 @@ import org.junit.Before;
 import org.junit.Test;
 import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 
 public class ServerProjectImplTest extends EasyMockSupport {
 
-  private IProject project;
+  private IReferencePoint project;
   private ServerWorkspaceImpl workspace;
 
   @Before
@@ -37,7 +37,7 @@ public class ServerProjectImplTest extends EasyMockSupport {
 
   @Test
   public void getType() {
-    assertEquals(IResource.Type.PROJECT, project.getType());
+    assertEquals(IResource.Type.REFERENCE_POINT, project.getType());
   }
 
   @Test

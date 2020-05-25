@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import saros.filesystem.IFile;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.intellij.filesystem.IntellijReferencePoint;
 import saros.intellij.filesystem.VirtualFileConverter;
 import saros.session.ISarosSession;
@@ -79,7 +79,7 @@ public class LocalEditorHandler {
    */
   @Nullable
   public Editor openEditor(
-      @NotNull VirtualFile virtualFile, @NotNull IProject referencePoint, boolean activate) {
+      @NotNull VirtualFile virtualFile, @NotNull IReferencePoint referencePoint, boolean activate) {
 
     IFile file = (IFile) VirtualFileConverter.convertToResource(virtualFile, referencePoint);
 
@@ -128,7 +128,7 @@ public class LocalEditorHandler {
       return null;
     }
 
-    Project project = ((IntellijReferencePoint) file.getProject()).getIntellijProject();
+    Project project = ((IntellijReferencePoint) file.getReferencePoint()).getIntellijProject();
 
     Editor editor = ProjectAPI.openEditor(project, virtualFile, activate);
 
@@ -154,7 +154,7 @@ public class LocalEditorHandler {
    * @param virtualFile the file for which to close the editor
    */
   public void closeEditor(@NotNull VirtualFile virtualFile) {
-    Set<IProject> sharedReferencePoints = sarosSession.getProjects();
+    Set<IReferencePoint> sharedReferencePoints = sarosSession.getProjects();
 
     IFile file = (IFile) VirtualFileConverter.convertToResource(sharedReferencePoints, virtualFile);
 
@@ -228,7 +228,7 @@ public class LocalEditorHandler {
       return;
     }
 
-    Set<IProject> sharedReferencePoints = sarosSession.getProjects();
+    Set<IReferencePoint> sharedReferencePoints = sarosSession.getProjects();
 
     IFile file = (IFile) VirtualFileConverter.convertToResource(sharedReferencePoints, virtualFile);
 
@@ -254,7 +254,7 @@ public class LocalEditorHandler {
       return false;
     }
 
-    Project project = ((IntellijReferencePoint) file.getProject()).getIntellijProject();
+    Project project = ((IntellijReferencePoint) file.getReferencePoint()).getIntellijProject();
 
     return ProjectAPI.isOpen(project, doc);
   }

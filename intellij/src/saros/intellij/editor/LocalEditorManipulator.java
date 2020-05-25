@@ -77,7 +77,7 @@ public class LocalEditorManipulator {
       return null;
     }
 
-    Project project = ((IntellijReferencePoint) file.getProject()).getIntellijProject();
+    Project project = ((IntellijReferencePoint) file.getReferencePoint()).getIntellijProject();
 
     Editor editor = ProjectAPI.openEditor(project, virtualFile, activate);
 
@@ -116,7 +116,7 @@ public class LocalEditorManipulator {
       return;
     }
 
-    Project project = ((IntellijReferencePoint) file.getProject()).getIntellijProject();
+    Project project = ((IntellijReferencePoint) file.getReferencePoint()).getIntellijProject();
 
     if (ProjectAPI.isOpen(project, virtualFile)) {
       ProjectAPI.closeEditor(project, virtualFile);
@@ -233,7 +233,7 @@ public class LocalEditorManipulator {
       return;
     }
 
-    Project project = ((IntellijReferencePoint) file.getProject()).getIntellijProject();
+    Project project = ((IntellijReferencePoint) file.getReferencePoint()).getIntellijProject();
 
     Document document = DocumentAPI.getDocument(virtualFile);
     if (document == null) {
@@ -258,7 +258,7 @@ public class LocalEditorManipulator {
       text = new String(content);
 
       String qualifiedResource =
-          file.getProject().getName() + " - " + file.getProjectRelativePath();
+          file.getReferencePoint().getName() + " - " + file.getReferencePointRelativePath();
 
       NotificationPanel.showWarning(
           String.format(

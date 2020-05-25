@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import saros.core.ui.util.CollaborationUtils;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.intellij.context.SharedIDEContext;
 import saros.intellij.filesystem.IntellijReferencePoint;
 import saros.intellij.ui.Messages;
@@ -174,7 +174,7 @@ class ContactPopMenu extends JPopupMenu {
 
         VirtualFile contentRoot = contentRoots[0];
 
-        IProject wrappedModule = new IntellijReferencePoint(project, contentRoot);
+        IReferencePoint wrappedModule = new IntellijReferencePoint(project, contentRoot);
 
         JMenuItem moduleItem = new JMenuItem(moduleName);
         moduleItem.setToolTipText(Messages.ContactPopMenu_menu_tooltip_share_module);
@@ -203,10 +203,12 @@ class ContactPopMenu extends JPopupMenu {
   private class ShareDirectoryAction implements ActionListener {
     private final Project project;
     private final String moduleName;
-    private final IProject referencePoint;
+    private final IReferencePoint referencePoint;
 
     private ShareDirectoryAction(
-        @NotNull Project project, @NotNull String moduleName, @Nullable IProject referencePoint) {
+        @NotNull Project project,
+        @NotNull String moduleName,
+        @Nullable IReferencePoint referencePoint) {
 
       this.project = project;
       this.moduleName = moduleName;
@@ -232,7 +234,7 @@ class ContactPopMenu extends JPopupMenu {
         return;
       }
 
-      Set<IProject> projects = Collections.singleton(referencePoint);
+      Set<IReferencePoint> projects = Collections.singleton(referencePoint);
       List<JID> contacts = Collections.singletonList(contactInfo.getJid());
 
       SharedIDEContext.preregisterProject(project);

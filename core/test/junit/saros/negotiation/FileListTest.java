@@ -28,7 +28,7 @@ import org.junit.Test;
 import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
 import saros.filesystem.IPath;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.misc.xstream.XStreamFactory;
 
@@ -52,7 +52,7 @@ public class FileListTest {
     xstream.processAnnotations(FileList.class);
   }
 
-  private IProject project;
+  private IReferencePoint project;
 
   @Before
   public void setUp() throws Exception {
@@ -109,9 +109,9 @@ public class FileListTest {
     assertEquals(list, listFromXml);
   }
 
-  private static IProject createProjectLayout() {
+  private static IReferencePoint createProjectLayout() {
 
-    final IProject project = EasyMock.createMock(IProject.class);
+    final IReferencePoint project = EasyMock.createMock(IReferencePoint.class);
 
     final IFolder barFolder = createFolderMock(project, "bar", Collections.emptyList());
 
@@ -148,14 +148,17 @@ public class FileListTest {
   }
 
   private static IFile createFileMock(
-      final IProject project, final String path, final String content, final String encoding) {
+      final IReferencePoint project,
+      final String path,
+      final String content,
+      final String encoding) {
 
     final IPath relativePath = createPathMock(path);
 
     final IFile fileMock = EasyMock.createMock(IFile.class);
 
-    EasyMock.expect(fileMock.getProject()).andStubReturn(project);
-    EasyMock.expect(fileMock.getProjectRelativePath()).andStubReturn(relativePath);
+    EasyMock.expect(fileMock.getReferencePoint()).andStubReturn(project);
+    EasyMock.expect(fileMock.getReferencePointRelativePath()).andStubReturn(relativePath);
 
     EasyMock.expect(fileMock.isIgnored()).andStubReturn(false);
     EasyMock.expect(fileMock.exists()).andStubReturn(true);
@@ -195,14 +198,14 @@ public class FileListTest {
   }
 
   private static IFolder createFolderMock(
-      final IProject project, final String path, final List<IResource> members) {
+      final IReferencePoint project, final String path, final List<IResource> members) {
 
     final IPath relativePath = createPathMock(path);
 
     final IFolder folderMock = EasyMock.createMock(IFolder.class);
 
-    EasyMock.expect(folderMock.getProject()).andStubReturn(project);
-    EasyMock.expect(folderMock.getProjectRelativePath()).andStubReturn(relativePath);
+    EasyMock.expect(folderMock.getReferencePoint()).andStubReturn(project);
+    EasyMock.expect(folderMock.getReferencePointRelativePath()).andStubReturn(relativePath);
 
     EasyMock.expect(folderMock.isIgnored()).andStubReturn(false);
     EasyMock.expect(folderMock.exists()).andStubReturn(true);

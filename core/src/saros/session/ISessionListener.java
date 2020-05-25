@@ -19,7 +19,7 @@
  */
 package saros.session;
 
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.session.User.Permission;
 
 /**
@@ -102,7 +102,7 @@ public interface ISessionListener {
    *
    * @param project the project that was added
    */
-  public default void projectAdded(IProject project) {
+  public default void projectAdded(IReferencePoint project) {
     // NOP
   }
 
@@ -114,7 +114,7 @@ public interface ISessionListener {
    *
    * @param project the project that was removed
    */
-  public default void projectRemoved(IProject project) {
+  public default void projectRemoved(IReferencePoint project) {
     // NOP
   }
 
@@ -123,7 +123,7 @@ public interface ISessionListener {
    *
    * <p>This method might <i>not</i> be called on the UI thread.
    */
-  public default void resourcesAdded(IProject project) {
+  public default void resourcesAdded(IReferencePoint project) {
     // NOP
   }
 }

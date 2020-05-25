@@ -14,7 +14,7 @@ import saros.core.monitoring.IStatus;
 import saros.core.monitoring.Status;
 import saros.filesystem.IContainer;
 import saros.filesystem.IFile;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.intellij.SarosComponent;
 import saros.intellij.runtime.UIMonitoredJob;
@@ -53,7 +53,7 @@ public class CollaborationUtils {
    * @param referencePoints the reference points to share
    * @param contacts the contacts to share the projects with
    */
-  public static void startSession(Set<IProject> referencePoints, final List<JID> contacts) {
+  public static void startSession(Set<IReferencePoint> referencePoints, final List<JID> contacts) {
 
     UIMonitoredJob sessionStartupJob =
         new UIMonitoredJob("Session Startup") {
@@ -147,7 +147,7 @@ public class CollaborationUtils {
    * @param referencePoints the reference points to add to the session
    * @nonBlocking
    */
-  public static void addResourcesToSession(Set<IProject> referencePoints) {
+  public static void addResourcesToSession(Set<IReferencePoint> referencePoints) {
 
     final ISarosSession sarosSession = sessionManager.getSession();
 
@@ -226,12 +226,12 @@ public class CollaborationUtils {
    * @return the message that invitees see on an incoming resource negotiation request
    */
   private static String getShareReferencePointsDescription(ISarosSession sarosSession) {
-    Set<IProject> referencePoints = sarosSession.getProjects();
+    Set<IReferencePoint> referencePoints = sarosSession.getProjects();
 
     StringBuilder result = new StringBuilder();
 
     try {
-      for (IProject referencePoint : referencePoints) {
+      for (IReferencePoint referencePoint : referencePoints) {
         Pair<Long, Long> fileCountAndSize;
 
         fileCountAndSize = getFileCountAndSize(referencePoint.members());
@@ -293,7 +293,7 @@ public class CollaborationUtils {
             log.warn("failed to retrieve size of file " + resource, e);
           }
           break;
-        case PROJECT:
+        case REFERENCE_POINT:
         case FOLDER:
           try {
             IContainer container = (IContainer) resource;

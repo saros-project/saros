@@ -17,7 +17,7 @@ import saros.exceptions.LocalCancellationException;
 import saros.exceptions.SarosCancellationException;
 import saros.filesystem.FileSystem;
 import saros.filesystem.IFolder;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.filesystem.IWorkspace;
 import saros.filesystem.checksum.IChecksumCache;
@@ -101,7 +101,7 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
    * @throws IllegalArgumentException if either a project id is not valid or the referenced project
    *     for that id does not exist
    */
-  public Status run(Map<String, IProject> projectMapping, final IProgressMonitor monitor) {
+  public Status run(Map<String, IReferencePoint> projectMapping, final IProgressMonitor monitor) {
 
     checkProjectMapping(projectMapping);
 
@@ -139,9 +139,9 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
        * the user who sends this ProjectNegotiation is now responsible for the
        * resources of the contained projects
        */
-      for (Entry<String, IProject> entry : projectMapping.entrySet()) {
+      for (Entry<String, IReferencePoint> entry : projectMapping.entrySet()) {
         final String projectID = entry.getKey();
-        final IProject project = entry.getValue();
+        final IReferencePoint project = entry.getValue();
         /*
          * TODO Queuing responsibility should be moved to Project
          * Negotiation, since its the only consumer of queuing
@@ -183,10 +183,10 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
        * We are finished with the negotiation. Add all projects resources
        * to the session.
        */
-      for (Entry<String, IProject> entry : projectMapping.entrySet()) {
+      for (Entry<String, IReferencePoint> entry : projectMapping.entrySet()) {
 
         final String projectID = entry.getKey();
-        final IProject project = entry.getValue();
+        final IReferencePoint project = entry.getValue();
 
         session.addSharedProject(project, projectID);
       }
@@ -224,7 +224,9 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
    * @throws IOException, SarosCancellationException
    */
   protected abstract void transfer(
-      IProgressMonitor monitor, Map<String, IProject> projectMapping, List<FileList> missingFiles)
+      IProgressMonitor monitor,
+      Map<String, IReferencePoint> projectMapping,
+      List<FileList> missingFiles)
       throws IOException, SarosCancellationException;
 
   /**
@@ -234,7 +236,7 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
    * @param monitor mapping from remote project ids to the target local projects
    * @param projectMapping mapping of projects
    */
-  protected void cleanup(IProgressMonitor monitor, Map<String, IProject> projectMapping) {
+  protected void cleanup(IProgressMonitor monitor, Map<String, IReferencePoint> projectMapping) {
     fileReplacementInProgressObservable.replacementDone();
 
     /*
@@ -243,7 +245,7 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
      * functionality. This will enable a specific Queuing mechanism per
      * TransferType (see github issue #137).
      */
-    for (IProject project : projectMapping.values()) session.disableQueuing(project);
+    for (IReferencePoint project : projectMapping.values()) session.disableQueuing(project);
 
     // only needed for error cases
     if (expectedTransfer != null) expectedTransfer.cancel(false);
@@ -328,7 +330,7 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
    * @throws IOException
    */
   protected Map<String, FileListDiff> computeLocalVsRemoteDiff(
-      final Map<String, IProject> localProjectMapping, final IProgressMonitor monitor)
+      final Map<String, IReferencePoint> localProjectMapping, final IProgressMonitor monitor)
       throws SarosCancellationException, IOException {
 
     log.debug(this + " : computing file and folder differences");
@@ -338,10 +340,10 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
 
     final Map<String, FileListDiff> result = new HashMap<String, FileListDiff>();
 
-    for (final Entry<String, IProject> entry : localProjectMapping.entrySet()) {
+    for (final Entry<String, IReferencePoint> entry : localProjectMapping.entrySet()) {
 
       final String id = entry.getKey();
-      final IProject project = entry.getValue();
+      final IReferencePoint project = entry.getValue();
 
       final FileList localProjectFileList =
           FileListFactory.createFileList(
@@ -375,17 +377,17 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
    * @throws IOException
    */
   protected List<FileList> synchronizeProjectStructures(
-      final Map<String, IProject> localProjectMapping, final Map<String, FileListDiff> diffs)
+      final Map<String, IReferencePoint> localProjectMapping, final Map<String, FileListDiff> diffs)
       throws IOException {
 
     log.debug(this + " : deleting files and folders, creating empty folders");
 
     final List<FileList> result = new ArrayList<FileList>();
 
-    for (final Entry<String, IProject> entry : localProjectMapping.entrySet()) {
+    for (final Entry<String, IReferencePoint> entry : localProjectMapping.entrySet()) {
 
       final String id = entry.getKey();
-      final IProject project = entry.getValue();
+      final IReferencePoint project = entry.getValue();
 
       final FileListDiff diff = diffs.get(id);
 
@@ -477,12 +479,12 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
     startActivityQueuingRequestCollector.cancel();
   }
 
-  protected void checkProjectMapping(final Map<String, IProject> mapping) {
+  protected void checkProjectMapping(final Map<String, IReferencePoint> mapping) {
 
-    for (final Entry<String, IProject> entry : mapping.entrySet()) {
+    for (final Entry<String, IReferencePoint> entry : mapping.entrySet()) {
 
       final String id = entry.getKey();
-      final IProject project = entry.getValue();
+      final IReferencePoint project = entry.getValue();
 
       final ProjectNegotiationData data = getProjectNegotiationData(id);
 
@@ -493,7 +495,7 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
     }
   }
 
-  protected IResource getResource(IProject project, String path) {
+  protected IResource getResource(IReferencePoint project, String path) {
     if (path.endsWith(FileList.DIR_SEPARATOR)) return project.getFolder(path);
     else return project.getFile(path);
   }

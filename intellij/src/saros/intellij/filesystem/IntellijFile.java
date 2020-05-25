@@ -180,7 +180,7 @@ public class IntellijFile extends AbstractIntellijResource implements IFile {
   private void createInternal(@Nullable InputStream input) throws IOException {
     IResource parent = getParent();
 
-    VirtualFile parentFile = referencePoint.findVirtualFile(parent.getProjectRelativePath());
+    VirtualFile parentFile = referencePoint.findVirtualFile(parent.getReferencePointRelativePath());
 
     if (parentFile == null || !parentFile.exists()) {
       throw new FileNotFoundException(

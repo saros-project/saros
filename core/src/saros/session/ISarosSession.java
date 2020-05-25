@@ -25,7 +25,7 @@ import java.util.concurrent.CancellationException;
 import saros.activities.IActivity;
 import saros.activities.IResourceActivity;
 import saros.concurrent.management.ConcurrentDocumentClient;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.net.xmpp.JID;
 import saros.session.IActivityConsumer.Priority;
@@ -162,13 +162,13 @@ public interface ISarosSession {
    * @param enabled <code>true</code> to enable or <code>false</code> to disable the activity
    *     execution
    */
-  public void setActivityExecution(IProject project, boolean enabled);
+  public void setActivityExecution(IReferencePoint project, boolean enabled);
 
   /**
    * @return the shared projects associated with this session, never <code>null</code> but may be
    *     empty
    */
-  public Set<IProject> getProjects();
+  public Set<IReferencePoint> getProjects();
 
   /**
    * FOR INTERNAL USE ONLY !
@@ -281,7 +281,7 @@ public interface ISarosSession {
   public void removeActivityConsumer(IActivityConsumer consumer);
 
   /** Checks if the user is ready to process {@link IResourceActivity}s for a given project */
-  public boolean userHasProject(User user, IProject project);
+  public boolean userHasProject(User user, IReferencePoint project);
 
   /**
    * @return <code>true</code> if the given {@link IResource resource} is currently shared in this
@@ -294,14 +294,14 @@ public interface ISarosSession {
    *
    * @return the global ID of the project or <code>null</code> if this project is not shared
    */
-  public String getProjectID(IProject project);
+  public String getProjectID(IReferencePoint project);
 
   /**
    * Returns the project with the given ID.
    *
    * @return the project with the given ID or <code>null</code> if no project with this ID is shared
    */
-  public IProject getProject(String projectID);
+  public IReferencePoint getProject(String projectID);
 
   /**
    * Adds the specified project to this session.
@@ -309,7 +309,7 @@ public interface ISarosSession {
    * @param project The project to share
    * @param projectID The global project ID
    */
-  void addSharedProject(IProject project, String projectID);
+  void addSharedProject(IReferencePoint project, String projectID);
 
   /**
    * Stores a bidirectional mapping between <code>project</code> and <code>projectID</code>.
@@ -318,13 +318,13 @@ public interface ISarosSession {
    *
    * @param projectID Session-wide ID of the project
    * @param project the local representation of the project
-   * @see #removeProjectMapping(String, IProject)
+   * @see #removeProjectMapping(String, IReferencePoint)
    */
-  public void addProjectMapping(String projectID, IProject project);
+  public void addProjectMapping(String projectID, IReferencePoint project);
 
   /**
    * Removes the bidirectional mapping <code>project</code> and <code>projectId</code> that was
-   * created by {@link #addProjectMapping(String, IProject) addProjectMapping()} .
+   * created by {@link #addProjectMapping(String, IReferencePoint) addProjectMapping()} .
    *
    * <p>TODO Why is the project parameter needed here? This forces callers to store the mapping
    * themselves (or retrieve it just before calling this method).
@@ -332,7 +332,7 @@ public interface ISarosSession {
    * @param projectID Session-wide ID of the project
    * @param project the local representation of the project
    */
-  public void removeProjectMapping(String projectID, IProject project);
+  public void removeProjectMapping(String projectID, IReferencePoint project);
 
   /**
    * Return the stop manager of this session.
@@ -356,20 +356,20 @@ public interface ISarosSession {
    * they cannot be applied before their corresponding project is received and extracted.
    *
    * <p>That queuing relies on an existing project-to-projectID mapping (see {@link
-   * #addProjectMapping(String, IProject)}), otherwise incoming activities cannot be queued and will
-   * be lost.
+   * #addProjectMapping(String, IReferencePoint)}), otherwise incoming activities cannot be queued
+   * and will be lost.
    *
    * @param project the project for which project-related activities should be queued
    * @see #disableQueuing
    */
-  public void enableQueuing(IProject project);
+  public void enableQueuing(IReferencePoint project);
 
   /**
    * FOR INTERNAL USE ONLY !
    *
    * <p>Disables queuing for the given project and flushes all queued activities.
    */
-  public void disableQueuing(IProject project);
+  public void disableQueuing(IReferencePoint project);
 
   /**
    * Returns the id of the current session.

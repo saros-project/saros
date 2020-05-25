@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 import org.apache.log4j.Logger;
 import saros.core.ui.util.CollaborationUtils;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.intellij.context.SharedIDEContext;
 import saros.intellij.filesystem.IntellijReferencePoint;
 import saros.intellij.ui.Messages;
@@ -56,7 +56,7 @@ public class ShareWithUserAction extends AnAction {
           "Unable to start session - could not determine virtual file for highlighted directory.");
     }
 
-    IProject referencePoint;
+    IReferencePoint referencePoint;
 
     try {
       referencePoint = new IntellijReferencePoint(project, virtualFile);
@@ -72,7 +72,7 @@ public class ShareWithUserAction extends AnAction {
       return;
     }
 
-    Set<IProject> referencePoints = new HashSet<>();
+    Set<IReferencePoint> referencePoints = new HashSet<>();
     referencePoints.add(referencePoint);
 
     List<JID> contacts = Collections.singletonList(userJID);

@@ -10,7 +10,7 @@ import java.util.Map;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import saros.SarosPluginContext;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.intellij.ui.util.IconManager;
 import saros.intellij.ui.views.SarosMainPanelView;
 import saros.repackaged.picocontainer.annotations.Inject;
@@ -68,7 +68,7 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode implements Dispo
         }
 
         @Override
-        public void resourcesAdded(final IProject referencePoint) {
+        public void resourcesAdded(final IReferencePoint referencePoint) {
           UIUtil.invokeLaterIfNeeded(
               new Runnable() {
                 @Override
@@ -185,7 +185,7 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode implements Dispo
     treeView.expandRow(2);
   }
 
-  private void addReferencePointNode(IProject referencePoint) {
+  private void addReferencePointNode(IReferencePoint referencePoint) {
     for (DefaultMutableTreeNode sessionNode : sessionNodeList.values()) {
       ReferencePointInfo referencePointInfo = new ReferencePointInfo(referencePoint);
 
@@ -254,14 +254,14 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode implements Dispo
   }
 
   private static class ReferencePointInfo extends LeafInfo {
-    private final IProject referencePoint;
+    private final IReferencePoint referencePoint;
 
-    public ReferencePointInfo(IProject referencePoint) {
+    public ReferencePointInfo(IReferencePoint referencePoint) {
       super(referencePoint.getName());
       this.referencePoint = referencePoint;
     }
 
-    public IProject getReferencePoint() {
+    public IReferencePoint getReferencePoint() {
       return referencePoint;
     }
 
