@@ -21,7 +21,7 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
  * <p>Furthermore you should "format" the XML output by adding XStream specific annotations to the
  * class fields.
  */
-@XStreamAlias(/* ProjectNegotiationCancel */ "PNCL")
+@XStreamAlias(/* ResourceNegotiationCancel */ "RNCL")
 public class CancelResourceNegotiationExtension extends SarosSessionPacketExtension {
 
   public static final Provider PROVIDER = new Provider();
@@ -43,7 +43,7 @@ public class CancelResourceNegotiationExtension extends SarosSessionPacketExtens
   /**
    * Returns the error message for this cancellation.
    *
-   * @return the error message or <code>null</code> if the remote contact canceled the project
+   * @return the error message or <code>null</code> if the remote contact canceled the resource
    *     negotiation manually
    */
   public String getErrorMessage() {
@@ -51,9 +51,9 @@ public class CancelResourceNegotiationExtension extends SarosSessionPacketExtens
   }
 
   /**
-   * Returns the id for the specific project negotiation that was cancelled.
+   * Returns the id for the specific resource negotiation that was cancelled.
    *
-   * @return id of a project negotiation
+   * @return id of a resource negotiation
    */
   public String getNegotiationID() {
     return negotiationID;
@@ -88,7 +88,7 @@ public class CancelResourceNegotiationExtension extends SarosSessionPacketExtens
   public static class Provider
       extends SarosSessionPacketExtension.Provider<CancelResourceNegotiationExtension> {
     private Provider() {
-      super("pncl", CancelResourceNegotiationExtension.class);
+      super("rncl", CancelResourceNegotiationExtension.class);
     }
   }
 }
