@@ -1,7 +1,6 @@
 package saros.negotiation;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedList;
@@ -100,9 +99,9 @@ public class FileListFactory {
   private static List<IFile> calculateMembers(final FileList list, final IProject project)
       throws IOException {
 
-    List<IResource> resources = Arrays.asList(project.members());
+    List<IResource> resources = project.members();
 
-    if (resources.size() == 0) return Collections.emptyList();
+    if (resources.isEmpty()) return Collections.emptyList();
 
     Deque<IResource> stack = new LinkedList<>(resources);
 
@@ -126,7 +125,7 @@ public class FileListFactory {
           break;
 
         case FOLDER:
-          stack.addAll(Arrays.asList(((IFolder) resource).members()));
+          stack.addAll(((IFolder) resource).members());
           list.addPath(path, null, true);
           break;
       }

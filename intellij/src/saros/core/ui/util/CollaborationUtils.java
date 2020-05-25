@@ -2,7 +2,6 @@ package saros.core.ui.util;
 
 import com.intellij.openapi.project.Project;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -238,7 +237,7 @@ public class CollaborationUtils {
 
         Pair<Long, Long> fileCountAndSize;
 
-        fileCountAndSize = getFileCountAndSize(Arrays.asList(project.members()));
+        fileCountAndSize = getFileCountAndSize(project.members());
 
         result.append(
             String.format(
@@ -303,8 +302,7 @@ public class CollaborationUtils {
           try {
             IContainer container = (IContainer) resource;
 
-            Pair<Long, Long> subFileCountAndSize =
-                getFileCountAndSize(Arrays.asList(container.members()));
+            Pair<Long, Long> subFileCountAndSize = getFileCountAndSize(container.members());
 
             totalFileSize += subFileCountAndSize.getLeft();
             totalFileCount += subFileCountAndSize.getRight();

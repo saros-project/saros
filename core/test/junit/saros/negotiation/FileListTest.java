@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -112,23 +113,31 @@ public class FileListTest {
 
     final IProject project = EasyMock.createMock(IProject.class);
 
-    final IFolder barFolder = createFolderMock(project, "bar", new IResource[0]);
+    final IFolder barFolder = createFolderMock(project, "bar", Collections.emptyList());
 
-    final IFolder foobarfooFolder = createFolderMock(project, "foobar/foo", new IResource[0]);
+    final IFolder foobarfooFolder =
+        createFolderMock(project, "foobar/foo", Collections.emptyList());
 
     final IFile infoTxtFile = createFileMock(project, "info.txt", "1234", "UTF-8");
 
     final IFile foobarInfoTxtFile =
         createFileMock(project, "foobar/info.txt", "12345", "ISO-8859-1");
 
-    final IFolder foobarFolder =
-        createFolderMock(project, "foobar", new IResource[] {foobarfooFolder, foobarInfoTxtFile});
+    List<IResource> fooBarFolderMembers = new ArrayList<>();
+    fooBarFolderMembers.add(foobarfooFolder);
+    fooBarFolderMembers.add(foobarInfoTxtFile);
+
+    final IFolder foobarFolder = createFolderMock(project, "foobar", fooBarFolderMembers);
 
     EasyMock.expect(project.getName()).andStubReturn("foo");
 
+    List<IResource> projectMembers = new ArrayList<>();
+    projectMembers.add(barFolder);
+    projectMembers.add(infoTxtFile);
+    projectMembers.add(foobarFolder);
+
     try {
-      EasyMock.expect(project.members())
-          .andStubReturn(new IResource[] {barFolder, infoTxtFile, foobarFolder});
+      EasyMock.expect(project.members()).andStubReturn(projectMembers);
     } catch (IOException e) {
       // cannot happen
     }
@@ -186,7 +195,7 @@ public class FileListTest {
   }
 
   private static IFolder createFolderMock(
-      final IProject project, final String path, final IResource[] members) {
+      final IProject project, final String path, final List<IResource> members) {
 
     final IPath relativePath = createPathMock(path);
 

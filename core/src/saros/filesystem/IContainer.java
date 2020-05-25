@@ -1,6 +1,7 @@
 package saros.filesystem;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Represents a handle for a container in the (virtual) file system. Containers are defined as
@@ -26,7 +27,7 @@ public interface IContainer extends IResource {
    * @throws IOException if the container does not exist or the contained resources could not be
    *     read
    */
-  IResource[] members() throws IOException;
+  List<IResource> members() throws IOException;
 
   /**
    * Returns a handle for the file with the given relative path to this resource.
