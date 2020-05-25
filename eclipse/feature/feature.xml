@@ -2,7 +2,7 @@
 <feature
       id="saros.feature"
       label="Saros"
-      version="15.0.0">
+      version="16.0.0">
 
    <description>
       Distributed Party Programming for Eclipse.
@@ -364,21 +364,20 @@ Public License instead of this License.
       <import plugin="org.eclipse.ui.editors"/>
       <import plugin="org.eclipse.core.resources"/>
       <import plugin="org.eclipse.ui.ide"/>
-      <import plugin="org.eclipse.gef"/>
    </requires>
 
    <plugin
          id="saros.eclipse"
          download-size="0"
          install-size="0"
-         version="15.0.0"
+         version="16.0.0"
          unpack="false"/>
 
    <plugin
          id="saros.core"
          download-size="0"
          install-size="0"
-         version="0.1.0"
+         version="0.2.0"
          unpack="false"/>
 
 </feature>
