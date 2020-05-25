@@ -399,16 +399,16 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
         /**
          * Sends the awareness information for all open shared editors. This is done to populate the
-         * UserEditorState of the participant that finished the reference point negotiation.
+         * UserEditorState of the participant that finished the resource negotiation.
          *
          * <p>This is done by first sending the needed state for all locally open editors. After the
          * awareness information for all locally open editors (including the active editor) has been
          * transmitted, a second editor activated activity is send for the locally active editor to
          * correctly set the active editor in the remote user editor state for the local user.
          *
-         * <p>This will not be executed for the user that finished the reference point negotiation
-         * as their user editor state will be propagated through {@link #resourcesAdded(IProject)}
-         * when the shared resources are initially added.
+         * <p>This will not be executed for the user that finished the resource negotiation as their
+         * user editor state will be propagated through {@link #resourcesAdded(IProject)} when the
+         * shared resources are initially added.
          */
         private void sendAwarenessInformation(@NotNull User user) {
           User localUser = session.getLocalUser();
@@ -958,7 +958,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
     /*
      * hack to avoid sending activities for changes caused by received
-     * activities during the reference point negotiation
+     * activities during the resource negotiation
      */
     if (fileReplacementInProgressObservable.isReplacementInProgress()) {
       if (log.isTraceEnabled()) {

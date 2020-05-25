@@ -29,8 +29,8 @@ import saros.session.INegotiationHandler;
 import saros.session.ISarosSessionManager;
 
 /**
- * This handler is responsible for presenting and running the session and reference point
- * negotiations that are received by the Saros Session Manager component.
+ * This handler is responsible for presenting and running the session and resource negotiations that
+ * are received by the Saros Session Manager component.
  */
 public class NegotiationHandler implements INegotiationHandler {
 
@@ -70,8 +70,7 @@ public class NegotiationHandler implements INegotiationHandler {
 
   @Override
   public void handleIncomingProjectNegotiation(AbstractIncomingProjectNegotiation negotiation) {
-    projectUtils.runWithProject(
-        project -> showIncomingReferencePointNegotiationUI(project, negotiation));
+    projectUtils.runWithProject(project -> showIncomingResourceNegotiationUI(project, negotiation));
   }
 
   private void showIncomingInvitationUI(
@@ -87,7 +86,7 @@ public class NegotiationHandler implements INegotiationHandler {
         ModalityState.defaultModalityState());
   }
 
-  private void showIncomingReferencePointNegotiationUI(
+  private void showIncomingResourceNegotiationUI(
       Project project, final AbstractIncomingProjectNegotiation negotiation) {
 
     EDTExecutor.invokeLater(
@@ -184,9 +183,9 @@ public class NegotiationHandler implements INegotiationHandler {
     private final AbstractOutgoingProjectNegotiation negotiation;
     private final String peer;
 
-    OutgoingProjectJob(AbstractOutgoingProjectNegotiation outgoingProjectNegotiation) {
+    OutgoingProjectJob(AbstractOutgoingProjectNegotiation outgoingResourceNegotiation) {
       super(Messages.NegotiationHandler_sharing_reference_point);
-      negotiation = outgoingProjectNegotiation;
+      negotiation = outgoingResourceNegotiation;
       peer = negotiation.getPeer().getBase();
     }
 

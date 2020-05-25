@@ -217,13 +217,13 @@ public class CollaborationUtils {
   }
 
   /**
-   * Creates the message that invitees see on an incoming reference point negotiation request.
+   * Creates the message that invitees see on an incoming resource negotiation request.
    *
    * <p>Currently it contains the reference point names along with the number of shared files and
    * total file size for each shared reference point.
    *
    * @param sarosSession the session fot which to get the descriptions
-   * @return the message that invitees see on an incoming reference point negotiation request
+   * @return the message that invitees see on an incoming resource negotiation request
    */
   private static String getShareReferencePointsDescription(ISarosSession sarosSession) {
     Set<IProject> referencePoints = sarosSession.getProjects();

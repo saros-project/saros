@@ -85,8 +85,8 @@ class ReferencePointTab {
   /**
    * Creates a panel to specify how a shared reference point is represented locally.
    *
-   * @param referencePointName the name of the shared reference point contained in the reference
-   *     point negotiation data
+   * @param referencePointName the name of the shared reference point contained in the resource
+   *     negotiation data
    */
   ReferencePointTab(
       @NotNull String referencePointName,
@@ -161,7 +161,7 @@ class ReferencePointTab {
 
   /**
    * Sets up the radio buttons used to choose whether to create a new directory or use and existing
-   * directory for the reference point negotiation.
+   * directory for the resource negotiation.
    */
   private void setUpRadioButtons() {
     final String CREATE_NEW_DIRECTORY_ACTION_COMMAND = "create new";
@@ -204,7 +204,7 @@ class ReferencePointTab {
 
   /**
    * Enables or disables all fields belonging to the option to create a new directory as part of the
-   * reference point negotiation.
+   * resource negotiation.
    *
    * @param enabled whether ot not the fields should be set to enabled
    */
@@ -215,7 +215,7 @@ class ReferencePointTab {
 
   /**
    * Enables or disables all fields belonging to the option to use an existing directory as part of
-   * the reference point negotiation.
+   * the resource negotiation.
    *
    * @param enabled whether ot not the fields should be set to enabled
    */
@@ -338,7 +338,7 @@ class ReferencePointTab {
    * <p>Also sets the default option for the selected project. If the name of the project root
    * directory matches the name of the shared reference point or the project contains a module with
    * a content root that matches the given reference point name, the option to use it for the
-   * project negotiation is selected by default. Otherwise, the option to create a new directory is
+   * resource negotiation is selected by default. Otherwise, the option to create a new directory is
    * selected by default.
    *
    * @param project the newly selected project to set the default values and selection for
@@ -400,7 +400,7 @@ class ReferencePointTab {
 
   /**
    * Adds listeners which update the reference point tab validity state on input changes to the
-   * fields used when creating a new directory as part of the reference point negotiation.
+   * fields used when creating a new directory as part of the resource negotiation.
    */
   private void addCreateNewDirectoryFieldListeners() {
     DocumentListener newDirectoryNameDocumentListener =
@@ -457,7 +457,7 @@ class ReferencePointTab {
 
   /**
    * Adds listeners which update the reference point tab validity state on input changes to the
-   * fields used when using an existing directory as part of the reference point negotiation.
+   * fields used when using an existing directory as part of the resource negotiation.
    */
   private void addUseExistingDirectoryFieldListeners() {
     DocumentListener existingDirectoryPathDocumentListener =
@@ -780,11 +780,9 @@ class ReferencePointTab {
   }
 
   /**
-   * Returns the name of the shared reference point contained in the reference point negotiation
-   * data.
+   * Returns the name of the shared reference point contained in the resource negotiation data.
    *
-   * @return the name of the shared reference point contained in the reference point negotiation
-   *     data
+   * @return the name of the shared reference point contained in the resource negotiation data
    */
   @NotNull
   String getReferencePointName() {
@@ -855,7 +853,7 @@ class ReferencePointTab {
   }
 
   /**
-   * Initializes the fields to create a new directory as part of the reference point negotiation.
+   * Initializes the fields to create a new directory as part of the resource negotiation.
    *
    * @param gbc the basic grid bag constraints object used to define the layout
    */
@@ -893,8 +891,7 @@ class ReferencePointTab {
   }
 
   /**
-   * Initializes the fields to chose an existing directory to use for the reference point
-   * negotiation.
+   * Initializes the fields to chose an existing directory to use for the resource negotiation.
    *
    * @param gbc the basic grid bag constraints object used to define the layout
    */

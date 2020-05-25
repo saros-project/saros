@@ -34,7 +34,7 @@ public class IntellijCollaborationUtilsImpl implements ICollaborationUtils {
       sharedProjects.add(((IntellijReferencePoint) resource.getProject()).getIntellijProject());
     }
 
-    // Workaround while we only allow a single module (-> single project) to be shared
+    // Workaround while we only allow a single reference point (-> single project) to be shared
     if (sharedProjects.size() != 1) {
       throw new IllegalStateException(
           "Saros/I currently only supports sharing of a single project. Found projects: "
