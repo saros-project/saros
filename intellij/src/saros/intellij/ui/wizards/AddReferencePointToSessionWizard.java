@@ -103,8 +103,8 @@ public class AddReferencePointToSessionWizard extends Wizard {
 
         /**
          * Extracts the local reference point's name and either displays the {@link
-         * AddReferencePointToSessionWizard#modifiedResourcesListPage} or triggers the reference
-         * point negotiation.
+         * AddReferencePointToSessionWizard#modifiedResourcesListPage} or triggers the resource
+         * negotiation.
          */
         @Override
         public void next() {
@@ -182,8 +182,8 @@ public class AddReferencePointToSessionWizard extends Wizard {
         }
 
         /**
-         * Creates a new directory for the reference point and starts the reference point
-         * negotiation with it.
+         * Creates a new directory for the reference point and starts the resource negotiation with
+         * it.
          *
          * @param project the project to bind the reference point to
          * @param directoryName the name for the new directory
@@ -304,14 +304,13 @@ public class AddReferencePointToSessionWizard extends Wizard {
 
           localReferencePoints.put(remoteReferencePointID, sharedReferencePoint);
 
-          triggerReferencePointNegotiation();
+          triggerResourceNegotiation();
         }
 
         /**
-         * Checks if the directory is valid and then starts the reference point negotiation with it.
+         * Checks if the directory is valid and then starts the resource negotiation with it.
          *
-         * @param existingDirectory the existing directory to use for the reference point
-         *     negotiation
+         * @param existingDirectory the existing directory to use for the resource negotiation
          */
         private void doExistingDirectory(
             @NotNull Project project, @NotNull VirtualFile existingDirectory) {
@@ -354,8 +353,8 @@ public class AddReferencePointToSessionWizard extends Wizard {
         }
 
         /**
-         * Cancels the reference point negotiation. Informs all channels of this cancellation by
-         * logging an error and showing an error notification to the local user.
+         * Cancels the resource negotiation. Informs all channels of this cancellation by logging an
+         * error and showing an error notification to the local user.
          *
          * @param reason the reason for the cancellation
          */
@@ -387,8 +386,8 @@ public class AddReferencePointToSessionWizard extends Wizard {
       };
 
   /**
-   * Cancels the reference point negotiation, notifies the host using the given reason, and closes
-   * the wizard.
+   * Cancels the resource negotiation, notifies the host using the given reason, and closes the
+   * wizard.
    *
    * <p><b>Note:</b> This is an asynchronous action. It is not guaranteed that the negotiation is
    * canceled when this method returns.
@@ -419,7 +418,7 @@ public class AddReferencePointToSessionWizard extends Wizard {
 
         @Override
         public void next() {
-          triggerReferencePointNegotiation();
+          triggerResourceNegotiation();
         }
 
         @Override
@@ -518,7 +517,7 @@ public class AddReferencePointToSessionWizard extends Wizard {
    *
    * <p>On success, a success notification is displayed, on error, a dialog is shown.
    */
-  private void triggerReferencePointNegotiation() {
+  private void triggerResourceNegotiation() {
 
     if (triggered) return;
 

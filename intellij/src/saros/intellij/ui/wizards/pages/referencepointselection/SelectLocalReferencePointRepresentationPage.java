@@ -39,7 +39,7 @@ public class SelectLocalReferencePointRepresentationPage extends AbstractWizardP
    * Creates a reference point tab for the given reference point name and adds it to the tabbed
    * reference point view.
    *
-   * @param referencePointName the name of a shared reference point contained in the reference point
+   * @param referencePointName the name of a shared reference point contained in the resource
    *     negotiation data
    */
   private void addReferencePointTab(@NotNull String referencePointName) {
@@ -77,8 +77,8 @@ public class SelectLocalReferencePointRepresentationPage extends AbstractWizardP
   /**
    * Returns the reference point selection results of the tab for the given reference point name.
    *
-   * @param referencePointName the name of the shared reference point contained in the reference
-   *     point negotiation data
+   * @param referencePointName the name of the shared reference point contained in the resource
+   *     negotiation data
    * @return the reference point selection results of the tab for the given reference point name or
    *     <code>null</code> if there is no reference point tab for the given name
    */

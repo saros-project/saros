@@ -58,8 +58,8 @@ public class ApplicationEventHandlersFactory {
      */
     /*
      * TODO make this a real application component
-     *  The handler listens to the whole virtual filesystem but still uses the project to look up
-     *  modules. This has to be adjusted before sharing multiple modules/projects is enabled.
+     *  The handler listens to the whole virtual filesystem but still uses the project.
+     *  This has to be adjusted before sharing multiple reference points/projects is enabled.
      */
     applicationEventHandlers.add(
         new LocalFilesystemModificationHandler(
