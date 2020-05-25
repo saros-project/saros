@@ -10,7 +10,7 @@ import saros.activities.IActivity;
 import saros.activities.IResourceActivity;
 import saros.activities.JupiterActivity;
 import saros.filesystem.IFile;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.session.User;
 
@@ -18,11 +18,11 @@ import saros.session.User;
 public class ActivityQueuer {
 
   private static class ProjectQueue {
-    private final IProject project;
+    private final IReferencePoint project;
     private final List<IResourceActivity<? extends IResource>> buffer;
     private int readyToFlush;
 
-    private ProjectQueue(IProject project) {
+    private ProjectQueue(IReferencePoint project) {
       this.project = project;
       buffer = new ArrayList<>();
       readyToFlush = 1;
@@ -68,7 +68,7 @@ public class ActivityQueuer {
    *
    * @param project
    */
-  public synchronized void enableQueuing(final IProject project) {
+  public synchronized void enableQueuing(final IReferencePoint project) {
     for (final ProjectQueue projectQueue : projectQueues) {
 
       if (projectQueue.project.equals(project)) {
@@ -95,7 +95,7 @@ public class ActivityQueuer {
    *
    * @param project
    */
-  public synchronized void disableQueuing(final IProject project) {
+  public synchronized void disableQueuing(final IReferencePoint project) {
     for (final ProjectQueue projectQueue : projectQueues) {
 
       if (projectQueue.project.equals(project)) {
@@ -144,8 +144,8 @@ public class ActivityQueuer {
         if (resource != null) {
 
           // try to reuse the queue as lookup is O(n)
-          if (projectQueue == null || !projectQueue.project.equals(resource.getProject())) {
-            projectQueue = getProjectQueue(resource.getProject());
+          if (projectQueue == null || !projectQueue.project.equals(resource.getReferencePoint())) {
+            projectQueue = getProjectQueue(resource.getReferencePoint());
           }
 
           if (projectQueue != null) {
@@ -217,7 +217,7 @@ public class ActivityQueuer {
       projectQueues.remove(projectQueue);
   }
 
-  private ProjectQueue getProjectQueue(final IProject project) {
+  private ProjectQueue getProjectQueue(final IReferencePoint project) {
 
     for (final ProjectQueue projectQueue : projectQueues) {
       if (projectQueue.project.equals(project)) return projectQueue;

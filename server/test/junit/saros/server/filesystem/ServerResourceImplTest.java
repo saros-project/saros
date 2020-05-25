@@ -17,7 +17,7 @@ import org.junit.Before;
 import org.junit.Test;
 import saros.filesystem.IFolder;
 import saros.filesystem.IPath;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 
 public class ServerResourceImplTest extends EasyMockSupport {
@@ -41,13 +41,13 @@ public class ServerResourceImplTest extends EasyMockSupport {
 
   private IResource resource;
   private ServerWorkspaceImpl workspace;
-  private IProject project;
+  private IReferencePoint project;
   private IFolder parent;
 
   @Before
   public void setUp() throws Exception {
     workspace = createMock(ServerWorkspaceImpl.class);
-    project = createMock(IProject.class);
+    project = createMock(IReferencePoint.class);
     parent = createMock(IFolder.class);
 
     expect(workspace.getLocation()).andStubReturn(createWorkspaceFolder());
@@ -72,7 +72,7 @@ public class ServerResourceImplTest extends EasyMockSupport {
 
   @Test
   public void getProjectRelativePath() {
-    assertEquals(path("folder/file"), resource.getProjectRelativePath());
+    assertEquals(path("folder/file"), resource.getReferencePointRelativePath());
   }
 
   @Test
@@ -89,7 +89,7 @@ public class ServerResourceImplTest extends EasyMockSupport {
 
   @Test
   public void getProject() {
-    assertEquals(project, resource.getProject());
+    assertEquals(project, resource.getReferencePoint());
   }
 
   @Test

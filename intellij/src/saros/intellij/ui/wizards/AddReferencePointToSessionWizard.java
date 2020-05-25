@@ -19,7 +19,7 @@ import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import saros.SarosPluginContext;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.checksum.IChecksumCache;
 import saros.intellij.context.SharedIDEContext;
 import saros.intellij.editor.DocumentAPI;
@@ -84,7 +84,7 @@ public class AddReferencePointToSessionWizard extends Wizard {
   private boolean triggered = false;
 
   /** reference point ID => reference point */
-  private final Map<String, IProject> localReferencePoints;
+  private final Map<String, IReferencePoint> localReferencePoints;
 
   @Inject private IChecksumCache checksumCache;
 
@@ -272,7 +272,7 @@ public class AddReferencePointToSessionWizard extends Wizard {
             return;
           }
 
-          IProject sharedReferencePoint;
+          IReferencePoint sharedReferencePoint;
 
           try {
             sharedReferencePoint = new IntellijReferencePoint(project, referencePointFile);
@@ -315,7 +315,7 @@ public class AddReferencePointToSessionWizard extends Wizard {
         private void doExistingDirectory(
             @NotNull Project project, @NotNull VirtualFile existingDirectory) {
 
-          IProject referencePoint;
+          IReferencePoint referencePoint;
 
           try {
             referencePoint = new IntellijReferencePoint(project, existingDirectory);
@@ -466,7 +466,7 @@ public class AddReferencePointToSessionWizard extends Wizard {
 
     List<ProjectNegotiationData> data = negotiation.getProjectNegotiationData();
 
-    localReferencePoints = new HashMap<String, IProject>();
+    localReferencePoints = new HashMap<String, IReferencePoint>();
 
     remoteReferencePointID = data.get(0).getProjectID();
     remoteReferencePointName = data.get(0).getProjectName();
@@ -560,7 +560,8 @@ public class AddReferencePointToSessionWizard extends Wizard {
     close();
   }
 
-  private void prepareResourcesChangedPage(final Map<String, IProject> referencePointMapping) {
+  private void prepareResourcesChangedPage(
+      final Map<String, IReferencePoint> referencePointMapping) {
 
     final Map<String, FileListDiff> modifiedResources = new HashMap<String, FileListDiff>();
 
@@ -608,12 +609,13 @@ public class AddReferencePointToSessionWizard extends Wizard {
 
   /** Creates a FileListDiff for all reference points that will be modified. */
   private Map<String, FileListDiff> getModifiedResourcesForReferencePoints(
-      Map<String, IProject> referencePointMapping, IProgressMonitor monitor) {
+      Map<String, IReferencePoint> referencePointMapping, IProgressMonitor monitor) {
 
     monitor.setTaskName("Calculating changed resources...");
 
     final Map<String, FileListDiff> modifiedResources = new HashMap<String, FileListDiff>();
-    final Map<String, IProject> modifiedReferencePoints = new HashMap<String, IProject>();
+    final Map<String, IReferencePoint> modifiedReferencePoints =
+        new HashMap<String, IReferencePoint>();
 
     modifiedReferencePoints.putAll(getModifiedReferencePoints(referencePointMapping));
     modifiedResources.putAll(getModifiedResources(modifiedReferencePoints, monitor));
@@ -626,12 +628,12 @@ public class AddReferencePointToSessionWizard extends Wizard {
    *
    * <p>Currently these are simply all reference points from the given reference point mapping.
    */
-  private Map<String, IProject> getModifiedReferencePoints(
-      Map<String, IProject> referencePointMapping) {
+  private Map<String, IReferencePoint> getModifiedReferencePoints(
+      Map<String, IReferencePoint> referencePointMapping) {
 
-    Map<String, IProject> modifiedReferencePoints = new HashMap<String, IProject>();
+    Map<String, IReferencePoint> modifiedReferencePoints = new HashMap<String, IReferencePoint>();
 
-    for (Map.Entry<String, IProject> entry : referencePointMapping.entrySet()) {
+    for (Map.Entry<String, IReferencePoint> entry : referencePointMapping.entrySet()) {
       modifiedReferencePoints.put(entry.getKey(), entry.getValue());
     }
 
@@ -645,7 +647,7 @@ public class AddReferencePointToSessionWizard extends Wizard {
    * <p><b>Important:</b> Do not call this inside the UI Thread. This is a long running operation!
    */
   private Map<String, FileListDiff> getModifiedResources(
-      Map<String, IProject> referencePointMapping, IProgressMonitor monitor) {
+      Map<String, IReferencePoint> referencePointMapping, IProgressMonitor monitor) {
 
     Map<String, FileListDiff> modifiedResources = new HashMap<String, FileListDiff>();
 
@@ -662,10 +664,10 @@ public class AddReferencePointToSessionWizard extends Wizard {
 
     subMonitor.setTaskName("\"Searching for files that will be modified...\",");
 
-    for (Map.Entry<String, IProject> entry : referencePointMapping.entrySet()) {
+    for (Map.Entry<String, IReferencePoint> entry : referencePointMapping.entrySet()) {
 
       String referencePointID = entry.getKey();
-      IProject referencePoint = entry.getValue();
+      IReferencePoint referencePoint = entry.getValue();
 
       try {
         final ProjectNegotiationData data = negotiation.getProjectNegotiationData(referencePointID);

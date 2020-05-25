@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.log4j.Logger;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 
 /**
  * Factory class to build the additional project data used for the project negotiation data.
@@ -55,7 +55,7 @@ public class AdditionalProjectDataFactory {
    * @param project the project to build the additional project data for
    * @return the additional project data for the passed project
    */
-  Map<String, String> build(IProject project) {
+  Map<String, String> build(IReferencePoint project) {
     Map<String, String> additionalProjectData = new HashMap<>();
 
     for (ProjectDataProvider projectDataProvider : projectDataProviders) {
@@ -82,6 +82,6 @@ public class AdditionalProjectDataFactory {
      * @param project the project to provide additional project options for
      * @return the mapping of additional project options for the given project
      */
-    Map<String, String> getMapping(IProject project);
+    Map<String, String> getMapping(IReferencePoint project);
   }
 }

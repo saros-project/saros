@@ -10,7 +10,7 @@ import java.util.concurrent.ExecutionException;
 import org.apache.log4j.Logger;
 import saros.exceptions.LocalCancellationException;
 import saros.exceptions.SarosCancellationException;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.filesystem.IWorkspace;
 import saros.filesystem.checksum.IChecksumCache;
@@ -64,7 +64,9 @@ public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNe
 
   @Override
   protected void transfer(
-      IProgressMonitor monitor, Map<String, IProject> projectMapping, List<FileList> missingFiles)
+      IProgressMonitor monitor,
+      Map<String, IReferencePoint> projectMapping,
+      List<FileList> missingFiles)
       throws IOException, SarosCancellationException {
 
     boolean filesMissing = false;
@@ -79,7 +81,7 @@ public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNe
 
   /** Receives the archive with all missing files and unpacks it. */
   private void receiveAndUnpackArchive(
-      final Map<String, IProject> localProjectMapping, final IProgressMonitor monitor)
+      final Map<String, IReferencePoint> localProjectMapping, final IProgressMonitor monitor)
       throws IOException, SarosCancellationException {
 
     // waiting for the big archive to come in
@@ -104,14 +106,14 @@ public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNe
   }
 
   private void unpackArchive(
-      final Map<String, IProject> localProjectMapping,
+      final Map<String, IReferencePoint> localProjectMapping,
       final File archiveFile,
       final IProgressMonitor monitor)
       throws LocalCancellationException, IOException {
 
-    final Map<String, IProject> projectMapping = new HashMap<String, IProject>();
+    final Map<String, IReferencePoint> projectMapping = new HashMap<String, IReferencePoint>();
 
-    for (Entry<String, IProject> entry : localProjectMapping.entrySet())
+    for (Entry<String, IReferencePoint> entry : localProjectMapping.entrySet())
       projectMapping.put(entry.getKey(), entry.getValue());
 
     final DecompressArchiveTask decompressTask =

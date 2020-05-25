@@ -11,7 +11,7 @@ import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import saros.filesystem.IFile;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.intellij.editor.DocumentAPI;
 import saros.intellij.editor.EditorManager;
 import saros.intellij.eventhandler.IProjectEventHandler;
@@ -135,7 +135,7 @@ public abstract class AbstractLocalDocumentModificationHandler implements IProje
       return null;
     }
 
-    Set<IProject> sharedReferencePoints = sarosSession.getProjects();
+    Set<IReferencePoint> sharedReferencePoints = sarosSession.getProjects();
 
     file = (IFile) VirtualFileConverter.convertToResource(sharedReferencePoints, virtualFile);
 

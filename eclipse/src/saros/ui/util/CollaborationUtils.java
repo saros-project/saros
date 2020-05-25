@@ -24,6 +24,7 @@ import org.eclipse.swt.widgets.Shell;
 import saros.Saros;
 import saros.SarosPluginContext;
 import saros.filesystem.EclipseProjectImpl;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.ResourceAdapterFactory;
 import saros.net.xmpp.JID;
 import saros.repackaged.picocontainer.annotations.Inject;
@@ -282,11 +283,11 @@ public class CollaborationUtils {
    */
   private static String getSessionDescription(ISarosSession sarosSession) {
 
-    final Set<saros.filesystem.IProject> projects = sarosSession.getProjects();
+    final Set<IReferencePoint> projects = sarosSession.getProjects();
 
     final StringBuilder result = new StringBuilder();
 
-    for (saros.filesystem.IProject project : projects) {
+    for (IReferencePoint project : projects) {
 
       final Pair<Long, Long> fileCountAndSize;
 
@@ -319,7 +320,7 @@ public class CollaborationUtils {
     return String.format(Locale.US, "%.2f GB", size / (1000F * 1000F * 1000F));
   }
 
-  private static Set<saros.filesystem.IProject> convert(Set<IProject> projects) {
+  private static Set<IReferencePoint> convert(Set<IProject> projects) {
     return projects.stream().map(ResourceAdapterFactory::create).collect(Collectors.toSet());
   }
 

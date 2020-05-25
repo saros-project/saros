@@ -37,7 +37,7 @@ import saros.communication.extensions.KickUserExtension;
 import saros.communication.extensions.LeaveSessionExtension;
 import saros.concurrent.management.ConcurrentDocumentClient;
 import saros.context.IContainerContext;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.net.IConnectionManager;
 import saros.net.ITransmitter;
@@ -89,7 +89,7 @@ public final class SarosSession implements ISarosSession {
   private final CopyOnWriteArrayList<IActivityProducer> activityProducers =
       new CopyOnWriteArrayList<IActivityProducer>();
 
-  private final Set<IProject> filteredProjects = new CopyOnWriteArraySet<>();
+  private final Set<IReferencePoint> filteredProjects = new CopyOnWriteArraySet<>();
 
   private final List<IActivityConsumer> activeActivityConsumers =
       new CopyOnWriteArrayList<IActivityConsumer>();
@@ -160,7 +160,7 @@ public final class SarosSession implements ISarosSession {
           if (activity instanceof IResourceActivity) {
             IResource resource = ((IResourceActivity<? extends IResource>) activity).getResource();
 
-            if (resource != null && filteredProjects.contains(resource.getProject())) {
+            if (resource != null && filteredProjects.contains(resource.getReferencePoint())) {
               log.debug("Dropped activity for resource of filtered project: " + activity);
 
               return;
@@ -220,7 +220,7 @@ public final class SarosSession implements ISarosSession {
   }
 
   @Override
-  public void addSharedProject(IProject project, String projectID) {
+  public void addSharedProject(IReferencePoint project, String projectID) {
     if (!projectMapper.isShared(project)) {
       projectMapper.addProject(projectID, project);
 
@@ -245,7 +245,7 @@ public final class SarosSession implements ISarosSession {
   }
 
   @Override
-  public boolean userHasProject(User user, IProject project) {
+  public boolean userHasProject(User user, IReferencePoint project) {
     return projectMapper.userHasProject(user, project);
   }
 
@@ -502,7 +502,7 @@ public final class SarosSession implements ISarosSession {
   }
 
   @Override
-  public void setActivityExecution(IProject project, boolean enabled) {
+  public void setActivityExecution(IReferencePoint project, boolean enabled) {
     if (project != null) {
       if (!enabled) {
         filteredProjects.add(project);
@@ -513,7 +513,7 @@ public final class SarosSession implements ISarosSession {
   }
 
   @Override
-  public Set<IProject> getProjects() {
+  public Set<IReferencePoint> getProjects() {
     return projectMapper.getProjects();
   }
 
@@ -709,17 +709,17 @@ public final class SarosSession implements ISarosSession {
   }
 
   @Override
-  public String getProjectID(IProject project) {
+  public String getProjectID(IReferencePoint project) {
     return projectMapper.getID(project);
   }
 
   @Override
-  public IProject getProject(String projectID) {
+  public IReferencePoint getProject(String projectID) {
     return projectMapper.getProject(projectID);
   }
 
   @Override
-  public void addProjectMapping(String projectID, IProject project) {
+  public void addProjectMapping(String projectID, IReferencePoint project) {
     if (projectMapper.getProject(projectID) == null) {
       projectMapper.addProject(projectID, project);
       listenerDispatch.projectAdded(project);
@@ -727,7 +727,7 @@ public final class SarosSession implements ISarosSession {
   }
 
   @Override
-  public void removeProjectMapping(String projectID, IProject project) {
+  public void removeProjectMapping(String projectID, IReferencePoint project) {
     if (projectMapper.getProject(projectID) != null) {
       projectMapper.removeProject(projectID);
       listenerDispatch.projectRemoved(project);
@@ -766,12 +766,12 @@ public final class SarosSession implements ISarosSession {
   }
 
   @Override
-  public void enableQueuing(IProject project) {
+  public void enableQueuing(IReferencePoint project) {
     activityQueuer.enableQueuing(project);
   }
 
   @Override
-  public void disableQueuing(IProject project) {
+  public void disableQueuing(IReferencePoint project) {
     activityQueuer.disableQueuing(project);
     // send us a dummy activity to ensure the queues get flushed
     sendActivity(Collections.singletonList(localUser), new NOPActivity(localUser, localUser, 0));

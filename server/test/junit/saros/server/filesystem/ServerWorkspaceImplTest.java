@@ -15,7 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 import saros.exceptions.OperationCanceledException;
 import saros.filesystem.IPath;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IWorkspaceRunnable;
 import saros.monitoring.IProgressMonitor;
 
@@ -42,7 +42,7 @@ public class ServerWorkspaceImplTest extends EasyMockSupport {
 
   @Test
   public void getProject() {
-    IProject project = workspace.getProject("project");
+    IReferencePoint project = workspace.getProject("project");
     assertEquals("project", project.getName());
     assertSame(workspace, ((ServerProjectImpl) project).getWorkspace());
   }

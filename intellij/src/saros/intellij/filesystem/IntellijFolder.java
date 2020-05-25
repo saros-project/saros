@@ -175,7 +175,7 @@ public class IntellijFolder extends AbstractIntellijResource implements IFolder 
   private void createInternal() throws IOException {
     IResource parent = getParent();
 
-    VirtualFile parentFile = referencePoint.findVirtualFile(parent.getProjectRelativePath());
+    VirtualFile parentFile = referencePoint.findVirtualFile(parent.getReferencePointRelativePath());
 
     if (parentFile == null || !parentFile.exists()) {
       throw new FileNotFoundException(

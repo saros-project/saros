@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.apache.log4j.Logger;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.server.filesystem.ServerProjectImpl;
 import saros.server.filesystem.ServerWorkspaceImpl;
 import saros.session.ISarosSession;
@@ -43,10 +43,10 @@ public class ShareCommand extends ConsoleCommand {
     }
 
     try {
-      Set<IProject> projects = new HashSet<>();
+      Set<IReferencePoint> projects = new HashSet<>();
       for (String path : args) {
         try {
-          IProject project = new ServerProjectImpl(this.workspace, path);
+          IReferencePoint project = new ServerProjectImpl(this.workspace, path);
           projects.add(project);
         } catch (Exception e) {
           log.error(path + " could not be added to the session", e);

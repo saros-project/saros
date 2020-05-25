@@ -414,9 +414,9 @@ abstract class AbstractEditorAnnotation {
               + ", "
               + end
               + ") for the file "
-              + file.getProject().getName()
+              + file.getReferencePoint().getName()
               + " - "
-              + file.getProjectRelativePath()
+              + file.getReferencePointRelativePath()
               + " failed as the given end position is located after the "
               + "document end. document length: "
               + documentLength

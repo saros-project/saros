@@ -7,7 +7,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.monitoring.NullProgressMonitor;
 import saros.negotiation.AbstractIncomingProjectNegotiation;
 import saros.negotiation.AbstractOutgoingProjectNegotiation;
@@ -136,11 +136,11 @@ public class NegotiationHandler implements INegotiationHandler {
   public void handleIncomingProjectNegotiation(
       final AbstractIncomingProjectNegotiation negotiation) {
 
-    Map<String, IProject> projectMapping = new HashMap<>();
+    Map<String, IReferencePoint> projectMapping = new HashMap<>();
 
     for (ProjectNegotiationData data : negotiation.getProjectNegotiationData()) {
       String projectName = data.getProjectName();
-      IProject project = workspace.getProject(projectName);
+      IReferencePoint project = workspace.getProject(projectName);
 
       // TODO: The file path is currently dictated by the name, potentially resulting in CONFLICTS
       if (!project.exists()) {

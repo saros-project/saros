@@ -19,6 +19,7 @@ import saros.activities.IActivity;
 import saros.activities.IResourceActivity;
 import saros.annotations.Component;
 import saros.editor.EditorManager;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.filesystem.ResourceAdapterFactory;
 import saros.observables.FileReplacementInProgressObservable;
@@ -91,7 +92,7 @@ public class SharedResourcesManager extends AbstractActivityProducer
       new ISessionListener() {
 
         @Override
-        public void projectAdded(saros.filesystem.IProject project) {
+        public void projectAdded(IReferencePoint project) {
           synchronized (projectStates) {
             IProject eclipseProject = (IProject) ResourceAdapterFactory.convertBack(project);
             projectStates.put(eclipseProject, eclipseProject.isOpen());
@@ -99,7 +100,7 @@ public class SharedResourcesManager extends AbstractActivityProducer
         }
 
         @Override
-        public void projectRemoved(saros.filesystem.IProject project) {
+        public void projectRemoved(IReferencePoint project) {
           synchronized (projectStates) {
             IProject eclipseProject = (IProject) ResourceAdapterFactory.convertBack(project);
             projectStates.remove(eclipseProject);

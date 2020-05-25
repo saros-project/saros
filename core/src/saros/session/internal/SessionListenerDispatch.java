@@ -1,7 +1,7 @@
 package saros.session.internal;
 
 import java.util.concurrent.CopyOnWriteArrayList;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.session.ISessionListener;
 import saros.session.User;
 
@@ -42,17 +42,17 @@ public class SessionListenerDispatch implements ISessionListener {
   }
 
   @Override
-  public void projectAdded(IProject project) {
+  public void projectAdded(IReferencePoint project) {
     for (ISessionListener listener : listeners) listener.projectAdded(project);
   }
 
   @Override
-  public void projectRemoved(IProject project) {
+  public void projectRemoved(IReferencePoint project) {
     for (ISessionListener listener : listeners) listener.projectRemoved(project);
   }
 
   @Override
-  public void resourcesAdded(IProject project) {
+  public void resourcesAdded(IReferencePoint project) {
     for (ISessionListener listener : listeners) listener.resourcesAdded(project);
   }
 

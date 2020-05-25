@@ -2,7 +2,7 @@ package saros.ui.util;
 
 import java.util.List;
 import java.util.Set;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.net.xmpp.JID;
 import saros.session.ISarosSession;
 
@@ -17,7 +17,7 @@ public interface ICollaborationUtils {
    * @param contacts which should be invited
    * @nonBlocking
    */
-  public void startSession(Set<IProject> projects, List<JID> contacts);
+  public void startSession(Set<IReferencePoint> projects, List<JID> contacts);
 
   /**
    * Leaves the currently running {@link ISarosSession}<br>
@@ -32,7 +32,7 @@ public interface ICollaborationUtils {
    * @param projects the projects to add to the session
    * @nonBlocking
    */
-  public void addProjectsToSession(Set<IProject> projects);
+  public void addProjectsToSession(Set<IReferencePoint> projects);
 
   /**
    * Adds the given contacts to the session.<br>

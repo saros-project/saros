@@ -14,7 +14,7 @@ import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
 import saros.filesystem.IPath;
 import saros.filesystem.IPathFactory;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.filesystem.IResource.Type;
 import saros.session.ISarosSession;
@@ -40,7 +40,7 @@ public class ResourceTransportWrapperConverterTest {
   private static IFile file;
   private static IFolder folder;
 
-  private static IProject project;
+  private static IReferencePoint project;
   private static IPathFactory pathFactory;
 
   @BeforeClass
@@ -50,7 +50,7 @@ public class ResourceTransportWrapperConverterTest {
     IPath filePath = EasyMock.createMock(IPath.class);
     IPath folderPath = EasyMock.createMock(IPath.class);
     pathFactory = EasyMock.createMock(IPathFactory.class);
-    project = EasyMock.createNiceMock(IProject.class);
+    project = EasyMock.createNiceMock(IReferencePoint.class);
     file = EasyMock.createNiceMock(IFile.class);
     folder = EasyMock.createNiceMock(IFolder.class);
 
@@ -73,12 +73,12 @@ public class ResourceTransportWrapperConverterTest {
     expect(project.getFile(filePath)).andStubReturn(file);
     expect(project.getFolder(folderPath)).andStubReturn(folder);
 
-    expect(file.getProject()).andStubReturn(project);
-    expect(file.getProjectRelativePath()).andStubReturn(filePath);
+    expect(file.getReferencePoint()).andStubReturn(project);
+    expect(file.getReferencePointRelativePath()).andStubReturn(filePath);
     expect(file.getType()).andStubReturn(Type.FILE);
 
-    expect(folder.getProject()).andStubReturn(project);
-    expect(folder.getProjectRelativePath()).andStubReturn(folderPath);
+    expect(folder.getReferencePoint()).andStubReturn(project);
+    expect(folder.getReferencePointRelativePath()).andStubReturn(folderPath);
     expect(folder.getType()).andStubReturn(Type.FOLDER);
 
     EasyMock.replay(filePath, folderPath, pathFactory, project, file, folder);

@@ -31,7 +31,7 @@ import saros.editor.text.LineRange;
 import saros.editor.text.TextPosition;
 import saros.editor.text.TextSelection;
 import saros.filesystem.IFile;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.intellij.context.SharedIDEContext;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.eventhandler.IProjectEventHandler.ProjectEventHandlerType;
@@ -220,7 +220,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
             @NotNull String replacedText,
             @NotNull String newText) {
 
-          Project project = ((IntellijReferencePoint) file.getProject()).getIntellijProject();
+          Project project =
+              ((IntellijReferencePoint) file.getReferencePoint()).getIntellijProject();
 
           if (!replacedText.isEmpty()) {
             String documentReplacedText = document.getText(new TextRange(start, oldEnd));
@@ -393,7 +394,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
         }
 
         @Override
-        public void resourcesAdded(final IProject referencePoint) {
+        public void resourcesAdded(final IReferencePoint referencePoint) {
           executeInUIThreadSynchronous(() -> addReferencePointResources(referencePoint));
         }
 
@@ -407,8 +408,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
          * correctly set the active editor in the remote user editor state for the local user.
          *
          * <p>This will not be executed for the user that finished the resource negotiation as their
-         * user editor state will be propagated through {@link #resourcesAdded(IProject)} when the
-         * shared resources are initially added.
+         * user editor state will be propagated through {@link #resourcesAdded(IReferencePoint)}
+         * when the shared resources are initially added.
          */
         private void sendAwarenessInformation(@NotNull User user) {
           User localUser = session.getLocalUser();
@@ -552,7 +553,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    *
    * @param referencePoint the added reference point
    */
-  private void addReferencePointResources(IProject referencePoint) {
+  private void addReferencePointResources(IReferencePoint referencePoint) {
     IntellijReferencePoint intellijReferencePoint = (IntellijReferencePoint) referencePoint;
     Project intellijProject = intellijReferencePoint.getIntellijProject();
 
@@ -1102,7 +1103,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   }
 
   @Override
-  public void saveEditors(final IProject referencePoint) {
+  public void saveEditors(final IReferencePoint referencePoint) {
     DocumentAPI.saveAllDocuments();
   }
 
@@ -1138,7 +1139,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
     Set<String> visibleFilePaths = new HashSet<>();
 
-    Project project = ((IntellijReferencePoint) file.getProject()).getIntellijProject();
+    Project project = ((IntellijReferencePoint) file.getReferencePoint()).getIntellijProject();
 
     for (VirtualFile virtualFile : ProjectAPI.getSelectedFiles(project)) {
       visibleFilePaths.add(virtualFile.getPath());

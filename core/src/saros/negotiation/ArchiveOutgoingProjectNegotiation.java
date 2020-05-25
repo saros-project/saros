@@ -12,7 +12,7 @@ import saros.exceptions.LocalCancellationException;
 import saros.exceptions.OperationCanceledException;
 import saros.exceptions.SarosCancellationException;
 import saros.filesystem.IFile;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.filesystem.IWorkspace;
 import saros.filesystem.checksum.IChecksumCache;
@@ -145,7 +145,7 @@ public class ArchiveOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
     for (final FileList list : fileLists) {
       final String projectID = list.getProjectID();
 
-      final IProject project = projects.getProject(projectID);
+      final IReferencePoint project = projects.getProject(projectID);
 
       if (project == null)
         throw new LocalCancellationException(

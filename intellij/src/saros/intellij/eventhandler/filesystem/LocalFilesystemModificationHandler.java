@@ -1,6 +1,6 @@
 package saros.intellij.eventhandler.filesystem;
 
-import static saros.filesystem.IResource.Type.PROJECT;
+import static saros.filesystem.IResource.Type.REFERENCE_POINT;
 
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Document;
@@ -37,7 +37,7 @@ import saros.filesystem.IContainer;
 import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
 import saros.filesystem.IPath;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.intellij.editor.DocumentAPI;
 import saros.intellij.editor.EditorManager;
@@ -214,7 +214,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       log.trace("Reacting before resource contents changed: " + virtualFile);
     }
 
-    Set<IProject> sharedReferencePoints = session.getProjects();
+    Set<IReferencePoint> sharedReferencePoints = session.getProjects();
 
     IFile file = (IFile) VirtualFileConverter.convertToResource(sharedReferencePoints, virtualFile);
 
@@ -285,7 +285,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       log.trace("Reacting to resource creation: " + createdVirtualFile);
     }
 
-    Set<IProject> sharedReferencePoints = session.getProjects();
+    Set<IReferencePoint> sharedReferencePoints = session.getProjects();
 
     IResource resource =
         VirtualFileConverter.convertToResource(sharedReferencePoints, createdVirtualFile);
@@ -354,7 +354,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
               + copy);
     }
 
-    Set<IProject> sharedReferencePoints = session.getProjects();
+    Set<IReferencePoint> sharedReferencePoints = session.getProjects();
 
     IFile copyWrapper = (IFile) VirtualFileConverter.convertToResource(sharedReferencePoints, copy);
 
@@ -415,7 +415,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
    * @param deletedFolder the folder that was deleted
    */
   private void generateFolderDeletionActivity(@NotNull VirtualFile deletedFolder) {
-    Set<IProject> sharedReferencePoints = session.getProjects();
+    Set<IReferencePoint> sharedReferencePoints = session.getProjects();
 
     IContainer container =
         (IContainer) VirtualFileConverter.convertToResource(sharedReferencePoints, deletedFolder);
@@ -427,7 +427,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
       return;
 
-    } else if (container.getType() == PROJECT) {
+    } else if (container.getType() == REFERENCE_POINT) {
       log.error(
           "Local representation of reference point "
               + container
@@ -444,7 +444,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       return;
     }
 
-    IProject baseReferencePoint = container.getProject();
+    IReferencePoint baseReferencePoint = container.getReferencePoint();
 
     User user = session.getLocalUser();
 
@@ -505,7 +505,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
    * @param deletedFile the file that was deleted
    */
   private void generateFileDeletionActivity(VirtualFile deletedFile) {
-    Set<IProject> sharedReferencePoints = session.getProjects();
+    Set<IReferencePoint> sharedReferencePoints = session.getProjects();
 
     IFile file = (IFile) VirtualFileConverter.convertToResource(sharedReferencePoints, deletedFile);
 
@@ -609,7 +609,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     String folderName = newFolderName != null ? newFolderName : oldFile.getName();
 
-    Set<IProject> sharedReferencePoints = session.getProjects();
+    Set<IReferencePoint> sharedReferencePoints = session.getProjects();
 
     IContainer oldFolderWrapper =
         (IContainer) VirtualFileConverter.convertToResource(sharedReferencePoints, oldFile);
@@ -634,7 +634,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
       return;
 
-    } else if (oldFolderIsShared && oldFolderWrapper.getType() == PROJECT) {
+    } else if (oldFolderIsShared && oldFolderWrapper.getType() == REFERENCE_POINT) {
       if (ProjectAPI.isExcluded(project, newParent)) {
         log.error(
             "Local representation of reference point "
@@ -688,10 +688,10 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
           if (newFolderIsShared) {
             IFolder newFolder =
                 newParentWrapper
-                    .getProject()
+                    .getReferencePoint()
                     .getFolder(
                         newParentWrapper
-                            .getProjectRelativePath()
+                            .getReferencePointRelativePath()
                             .append(folderName)
                             .append(relativePath));
 
@@ -703,8 +703,9 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
           if (oldFolderIsShared) {
             IFolder oldFolder =
                 oldFolderWrapper
-                    .getProject()
-                    .getFolder(oldFolderWrapper.getProjectRelativePath().append(relativePath));
+                    .getReferencePoint()
+                    .getFolder(
+                        oldFolderWrapper.getReferencePointRelativePath().append(relativePath));
 
             if (!session.isShared(oldFolder)) {
               log.debug(
@@ -781,7 +782,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     String encoding = oldFile.getCharset().name();
 
-    Set<IProject> sharedReferencePoints = session.getProjects();
+    Set<IReferencePoint> sharedReferencePoints = session.getProjects();
 
     IFile oldFileWrapper =
         (IFile) VirtualFileConverter.convertToResource(sharedReferencePoints, oldFile);
@@ -824,8 +825,8 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       // moved file inside/between shared reference point(s)
       IFile newFileWrapper =
           newParentWrapper
-              .getProject()
-              .getFile(newParentWrapper.getProjectRelativePath().append(relativePath));
+              .getReferencePoint()
+              .getFile(newParentWrapper.getReferencePointRelativePath().append(relativePath));
 
       activity =
           new FileActivity(
@@ -847,8 +848,8 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
       IFile newFileWrapper =
           newParentWrapper
-              .getProject()
-              .getFile(newParentWrapper.getProjectRelativePath().append(relativePath));
+              .getReferencePoint()
+              .getFile(newParentWrapper.getReferencePointRelativePath().append(relativePath));
 
       activity =
           new FileActivity(
@@ -900,8 +901,8 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
     if (newFileIsShared && isOpenInTextEditor) {
       IFile newFileWrapper =
           newParentWrapper
-              .getProject()
-              .getFile(newParentWrapper.getProjectRelativePath().append(relativePath));
+              .getReferencePoint()
+              .getFile(newParentWrapper.getReferencePointRelativePath().append(relativePath));
 
       EditorActivity openNewEditorActivity =
           new EditorActivity(user, EditorActivity.Type.ACTIVATED, newFileWrapper);
@@ -960,11 +961,11 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
         VirtualFile parent = file.getParent();
 
         if (parent == null) {
-          Set<IProject> sharedReferencePoints = session.getProjects();
+          Set<IReferencePoint> sharedReferencePoints = session.getProjects();
           IResource resource = VirtualFileConverter.convertToResource(sharedReferencePoints, file);
 
           if (resource != null && session.isShared(resource)) {
-            if (resource.getType() == PROJECT) {
+            if (resource.getType() == REFERENCE_POINT) {
               if (log.isTraceEnabled()) {
                 log.trace("Ignoring rename of reference point base directory " + resource);
               }

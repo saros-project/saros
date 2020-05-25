@@ -2,7 +2,7 @@ package saros.negotiation;
 
 import java.util.HashSet;
 import java.util.Set;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 
 /**
  * This class collects resources that should be added to a session to add them at once in
@@ -10,14 +10,14 @@ import saros.filesystem.IProject;
  * running project negotiations per user.
  */
 public class ProjectNegotiationCollector {
-  private Set<IProject> projects = new HashSet<>();
+  private Set<IReferencePoint> projects = new HashSet<>();
 
   /**
    * Add projects for the next project negotiation.
    *
    * @param projectsToAdd projects to add
    */
-  public synchronized void addProjects(Set<IProject> projectsToAdd) {
+  public synchronized void addProjects(Set<IReferencePoint> projectsToAdd) {
     projects.addAll(projectsToAdd);
   }
 
@@ -28,8 +28,8 @@ public class ProjectNegotiationCollector {
    *
    * @return projects to add
    */
-  public synchronized Set<IProject> getProjects() {
-    Set<IProject> tmp = projects;
+  public synchronized Set<IReferencePoint> getProjects() {
+    Set<IReferencePoint> tmp = projects;
     projects = new HashSet<>();
 
     return tmp;

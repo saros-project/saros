@@ -12,11 +12,11 @@ import org.jetbrains.annotations.Nullable;
 import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
 import saros.filesystem.IPath;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 
 /** Intellij implementation of the Saros reference point interface. */
-public class IntellijReferencePoint implements IProject {
+public class IntellijReferencePoint implements IReferencePoint {
   private static final Logger log = Logger.getLogger(IntellijReferencePoint.class);
 
   /** The project instance the reference point is bound to. */
@@ -107,7 +107,7 @@ public class IntellijReferencePoint implements IProject {
 
   @Override
   @NotNull
-  public IPath getProjectRelativePath() {
+  public IPath getReferencePointRelativePath() {
     return IntellijPath.EMPTY;
   }
 

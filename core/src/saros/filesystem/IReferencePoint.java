@@ -3,38 +3,40 @@ package saros.filesystem;
 import java.io.IOException;
 
 /**
- * Represents a project in the local (virtual) file system.
+ * Represents a reference point in the local (virtual) file system.
  *
- * <p>Defines the project specific default behavior of methods defined by {@link IContainer}.
+ * <p>Defines the reference-point-specific default behavior of methods defined by {@link
+ * IContainer}.
  *
  * <p>This interface is under development. It is currently a placeholder and will be reworked once
  * the migration to reference points is completed.
  */
-public interface IProject extends IContainer {
+public interface IReferencePoint extends IContainer {
   /**
    * Returns an empty path.
    *
    * @return an empty path
    */
-  IPath getProjectRelativePath();
+  IPath getReferencePointRelativePath();
 
   /**
    * Always throws an IO exception.
    *
-   * <p>Deleting a project resource is not supported.
+   * <p>Deleting a reference point resource is not supported.
    *
    * @throws IOException always
    */
   default void delete() throws IOException {
-    throw new IOException("Deleting project resources is not supported - tried to delete " + this);
+    throw new IOException(
+        "Deleting reference point resources is not supported - tried to delete " + this);
   }
 
   /**
    * Always returns <code>null</code>.
    *
-   * <p>Resources above the shared project can not be described through (conventional) relative
-   * paths. Additionally, such resources are not part of the shared scope and should therefore not
-   * be of interest for Saros.
+   * <p>Resources above the shared reference point can not be described through (conventional)
+   * relative paths. Additionally, such resources are not part of the shared scope and should
+   * therefore not be of interest for Saros.
    *
    * @return <code>null</code>
    */
@@ -47,18 +49,18 @@ public interface IProject extends IContainer {
    *
    * @return a reference to itself
    */
-  default IProject getProject() {
+  default IReferencePoint getReferencePoint() {
     return this;
   }
 
   default Type getType() {
-    return Type.PROJECT;
+    return Type.REFERENCE_POINT;
   }
 
   /**
    * Returns <code>false</code>.
    *
-   * <p>Projects are the base for all shared resources and can therefore not be ignored.
+   * <p>Reference points are the base for all shared resources and can therefore not be ignored.
    *
    * @return <code>false</code>
    */

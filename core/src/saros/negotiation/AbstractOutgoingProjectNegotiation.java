@@ -15,7 +15,7 @@ import saros.communication.extensions.StartActivityQueuingResponse;
 import saros.editor.IEditorManager;
 import saros.exceptions.LocalCancellationException;
 import saros.exceptions.SarosCancellationException;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IWorkspace;
 import saros.filesystem.checksum.IChecksumCache;
 import saros.monitoring.IProgressMonitor;
@@ -108,7 +108,7 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
        * can thus safely assume these projects to be shared now.
        */
       if (!session.isHost()) {
-        for (IProject project : projects) {
+        for (IReferencePoint project : projects) {
           String projectID = projects.getProjectID(project);
           session.addSharedProject(project, projectID);
         }
@@ -320,7 +320,7 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
     List<ProjectNegotiationData> negData =
         new ArrayList<ProjectNegotiationData>(projectSharingData.size());
 
-    for (IProject project : projectSharingData) {
+    for (IReferencePoint project : projectSharingData) {
 
       if (monitor.isCanceled())
         throw new LocalCancellationException(null, CancelOption.DO_NOT_NOTIFY_PEER);

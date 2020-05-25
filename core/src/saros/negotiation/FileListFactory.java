@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
 import saros.filesystem.FileSystem;
 import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.filesystem.checksum.IChecksumCache;
 import saros.monitoring.IProgressMonitor;
@@ -21,7 +21,7 @@ import saros.negotiation.FileList.MetaData;
  *
  * <p>
  * <li>Either an inexpensive one that rescans the whole project to gather meta data:<br>
- *     {@link #createFileList(IProject, IChecksumCache, IProgressMonitor)}
+ *     {@link #createFileList(IReferencePoint, IChecksumCache, IProgressMonitor)}
  * <li>Or a cheap one which requires the caller to take care of the validity of input data:<br>
  *     {@link #createFileList(List)}
  */
@@ -69,7 +69,7 @@ public class FileListFactory {
    *     project or one of its folders, or the charset of a contained file could not be obtained
    */
   public static FileList createFileList(
-      final IProject project,
+      final IReferencePoint project,
       final IChecksumCache checksumCache,
       final IProgressMonitor suggestedMonitor)
       throws IOException {
@@ -96,7 +96,7 @@ public class FileListFactory {
    * @throws IOException if the members contained in the project or one of its folders or the
    *     charset of a contained file could not be obtained
    */
-  private static List<IFile> calculateMembers(final FileList list, final IProject project)
+  private static List<IFile> calculateMembers(final FileList list, final IReferencePoint project)
       throws IOException {
 
     List<IResource> resources = project.members();
@@ -112,7 +112,7 @@ public class FileListFactory {
 
       if (resource.isIgnored() || !resource.exists()) continue;
 
-      String path = resource.getProjectRelativePath().toPortableString();
+      String path = resource.getReferencePointRelativePath().toPortableString();
 
       if (list.contains(path)) continue;
 
@@ -152,9 +152,10 @@ public class FileListFactory {
 
     for (IFile file : files) {
       try {
-        monitor.subTask(file.getProject().getName() + ": " + file.getProjectRelativePath());
+        monitor.subTask(
+            file.getReferencePoint().getName() + ": " + file.getReferencePointRelativePath());
 
-        MetaData data = list.getMetaData(file.getProjectRelativePath().toPortableString());
+        MetaData data = list.getMetaData(file.getReferencePointRelativePath().toPortableString());
 
         Long checksum = null;
 

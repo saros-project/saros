@@ -4,16 +4,16 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 
 /**
  * Defines which projects and which of their resources) to share during a particular {@link
  * AbstractOutgoingProjectNegotiation}.
  */
-public class ProjectSharingData implements Iterable<IProject> {
+public class ProjectSharingData implements Iterable<IReferencePoint> {
 
-  private Map<String, IProject> projectsById = new HashMap<>();
-  private Map<IProject, String> idsByProject = new HashMap<>();
+  private Map<String, IReferencePoint> projectsById = new HashMap<>();
+  private Map<IReferencePoint, String> idsByProject = new HashMap<>();
 
   /**
    * Declares that the passed project should be shared with the specified ID.
@@ -21,7 +21,7 @@ public class ProjectSharingData implements Iterable<IProject> {
    * @param project project that should be shared
    * @param projectId session-wide ID assigned to the project
    */
-  public void addProject(IProject project, String projectId) {
+  public void addProject(IReferencePoint project, String projectId) {
     projectsById.put(projectId, project);
     idsByProject.put(project, projectId);
   }
@@ -32,7 +32,7 @@ public class ProjectSharingData implements Iterable<IProject> {
    * @param id project ID
    * @return project with the ID
    */
-  public IProject getProject(String id) {
+  public IReferencePoint getProject(String id) {
     return projectsById.get(id);
   }
 
@@ -52,7 +52,7 @@ public class ProjectSharingData implements Iterable<IProject> {
    * @param project
    * @return boolean indicating if the project is already contained in this collection
    */
-  public boolean hasProject(IProject project) {
+  public boolean hasProject(IReferencePoint project) {
     return idsByProject.containsKey(project);
   }
 
@@ -62,7 +62,7 @@ public class ProjectSharingData implements Iterable<IProject> {
    * @param project one of the to-be-shared projects
    * @return matching project ID
    */
-  public String getProjectID(IProject project) {
+  public String getProjectID(IReferencePoint project) {
     return idsByProject.get(project);
   }
 
@@ -85,7 +85,7 @@ public class ProjectSharingData implements Iterable<IProject> {
   }
 
   @Override
-  public Iterator<IProject> iterator() {
+  public Iterator<IReferencePoint> iterator() {
     return Collections.unmodifiableCollection(projectsById.values()).iterator();
   }
 }

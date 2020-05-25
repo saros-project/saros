@@ -39,7 +39,7 @@ import saros.concurrent.management.ConcurrentDocumentClient;
 import saros.concurrent.management.ConcurrentDocumentServer;
 import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.session.IActivityHandlerCallback;
 import saros.session.ISarosSession;
 import saros.session.User;
@@ -335,7 +335,7 @@ public class ActivityHandlerTest {
             })
         .anyTimes();
 
-    IProject project = EasyMock.createMock(IProject.class);
+    IReferencePoint project = EasyMock.createMock(IReferencePoint.class);
 
     EasyMock.expect(sessionMock.userHasProject(dave, project)).andStubReturn(false);
     for (User user : remoteUsersWithProjects) {
@@ -367,11 +367,11 @@ public class ActivityHandlerTest {
     activities.add(EasyMock.createNiceMock(ChecksumActivity.class));
 
     IFile file = EasyMock.createNiceMock(IFile.class);
-    EasyMock.expect(file.getProject()).andStubReturn(project);
+    EasyMock.expect(file.getReferencePoint()).andStubReturn(project);
     EasyMock.replay(file);
 
     IFolder folder = EasyMock.createNiceMock(IFolder.class);
-    EasyMock.expect(folder.getProject()).andStubReturn(project);
+    EasyMock.expect(folder.getReferencePoint()).andStubReturn(project);
     EasyMock.replay(folder);
 
     // Assign Targets and Source to activities

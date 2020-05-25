@@ -32,6 +32,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
+import saros.filesystem.IReferencePoint;
 import saros.negotiation.ProjectNegotiationData;
 import saros.net.IConnectionManager;
 import saros.net.xmpp.JID;
@@ -381,7 +382,7 @@ public class EnterProjectNamePage extends WizardPage {
       String projectID = entry.getKey();
       ProjectOptionComposite projectOptionComposite = entry.getValue();
 
-      saros.filesystem.IProject project = session.getProject(projectID);
+      IReferencePoint project = session.getProject(projectID);
 
       // not shared yet
       if (project == null) continue;
@@ -397,7 +398,7 @@ public class EnterProjectNamePage extends WizardPage {
       String projectID = entry.getKey();
       ProjectOptionComposite projectOptionComposite = entry.getValue();
 
-      saros.filesystem.IProject project = session.getProject(projectID);
+      IReferencePoint project = session.getProject(projectID);
 
       // already shared
       if (project != null) continue;
