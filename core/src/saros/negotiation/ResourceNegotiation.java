@@ -34,15 +34,16 @@ public abstract class ResourceNegotiation extends Negotiation {
   public static final String TRANSFER_ID_PREFIX = "saros-dpp-pn-server-client/";
 
   /**
-   * Delimiter for every Zip entry to delimit the project id from the path entry.
+   * Delimiter for every Zip entry to delimit the reference point id from the path entry.
    *
    * <p>E.g: <b>12345:foo/bar/foobar.java</b>
    */
   protected static final String PATH_DELIMITER = ":";
 
-  /** Timeout for all packet exchanges during the project negotiation */
+  // TODO this is defined nowhere
+  /** Timeout for all packet exchanges during the resource negotiation */
   protected static final long PACKET_TIMEOUT =
-      Long.getLong("saros.negotiation.project.PACKET_TIMEOUT", 30000L);
+      Long.getLong("saros.negotiation.resource.PACKET_TIMEOUT", 30000L);
 
   protected final ISarosSessionManager sessionManager;
 
@@ -96,7 +97,9 @@ public abstract class ResourceNegotiation extends Negotiation {
     if (cause.getCancelOption() != CancelOption.NOTIFY_PEER) return;
 
     log.debug(
-        "notifying remote contact " + getPeer() + " of the local project negotiation cancellation");
+        "notifying remote contact "
+            + getPeer()
+            + " of the local resource negotiation cancellation");
 
     PacketExtension notification =
         CancelProjectNegotiationExtension.PROVIDER.create(
