@@ -180,7 +180,6 @@ public class ConnectionHandler {
     this.callback = callback;
   }
 
-  // TODO move messages to CoreMessages
   private static String generateConnectingFailureErrorMessage(
       XMPPAccount account, Exception exception) {
     if (!(exception instanceof XMPPException)) {
@@ -193,29 +192,20 @@ public class ConnectionHandler {
     XMPPException xmppException = (XMPPException) exception;
     XMPPError error = xmppException.getXMPPError();
 
-    if (error != null && error.getCode() == 504)
-      return "The XMPP server "
-          + account.getDomain()
-          + " could not be found. Make sure that you are connected to the internet and that you entered the domain part of your JID correctly.\n\n"
-          // TODO re-add when settings are implemented
-          /*+ "In case of DNS or SRV problems please try to manually configure the server address and port under the advanced settings for this account or update the hosts file of your OS.\n\n"*/
-          + "Detailed error:\nSMACK: "
-          + error
-          + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-          + xmppException.getMessage();
-    else if (error != null && error.getCode() == 502)
-      return "Could not connect to the XMPP server "
-          + account.getDomain()
-          + (account.getPort() != 0 ? (":" + account.getPort()) : "")
-          + ". Make sure that a XMPP service is running on the given domain / IP address and port.\n\n"
-          // TODO re-add when settings are implemented
-          /*+ "In case of DNS or SRV problems please try to manually configure the server address and port under the advanced settings for this account or update the hosts file of your OS.\n\n"*/
-          + "Detailed error:\nSMACK: "
-          + error
-          + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-          + xmppException.getMessage();
-
-    String message = null;
+    if (error != null && error.getCode() == 504) {
+      return MessageFormat.format(
+          CoreMessages.ConnectingFailureHandler_server_not_found,
+          account.getDomain(),
+          error,
+          xmppException.getMessage());
+    } else if (error != null && error.getCode() == 502) {
+      return MessageFormat.format(
+          CoreMessages.ConnectingFailureHandler_server_not_connect,
+          account.getDomain(),
+          (account.getPort() != 0 ? (":" + account.getPort()) : ""),
+          error,
+          xmppException.getMessage());
+    }
 
     String errorMessage = xmppException.getMessage();
 
@@ -227,28 +217,18 @@ public class ConnectionHandler {
           || errorMessage.toLowerCase().contains("403") // non SASL //$NON-NLS-1$
           || errorMessage.toLowerCase().contains("401")) { // non SASL //$NON-NLS-1$
 
-        message =
-            MessageFormat.format(
-                CoreMessages.ConnectingFailureHandler_invalid_username_password_message,
-                account.getUsername(),
-                account.getDomain());
+        return MessageFormat.format(
+            CoreMessages.ConnectingFailureHandler_invalid_username_password_message,
+            account.getUsername(),
+            account.getDomain());
 
       } else if (errorMessage.toLowerCase().contains("503")) { // $NON-NLS-1$
-        message =
-            "The XMPP server only allows authentication via SASL.\n"
-                // TODO replace when settings are implemented
-                /*+ "Please enable SASL for the current account in the account options and try again.";*/
-                + "This is currently not supported by the Saros/I client.";
+        return CoreMessages.ConnectingFailureHandler_only_sasl_allowed;
       }
     }
 
-    if (message == null) {
-      message =
-          MessageFormat.format(
-              CoreMessages.ConnectingFailureHandler_unknown_error_message, account, xmppException);
-    }
-
-    return message;
+    return MessageFormat.format(
+        CoreMessages.ConnectingFailureHandler_unknown_error_message, account, xmppException);
   }
 
   private void disconnectXMPPInternal() {
