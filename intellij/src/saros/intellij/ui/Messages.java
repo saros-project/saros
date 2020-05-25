@@ -5,7 +5,7 @@ import saros.util.MessageUtils;
 /** UI message bundle. */
 public class Messages {
 
-  private static final String BUNDLE_NAME = Messages.class.getName().toLowerCase();
+  private static final String BUNDLE_NAME = "messages.IntellijMessages";
 
   static {
     MessageUtils.initializeMessages(BUNDLE_NAME, Messages.class);
