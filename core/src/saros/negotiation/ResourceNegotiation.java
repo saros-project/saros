@@ -4,7 +4,7 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.packet.PacketExtension;
 import org.jivesoftware.smackx.filetransfer.FileTransfer;
-import saros.communication.extensions.CancelProjectNegotiationExtension;
+import saros.communication.extensions.CancelResourceNegotiationExtension;
 import saros.exceptions.LocalCancellationException;
 import saros.exceptions.RemoteCancellationException;
 import saros.exceptions.SarosCancellationException;
@@ -102,8 +102,8 @@ public abstract class ResourceNegotiation extends Negotiation {
             + " of the local resource negotiation cancellation");
 
     PacketExtension notification =
-        CancelProjectNegotiationExtension.PROVIDER.create(
-            new CancelProjectNegotiationExtension(getSessionID(), getID(), cause.getMessage()));
+        CancelResourceNegotiationExtension.PROVIDER.create(
+            new CancelResourceNegotiationExtension(getSessionID(), getID(), cause.getMessage()));
 
     try {
       transmitter.send(ISarosSession.SESSION_CONNECTION_ID, getPeer(), notification);

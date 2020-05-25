@@ -6,7 +6,7 @@ import org.apache.log4j.Logger;
 import saros.account.XMPPAccountStore;
 import saros.communication.extensions.ActivitiesExtension;
 import saros.communication.extensions.CancelInviteExtension;
-import saros.communication.extensions.CancelProjectNegotiationExtension;
+import saros.communication.extensions.CancelResourceNegotiationExtension;
 import saros.communication.extensions.ConnectionEstablishedExtension;
 import saros.communication.extensions.InfoExchangeExtension;
 import saros.communication.extensions.InvitationAcceptedExtension;
@@ -125,7 +125,7 @@ public class ContainerContext implements IContainerContext {
       Class.forName(ConnectionEstablishedExtension.class.getName());
 
       // Project negotiation extensions
-      Class.forName(CancelProjectNegotiationExtension.class.getName());
+      Class.forName(CancelResourceNegotiationExtension.class.getName());
       Class.forName(ProjectNegotiationOfferingExtension.class.getName());
       Class.forName(ProjectNegotiationMissingFilesExtension.class.getName());
 
