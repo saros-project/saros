@@ -41,10 +41,10 @@ import saros.negotiation.NegotiationFactory;
 import saros.negotiation.NegotiationListener;
 import saros.negotiation.NegotiationTools.CancelOption;
 import saros.negotiation.OutgoingSessionNegotiation;
-import saros.negotiation.ProjectNegotiation;
 import saros.negotiation.ProjectNegotiationCollector;
 import saros.negotiation.ProjectNegotiationData;
 import saros.negotiation.ProjectSharingData;
+import saros.negotiation.ResourceNegotiation;
 import saros.negotiation.SessionNegotiation;
 import saros.negotiation.hooks.ISessionNegotiationHook;
 import saros.negotiation.hooks.SessionNegotiationHookManager;
@@ -127,7 +127,7 @@ public class SarosSessionManager implements ISarosSessionManager {
         }
 
         @Override
-        public void negotiationTerminated(final ProjectNegotiation negotiation) {
+        public void negotiationTerminated(final ResourceNegotiation negotiation) {
           currentProjectNegotiations.remove(negotiation);
 
           if (session != null
@@ -784,7 +784,7 @@ public class SarosSessionManager implements ISarosSessionManager {
       negotiation.localCancel(null, CancelOption.NOTIFY_PEER);
     }
 
-    for (ProjectNegotiation negotiation : currentProjectNegotiations.list())
+    for (ResourceNegotiation negotiation : currentProjectNegotiations.list())
       negotiation.localCancel(null, CancelOption.NOTIFY_PEER);
 
     log.trace("waiting for all session and project negotiations to terminate");

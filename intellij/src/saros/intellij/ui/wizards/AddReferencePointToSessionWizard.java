@@ -44,8 +44,8 @@ import saros.negotiation.FileListDiff;
 import saros.negotiation.FileListFactory;
 import saros.negotiation.NegotiationTools;
 import saros.negotiation.NegotiationTools.CancelLocation;
-import saros.negotiation.ProjectNegotiation;
 import saros.negotiation.ProjectNegotiationData;
+import saros.negotiation.ResourceNegotiation;
 import saros.net.xmpp.JID;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.ISarosSession;
@@ -533,19 +533,19 @@ public class AddReferencePointToSessionWizard extends Wizard {
 
               @Override
               public void run(@NotNull ProgressIndicator indicator) {
-                final ProjectNegotiation.Status status =
+                final ResourceNegotiation.Status status =
                     negotiation.run(localReferencePoints, new ProgressMonitorAdapter(indicator));
 
                 indicator.stop();
 
-                if (status == ProjectNegotiation.Status.ERROR) {
+                if (status == ResourceNegotiation.Status.ERROR) {
                   NotificationPanel.showError(
                       MessageFormat.format(
                           Messages.AddReferencePointToSessionWizard_negotiation_error_message,
                           negotiation.getErrorMessage()),
                       Messages.AddReferencePointToSessionWizard_negotiation_error_title);
 
-                } else if (status == ProjectNegotiation.Status.OK) {
+                } else if (status == ResourceNegotiation.Status.OK) {
                   NotificationPanel.showInformation(
                       Messages.AddReferencePointToSessionWizard_negotiation_successful_message,
                       Messages.AddReferencePointToSessionWizard_negotiation_successful_title);

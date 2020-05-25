@@ -43,7 +43,7 @@ import saros.session.SessionEndReason;
  * <p>Concrete implementations need to provide an implementation to exchange the calculated
  * differences. This class only provides the initial setup and calculation.
  */
-public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiation {
+public abstract class AbstractIncomingProjectNegotiation extends ResourceNegotiation {
 
   private static final Logger log = Logger.getLogger(AbstractIncomingProjectNegotiation.class);
 

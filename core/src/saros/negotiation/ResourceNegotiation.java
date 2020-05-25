@@ -26,9 +26,9 @@ import saros.session.ISarosSessionManager;
  * This abstract class is the superclass for {@link AbstractOutgoingProjectNegotiation} and {@link
  * AbstractIncomingProjectNegotiation}.
  */
-public abstract class ProjectNegotiation extends Negotiation {
+public abstract class ResourceNegotiation extends Negotiation {
 
-  private static final Logger log = Logger.getLogger(ProjectNegotiation.class);
+  private static final Logger log = Logger.getLogger(ResourceNegotiation.class);
 
   /** Prefix part of the id used in the SMACK XMPP file transfer protocol. */
   public static final String TRANSFER_ID_PREFIX = "saros-dpp-pn-server-client/";
@@ -56,7 +56,7 @@ public abstract class ProjectNegotiation extends Negotiation {
 
   protected final XMPPFileTransferManager fileTransferManager;
 
-  public ProjectNegotiation(
+  public ResourceNegotiation(
       final String id,
       final JID peer,
       final ISarosSessionManager sessionManager,

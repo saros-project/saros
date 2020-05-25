@@ -7,34 +7,34 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
-import saros.negotiation.ProjectNegotiation;
+import saros.negotiation.ResourceNegotiation;
 import saros.net.xmpp.JID;
 
 /**
- * Observable which keeps track of all {@link ProjectNegotiation project negotiations} currently
+ * Observable which keeps track of all {@link ResourceNegotiation project negotiations} currently
  * running.
  */
 final class ProjectNegotiationObservable {
 
   private static final Logger log = Logger.getLogger(ProjectNegotiationObservable.class);
 
-  private final Map<JID, List<ProjectNegotiation>> negotiations =
-      new HashMap<JID, List<ProjectNegotiation>>();
+  private final Map<JID, List<ResourceNegotiation>> negotiations =
+      new HashMap<JID, List<ResourceNegotiation>>();
 
   /**
    * Returns the project negotiation for the given JID with the given id.
    *
    * @param jid the JID to lookup
    * @param id the ID to lookup
-   * @return the current {@link ProjectNegotiation project negotiation} or <code>null</code> if no
+   * @return the current {@link ResourceNegotiation project negotiation} or <code>null</code> if no
    *     such negotiation exists
    */
-  public synchronized ProjectNegotiation get(final JID jid, final String id) {
-    final List<ProjectNegotiation> currentNegotiations = negotiations.get(jid);
+  public synchronized ResourceNegotiation get(final JID jid, final String id) {
+    final List<ResourceNegotiation> currentNegotiations = negotiations.get(jid);
 
     if (currentNegotiations == null || currentNegotiations.isEmpty()) return null;
 
-    for (final ProjectNegotiation negotiation : currentNegotiations)
+    for (final ResourceNegotiation negotiation : currentNegotiations)
       if (negotiation.getID().equals(id)) return negotiation;
 
     return null;
@@ -45,15 +45,15 @@ final class ProjectNegotiationObservable {
    *
    * @param negotiation the project negotiation to add
    */
-  public synchronized void add(final ProjectNegotiation negotiation) {
-    List<ProjectNegotiation> currentNegotiations = negotiations.get(negotiation.getPeer());
+  public synchronized void add(final ResourceNegotiation negotiation) {
+    List<ResourceNegotiation> currentNegotiations = negotiations.get(negotiation.getPeer());
 
     if (currentNegotiations == null) {
-      currentNegotiations = new ArrayList<ProjectNegotiation>();
+      currentNegotiations = new ArrayList<ResourceNegotiation>();
       negotiations.put(negotiation.getPeer(), currentNegotiations);
     }
 
-    for (final ProjectNegotiation currentNegotiation : currentNegotiations) {
+    for (final ResourceNegotiation currentNegotiation : currentNegotiations) {
       if (currentNegotiation.getID().equals(negotiation.getID())) {
         log.warn(
             negotiation.getPeer()
@@ -72,14 +72,14 @@ final class ProjectNegotiationObservable {
    *
    * @param negotiation the project negotiation to remove
    */
-  public synchronized void remove(ProjectNegotiation negotiation) {
-    List<ProjectNegotiation> currentNegotiations = negotiations.get(negotiation.getPeer());
+  public synchronized void remove(ResourceNegotiation negotiation) {
+    List<ResourceNegotiation> currentNegotiations = negotiations.get(negotiation.getPeer());
 
     if (currentNegotiations == null) currentNegotiations = Collections.emptyList();
 
-    for (final Iterator<ProjectNegotiation> it = currentNegotiations.iterator(); it.hasNext(); ) {
+    for (final Iterator<ResourceNegotiation> it = currentNegotiations.iterator(); it.hasNext(); ) {
 
-      final ProjectNegotiation currentNegotiation = it.next();
+      final ResourceNegotiation currentNegotiation = it.next();
       if (currentNegotiation.getID().equals(negotiation.getID())) {
         it.remove();
         return;
@@ -98,10 +98,10 @@ final class ProjectNegotiationObservable {
    *
    * @return a list of all currently running project negotiations
    */
-  public synchronized List<ProjectNegotiation> list() {
-    final List<ProjectNegotiation> currentNegotiations = new ArrayList<ProjectNegotiation>();
+  public synchronized List<ResourceNegotiation> list() {
+    final List<ResourceNegotiation> currentNegotiations = new ArrayList<ResourceNegotiation>();
 
-    for (final List<ProjectNegotiation> negotiationList : negotiations.values())
+    for (final List<ResourceNegotiation> negotiationList : negotiations.values())
       currentNegotiations.addAll(negotiationList);
 
     return currentNegotiations;
@@ -113,7 +113,7 @@ final class ProjectNegotiationObservable {
    * @return <tt>true</tt> if no running negotiations exist
    */
   public synchronized boolean isEmpty() {
-    for (List<ProjectNegotiation> negotiationList : negotiations.values()) {
+    for (List<ResourceNegotiation> negotiationList : negotiations.values()) {
       if (!negotiationList.isEmpty()) {
         return false;
       }

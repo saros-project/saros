@@ -21,7 +21,7 @@ import saros.negotiation.AbstractIncomingProjectNegotiation;
 import saros.negotiation.AbstractOutgoingProjectNegotiation;
 import saros.negotiation.IncomingSessionNegotiation;
 import saros.negotiation.OutgoingSessionNegotiation;
-import saros.negotiation.ProjectNegotiation;
+import saros.negotiation.ResourceNegotiation;
 import saros.negotiation.SessionNegotiation;
 import saros.net.util.XMPPUtils;
 import saros.net.xmpp.JID;
@@ -192,7 +192,7 @@ public class NegotiationHandler implements INegotiationHandler {
     @Override
     protected IStatus run(IProgressMonitor monitor) {
       try {
-        ProjectNegotiation.Status status = negotiation.run(monitor);
+        ResourceNegotiation.Status status = negotiation.run(monitor);
         String peerName = getNickname(new JID(peer));
 
         final String message;

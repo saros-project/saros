@@ -56,8 +56,8 @@ import saros.negotiation.FileListFactory;
 import saros.negotiation.NegotiationTools;
 import saros.negotiation.NegotiationTools.CancelLocation;
 import saros.negotiation.NegotiationTools.CancelOption;
-import saros.negotiation.ProjectNegotiation;
 import saros.negotiation.ProjectNegotiationData;
+import saros.negotiation.ResourceNegotiation;
 import saros.net.IConnectionManager;
 import saros.net.xmpp.JID;
 import saros.preferences.Preferences;
@@ -338,7 +338,7 @@ public class AddProjectToSessionWizard extends Wizard {
                     entry.getKey(), ResourceAdapterFactory.create(entry.getValue()));
               }
 
-              final ProjectNegotiation.Status status =
+              final ResourceNegotiation.Status status =
                   negotiation.run(convertedMapping, ProgressMonitorAdapterFactory.convert(monitor));
 
               if (isAutoBuilding) {
@@ -350,7 +350,7 @@ public class AddProjectToSessionWizard extends Wizard {
                 }
               }
 
-              if (status != ProjectNegotiation.Status.OK) return Status.CANCEL_STATUS;
+              if (status != ResourceNegotiation.Status.OK) return Status.CANCEL_STATUS;
 
               final List<String> projectNames = new ArrayList<String>();
 
