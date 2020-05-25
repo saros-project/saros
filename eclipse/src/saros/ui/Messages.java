@@ -70,6 +70,8 @@ public class Messages extends NLS {
   public static String ChatRoomsComposite_muc_error_connecting_failed;
   public static String ChatRoomsComposite_muc_error_connecting_failed_unknown_error;
 
+  public static String ConnectingFailureHandler_ask_retry_error_message;
+
   /* chat */
   public static String OpenChatAction_MenuItem;
 
