@@ -31,6 +31,7 @@ If only the `saros.eclipse` version is increased, a Saros update (via the update
 * Click on `Build All`
 * The Update Site is created in the `Saros Update Site` project directory
 
+
 #### Drop-in
 
 * Open an eclipse instance which contains a working [Saros development setup](https://www.saros-project.org/contribute/development-environment.html)
@@ -63,6 +64,28 @@ The release artifacts are manually tested with at least one other person:
 * You have to install the artifact and start a session.
 * During this session you should check (at least) that the basic features are working.
 
+### Eclipse Update-site
+
+The following instructions use port `9090` and `8080` and a python development webserver
+(Use `python -m SimpleHTTPServer <port>` if you use `python2` instead of `python3`).
+However, you can use other HTTP-servers (e.g. the php development server) and ports.
+
+In order to test the update-site [you created](#update-site) (in this excample in the directory `<update-site-dir>`), you have to:
+1. **Host the update-site**
+  * Open a terminal
+  * Change the directory to `<update-site-dir>`
+  * Spawn a local HTTP-server that hosts the update-site content:<br/>
+    `python -m http.server 9090`
+2. **Host the composite update-site**
+  * In the directory `<saros-repo>/docs/update-site/eclipse` change the `location` reference in the files `compositeArtifacts.xml` and
+    `compositeContent.xml` to reference the locally hosted artifacts:<br/>
+    Change `<child location='https://saros-project.github.io/update-site-artifacts' />` to `<child location='http://localhost:9090' />`.
+  * Open a second terminal
+  * Change the directory to `<saros-repo>/docs/update-site/eclipse`
+  * Spawn a local HTTP-server that hosts the composite update-site:<br/>
+    `python -m http.server 8080`
+3. **Install Saros** via the composite update-site `http://localhost:8080`
+
 ## How do I release the artifacts?
 In the following the technical steps which are required for releasing artifacts are described.
 
@@ -81,7 +104,7 @@ The update site is hosted via GitHub Pages. Therefore you just have to change th
 in order to change the update site.
 
 **What is released via this channel?**
-We release the update site (which contains the Eclipse plug-in jars and additional resources) via this channel.
+We release the update site (which consists of: the directories `plugins` and `features`, and the Jars `artifacts.jar` and `content.jar`) via this channel.
 
 **Login process**
 
