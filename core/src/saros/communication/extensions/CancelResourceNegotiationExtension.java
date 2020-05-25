@@ -22,7 +22,7 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
  * class fields.
  */
 @XStreamAlias(/* ProjectNegotiationCancel */ "PNCL")
-public class CancelProjectNegotiationExtension extends SarosSessionPacketExtension {
+public class CancelResourceNegotiationExtension extends SarosSessionPacketExtension {
 
   public static final Provider PROVIDER = new Provider();
 
@@ -31,7 +31,7 @@ public class CancelProjectNegotiationExtension extends SarosSessionPacketExtensi
   @XStreamAlias("error")
   private String errorMessage;
 
-  public CancelProjectNegotiationExtension(
+  public CancelResourceNegotiationExtension(
       String sessionID, String negotiationID, String errorMessage) {
     super(sessionID);
 
@@ -86,9 +86,9 @@ public class CancelProjectNegotiationExtension extends SarosSessionPacketExtensi
    */
 
   public static class Provider
-      extends SarosSessionPacketExtension.Provider<CancelProjectNegotiationExtension> {
+      extends SarosSessionPacketExtension.Provider<CancelResourceNegotiationExtension> {
     private Provider() {
-      super("pncl", CancelProjectNegotiationExtension.class);
+      super("pncl", CancelResourceNegotiationExtension.class);
     }
   }
 }

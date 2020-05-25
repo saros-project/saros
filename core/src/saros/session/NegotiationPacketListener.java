@@ -6,7 +6,7 @@ import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
 import saros.communication.extensions.CancelInviteExtension;
-import saros.communication.extensions.CancelProjectNegotiationExtension;
+import saros.communication.extensions.CancelResourceNegotiationExtension;
 import saros.communication.extensions.InvitationAcknowledgedExtension;
 import saros.communication.extensions.InvitationOfferingExtension;
 import saros.communication.extensions.ProjectNegotiationOfferingExtension;
@@ -50,7 +50,7 @@ final class NegotiationPacketListener {
 
           receiver.addPacketListener(
               projectNegotiationCanceledListener,
-              CancelProjectNegotiationExtension.PROVIDER.getPacketFilter(session.getID()));
+              CancelResourceNegotiationExtension.PROVIDER.getPacketFilter(session.getID()));
         }
 
         @Override
@@ -110,8 +110,8 @@ final class NegotiationPacketListener {
         @Override
         public void processPacket(Packet packet) {
 
-          final CancelProjectNegotiationExtension extension =
-              CancelProjectNegotiationExtension.PROVIDER.getPayload(packet);
+          final CancelResourceNegotiationExtension extension =
+              CancelResourceNegotiationExtension.PROVIDER.getPayload(packet);
 
           if (extension == null) {
             log.warn("received malformed project negotiation packet from " + packet.getFrom());
