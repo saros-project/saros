@@ -2,7 +2,7 @@ package saros.negotiation;
 
 /**
  * Listener interface for signaling termination of {@link SessionNegotiation} and {@link
- * ProjectNegotiation} negotiations.
+ * ResourceNegotiation} negotiations.
  *
  * @author srossbach
  */
@@ -20,5 +20,5 @@ public interface NegotiationListener {
    *
    * @param negotiation the project negotiation that was terminated
    */
-  public void negotiationTerminated(ProjectNegotiation negotiation);
+  public void negotiationTerminated(ResourceNegotiation negotiation);
 }

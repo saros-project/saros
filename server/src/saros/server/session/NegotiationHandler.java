@@ -14,8 +14,8 @@ import saros.negotiation.AbstractOutgoingProjectNegotiation;
 import saros.negotiation.IncomingSessionNegotiation;
 import saros.negotiation.NegotiationTools;
 import saros.negotiation.OutgoingSessionNegotiation;
-import saros.negotiation.ProjectNegotiation;
 import saros.negotiation.ProjectNegotiationData;
+import saros.negotiation.ResourceNegotiation;
 import saros.negotiation.SessionNegotiation;
 import saros.net.xmpp.JID;
 import saros.server.ServerConfig;
@@ -119,14 +119,14 @@ public class NegotiationHandler implements INegotiationHandler {
         new Runnable() {
           @Override
           public void run() {
-            ProjectNegotiation.Status status;
+            ResourceNegotiation.Status status;
             if (ServerConfig.isInteractive()) {
               status = negotiation.run(new ConsoleProgressIndicator(System.out));
             } else {
               status = negotiation.run(new NullProgressMonitor());
             }
 
-            if (status != ProjectNegotiation.Status.OK)
+            if (status != ResourceNegotiation.Status.OK)
               handleErrorStatus(status, negotiation.getErrorMessage(), negotiation.getPeer());
           }
         });
@@ -160,20 +160,20 @@ public class NegotiationHandler implements INegotiationHandler {
         new Runnable() {
           @Override
           public void run() {
-            ProjectNegotiation.Status status;
+            ResourceNegotiation.Status status;
             if (ServerConfig.isInteractive()) {
               status = negotiation.run(projectMapping, new ConsoleProgressIndicator(System.out));
             } else {
               status = negotiation.run(projectMapping, new NullProgressMonitor());
             }
 
-            if (status != ProjectNegotiation.Status.OK)
+            if (status != ResourceNegotiation.Status.OK)
               handleErrorStatus(status, negotiation.getErrorMessage(), negotiation.getPeer());
           }
         });
   }
 
-  private void handleErrorStatus(ProjectNegotiation.Status status, String errorMessage, JID peer) {
+  private void handleErrorStatus(ResourceNegotiation.Status status, String errorMessage, JID peer) {
     switch (status) {
       case ERROR:
         log.error("ERROR running project negotiation: " + errorMessage);

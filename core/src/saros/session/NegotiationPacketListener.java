@@ -10,8 +10,8 @@ import saros.communication.extensions.CancelProjectNegotiationExtension;
 import saros.communication.extensions.InvitationAcknowledgedExtension;
 import saros.communication.extensions.InvitationOfferingExtension;
 import saros.communication.extensions.ProjectNegotiationOfferingExtension;
-import saros.negotiation.ProjectNegotiation;
 import saros.negotiation.ProjectNegotiationData;
+import saros.negotiation.ResourceNegotiation;
 import saros.negotiation.SessionNegotiation;
 import saros.net.IReceiver;
 import saros.net.ITransmitter;
@@ -281,7 +281,7 @@ final class NegotiationPacketListener {
   private void projectNegotiationCanceled(
       final JID sender, final String negotiationID, final String errorMessage) {
 
-    final ProjectNegotiation negotiation = projectNegotiations.get(sender, negotiationID);
+    final ResourceNegotiation negotiation = projectNegotiations.get(sender, negotiationID);
 
     if (negotiation != null) {
       log.debug(
