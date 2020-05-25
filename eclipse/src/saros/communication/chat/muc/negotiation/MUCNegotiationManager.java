@@ -5,15 +5,12 @@ import java.util.Map;
 import java.util.Random;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.jivesoftware.smack.Connection;
 import saros.communication.chat.muc.MultiUserChatPreferences;
 import saros.negotiation.hooks.ISessionNegotiationHook;
 import saros.negotiation.hooks.SessionNegotiationHookManager;
 import saros.net.util.XMPPUtils;
 import saros.net.xmpp.JID;
-import saros.net.xmpp.XMPPConnectionService;
 import saros.preferences.EclipsePreferenceConstants;
-import saros.repackaged.picocontainer.annotations.Nullable;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
 
@@ -39,8 +36,6 @@ public class MUCNegotiationManager {
   private final IPreferenceStore preferences;
 
   private final String password;
-
-  private final XMPPConnectionService connectionService;
 
   private final ISarosSessionManager sessionManager;
 
@@ -106,11 +101,9 @@ public class MUCNegotiationManager {
 
   public MUCNegotiationManager(
       ISarosSessionManager sessionManager,
-      @Nullable XMPPConnectionService connectionService,
       IPreferenceStore preferences,
       SessionNegotiationHookManager hooks) {
     this.sessionManager = sessionManager;
-    this.connectionService = connectionService;
     this.preferences = preferences;
     this.password = String.valueOf(random.nextInt());
 
@@ -162,12 +155,7 @@ public class MUCNegotiationManager {
     if (useCustomMUCService && customMUCService != null && !customMUCService.isEmpty())
       return customMUCService;
 
-    if (connectionService != null) {
-      Connection connection = connectionService.getConnection();
-
-      if (connection != null)
-        service = XMPPUtils.getMultiUserChatService(connection, connection.getServiceName());
-    }
+    service = XMPPUtils.getMultiUserChatService();
 
     if (service == null) service = customMUCService;
 
