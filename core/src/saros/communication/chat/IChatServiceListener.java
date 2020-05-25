@@ -1,6 +1,6 @@
 package saros.communication.chat;
 
-import org.jivesoftware.smack.XMPPException;
+import java.util.Optional;
 
 /** This listener is invoked with notifications related to an {@link IChat}s life cycle. */
 public interface IChatServiceListener {
@@ -26,8 +26,8 @@ public interface IChatServiceListener {
    * layer.
    *
    * @param chat the {@link IChat} that has been aborted
-   * @param exception {@link XMPPException} that has been thrown or <code>null</code> if the chat
-   *     has not been created yet
+   * @param errorMessage Optional an describing error message, always empty if the chat has not been
+   *     created yet
    */
-  public void chatAborted(IChat chat, XMPPException exception);
+  public void chatAborted(IChat chat, Optional<String> errorMessage);
 }

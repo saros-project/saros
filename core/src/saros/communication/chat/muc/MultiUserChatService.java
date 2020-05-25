@@ -103,7 +103,7 @@ public class MultiUserChatService extends AbstractChatService {
     try {
       createdRoom = chat.connect();
     } catch (XMPPException e) {
-      notifyChatAborted(chat, e);
+      notifyChatAborted(chat, e.getMessage());
       log.error("Couldn't join chat: " + preferences.getRoom(), e);
       return null;
     }

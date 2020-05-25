@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
@@ -22,7 +23,6 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.jivesoftware.smack.XMPPException;
 import saros.SarosPluginContext;
 import saros.communication.chat.IChat;
 import saros.communication.chat.IChatServiceListener;
@@ -367,7 +367,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         }
 
         @Override
-        public void chatAborted(IChat chat, XMPPException exception) {
+        public void chatAborted(IChat chat, Optional<String> chatErrorMessage) {
 
           if (!(chat instanceof MultiUserChat)) return;
 
@@ -387,9 +387,8 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
                 MessageFormat.format(
                     Messages.ChatRoomsComposite_muc_error_connecting_failed,
                     mucService,
-                    exception == null
-                        ? Messages.ChatRoomsComposite_muc_error_connecting_failed_unknown_error
-                        : exception.getMessage());
+                    chatErrorMessage.orElse(
+                        Messages.ChatRoomsComposite_muc_error_connecting_failed_unknown_error));
           }
 
           SWTUtils.runSafeSWTAsync(

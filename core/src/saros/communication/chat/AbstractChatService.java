@@ -1,8 +1,8 @@
 package saros.communication.chat;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
-import org.jivesoftware.smack.XMPPException;
 
 /**
  * Parent class for chat services. It provides convenience methods for notifying registered
@@ -53,11 +53,11 @@ public abstract class AbstractChatService implements IChatService {
    * in the XMPP/network layer.
    *
    * @param chat the {@link IChat} that has been aborted
-   * @param exception {@link XMPPException} that has been thrown
+   * @param errorMessage Optional an describing error message
    */
-  public void notifyChatAborted(IChat chat, XMPPException exception) {
+  public void notifyChatAborted(IChat chat, String errorMessage) {
     for (IChatServiceListener listener : chatServiceListeners) {
-      listener.chatAborted(chat, exception);
+      listener.chatAborted(chat, Optional.ofNullable(errorMessage));
     }
   }
 }
