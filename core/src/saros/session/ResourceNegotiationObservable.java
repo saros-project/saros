@@ -11,7 +11,7 @@ import saros.negotiation.ResourceNegotiation;
 import saros.net.xmpp.JID;
 
 /**
- * Observable which keeps track of all {@link ResourceNegotiation project negotiations} currently
+ * Observable which keeps track of all {@link ResourceNegotiation resource negotiations} currently
  * running.
  */
 final class ResourceNegotiationObservable {
@@ -22,11 +22,11 @@ final class ResourceNegotiationObservable {
       new HashMap<JID, List<ResourceNegotiation>>();
 
   /**
-   * Returns the project negotiation for the given JID with the given id.
+   * Returns the resource negotiation for the given JID with the given id.
    *
    * @param jid the JID to lookup
    * @param id the ID to lookup
-   * @return the current {@link ResourceNegotiation project negotiation} or <code>null</code> if no
+   * @return the current {@link ResourceNegotiation resource negotiation} or <code>null</code> if no
    *     such negotiation exists
    */
   public synchronized ResourceNegotiation get(final JID jid, final String id) {
@@ -41,9 +41,9 @@ final class ResourceNegotiationObservable {
   }
 
   /**
-   * Adds a project negotiation.
+   * Adds a resource negotiation.
    *
-   * @param negotiation the project negotiation to add
+   * @param negotiation the resource negotiation to add
    */
   public synchronized void add(final ResourceNegotiation negotiation) {
     List<ResourceNegotiation> currentNegotiations = negotiations.get(negotiation.getPeer());
@@ -57,7 +57,7 @@ final class ResourceNegotiationObservable {
       if (currentNegotiation.getID().equals(negotiation.getID())) {
         log.warn(
             negotiation.getPeer()
-                + ": a project negotiation with ID "
+                + ": a resource negotiation with ID "
                 + negotiation.getID()
                 + " is already registered");
         return;
@@ -68,9 +68,9 @@ final class ResourceNegotiationObservable {
   }
 
   /**
-   * Removes a project negotiation.
+   * Removes a resource negotiation.
    *
-   * @param negotiation the project negotiation to remove
+   * @param negotiation the resource negotiation to remove
    */
   public synchronized void remove(ResourceNegotiation negotiation) {
     List<ResourceNegotiation> currentNegotiations = negotiations.get(negotiation.getPeer());
@@ -88,15 +88,15 @@ final class ResourceNegotiationObservable {
 
     log.warn(
         negotiation.getPeer()
-            + ": a project negotiation with ID "
+            + ": a resource negotiation with ID "
             + negotiation.getID()
             + " is not registered");
   }
 
   /**
-   * Returns a snap shot of all currently running project negotiations.
+   * Returns a snap shot of all currently running resource negotiations.
    *
-   * @return a list of all currently running project negotiations
+   * @return a list of all currently running resource negotiations
    */
   public synchronized List<ResourceNegotiation> list() {
     final List<ResourceNegotiation> currentNegotiations = new ArrayList<ResourceNegotiation>();
