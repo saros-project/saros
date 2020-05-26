@@ -18,7 +18,7 @@ public interface ISarosSessionManager {
   /**
    * Starts a new Saros session with the local user as the only participant.
    *
-   * @param referencePoints the local projects which should be shared
+   * @param referencePoints the local reference points which should be shared
    */
   void startSession(Set<IReferencePoint> referencePoints);
 
@@ -59,10 +59,10 @@ public interface ISarosSessionManager {
   public void removeSessionLifecycleListener(ISessionLifecycleListener listener);
 
   /**
-   * Starts sharing all projects of the current session with the given session user. This should be
-   * called after the user joined the current session.
+   * Starts sharing all reference points of the current session with the given session user. This
+   * should be called after the user joined the current session.
    *
-   * @param user JID of the user to share projects with
+   * @param user JID of the user to share reference points with
    */
   public void startSharingReferencePoints(JID user);
 
@@ -75,16 +75,16 @@ public interface ISarosSessionManager {
   public void invite(JID toInvite, String description);
 
   /**
-   * Invites users to the shared project.
+   * Invites users to the shared reference point.
    *
    * @param jidsToInvite the JIDs of the users that should be invited.
    */
   public void invite(Collection<JID> jidsToInvite, String description);
 
   /**
-   * Adds projects to an existing session.
+   * Adds reference points to an existing session.
    *
-   * @param referencePoints the projects to add
+   * @param referencePoints the reference points to add
    */
   void addReferencePointsToSession(Set<IReferencePoint> referencePoints);
 
@@ -106,7 +106,7 @@ public interface ISarosSessionManager {
 
   /**
    * Sets the {@link INegotiationHandler negotiation handler} that will handle incoming and outgoing
-   * session and project negotiations requests.
+   * session and resource negotiations requests.
    *
    * @param handler a handler to handle negotiation request or <code>null</code> if requests should
    *     not be handled at all.
