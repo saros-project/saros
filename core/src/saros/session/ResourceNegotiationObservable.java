@@ -14,9 +14,9 @@ import saros.net.xmpp.JID;
  * Observable which keeps track of all {@link ResourceNegotiation project negotiations} currently
  * running.
  */
-final class ProjectNegotiationObservable {
+final class ResourceNegotiationObservable {
 
-  private static final Logger log = Logger.getLogger(ProjectNegotiationObservable.class);
+  private static final Logger log = Logger.getLogger(ResourceNegotiationObservable.class);
 
   private final Map<JID, List<ResourceNegotiation>> negotiations =
       new HashMap<JID, List<ResourceNegotiation>>();
