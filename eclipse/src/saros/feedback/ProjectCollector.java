@@ -29,8 +29,8 @@ public class ProjectCollector extends AbstractStatisticCollector {
   private final ISessionListener sessionListener =
       new ISessionListener() {
         @Override
-        public void resourcesAdded(IReferencePoint project) {
-          String projectID = sarosSession.getReferencePointId(project);
+        public void resourcesAdded(IReferencePoint referencePoint) {
+          String projectID = sarosSession.getReferencePointId(referencePoint);
 
           ProjectInformation info = sharedProjects.get(projectID);
 

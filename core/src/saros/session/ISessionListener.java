@@ -68,7 +68,7 @@ public interface ISessionListener {
    *
    * @param user the user that has joined.
    */
-  public default void userFinishedProjectNegotiation(User user) {
+  public default void userFinishedResourceNegotiation(User user) {
     // NOP
   }
 
@@ -100,9 +100,9 @@ public interface ISessionListener {
    *
    * <p>This method might <i>not</i> be called on the UI thread.
    *
-   * @param project the project that was added
+   * @param referencePoint the project that was added
    */
-  public default void projectAdded(IReferencePoint project) {
+  public default void referencePointAdded(IReferencePoint referencePoint) {
     // NOP
   }
 
@@ -112,9 +112,9 @@ public interface ISessionListener {
    *
    * <p>This method might <i>not</i> be called on the UI thread.
    *
-   * @param project the project that was removed
+   * @param referencePoint the project that was removed
    */
-  public default void projectRemoved(IReferencePoint project) {
+  public default void referencePointRemoved(IReferencePoint referencePoint) {
     // NOP
   }
 
@@ -123,7 +123,7 @@ public interface ISessionListener {
    *
    * <p>This method might <i>not</i> be called on the UI thread.
    */
-  public default void resourcesAdded(IReferencePoint project) {
+  public default void resourcesAdded(IReferencePoint referencePoint) {
     // NOP
   }
 }

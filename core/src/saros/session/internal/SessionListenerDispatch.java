@@ -27,8 +27,8 @@ public class SessionListenerDispatch implements ISessionListener {
   }
 
   @Override
-  public void userFinishedProjectNegotiation(User user) {
-    for (ISessionListener listener : listeners) listener.userFinishedProjectNegotiation(user);
+  public void userFinishedResourceNegotiation(User user) {
+    for (ISessionListener listener : listeners) listener.userFinishedResourceNegotiation(user);
   }
 
   @Override
@@ -42,18 +42,18 @@ public class SessionListenerDispatch implements ISessionListener {
   }
 
   @Override
-  public void projectAdded(IReferencePoint project) {
-    for (ISessionListener listener : listeners) listener.projectAdded(project);
+  public void referencePointAdded(IReferencePoint referencePoint) {
+    for (ISessionListener listener : listeners) listener.referencePointAdded(referencePoint);
   }
 
   @Override
-  public void projectRemoved(IReferencePoint project) {
-    for (ISessionListener listener : listeners) listener.projectRemoved(project);
+  public void referencePointRemoved(IReferencePoint referencePoint) {
+    for (ISessionListener listener : listeners) listener.referencePointRemoved(referencePoint);
   }
 
   @Override
-  public void resourcesAdded(IReferencePoint project) {
-    for (ISessionListener listener : listeners) listener.resourcesAdded(project);
+  public void resourcesAdded(IReferencePoint referencePoint) {
+    for (ISessionListener listener : listeners) listener.resourcesAdded(referencePoint);
   }
 
   public void add(ISessionListener listener) {
