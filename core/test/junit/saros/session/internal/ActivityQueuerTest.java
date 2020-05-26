@@ -33,42 +33,44 @@ public class ActivityQueuerTest {
   private static final User ALICE = new User(new JID("Alice"), true, true, null);
   private static final User BOB = new User(new JID("Bob"), false, false, null);
 
-  private static IReferencePoint SHARED_PROJECT;
-  private static IReferencePoint NOT_SHARED_PROJECT;
+  private static IReferencePoint SHARED_REFERENCE_POINT;
+  private static IReferencePoint NOT_SHARED_REFERENCE_POINT;
 
-  private static IFile FOO_FILE_SHARED_PROJECT;
-  private static IFile BAR_FILE_SHARED_PROJECT;
-  private static IFile FILE_OF_NOT_SHARED_PROJECT;
-  private static IFolder FOLDER_OF_NOT_SHARED_PROJECT;
+  private static IFile FOO_FILE_SHARED_REFERENCE_POINT;
+  private static IFile BAR_FILE_SHARED_REFERENCE_POINT;
+  private static IFile FILE_OF_NOT_SHARED_REFERENCE_POINT;
+  private static IFolder FOLDER_OF_NOT_SHARED_REFERENCE_POINT;
 
   private ActivityQueuer activityQueuer;
 
   @BeforeClass
   public static void prepare() {
-    SHARED_PROJECT = EasyMock.createMock(IReferencePoint.class);
-    NOT_SHARED_PROJECT = EasyMock.createMock(IReferencePoint.class);
+    SHARED_REFERENCE_POINT = EasyMock.createMock(IReferencePoint.class);
+    NOT_SHARED_REFERENCE_POINT = EasyMock.createMock(IReferencePoint.class);
 
-    FOO_FILE_SHARED_PROJECT = EasyMock.createNiceMock(IFile.class);
-    EasyMock.expect(FOO_FILE_SHARED_PROJECT.getReferencePoint()).andStubReturn(SHARED_PROJECT);
+    FOO_FILE_SHARED_REFERENCE_POINT = EasyMock.createNiceMock(IFile.class);
+    EasyMock.expect(FOO_FILE_SHARED_REFERENCE_POINT.getReferencePoint())
+        .andStubReturn(SHARED_REFERENCE_POINT);
 
-    BAR_FILE_SHARED_PROJECT = EasyMock.createNiceMock(IFile.class);
-    EasyMock.expect(BAR_FILE_SHARED_PROJECT.getReferencePoint()).andStubReturn(SHARED_PROJECT);
+    BAR_FILE_SHARED_REFERENCE_POINT = EasyMock.createNiceMock(IFile.class);
+    EasyMock.expect(BAR_FILE_SHARED_REFERENCE_POINT.getReferencePoint())
+        .andStubReturn(SHARED_REFERENCE_POINT);
 
-    FILE_OF_NOT_SHARED_PROJECT = EasyMock.createNiceMock(IFile.class);
-    EasyMock.expect(FILE_OF_NOT_SHARED_PROJECT.getReferencePoint())
-        .andStubReturn(NOT_SHARED_PROJECT);
+    FILE_OF_NOT_SHARED_REFERENCE_POINT = EasyMock.createNiceMock(IFile.class);
+    EasyMock.expect(FILE_OF_NOT_SHARED_REFERENCE_POINT.getReferencePoint())
+        .andStubReturn(NOT_SHARED_REFERENCE_POINT);
 
-    FOLDER_OF_NOT_SHARED_PROJECT = EasyMock.createNiceMock(IFolder.class);
-    EasyMock.expect(FOLDER_OF_NOT_SHARED_PROJECT.getReferencePoint())
-        .andStubReturn(NOT_SHARED_PROJECT);
+    FOLDER_OF_NOT_SHARED_REFERENCE_POINT = EasyMock.createNiceMock(IFolder.class);
+    EasyMock.expect(FOLDER_OF_NOT_SHARED_REFERENCE_POINT.getReferencePoint())
+        .andStubReturn(NOT_SHARED_REFERENCE_POINT);
 
     EasyMock.replay(
-        FOO_FILE_SHARED_PROJECT,
-        BAR_FILE_SHARED_PROJECT,
-        FILE_OF_NOT_SHARED_PROJECT,
-        FOLDER_OF_NOT_SHARED_PROJECT);
+        FOO_FILE_SHARED_REFERENCE_POINT,
+        BAR_FILE_SHARED_REFERENCE_POINT,
+        FILE_OF_NOT_SHARED_REFERENCE_POINT,
+        FOLDER_OF_NOT_SHARED_REFERENCE_POINT);
 
-    EasyMock.replay(SHARED_PROJECT, NOT_SHARED_PROJECT);
+    EasyMock.replay(SHARED_REFERENCE_POINT, NOT_SHARED_REFERENCE_POINT);
   }
 
   @Before
@@ -94,19 +96,19 @@ public class ActivityQueuerTest {
     // see testHackForBug808 ... we are generating missing activities if
     // necessary
     final IActivity expectedEA =
-        new EditorActivity(BOB, EditorActivity.Type.ACTIVATED, FILE_OF_NOT_SHARED_PROJECT);
+        new EditorActivity(BOB, EditorActivity.Type.ACTIVATED, FILE_OF_NOT_SHARED_REFERENCE_POINT);
 
-    IActivity activityToBeQueued = createJupiterActivity(FILE_OF_NOT_SHARED_PROJECT);
+    IActivity activityToBeQueued = createJupiterActivity(FILE_OF_NOT_SHARED_REFERENCE_POINT);
     activities.add(activityToBeQueued);
 
-    activityQueuer.enableQueuing(NOT_SHARED_PROJECT);
+    activityQueuer.enableQueuing(NOT_SHARED_REFERENCE_POINT);
 
     List<IActivity> processedActivities = activityQueuer.process(activities);
 
     assertFalse(processedActivities.contains(activityToBeQueued));
     assertListsAreEqual(expectedActivities, processedActivities);
 
-    IActivity activityNotToBeQueued = createJupiterActivity(FOO_FILE_SHARED_PROJECT);
+    IActivity activityNotToBeQueued = createJupiterActivity(FOO_FILE_SHARED_REFERENCE_POINT);
 
     List<IActivity> notQueuedActivities =
         activityQueuer.process(Collections.singletonList(activityNotToBeQueued));
@@ -120,7 +122,7 @@ public class ActivityQueuerTest {
     // flush queue
     IActivity nopActivity = new NOPActivity(ALICE, ALICE, 0);
 
-    activityQueuer.disableQueuing(NOT_SHARED_PROJECT);
+    activityQueuer.disableQueuing(NOT_SHARED_REFERENCE_POINT);
 
     processedActivities.addAll(activityQueuer.process(Collections.singletonList(nopActivity)));
 
@@ -136,7 +138,7 @@ public class ActivityQueuerTest {
 
   @Test
   public void testQueuingEnabledWithActivityWithoutFile() {
-    activityQueuer.enableQueuing(NOT_SHARED_PROJECT);
+    activityQueuer.enableQueuing(NOT_SHARED_REFERENCE_POINT);
 
     IActivity serializedEditorActivity =
         new EditorActivity(ALICE, EditorActivity.Type.ACTIVATED, null);
@@ -155,11 +157,11 @@ public class ActivityQueuerTest {
 
   @Test
   public void testInternalFushCounter() {
-    activityQueuer.enableQueuing(NOT_SHARED_PROJECT);
-    activityQueuer.enableQueuing(NOT_SHARED_PROJECT);
+    activityQueuer.enableQueuing(NOT_SHARED_REFERENCE_POINT);
+    activityQueuer.enableQueuing(NOT_SHARED_REFERENCE_POINT);
 
     IActivity firstActivityToBeQueued =
-        new FolderCreatedActivity(BOB, FOLDER_OF_NOT_SHARED_PROJECT);
+        new FolderCreatedActivity(BOB, FOLDER_OF_NOT_SHARED_REFERENCE_POINT);
 
     List<IActivity> result;
 
@@ -168,15 +170,15 @@ public class ActivityQueuerTest {
     assertEquals("activity was not queued", 0, result.size());
 
     IActivity secondActivityToBeQueued =
-        new FolderDeletedActivity(ALICE, FOLDER_OF_NOT_SHARED_PROJECT);
+        new FolderDeletedActivity(ALICE, FOLDER_OF_NOT_SHARED_REFERENCE_POINT);
 
-    activityQueuer.disableQueuing(NOT_SHARED_PROJECT);
+    activityQueuer.disableQueuing(NOT_SHARED_REFERENCE_POINT);
 
     result = activityQueuer.process(Collections.singletonList(secondActivityToBeQueued));
 
     assertEquals("activity was not queued", 0, result.size());
 
-    activityQueuer.disableQueuing(NOT_SHARED_PROJECT);
+    activityQueuer.disableQueuing(NOT_SHARED_REFERENCE_POINT);
 
     result = activityQueuer.process(Collections.<IActivity>emptyList());
 
@@ -187,7 +189,7 @@ public class ActivityQueuerTest {
     assertSame("wrong flushing order", secondActivityToBeQueued, result.get(1));
 
     IActivity activityNotToBeQueued =
-        new FolderDeletedActivity(ALICE, FOLDER_OF_NOT_SHARED_PROJECT);
+        new FolderDeletedActivity(ALICE, FOLDER_OF_NOT_SHARED_REFERENCE_POINT);
 
     result = activityQueuer.process(Collections.singletonList(activityNotToBeQueued));
 
@@ -200,34 +202,34 @@ public class ActivityQueuerTest {
   @Test
   public void testHackForBug808() {
     final IActivity fooExpectedEditorADO =
-        new EditorActivity(ALICE, EditorActivity.Type.ACTIVATED, FOO_FILE_SHARED_PROJECT);
+        new EditorActivity(ALICE, EditorActivity.Type.ACTIVATED, FOO_FILE_SHARED_REFERENCE_POINT);
 
     final IActivity barExpectedEditorADO =
-        new EditorActivity(ALICE, EditorActivity.Type.ACTIVATED, BAR_FILE_SHARED_PROJECT);
+        new EditorActivity(ALICE, EditorActivity.Type.ACTIVATED, BAR_FILE_SHARED_REFERENCE_POINT);
 
     final IActivity fooClosedEditorADO =
-        new EditorActivity(ALICE, EditorActivity.Type.CLOSED, FOO_FILE_SHARED_PROJECT);
+        new EditorActivity(ALICE, EditorActivity.Type.CLOSED, FOO_FILE_SHARED_REFERENCE_POINT);
 
     final IActivity fooSavedEditorADO =
-        new EditorActivity(ALICE, EditorActivity.Type.CLOSED, FOO_FILE_SHARED_PROJECT);
+        new EditorActivity(ALICE, EditorActivity.Type.CLOSED, FOO_FILE_SHARED_REFERENCE_POINT);
 
     final List<IActivity> flush = Collections.emptyList();
 
     final IActivity fooJupiterADO =
         new JupiterActivity(
-            new JupiterVectorTime(0, 0), new NoOperation(), ALICE, FOO_FILE_SHARED_PROJECT);
+            new JupiterVectorTime(0, 0), new NoOperation(), ALICE, FOO_FILE_SHARED_REFERENCE_POINT);
 
     final IActivity barJupiterADO =
         new JupiterActivity(
-            new JupiterVectorTime(0, 0), new NoOperation(), ALICE, BAR_FILE_SHARED_PROJECT);
+            new JupiterVectorTime(0, 0), new NoOperation(), ALICE, BAR_FILE_SHARED_REFERENCE_POINT);
 
     List<IActivity> activities;
 
     activityQueuer = new ActivityQueuer();
-    activityQueuer.enableQueuing(SHARED_PROJECT);
+    activityQueuer.enableQueuing(SHARED_REFERENCE_POINT);
 
     activityQueuer.process(Collections.singletonList(fooJupiterADO));
-    activityQueuer.disableQueuing(SHARED_PROJECT);
+    activityQueuer.disableQueuing(SHARED_REFERENCE_POINT);
 
     activities = activityQueuer.process(flush);
 
@@ -244,10 +246,10 @@ public class ActivityQueuerTest {
     // ------------------------------------------
 
     activityQueuer = new ActivityQueuer();
-    activityQueuer.enableQueuing(SHARED_PROJECT);
+    activityQueuer.enableQueuing(SHARED_REFERENCE_POINT);
 
     activityQueuer.process(Collections.singletonList(fooClosedEditorADO));
-    activityQueuer.disableQueuing(SHARED_PROJECT);
+    activityQueuer.disableQueuing(SHARED_REFERENCE_POINT);
 
     activities = activityQueuer.process(flush);
 
@@ -260,10 +262,10 @@ public class ActivityQueuerTest {
     // ------------------------------------------
 
     activityQueuer = new ActivityQueuer();
-    activityQueuer.enableQueuing(SHARED_PROJECT);
+    activityQueuer.enableQueuing(SHARED_REFERENCE_POINT);
 
     activityQueuer.process(Collections.singletonList(fooSavedEditorADO));
-    activityQueuer.disableQueuing(SHARED_PROJECT);
+    activityQueuer.disableQueuing(SHARED_REFERENCE_POINT);
 
     activities = activityQueuer.process(flush);
 
@@ -276,10 +278,10 @@ public class ActivityQueuerTest {
     // ------------------------------------------
 
     activityQueuer = new ActivityQueuer();
-    activityQueuer.enableQueuing(SHARED_PROJECT);
+    activityQueuer.enableQueuing(SHARED_REFERENCE_POINT);
 
     activityQueuer.process(Arrays.asList(fooJupiterADO, fooSavedEditorADO, fooClosedEditorADO));
-    activityQueuer.disableQueuing(SHARED_PROJECT);
+    activityQueuer.disableQueuing(SHARED_REFERENCE_POINT);
 
     activities = activityQueuer.process(flush);
 
@@ -292,10 +294,10 @@ public class ActivityQueuerTest {
     // ------------------------------------------
 
     activityQueuer = new ActivityQueuer();
-    activityQueuer.enableQueuing(SHARED_PROJECT);
+    activityQueuer.enableQueuing(SHARED_REFERENCE_POINT);
 
     activityQueuer.process(Arrays.asList(fooJupiterADO, barJupiterADO));
-    activityQueuer.disableQueuing(SHARED_PROJECT);
+    activityQueuer.disableQueuing(SHARED_REFERENCE_POINT);
 
     activities = activityQueuer.process(flush);
 
@@ -310,24 +312,24 @@ public class ActivityQueuerTest {
     // ------------------------------------------
 
     final IActivity aliceExpectedEditorADO =
-        new EditorActivity(ALICE, EditorActivity.Type.ACTIVATED, FOO_FILE_SHARED_PROJECT);
+        new EditorActivity(ALICE, EditorActivity.Type.ACTIVATED, FOO_FILE_SHARED_REFERENCE_POINT);
 
     final IActivity bobExpectedEditorADO =
-        new EditorActivity(BOB, EditorActivity.Type.ACTIVATED, FOO_FILE_SHARED_PROJECT);
+        new EditorActivity(BOB, EditorActivity.Type.ACTIVATED, FOO_FILE_SHARED_REFERENCE_POINT);
 
     final IActivity aliceJupiterADO =
         new JupiterActivity(
-            new JupiterVectorTime(0, 0), new NoOperation(), ALICE, FOO_FILE_SHARED_PROJECT);
+            new JupiterVectorTime(0, 0), new NoOperation(), ALICE, FOO_FILE_SHARED_REFERENCE_POINT);
 
     final IActivity bobJupiterADO =
         new JupiterActivity(
-            new JupiterVectorTime(0, 0), new NoOperation(), BOB, FOO_FILE_SHARED_PROJECT);
+            new JupiterVectorTime(0, 0), new NoOperation(), BOB, FOO_FILE_SHARED_REFERENCE_POINT);
 
     activityQueuer = new ActivityQueuer();
-    activityQueuer.enableQueuing(SHARED_PROJECT);
+    activityQueuer.enableQueuing(SHARED_REFERENCE_POINT);
 
     activityQueuer.process(Arrays.asList(aliceJupiterADO, bobJupiterADO));
-    activityQueuer.disableQueuing(SHARED_PROJECT);
+    activityQueuer.disableQueuing(SHARED_REFERENCE_POINT);
 
     activities = activityQueuer.process(flush);
 
@@ -341,7 +343,7 @@ public class ActivityQueuerTest {
   private List<IActivity> createSomeActivities() {
     IActivity startFollowingActivity = new StartFollowingActivity(ALICE, BOB);
 
-    IActivity jupiterActivity = createJupiterActivity(FOO_FILE_SHARED_PROJECT);
+    IActivity jupiterActivity = createJupiterActivity(FOO_FILE_SHARED_REFERENCE_POINT);
 
     List<IActivity> activities = new ArrayList<IActivity>();
     activities.add(startFollowingActivity);
