@@ -13,7 +13,7 @@ import saros.preferences.IPreferenceStore;
 public interface ISarosSessionManager {
 
   /** @return the active session or <code>null</code> if there is no active session. */
-  public ISarosSession getSession();
+  ISarosSession getSession();
 
   /**
    * Starts a new Saros session with the local user as the only participant.
@@ -30,7 +30,7 @@ public interface ISarosSessionManager {
    * @param host the host of the session.
    * @return a new session.
    */
-  public ISarosSession joinSession(
+  ISarosSession joinSession(
       final String id,
       JID host,
       IPreferenceStore hostProperties,
@@ -42,21 +42,21 @@ public interface ISarosSessionManager {
    *
    * @param reason the reason why the session ended.
    */
-  public void stopSession(SessionEndReason reason);
+  void stopSession(SessionEndReason reason);
 
   /**
    * Add the given session life-cycle listener.
    *
    * @param listener the listener that is to be added.
    */
-  public void addSessionLifecycleListener(ISessionLifecycleListener listener);
+  void addSessionLifecycleListener(ISessionLifecycleListener listener);
 
   /**
    * Removes the given session life-cycle listener.
    *
    * @param listener the listener that is to be removed.
    */
-  public void removeSessionLifecycleListener(ISessionLifecycleListener listener);
+  void removeSessionLifecycleListener(ISessionLifecycleListener listener);
 
   /**
    * Starts sharing all reference points of the current session with the given session user. This
@@ -64,7 +64,7 @@ public interface ISarosSessionManager {
    *
    * @param user JID of the user to share reference points with
    */
-  public void startSharingReferencePoints(JID user);
+  void startSharingReferencePoints(JID user);
 
   /**
    * Invites a user to a running session. Does nothing if no session is running, the user is already
@@ -72,14 +72,14 @@ public interface ISarosSessionManager {
    *
    * @param toInvite the JID of the user that is to be invited.
    */
-  public void invite(JID toInvite, String description);
+  void invite(JID toInvite, String description);
 
   /**
    * Invites users to the shared reference point.
    *
    * @param jidsToInvite the JIDs of the users that should be invited.
    */
-  public void invite(Collection<JID> jidsToInvite, String description);
+  void invite(Collection<JID> jidsToInvite, String description);
 
   /**
    * Adds reference points to an existing session.
@@ -111,5 +111,5 @@ public interface ISarosSessionManager {
    * @param handler a handler to handle negotiation request or <code>null</code> if requests should
    *     not be handled at all.
    */
-  public void setNegotiationHandler(INegotiationHandler handler);
+  void setNegotiationHandler(INegotiationHandler handler);
 }
