@@ -10,7 +10,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.Future;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.packet.Packet;
-import saros.communication.extensions.ProjectNegotiationMissingFilesExtension;
+import saros.communication.extensions.ResourceNegotiationMissingFilesExtension;
 import saros.communication.extensions.StartActivityQueuingRequest;
 import saros.communication.extensions.StartActivityQueuingResponse;
 import saros.exceptions.LocalCancellationException;
@@ -132,8 +132,8 @@ public abstract class AbstractIncomingResourceNegotiation extends ResourceNegoti
       transmitter.send(
           ISarosSession.SESSION_CONNECTION_ID,
           getPeer(),
-          ProjectNegotiationMissingFilesExtension.PROVIDER.create(
-              new ProjectNegotiationMissingFilesExtension(getSessionID(), getID(), missingFiles)));
+          ResourceNegotiationMissingFilesExtension.PROVIDER.create(
+              new ResourceNegotiationMissingFilesExtension(getSessionID(), getID(), missingFiles)));
 
       awaitActivityQueueingActivation(monitor);
 
