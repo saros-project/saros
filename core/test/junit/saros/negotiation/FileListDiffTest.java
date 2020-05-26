@@ -15,7 +15,6 @@ public class FileListDiffTest {
   private static final String FILE_A = FOLDER_SRC + "file_a";
   private static final String FILE_B = FOLDER_SRC + "file_b";
   private static final String FILE_C = FOLDER_SRC + "file_c";
-  private static final String FILE_D = FOLDER_SRC + "file_d";
 
   private static final String FOLDER_A = FOLDER_SRC + "folder_a/";
   private static final String FOLDER_B = FOLDER_SRC + "folder_b/";

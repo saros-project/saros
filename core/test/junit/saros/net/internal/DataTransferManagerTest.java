@@ -354,8 +354,6 @@ public class DataTransferManagerTest {
 
     connectionListener.getValue().connectionStateChanged(connectionMock, ConnectionState.CONNECTED);
 
-    TransferDescription description = TransferDescription.newDescription();
-
     assertNull(dtm.getConnection("foo", new JID("foo@bar.com")));
   }
 
