@@ -23,7 +23,7 @@ import saros.communication.extensions.ResourceNegotiationMissingFilesExtension;
 import saros.communication.extensions.ResourceNegotiationOfferingExtension;
 import saros.communication.extensions.StartActivityQueuingRequest;
 import saros.communication.extensions.StartActivityQueuingResponse;
-import saros.communication.extensions.UserFinishedProjectNegotiationExtension;
+import saros.communication.extensions.UserFinishedResourceNegotiationExtension;
 import saros.communication.extensions.UserListExtension;
 import saros.communication.extensions.UserListReceivedExtension;
 import saros.net.util.XMPPUtils;
@@ -137,7 +137,7 @@ public class ContainerContext implements IContainerContext {
       Class.forName(UserListReceivedExtension.class.getName());
       Class.forName(StartActivityQueuingRequest.class.getName());
       Class.forName(StartActivityQueuingResponse.class.getName());
-      Class.forName(UserFinishedProjectNegotiationExtension.class.getName());
+      Class.forName(UserFinishedResourceNegotiationExtension.class.getName());
 
       // Session extensions for Timeout-Handling during a session
       Class.forName(PingExtension.class.getName());

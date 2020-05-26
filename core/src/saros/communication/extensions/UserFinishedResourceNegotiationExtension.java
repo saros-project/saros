@@ -6,8 +6,8 @@ import com.thoughtworks.xstream.annotations.XStreamConverter;
 import saros.misc.xstream.JIDConverter;
 import saros.net.xmpp.JID;
 
-@XStreamAlias(/* ProjectNegotiationCompleted */ "PNCMP")
-public class UserFinishedProjectNegotiationExtension extends SarosSessionPacketExtension {
+@XStreamAlias(/* ResourceNegotiationCompleted */ "RNCMP")
+public class UserFinishedResourceNegotiationExtension extends SarosSessionPacketExtension {
 
   public static final Provider PROVIDER = new Provider();
 
@@ -15,7 +15,7 @@ public class UserFinishedProjectNegotiationExtension extends SarosSessionPacketE
   @XStreamConverter(JIDConverter.class)
   private JID jid;
 
-  public UserFinishedProjectNegotiationExtension(String sessionID, JID jid) {
+  public UserFinishedResourceNegotiationExtension(String sessionID, JID jid) {
     super(sessionID);
     this.jid = jid;
   }
@@ -25,10 +25,10 @@ public class UserFinishedProjectNegotiationExtension extends SarosSessionPacketE
   }
 
   public static class Provider
-      extends SarosSessionPacketExtension.Provider<UserFinishedProjectNegotiationExtension> {
+      extends SarosSessionPacketExtension.Provider<UserFinishedResourceNegotiationExtension> {
 
     private Provider() {
-      super("pncmp", UserFinishedProjectNegotiationExtension.class);
+      super("rncmp", UserFinishedResourceNegotiationExtension.class);
     }
   }
 }
