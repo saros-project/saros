@@ -115,7 +115,7 @@ public class InstantOutgoingResourceNegotiation extends AbstractOutgoingResource
     for (final FileList list : fileLists) {
       fileCount += list.getPaths().size();
 
-      final String referencePointID = list.getProjectID();
+      final String referencePointID = list.getReferencePointID();
       final IReferencePoint referencePoint = resourceSharingData.getProject(referencePointID);
 
       if (referencePoint == null)
@@ -188,7 +188,7 @@ public class InstantOutgoingResourceNegotiation extends AbstractOutgoingResource
   private void createTransferList(List<FileList> fileLists, int fileCount) {
     List<IFile> files = new ArrayList<>(fileCount);
     for (final FileList list : fileLists) {
-      IReferencePoint referencePoint = resourceSharingData.getProject(list.getProjectID());
+      IReferencePoint referencePoint = resourceSharingData.getProject(list.getReferencePointID());
       for (String file : list.getPaths()) {
         files.add(referencePoint.getFile(file));
       }

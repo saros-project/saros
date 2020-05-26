@@ -143,7 +143,7 @@ public class ArchiveOutgoingResourceNegotiation extends AbstractOutgoingResource
     final List<IResource> resourcesToLock = new ArrayList<IResource>();
 
     for (final FileList list : fileLists) {
-      final String referencePointID = list.getProjectID();
+      final String referencePointID = list.getReferencePointID();
 
       final IReferencePoint referencePoint = resourceSharingData.getProject(referencePointID);
 

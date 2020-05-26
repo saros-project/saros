@@ -443,7 +443,7 @@ public abstract class AbstractIncomingResourceNegotiation extends ResourceNegoti
               ? FileListFactory.createEmptyFileList()
               : FileListFactory.createFileList(missingFiles);
 
-      fileList.setProjectID(id);
+      fileList.setReferencePointID(id);
 
       result.add(fileList);
     }
