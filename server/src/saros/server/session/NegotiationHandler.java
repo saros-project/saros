@@ -71,7 +71,7 @@ public class NegotiationHandler implements INegotiationHandler {
 
             switch (status) {
               case OK:
-                sessionManager.startSharingProjects(negotiation.getPeer());
+                sessionManager.startSharingReferencePoints(negotiation.getPeer());
                 break;
               case ERROR:
                 log.error("ERROR running session negotiation: " + negotiation.getErrorMessage());

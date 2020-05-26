@@ -206,7 +206,7 @@ public class SarosSessionManager implements ISarosSessionManager {
    * order to start a session.)
    */
   @Override
-  public void startSession(final Set<IReferencePoint> projects) {
+  public void startSession(final Set<IReferencePoint> referencePoints) {
 
     /*
      * FIXME split the logic, start a session without anything and then add
@@ -264,7 +264,7 @@ public class SarosSessionManager implements ISarosSessionManager {
       session.start();
       sessionStarted(session);
 
-      for (IReferencePoint project : projects) {
+      for (IReferencePoint project : referencePoints) {
         String projectID = String.valueOf(SESSION_ID_GENERATOR.nextInt(Integer.MAX_VALUE));
 
         session.addSharedReferencePoint(project, projectID);
@@ -500,11 +500,11 @@ public class SarosSessionManager implements ISarosSessionManager {
   /**
    * Adds projects to an existing session.
    *
-   * @param projects to projects to add
+   * @param referencePoints to projects to add
    */
   @Override
-  public synchronized void addProjectsToSession(Set<IReferencePoint> projects) {
-    if (projects == null) {
+  public synchronized void addReferencePointsToSession(Set<IReferencePoint> referencePoints) {
+    if (referencePoints == null) {
       return;
     }
 
@@ -515,7 +515,7 @@ public class SarosSessionManager implements ISarosSessionManager {
      * negotiation with all collected resources.
      */
 
-    nextProjectNegotiation.addReferencePoints(projects);
+    nextProjectNegotiation.addReferencePoints(referencePoints);
 
     if (nextProjectNegotiationWorker != null && nextProjectNegotiationWorker.isAlive()) {
       return;
@@ -667,7 +667,7 @@ public class SarosSessionManager implements ISarosSessionManager {
   }
 
   @Override
-  public void startSharingProjects(JID user) {
+  public void startSharingReferencePoints(JID user) {
 
     ISarosSession currentSession = session;
 

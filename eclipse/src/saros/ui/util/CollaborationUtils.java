@@ -234,7 +234,7 @@ public class CollaborationUtils {
                */
             }
 
-            sessionManager.addProjectsToSession(convert(projectsToAdd));
+            sessionManager.addReferencePointsToSession(convert(projectsToAdd));
           }
         });
   }

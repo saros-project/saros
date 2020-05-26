@@ -41,7 +41,7 @@ public class InviteCommand extends ConsoleCommand {
 
       sessionManager.invite(jids.get(true), "Invitation by server command");
       for (JID jid : jids.get(true)) {
-        sessionManager.startSharingProjects(jid);
+        sessionManager.startSharingReferencePoints(jid);
       }
     } catch (Exception e) {
       log.error("Error inviting users", e);

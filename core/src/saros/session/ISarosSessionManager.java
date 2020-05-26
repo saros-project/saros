@@ -18,9 +18,9 @@ public interface ISarosSessionManager {
   /**
    * Starts a new Saros session with the local user as the only participant.
    *
-   * @param projects the local projects which should be shared
+   * @param referencePoints the local projects which should be shared
    */
-  void startSession(Set<IReferencePoint> projects);
+  void startSession(Set<IReferencePoint> referencePoints);
 
   // FIXME this method is error prone and only used by the IPN, find a better
   // abstraction
@@ -64,7 +64,7 @@ public interface ISarosSessionManager {
    *
    * @param user JID of the user to share projects with
    */
-  public void startSharingProjects(JID user);
+  public void startSharingReferencePoints(JID user);
 
   /**
    * Invites a user to a running session. Does nothing if no session is running, the user is already
@@ -84,9 +84,9 @@ public interface ISarosSessionManager {
   /**
    * Adds projects to an existing session.
    *
-   * @param projects the projects to add
+   * @param referencePoints the projects to add
    */
-  void addProjectsToSession(Set<IReferencePoint> projects);
+  void addReferencePointsToSession(Set<IReferencePoint> referencePoints);
 
   /**
    * Call this before a ISarosSession is started.
