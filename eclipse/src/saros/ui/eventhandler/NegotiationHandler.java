@@ -11,7 +11,7 @@ import org.eclipse.ui.progress.IProgressConstants;
 import saros.Saros;
 import saros.monitoring.ProgressMonitorAdapterFactory;
 import saros.negotiation.AbstractIncomingProjectNegotiation;
-import saros.negotiation.AbstractOutgoingProjectNegotiation;
+import saros.negotiation.AbstractOutgoingResourceNegotiation;
 import saros.negotiation.IncomingSessionNegotiation;
 import saros.negotiation.OutgoingSessionNegotiation;
 import saros.negotiation.ResourceNegotiation;
@@ -122,10 +122,10 @@ public class NegotiationHandler implements INegotiationHandler {
 
   private class OutgoingProjectJob extends Job {
 
-    private AbstractOutgoingProjectNegotiation negotiation;
+    private AbstractOutgoingResourceNegotiation negotiation;
     private String peer;
 
-    public OutgoingProjectJob(AbstractOutgoingProjectNegotiation outgoingProjectNegotiation) {
+    public OutgoingProjectJob(AbstractOutgoingResourceNegotiation outgoingProjectNegotiation) {
       super(Messages.NegotiationHandler_sharing_project);
       negotiation = outgoingProjectNegotiation;
       peer = negotiation.getPeer().getBase();
@@ -211,7 +211,7 @@ public class NegotiationHandler implements INegotiationHandler {
   }
 
   @Override
-  public void handleOutgoingProjectNegotiation(AbstractOutgoingProjectNegotiation negotiation) {
+  public void handleOutgoingProjectNegotiation(AbstractOutgoingResourceNegotiation negotiation) {
 
     OutgoingProjectJob job = new OutgoingProjectJob(negotiation);
     job.setPriority(Job.SHORT);

@@ -110,7 +110,7 @@ public final class NegotiationFactory {
         receiver);
   }
 
-  public AbstractOutgoingProjectNegotiation newOutgoingProjectNegotiation(
+  public AbstractOutgoingResourceNegotiation newOutgoingProjectNegotiation(
       JID remoteAddress,
       ProjectSharingData projectSharingData,
       ISarosSessionManager sessionManager,

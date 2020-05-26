@@ -35,7 +35,7 @@ import saros.communication.connection.IConnectionStateListener;
 import saros.context.IContainerContext;
 import saros.filesystem.IReferencePoint;
 import saros.negotiation.AbstractIncomingProjectNegotiation;
-import saros.negotiation.AbstractOutgoingProjectNegotiation;
+import saros.negotiation.AbstractOutgoingResourceNegotiation;
 import saros.negotiation.IncomingSessionNegotiation;
 import saros.negotiation.NegotiationFactory;
 import saros.negotiation.NegotiationListener;
@@ -618,8 +618,8 @@ public class SarosSessionManager implements ISarosSessionManager {
       return;
     }
 
-    List<AbstractOutgoingProjectNegotiation> negotiations =
-        new ArrayList<AbstractOutgoingProjectNegotiation>();
+    List<AbstractOutgoingResourceNegotiation> negotiations =
+        new ArrayList<AbstractOutgoingResourceNegotiation>();
 
     if (!startStopSessionLock.tryLock()) {
       log.warn(
@@ -649,7 +649,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     try {
       for (User user : recipients) {
-        AbstractOutgoingProjectNegotiation negotiation =
+        AbstractOutgoingResourceNegotiation negotiation =
             negotiationFactory.newOutgoingProjectNegotiation(
                 user.getJID(), projectSharingData, this, session);
 
@@ -661,7 +661,7 @@ public class SarosSessionManager implements ISarosSessionManager {
       startStopSessionLock.unlock();
     }
 
-    for (AbstractOutgoingProjectNegotiation negotiation : negotiations)
+    for (AbstractOutgoingResourceNegotiation negotiation : negotiations)
       handler.handleOutgoingProjectNegotiation(negotiation);
   }
 
@@ -693,7 +693,7 @@ public class SarosSessionManager implements ISarosSessionManager {
       return;
     }
 
-    AbstractOutgoingProjectNegotiation negotiation;
+    AbstractOutgoingResourceNegotiation negotiation;
 
     synchronized (this) {
       if (!startStopSessionLock.tryLock()) {

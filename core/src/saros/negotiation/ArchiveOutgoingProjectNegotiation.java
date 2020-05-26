@@ -29,10 +29,10 @@ import saros.session.User;
 import saros.synchronize.StartHandle;
 
 /**
- * Implementation of {@link AbstractOutgoingProjectNegotiation} utilizing a transferred zip archive
+ * Implementation of {@link AbstractOutgoingResourceNegotiation} utilizing a transferred zip archive
  * to exchange differences in the project files.
  */
-public class ArchiveOutgoingProjectNegotiation extends AbstractOutgoingProjectNegotiation {
+public class ArchiveOutgoingProjectNegotiation extends AbstractOutgoingResourceNegotiation {
 
   private static final Logger log = Logger.getLogger(ArchiveOutgoingProjectNegotiation.class);
   private File zipArchive = null;

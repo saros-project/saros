@@ -10,7 +10,7 @@ import org.apache.log4j.Logger;
 import saros.filesystem.IReferencePoint;
 import saros.monitoring.NullProgressMonitor;
 import saros.negotiation.AbstractIncomingProjectNegotiation;
-import saros.negotiation.AbstractOutgoingProjectNegotiation;
+import saros.negotiation.AbstractOutgoingResourceNegotiation;
 import saros.negotiation.IncomingSessionNegotiation;
 import saros.negotiation.NegotiationTools;
 import saros.negotiation.OutgoingSessionNegotiation;
@@ -113,7 +113,7 @@ public class NegotiationHandler implements INegotiationHandler {
 
   @Override
   public void handleOutgoingProjectNegotiation(
-      final AbstractOutgoingProjectNegotiation negotiation) {
+      final AbstractOutgoingResourceNegotiation negotiation) {
 
     projectExecutor.execute(
         new Runnable() {
