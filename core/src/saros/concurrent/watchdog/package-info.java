@@ -18,7 +18,7 @@
  *       inconsistent state.
  *   <li>The word "equivalent" needs some caution. Because Saros allows multiple participants to
  *       write concurrently, consistency is naturally a relative concept. The best way of thinking
- *       about it is, that if everybody stops changing files and folders, the project should
+ *       about it is, that if everybody stops changing files and folders, the reference point should
  *       eventually become consistent.
  * </ol>
  *
