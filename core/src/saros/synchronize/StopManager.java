@@ -103,6 +103,7 @@ public final class StopManager extends AbstractActivityProducer implements Start
         }
       };
 
+  // TODO update this entry
   /**
    * @JTourBusStop 2, StopManager:
    *
@@ -251,7 +252,7 @@ public final class StopManager extends AbstractActivityProducer implements Start
    * @JTourBusStop 1, StopManager:
    *
    * <p>Sometimes it is necessary to prevent others from making modifications, e.g. during the
-   * OutgoingProjectNegotiation or during the recovery by ConsistencyWatchdogHandler and this class
+   * OutgoingResourceNegotiation or during the recovery by ConsistencyWatchdogHandler and this class
    * is responsible for managing this process. Objects that want to implement a lock need to
    * register a Blockable with the StopManager, the Blockable will be called when the StopManager is
    * locked or unlocked. The stop method will either stop a single user or a list of users and then
