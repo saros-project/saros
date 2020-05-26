@@ -16,7 +16,7 @@ public class ConnectingFailureHandler {
     connectionHandler.setCallback(connectingFailureCallback);
   }
 
-  private void handleConnectionFailed(XMPPAccount account, String errorMessage) {
+  public void handleConnectionFailed(XMPPAccount account, String errorMessage) {
     // TODO offer user possibility of adjusting settings and re-connect
     NotificationPanel.showError(errorMessage, CoreMessages.ConnectingFailureHandler_title);
   }
