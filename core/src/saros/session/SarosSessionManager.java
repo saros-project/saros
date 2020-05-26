@@ -100,7 +100,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
   private final SessionNegotiationObservable currentSessionNegotiations;
 
-  private final ProjectNegotiationObservable currentProjectNegotiations;
+  private final ResourceNegotiationObservable currentProjectNegotiations;
 
   private final ResourceNegotiationCollector nextProjectNegotiation =
       new ResourceNegotiationCollector();
@@ -176,7 +176,7 @@ public class SarosSessionManager implements ISarosSessionManager {
     this.context = context;
     this.connectionHandler = connectionHandler;
     this.currentSessionNegotiations = new SessionNegotiationObservable();
-    this.currentProjectNegotiations = new ProjectNegotiationObservable();
+    this.currentProjectNegotiations = new ResourceNegotiationObservable();
     this.connectionHandler.addConnectionStateListener(connectionListener);
 
     this.negotiationFactory = negotiationFactory;
