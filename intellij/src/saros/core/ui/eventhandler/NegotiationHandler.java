@@ -172,7 +172,7 @@ public class NegotiationHandler implements INegotiationHandler {
         return new Status(IStatus.ERROR, SarosComponent.PLUGIN_ID, e.getMessage(), e);
       }
 
-      sessionManager.startSharingProjects(negotiation.getPeer());
+      sessionManager.startSharingReferencePoints(negotiation.getPeer());
 
       return Status.OK_STATUS;
     }

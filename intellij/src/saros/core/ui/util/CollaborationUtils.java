@@ -168,7 +168,7 @@ public class CollaborationUtils {
           public void run() {
 
             if (sarosSession.hasWriteAccess()) {
-              sessionManager.addProjectsToSession(referencePoints);
+              sessionManager.addReferencePointsToSession(referencePoints);
               return;
             }
 
