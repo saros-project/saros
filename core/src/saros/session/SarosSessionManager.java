@@ -71,12 +71,12 @@ public class SarosSessionManager implements ISarosSessionManager {
    * @JTourBusStop 6, Architecture Overview, Invitation Management:
    *
    * <p>While Activities are used to keep a running session consistent, we use MESSAGES whenever the
-   * Session itself is modified. This means adding users or projects to the session.
+   * Session itself is modified. This means adding users or reference points to the session.
    *
    * <p>The Invitation Process is managed by the "Invitation Management"-Component. This class is
    * the main entrance point of this Component. During the invitation Process, the Network Layer is
    * used to send MESSAGES between the host and the invitees and the Session Management is informed
-   * about joined users and added projects.
+   * about joined users and added reference points.
    *
    * <p>For more information about the Invitation Process see the "Invitation Process"-Tour.
    */
@@ -100,11 +100,11 @@ public class SarosSessionManager implements ISarosSessionManager {
 
   private final SessionNegotiationObservable currentSessionNegotiations;
 
-  private final ResourceNegotiationObservable currentProjectNegotiations;
+  private final ResourceNegotiationObservable currentResourceNegotiations;
 
-  private final ResourceNegotiationCollector nextProjectNegotiation =
+  private final ResourceNegotiationCollector nextResourceNegotiation =
       new ResourceNegotiationCollector();
-  private Thread nextProjectNegotiationWorker;
+  private Thread nextResourceNegotiationWorker;
 
   private final ConnectionHandler connectionHandler;
 
@@ -128,7 +128,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
         @Override
         public void negotiationTerminated(final ResourceNegotiation negotiation) {
-          currentProjectNegotiations.remove(negotiation);
+          currentResourceNegotiations.remove(negotiation);
 
           if (session != null
               && session.isHost()
@@ -140,19 +140,19 @@ public class SarosSessionManager implements ISarosSessionManager {
             ResourceSharingData resourceSharingData = new ResourceSharingData();
             for (ResourceNegotiationData resourceNegotiationData :
                 ipn.getResourceNegotiationData()) {
-              String projectID = resourceNegotiationData.getReferencePointID();
-              IReferencePoint project = session.getReferencePoint(projectID);
+              String referencePointId = resourceNegotiationData.getReferencePointID();
+              IReferencePoint referencePoint = session.getReferencePoint(referencePointId);
 
-              resourceSharingData.addReferencePoint(project, projectID);
+              resourceSharingData.addReferencePoint(referencePoint, referencePointId);
             }
 
             User originUser = session.getUser(negotiation.getPeer());
             executeOutgoingResourceNegotiation(resourceSharingData, originUser);
           }
 
-          if (currentProjectNegotiations.isEmpty()) {
-            synchronized (nextProjectNegotiation) {
-              nextProjectNegotiation.notifyAll();
+          if (currentResourceNegotiations.isEmpty()) {
+            synchronized (nextResourceNegotiation) {
+              nextResourceNegotiation.notifyAll();
             }
           }
         }
@@ -176,7 +176,7 @@ public class SarosSessionManager implements ISarosSessionManager {
     this.context = context;
     this.connectionHandler = connectionHandler;
     this.currentSessionNegotiations = new SessionNegotiationObservable();
-    this.currentProjectNegotiations = new ResourceNegotiationObservable();
+    this.currentResourceNegotiations = new ResourceNegotiationObservable();
     this.connectionHandler.addConnectionStateListener(connectionListener);
 
     this.negotiationFactory = negotiationFactory;
@@ -184,7 +184,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     this.negotiationPacketLister =
         new NegotiationPacketListener(
-            this, currentSessionNegotiations, currentProjectNegotiations, transmitter, receiver);
+            this, currentSessionNegotiations, currentResourceNegotiations, transmitter, receiver);
   }
 
   @Override
@@ -197,13 +197,13 @@ public class SarosSessionManager implements ISarosSessionManager {
    *
    * <p>This class manages the current Saros session.
    *
-   * <p>Saros makes a distinction between a session and a shared project. A session is an on-line
-   * collaboration between users which allows users to carry out activities. The main activity is to
-   * share projects. Hence, before you share a project, a session has to be started and all users
-   * added to it.
+   * <p>Saros makes a distinction between a session and a shared reference point. A session is an
+   * on-line collaboration between users which allows users to carry out activities. The main
+   * activity is to share reference points. Hence, before you share a reference point, a session has
+   * to be started and all users added to it.
    *
-   * <p>(At the moment, this separation is invisible to the user. He/she must share a project in
-   * order to start a session.)
+   * <p>(At the moment, this separation is invisible to the user. They must share a reference point
+   * in order to start a session.)
    */
   @Override
   public void startSession(final Set<IReferencePoint> referencePoints) {
@@ -264,10 +264,10 @@ public class SarosSessionManager implements ISarosSessionManager {
       session.start();
       sessionStarted(session);
 
-      for (IReferencePoint project : referencePoints) {
-        String projectID = String.valueOf(SESSION_ID_GENERATOR.nextInt(Integer.MAX_VALUE));
+      for (IReferencePoint referencePoint : referencePoints) {
+        String referencePointId = String.valueOf(SESSION_ID_GENERATOR.nextInt(Integer.MAX_VALUE));
 
-        session.addSharedReferencePoint(project, projectID);
+        session.addSharedReferencePoint(referencePoint, referencePointId);
       }
 
       log.info("session started");
@@ -421,7 +421,7 @@ public class SarosSessionManager implements ISarosSessionManager {
     INegotiationHandler handler = negotiationHandler;
 
     if (handler == null) {
-      log.warn("could not accept project negotiation because no handler is installed");
+      log.warn("could not accept resource negotiation because no handler is installed");
       return;
     }
 
@@ -429,7 +429,7 @@ public class SarosSessionManager implements ISarosSessionManager {
     synchronized (this) {
       if (!startStopSessionLock.tryLock()) {
         log.warn(
-            "could not accept project negotiation because the current session is about to stop");
+            "could not accept resource negotiation because the current session is about to stop");
         return;
       }
 
@@ -439,7 +439,7 @@ public class SarosSessionManager implements ISarosSessionManager {
                 remoteAddress, negotiationID, resourceNegotiationData, this, session);
 
         negotiation.setNegotiationListener(negotiationListener);
-        currentProjectNegotiations.add(negotiation);
+        currentResourceNegotiations.add(negotiation);
 
       } finally {
         startStopSessionLock.unlock();
@@ -498,9 +498,9 @@ public class SarosSessionManager implements ISarosSessionManager {
   }
 
   /**
-   * Adds projects to an existing session.
+   * Adds reference points to an existing session.
    *
-   * @param referencePoints to projects to add
+   * @param referencePoints to reference points to add
    */
   @Override
   public synchronized void addReferencePointsToSession(Set<IReferencePoint> referencePoints) {
@@ -515,11 +515,11 @@ public class SarosSessionManager implements ISarosSessionManager {
      * negotiation with all collected resources.
      */
 
-    nextProjectNegotiation.addReferencePoints(referencePoints);
+    nextResourceNegotiation.addReferencePoints(referencePoints);
 
-    if (nextProjectNegotiationWorker != null && nextProjectNegotiationWorker.isAlive()) {
+    if (nextResourceNegotiationWorker != null && nextResourceNegotiationWorker.isAlive()) {
       return;
-    } else if (currentProjectNegotiations.isEmpty()) {
+    } else if (currentResourceNegotiations.isEmpty()) {
       /* shortcut to direct handling */
       startNextResourceNegotiation();
       return;
@@ -530,10 +530,10 @@ public class SarosSessionManager implements ISarosSessionManager {
         new Runnable() {
           @Override
           public void run() {
-            synchronized (nextProjectNegotiation) {
-              while (!currentProjectNegotiations.isEmpty()) {
+            synchronized (nextResourceNegotiation) {
+              while (!currentResourceNegotiations.isEmpty()) {
                 try {
-                  nextProjectNegotiation.wait();
+                  nextResourceNegotiation.wait();
                 } catch (InterruptedException e) {
                   Thread.currentThread().interrupt();
                   return;
@@ -544,11 +544,11 @@ public class SarosSessionManager implements ISarosSessionManager {
             startNextResourceNegotiation();
           }
         };
-    nextProjectNegotiationWorker = ThreadUtils.runSafeAsync(log, worker);
+    nextResourceNegotiationWorker = ThreadUtils.runSafeAsync(log, worker);
   }
 
   /**
-   * This method handles new project negotiations for already invited user (not the first in the
+   * This method handles new resource negotiations for already invited user (not the first in the
    * process of inviting to the session).
    */
   private synchronized void startNextResourceNegotiation() {
@@ -570,52 +570,51 @@ public class SarosSessionManager implements ISarosSessionManager {
       return;
     }
 
-    ResourceSharingData projectsToShare = new ResourceSharingData();
-    Set<IReferencePoint> projects = nextProjectNegotiation.getReferencePoints();
+    ResourceSharingData referencePointsToShare = new ResourceSharingData();
+    Set<IReferencePoint> referencePoints = nextResourceNegotiation.getReferencePoints();
 
     /*
-     * Put all information about which projects and resources to share into
-     * a ProjectsToShare instance, for passing to
-     * OutgoingProjectNegotiation. On the way, generate session-wide ID's
-     * for the projects that don't have them yet.
+     * Put all information about which reference points and resources to share into a
+     * referencePointsToShare, for passing to OutgoingResourceNegotiation. On the way, generate
+     * session-wide ID's for the reference points that don't have them yet.
      */
-    for (IReferencePoint project : projects) {
-      String projectID = currentSession.getReferencePointId(project);
+    for (IReferencePoint referencePoint : referencePoints) {
+      String referencePointId = currentSession.getReferencePointId(referencePoint);
 
-      if (projectID == null) {
-        projectID = String.valueOf(SESSION_ID_GENERATOR.nextInt(Integer.MAX_VALUE));
+      if (referencePointId == null) {
+        referencePointId = String.valueOf(SESSION_ID_GENERATOR.nextInt(Integer.MAX_VALUE));
       }
-      projectsToShare.addReferencePoint(project, projectID);
+      referencePointsToShare.addReferencePoint(referencePoint, referencePointId);
 
       /*
-       * If this is the host, add the project directly to the session
+       * If this is the host, add the reference points directly to the session
        * before sending it to the other clients. (Non-hosts, on the other
-       * hand, wait until the host has accepted the project and offers it
-       * back with a second project negotiation.)
+       * hand, wait until the host has accepted the reference points and offers it
+       * back with a second reference point negotiation.)
        *
-       * Note that partial projects are re-added even if they were already
+       * Note that partial reference points are re-added even if they were already
        * registered as being part of the session. This is because their
        * lists of shared resources may have changed.
        */
-      if (currentSession.isHost() && !currentSession.isShared(project)) {
-        currentSession.addSharedReferencePoint(project, projectID);
+      if (currentSession.isHost() && !currentSession.isShared(referencePoint)) {
+        currentSession.addSharedReferencePoint(referencePoint, referencePointId);
       }
     }
 
-    if (projectsToShare.isEmpty()) {
+    if (referencePointsToShare.isEmpty()) {
       log.warn(
-          "skipping project negotiation because no new projects were added to the current session");
+          "skipping resource negotiation because no new reference points were added to the current session");
       return;
     }
 
-    executeOutgoingResourceNegotiation(projectsToShare, session.getLocalUser());
+    executeOutgoingResourceNegotiation(referencePointsToShare, session.getLocalUser());
   }
 
   private void executeOutgoingResourceNegotiation(
       ResourceSharingData resourceSharingData, User originUser) {
     INegotiationHandler handler = negotiationHandler;
     if (handler == null) {
-      log.warn("could not start a project negotiation because no handler is installed");
+      log.warn("could not start a resource negotiation because no handler is installed");
       return;
     }
 
@@ -624,15 +623,15 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     if (!startStopSessionLock.tryLock()) {
       log.warn(
-          "could not start a project negotiation because the current session is about to stop");
+          "could not start a resource negotiation because the current session is about to stop");
       return;
     }
 
     List<User> recipients = new ArrayList<>();
     if (session.isHost()) {
       /*
-       * If we received these project from a non-host user previously,
-       * that user already has the project.
+       * If we received these reference points from a non-host user previously,
+       * that user already has the reference point.
        */
       for (User user : session.getRemoteUsers()) {
         if (!user.equals(originUser)) {
@@ -641,7 +640,7 @@ public class SarosSessionManager implements ISarosSessionManager {
       }
     } else {
       /*
-       * As a non-host, we share the project to the host only, who
+       * As a non-host, we share the reference point to the host only, who
        * takes care of sharing it with all other users in the session
        * (see negotiationListener in this class).
        */
@@ -655,7 +654,7 @@ public class SarosSessionManager implements ISarosSessionManager {
                 user.getJID(), resourceSharingData, this, session);
 
         negotiation.setNegotiationListener(negotiationListener);
-        currentProjectNegotiations.add(negotiation);
+        currentResourceNegotiations.add(negotiation);
         negotiations.add(negotiation);
       }
     } finally {
@@ -676,21 +675,22 @@ public class SarosSessionManager implements ISarosSessionManager {
        * as this currently only called by the OutgoingSessionNegotiation
        * job just silently return
        */
-      log.error("cannot share projects when no session is running");
+      log.error("cannot share reference points when no session is running");
       return;
     }
 
-    ResourceSharingData currentSharedProjects = new ResourceSharingData();
-    for (IReferencePoint project : currentSession.getReferencePoints()) {
-      currentSharedProjects.addReferencePoint(project, session.getReferencePointId(project));
+    ResourceSharingData currentSharedReferencePoints = new ResourceSharingData();
+    for (IReferencePoint referencePoint : currentSession.getReferencePoints()) {
+      currentSharedReferencePoints.addReferencePoint(
+          referencePoint, session.getReferencePointId(referencePoint));
     }
 
-    if (currentSharedProjects.isEmpty()) return;
+    if (currentSharedReferencePoints.isEmpty()) return;
 
     INegotiationHandler handler = negotiationHandler;
 
     if (handler == null) {
-      log.warn("could not start a project negotiation because no" + " handler is installed");
+      log.warn("could not start a resource negotiation because no handler is installed");
       return;
     }
 
@@ -699,7 +699,7 @@ public class SarosSessionManager implements ISarosSessionManager {
     synchronized (this) {
       if (!startStopSessionLock.tryLock()) {
         log.warn(
-            "could not start a project negotiation because the"
+            "could not start a resource negotiation because the"
                 + " current session is about to stop");
         return;
       }
@@ -708,17 +708,17 @@ public class SarosSessionManager implements ISarosSessionManager {
         User remoteUser = currentSession.getUser(user);
         if (remoteUser == null) {
           log.warn(
-              "could not start a project negotiation because"
+              "could not start a resource negotiation because"
                   + " the remote user is not part of the current session");
           return;
         }
 
         negotiation =
             negotiationFactory.newOutgoingResourceNegotiation(
-                user, currentSharedProjects, this, currentSession);
+                user, currentSharedReferencePoints, this, currentSession);
 
         negotiation.setNegotiationListener(negotiationListener);
-        currentProjectNegotiations.add(negotiation);
+        currentResourceNegotiations.add(negotiation);
 
       } finally {
         startStopSessionLock.unlock();
@@ -785,17 +785,17 @@ public class SarosSessionManager implements ISarosSessionManager {
       negotiation.localCancel(null, CancelOption.NOTIFY_PEER);
     }
 
-    for (ResourceNegotiation negotiation : currentProjectNegotiations.list())
+    for (ResourceNegotiation negotiation : currentResourceNegotiations.list())
       negotiation.localCancel(null, CancelOption.NOTIFY_PEER);
 
-    log.trace("waiting for all session and project negotiations to terminate");
+    log.trace("waiting for all session and resource negotiations to terminate");
 
     long startTime = System.currentTimeMillis();
 
     boolean terminated = false;
 
     while (System.currentTimeMillis() - startTime < NEGOTIATION_TIMEOUT) {
-      if (currentSessionNegotiations.list().isEmpty() && currentProjectNegotiations.isEmpty()) {
+      if (currentSessionNegotiations.list().isEmpty() && currentResourceNegotiations.isEmpty()) {
         terminated = true;
         break;
       }
