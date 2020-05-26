@@ -40,7 +40,7 @@ public interface ISessionListener {
   }
 
   /**
-   * Is fired when an user joins the shared project.
+   * Is fired when an user joins the session.
    *
    * <p>This method is called on the UI thread.
    *
@@ -62,7 +62,7 @@ public interface ISessionListener {
   }
 
   /**
-   * Is fired when a finished the Project Negotiation
+   * Is fired when a finished the resource negotiation
    *
    * <p>This method is called on the UI thread.
    *
@@ -84,7 +84,7 @@ public interface ISessionListener {
   }
 
   /**
-   * Is fired when an user leaves the shared project.
+   * Is fired when an user leaves the session.
    *
    * <p>This method is called on the UI thread.
    *
@@ -95,24 +95,24 @@ public interface ISessionListener {
   }
 
   /**
-   * Is fired then a project has been made part of the session, either because the local user began
-   * sharing it or because it is being shared by a remote user.
+   * Is fired then a reference point has been made part of the session, either because the local
+   * user began sharing it or because it is being shared by a remote user.
    *
    * <p>This method might <i>not</i> be called on the UI thread.
    *
-   * @param referencePoint the project that was added
+   * @param referencePoint the reference point that was added
    */
   default void referencePointAdded(IReferencePoint referencePoint) {
     // NOP
   }
 
   /**
-   * Is fired then a project has been removed from the session, meaning it is not shared between the
-   * session's users anymore.
+   * Is fired then a reference point has been removed from the session, meaning it is not shared
+   * between the session's users anymore.
    *
    * <p>This method might <i>not</i> be called on the UI thread.
    *
-   * @param referencePoint the project that was removed
+   * @param referencePoint the reference point that was removed
    */
   default void referencePointRemoved(IReferencePoint referencePoint) {
     // NOP
