@@ -37,7 +37,7 @@ import saros.session.User;
 import saros.synchronize.StartHandle;
 
 /** Share Projects to display them instant on client side using a stream based solution. */
-public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNegotiation {
+public class InstantOutgoingProjectNegotiation extends AbstractOutgoingResourceNegotiation {
 
   private static final Logger log = Logger.getLogger(InstantOutgoingProjectNegotiation.class);
 

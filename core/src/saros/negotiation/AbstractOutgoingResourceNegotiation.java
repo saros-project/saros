@@ -38,9 +38,9 @@ import saros.synchronize.StartHandle;
  * <p>Concrete implementations need to provide an implementation to exchange the calculated
  * differences. This class only provides the initial setup and calculation.
  */
-public abstract class AbstractOutgoingProjectNegotiation extends ResourceNegotiation {
+public abstract class AbstractOutgoingResourceNegotiation extends ResourceNegotiation {
 
-  private static final Logger log = Logger.getLogger(AbstractOutgoingProjectNegotiation.class);
+  private static final Logger log = Logger.getLogger(AbstractOutgoingResourceNegotiation.class);
 
   protected ProjectSharingData projects;
 
@@ -54,7 +54,7 @@ public abstract class AbstractOutgoingProjectNegotiation extends ResourceNegotia
 
   private final AdditionalProjectDataFactory additionalProjectDataFactory;
 
-  protected AbstractOutgoingProjectNegotiation( //
+  protected AbstractOutgoingResourceNegotiation( //
       final JID peer, //
       final ProjectSharingData projects, //
       final ISarosSessionManager sessionManager, //

@@ -18,7 +18,7 @@ import saros.intellij.ui.wizards.AddReferencePointToSessionWizard;
 import saros.intellij.ui.wizards.JoinSessionWizard;
 import saros.monitoring.IProgressMonitor;
 import saros.negotiation.AbstractIncomingProjectNegotiation;
-import saros.negotiation.AbstractOutgoingProjectNegotiation;
+import saros.negotiation.AbstractOutgoingResourceNegotiation;
 import saros.negotiation.IncomingSessionNegotiation;
 import saros.negotiation.OutgoingSessionNegotiation;
 import saros.negotiation.ResourceNegotiation;
@@ -63,7 +63,7 @@ public class NegotiationHandler implements INegotiationHandler {
   }
 
   @Override
-  public void handleOutgoingProjectNegotiation(AbstractOutgoingProjectNegotiation negotiation) {
+  public void handleOutgoingProjectNegotiation(AbstractOutgoingResourceNegotiation negotiation) {
     OutgoingProjectJob job = new OutgoingProjectJob(negotiation);
     job.schedule();
   }
@@ -180,10 +180,10 @@ public class NegotiationHandler implements INegotiationHandler {
 
   private class OutgoingProjectJob extends UIMonitoredJob {
 
-    private final AbstractOutgoingProjectNegotiation negotiation;
+    private final AbstractOutgoingResourceNegotiation negotiation;
     private final String peer;
 
-    OutgoingProjectJob(AbstractOutgoingProjectNegotiation outgoingResourceNegotiation) {
+    OutgoingProjectJob(AbstractOutgoingResourceNegotiation outgoingResourceNegotiation) {
       super(Messages.NegotiationHandler_sharing_reference_point);
       negotiation = outgoingResourceNegotiation;
       peer = negotiation.getPeer().getBase();

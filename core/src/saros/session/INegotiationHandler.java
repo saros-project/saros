@@ -1,7 +1,7 @@
 package saros.session;
 
 import saros.negotiation.AbstractIncomingProjectNegotiation;
-import saros.negotiation.AbstractOutgoingProjectNegotiation;
+import saros.negotiation.AbstractOutgoingResourceNegotiation;
 import saros.negotiation.IncomingSessionNegotiation;
 import saros.negotiation.OutgoingSessionNegotiation;
 
@@ -33,7 +33,7 @@ public interface INegotiationHandler {
    *
    * @param negotiation the negotiation to use for executing the project synchronization
    */
-  public void handleOutgoingProjectNegotiation(AbstractOutgoingProjectNegotiation negotiation);
+  public void handleOutgoingProjectNegotiation(AbstractOutgoingResourceNegotiation negotiation);
 
   /**
    * Called when a remote project from a remote session user should be synchronized with a local

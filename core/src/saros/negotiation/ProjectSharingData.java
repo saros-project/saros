@@ -8,7 +8,7 @@ import saros.filesystem.IReferencePoint;
 
 /**
  * Defines which projects and which of their resources) to share during a particular {@link
- * AbstractOutgoingProjectNegotiation}.
+ * AbstractOutgoingResourceNegotiation}.
  */
 public class ProjectSharingData implements Iterable<IReferencePoint> {
 
