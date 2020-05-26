@@ -344,7 +344,7 @@ public abstract class AbstractOutgoingResourceNegotiation extends ResourceNegoti
                     SubProgressMonitor.SUPPRESS_BEGINTASK
                         | SubProgressMonitor.SUPPRESS_SETTASKNAME));
 
-        referencePointFileList.setProjectID(referencePointID);
+        referencePointFileList.setReferencePointID(referencePointID);
 
         Map<String, String> additionalResourceData =
             additionalResourceDataFactory.build(referencePoint);
