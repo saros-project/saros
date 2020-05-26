@@ -6,18 +6,18 @@ import saros.filesystem.IReferencePoint;
 import saros.net.xmpp.JID;
 import saros.session.ISarosSession;
 
-/** Offers convenient methods for collaboration actions like sharing a project resources. */
+/** Offers convenient methods for collaboration actions like sharing a reference point resources. */
 public interface ICollaborationUtils {
 
   /**
-   * Starts a new session and shares the given projects with given contacts.<br>
+   * Starts a new session and shares the given reference points with given contacts.<br>
    * Does nothing if a {@link ISarosSession session} is already running.
    *
-   * @param projects projects to share
+   * @param referencePoints reference points to share
    * @param contacts which should be invited
    * @nonBlocking
    */
-  public void startSession(Set<IReferencePoint> projects, List<JID> contacts);
+  public void startSession(Set<IReferencePoint> referencePoints, List<JID> contacts);
 
   /**
    * Leaves the currently running {@link ISarosSession}<br>
@@ -26,13 +26,13 @@ public interface ICollaborationUtils {
   public void leaveSession();
 
   /**
-   * Adds the given projects to the session.<br>
+   * Adds the given reference points to the session.<br>
    * Does nothing if no {@link ISarosSession session} is running.
    *
-   * @param projects the projects to add to the session
+   * @param referencePoints the reference points to add to the session
    * @nonBlocking
    */
-  public void addProjectsToSession(Set<IReferencePoint> projects);
+  public void addReferencePointsToSession(Set<IReferencePoint> referencePoints);
 
   /**
    * Adds the given contacts to the session.<br>
