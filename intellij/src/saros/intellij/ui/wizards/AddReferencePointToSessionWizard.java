@@ -44,8 +44,8 @@ import saros.negotiation.FileListDiff;
 import saros.negotiation.FileListFactory;
 import saros.negotiation.NegotiationTools;
 import saros.negotiation.NegotiationTools.CancelLocation;
-import saros.negotiation.ProjectNegotiationData;
 import saros.negotiation.ResourceNegotiation;
+import saros.negotiation.ResourceNegotiationData;
 import saros.net.xmpp.JID;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.ISarosSession;
@@ -464,12 +464,12 @@ public class AddReferencePointToSessionWizard extends Wizard {
 
     this.setPreferredSize(new Dimension(650, 535));
 
-    List<ProjectNegotiationData> data = negotiation.getResourceNegotiationData();
+    List<ResourceNegotiationData> data = negotiation.getResourceNegotiationData();
 
     localReferencePoints = new HashMap<String, IReferencePoint>();
 
-    remoteReferencePointID = data.get(0).getProjectID();
-    remoteReferencePointName = data.get(0).getProjectName();
+    remoteReferencePointID = data.get(0).getReferencePointID();
+    remoteReferencePointName = data.get(0).getReferencePointName();
 
     selectLocalReferencePointRepresentationPage =
         new SelectLocalReferencePointRepresentationPage(
@@ -670,7 +670,7 @@ public class AddReferencePointToSessionWizard extends Wizard {
       IReferencePoint referencePoint = entry.getValue();
 
       try {
-        final ProjectNegotiationData data =
+        final ResourceNegotiationData data =
             negotiation.getResourceNegotiationData(referencePointID);
 
         FileList localFileList =

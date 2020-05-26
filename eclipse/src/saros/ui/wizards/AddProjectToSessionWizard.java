@@ -56,8 +56,8 @@ import saros.negotiation.FileListFactory;
 import saros.negotiation.NegotiationTools;
 import saros.negotiation.NegotiationTools.CancelLocation;
 import saros.negotiation.NegotiationTools.CancelOption;
-import saros.negotiation.ProjectNegotiationData;
 import saros.negotiation.ResourceNegotiation;
+import saros.negotiation.ResourceNegotiationData;
 import saros.net.IConnectionManager;
 import saros.net.xmpp.JID;
 import saros.preferences.Preferences;
@@ -588,7 +588,7 @@ public class AddProjectToSessionWizard extends Wizard {
                 IStatus.ERROR, Saros.PLUGIN_ID, "failed to compute local file list", e));
       }
 
-      final ProjectNegotiationData data = negotiation.getResourceNegotiationData(projectID);
+      final ResourceNegotiationData data = negotiation.getResourceNegotiationData(projectID);
 
       final FileListDiff diff = FileListDiff.diff(localFileList, data.getFileList());
 
@@ -627,8 +627,8 @@ public class AddProjectToSessionWizard extends Wizard {
 
     final Map<String, IProject> result = new HashMap<String, IProject>();
 
-    for (final ProjectNegotiationData data : negotiation.getResourceNegotiationData()) {
-      final String projectID = data.getProjectID();
+    for (final ResourceNegotiationData data : negotiation.getResourceNegotiationData()) {
+      final String projectID = data.getReferencePointID();
 
       result.put(
           projectID,
@@ -681,10 +681,10 @@ public class AddProjectToSessionWizard extends Wizard {
   private void storeCurrentProjectNameMapping(final JID jid) {
     Map<String, String> currentProjectNameMapping = new HashMap<>();
 
-    for (final ProjectNegotiationData data : negotiation.getResourceNegotiationData()) {
-      final String projectID = data.getProjectID();
+    for (final ResourceNegotiationData data : negotiation.getResourceNegotiationData()) {
+      final String projectID = data.getReferencePointID();
       currentProjectNameMapping.put(
-          data.getProjectName(), namePage.getTargetProjectName(projectID));
+          data.getReferencePointName(), namePage.getTargetProjectName(projectID));
     }
 
     mappingStorage.updateMapping(jid, currentProjectNameMapping);

@@ -14,8 +14,8 @@ import saros.negotiation.AbstractOutgoingResourceNegotiation;
 import saros.negotiation.IncomingSessionNegotiation;
 import saros.negotiation.NegotiationTools;
 import saros.negotiation.OutgoingSessionNegotiation;
-import saros.negotiation.ProjectNegotiationData;
 import saros.negotiation.ResourceNegotiation;
+import saros.negotiation.ResourceNegotiationData;
 import saros.negotiation.SessionNegotiation;
 import saros.net.xmpp.JID;
 import saros.server.ServerConfig;
@@ -138,8 +138,8 @@ public class NegotiationHandler implements INegotiationHandler {
 
     Map<String, IReferencePoint> projectMapping = new HashMap<>();
 
-    for (ProjectNegotiationData data : negotiation.getResourceNegotiationData()) {
-      String projectName = data.getProjectName();
+    for (ResourceNegotiationData data : negotiation.getResourceNegotiationData()) {
+      String projectName = data.getReferencePointName();
       IReferencePoint project = workspace.getProject(projectName);
 
       // TODO: The file path is currently dictated by the name, potentially resulting in CONFLICTS
@@ -153,7 +153,7 @@ public class NegotiationHandler implements INegotiationHandler {
         }
       }
 
-      projectMapping.put(data.getProjectID(), project);
+      projectMapping.put(data.getReferencePointID(), project);
     }
 
     projectExecutor.execute(

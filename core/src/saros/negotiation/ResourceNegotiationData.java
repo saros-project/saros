@@ -17,21 +17,21 @@ import java.util.Map;
  * @see FileList
  * @see AdditionalResourceDataFactory
  */
-@XStreamAlias("PJNGDATA")
-public class ProjectNegotiationData {
+@XStreamAlias("RNDATA")
+public class ResourceNegotiationData {
 
   @XStreamAlias("name")
   @XStreamAsAttribute
   private final String projectName;
 
-  @XStreamAlias("pid")
+  @XStreamAlias("rpid")
   @XStreamAsAttribute
   private final String projectID;
 
   @XStreamAlias("filelist")
   private final FileList fileList;
 
-  @XStreamAlias("additionalProjectOptions")
+  @XStreamAlias("ard")
   private final Map<String, String> additionalProjectData;
 
   /**
@@ -40,7 +40,7 @@ public class ProjectNegotiationData {
    * @param fileList complete list of all files that are part of the sharing for the given project
    * @param additionalProjectData a map of additional project options
    */
-  public ProjectNegotiationData(
+  public ResourceNegotiationData(
       String projectID,
       String projectName,
       FileList fileList,
@@ -56,11 +56,11 @@ public class ProjectNegotiationData {
     return fileList;
   }
 
-  public String getProjectName() {
+  public String getReferencePointName() {
     return projectName;
   }
 
-  public String getProjectID() {
+  public String getReferencePointID() {
     return projectID;
   }
 
@@ -72,7 +72,7 @@ public class ProjectNegotiationData {
    *
    * @return an unmodifiable view of the map of additional project options
    */
-  public Map<String, String> getAdditionalProjectData() {
+  public Map<String, String> getAdditionalResourceData() {
     if (additionalProjectData == null) return Collections.emptyMap();
 
     return Collections.unmodifiableMap(additionalProjectData);

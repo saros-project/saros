@@ -176,7 +176,7 @@ public abstract class AbstractOutgoingResourceNegotiation extends ResourceNegoti
   }
 
   protected void sendFileList(
-      List<ProjectNegotiationData> resourceNegotiationData, IProgressMonitor monitor)
+      List<ResourceNegotiationData> resourceNegotiationData, IProgressMonitor monitor)
       throws IOException, SarosCancellationException {
 
     /*
@@ -307,7 +307,7 @@ public abstract class AbstractOutgoingResourceNegotiation extends ResourceNegoti
     startActivityQueuingResponseCollector.cancel();
   }
 
-  protected List<ProjectNegotiationData> createResourceNegotiationDataList(
+  protected List<ResourceNegotiationData> createResourceNegotiationDataList(
       final ProjectSharingData resourceSharingData, final IProgressMonitor monitor)
       throws IOException, LocalCancellationException {
 
@@ -318,8 +318,8 @@ public abstract class AbstractOutgoingResourceNegotiation extends ResourceNegoti
         "Creating file list and calculating file checksums. This may take a while...",
         resourceSharingData.size() * scale);
 
-    List<ProjectNegotiationData> negData =
-        new ArrayList<ProjectNegotiationData>(resourceSharingData.size());
+    List<ResourceNegotiationData> negData =
+        new ArrayList<ResourceNegotiationData>(resourceSharingData.size());
 
     for (IReferencePoint referencePoint : resourceSharingData) {
 
@@ -349,8 +349,8 @@ public abstract class AbstractOutgoingResourceNegotiation extends ResourceNegoti
         Map<String, String> additionalResourceData =
             additionalResourceDataFactory.build(referencePoint);
 
-        ProjectNegotiationData data =
-            new ProjectNegotiationData(
+        ResourceNegotiationData data =
+            new ResourceNegotiationData(
                 referencePointID,
                 referencePoint.getName(),
                 referencePointFileList,

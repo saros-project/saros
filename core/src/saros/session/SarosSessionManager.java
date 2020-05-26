@@ -41,10 +41,10 @@ import saros.negotiation.NegotiationFactory;
 import saros.negotiation.NegotiationListener;
 import saros.negotiation.NegotiationTools.CancelOption;
 import saros.negotiation.OutgoingSessionNegotiation;
-import saros.negotiation.ProjectNegotiationData;
 import saros.negotiation.ProjectSharingData;
 import saros.negotiation.ResourceNegotiation;
 import saros.negotiation.ResourceNegotiationCollector;
+import saros.negotiation.ResourceNegotiationData;
 import saros.negotiation.SessionNegotiation;
 import saros.negotiation.hooks.ISessionNegotiationHook;
 import saros.negotiation.hooks.SessionNegotiationHookManager;
@@ -138,8 +138,9 @@ public class SarosSessionManager implements ISarosSessionManager {
                 (AbstractIncomingResourceNegotiation) negotiation;
 
             ProjectSharingData projectSharingData = new ProjectSharingData();
-            for (ProjectNegotiationData projectNegotiationData : ipn.getResourceNegotiationData()) {
-              String projectID = projectNegotiationData.getProjectID();
+            for (ResourceNegotiationData resourceNegotiationData :
+                ipn.getResourceNegotiationData()) {
+              String projectID = resourceNegotiationData.getReferencePointID();
               IReferencePoint project = session.getProject(projectID);
 
               projectSharingData.addProject(project, projectID);
@@ -414,7 +415,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
   void projectNegotiationRequestReceived(
       JID remoteAddress,
-      List<ProjectNegotiationData> projectNegotiationData,
+      List<ResourceNegotiationData> resourceNegotiationData,
       String negotiationID) {
 
     INegotiationHandler handler = negotiationHandler;
@@ -435,7 +436,7 @@ public class SarosSessionManager implements ISarosSessionManager {
       try {
         negotiation =
             negotiationFactory.newIncomingResourceNegotiation(
-                remoteAddress, negotiationID, projectNegotiationData, this, session);
+                remoteAddress, negotiationID, resourceNegotiationData, this, session);
 
         negotiation.setNegotiationListener(negotiationListener);
         currentProjectNegotiations.add(negotiation);

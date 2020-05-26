@@ -151,7 +151,7 @@ public final class NegotiationFactory {
   public AbstractIncomingResourceNegotiation newIncomingResourceNegotiation(
       JID remoteAddress,
       String negotiationID,
-      List<ProjectNegotiationData> resourceNegotiationData,
+      List<ResourceNegotiationData> resourceNegotiationData,
       ISarosSessionManager sessionManager,
       ISarosSession session) {
 
