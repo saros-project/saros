@@ -147,7 +147,7 @@ public class SarosSessionManager implements ISarosSessionManager {
             }
 
             User originUser = session.getUser(negotiation.getPeer());
-            executeOutgoingProjectNegotiation(resourceSharingData, originUser);
+            executeOutgoingResourceNegotiation(resourceSharingData, originUser);
           }
 
           if (currentProjectNegotiations.isEmpty()) {
@@ -413,7 +413,7 @@ public class SarosSessionManager implements ISarosSessionManager {
     handler.handleIncomingSessionNegotiation(negotiation);
   }
 
-  void projectNegotiationRequestReceived(
+  void resourceNegotiationRequestReceived(
       JID remoteAddress,
       List<ResourceNegotiationData> resourceNegotiationData,
       String negotiationID) {
@@ -521,7 +521,7 @@ public class SarosSessionManager implements ISarosSessionManager {
       return;
     } else if (currentProjectNegotiations.isEmpty()) {
       /* shortcut to direct handling */
-      startNextProjectNegotiation();
+      startNextResourceNegotiation();
       return;
     }
 
@@ -541,7 +541,7 @@ public class SarosSessionManager implements ISarosSessionManager {
               }
             }
 
-            startNextProjectNegotiation();
+            startNextResourceNegotiation();
           }
         };
     nextProjectNegotiationWorker = ThreadUtils.runSafeAsync(log, worker);
@@ -551,7 +551,7 @@ public class SarosSessionManager implements ISarosSessionManager {
    * This method handles new project negotiations for already invited user (not the first in the
    * process of inviting to the session).
    */
-  private synchronized void startNextProjectNegotiation() {
+  private synchronized void startNextResourceNegotiation() {
     ISarosSession currentSession = session;
 
     if (currentSession == null) {
@@ -608,10 +608,10 @@ public class SarosSessionManager implements ISarosSessionManager {
       return;
     }
 
-    executeOutgoingProjectNegotiation(projectsToShare, session.getLocalUser());
+    executeOutgoingResourceNegotiation(projectsToShare, session.getLocalUser());
   }
 
-  private void executeOutgoingProjectNegotiation(
+  private void executeOutgoingResourceNegotiation(
       ResourceSharingData resourceSharingData, User originUser) {
     INegotiationHandler handler = negotiationHandler;
     if (handler == null) {

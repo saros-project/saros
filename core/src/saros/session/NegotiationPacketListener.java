@@ -310,7 +310,7 @@ final class NegotiationPacketListener {
     log.info(
         "received resource negotiation from " + sender + " with negotiation id: " + negotiationID);
 
-    sessionManager.projectNegotiationRequestReceived(
+    sessionManager.resourceNegotiationRequestReceived(
         sender, resourceNegotiationData, negotiationID);
   }
 }
