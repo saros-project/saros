@@ -51,7 +51,7 @@ public class CollaborationUtils {
    * <p>Does nothing if a {@link ISarosSession session} is already running.
    *
    * @param referencePoints the reference points to share
-   * @param contacts the contacts to share the projects with
+   * @param contacts the contacts to share the reference point with
    */
   public static void startSession(Set<IReferencePoint> referencePoints, final List<JID> contacts) {
 

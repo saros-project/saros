@@ -64,7 +64,7 @@ public class NegotiationHandler implements INegotiationHandler {
 
   @Override
   public void handleOutgoingResourceNegotiation(AbstractOutgoingResourceNegotiation negotiation) {
-    OutgoingProjectJob job = new OutgoingProjectJob(negotiation);
+    OutgoingResourceNegotiationJob job = new OutgoingResourceNegotiationJob(negotiation);
     job.schedule();
   }
 
@@ -178,12 +178,13 @@ public class NegotiationHandler implements INegotiationHandler {
     }
   }
 
-  private class OutgoingProjectJob extends UIMonitoredJob {
+  private class OutgoingResourceNegotiationJob extends UIMonitoredJob {
 
     private final AbstractOutgoingResourceNegotiation negotiation;
     private final String peer;
 
-    OutgoingProjectJob(AbstractOutgoingResourceNegotiation outgoingResourceNegotiation) {
+    OutgoingResourceNegotiationJob(
+        AbstractOutgoingResourceNegotiation outgoingResourceNegotiation) {
       super(Messages.NegotiationHandler_sharing_reference_point);
       negotiation = outgoingResourceNegotiation;
       peer = negotiation.getPeer().getBase();

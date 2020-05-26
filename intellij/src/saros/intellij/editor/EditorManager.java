@@ -554,7 +554,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    */
   private void addReferencePointResources(IReferencePoint referencePoint) {
     IntellijReferencePoint intellijReferencePoint = (IntellijReferencePoint) referencePoint;
-    Project intellijProject = intellijReferencePoint.getProject();
+    Project project = intellijReferencePoint.getProject();
 
     Map<IFile, Editor> openFileMapping = new HashMap<>();
 
@@ -565,7 +565,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
       setLocalEditorStatusChangeHandlersEnabled(false);
       setLocalViewPortChangeHandlersEnabled(false);
 
-      for (VirtualFile openFile : ProjectAPI.getOpenFiles(intellijProject)) {
+      for (VirtualFile openFile : ProjectAPI.getOpenFiles(project)) {
         IFile file = (IFile) VirtualFileConverter.convertToResource(openFile, referencePoint);
 
         if (file == null) {
@@ -595,7 +595,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
     Set<String> selectedFiles = new HashSet<>();
 
-    for (VirtualFile selectedFile : ProjectAPI.getSelectedFiles(intellijProject)) {
+    for (VirtualFile selectedFile : ProjectAPI.getSelectedFiles(project)) {
       if (VirtualFileConverter.convertToResource(selectedFile, referencePoint) != null) {
         selectedFiles.add(selectedFile.getPath());
       }
@@ -610,7 +610,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           sendSelectionInformation(localUser, file, editor);
         });
 
-    sendActiveEditorInformation(localUser, intellijProject);
+    sendActiveEditorInformation(localUser, project);
   }
 
   @SuppressWarnings("FieldCanBeLocal")
