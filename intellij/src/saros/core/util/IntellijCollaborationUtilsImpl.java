@@ -27,10 +27,10 @@ public class IntellijCollaborationUtilsImpl implements ICollaborationUtils {
   }
 
   @Override
-  public void startSession(Set<IReferencePoint> projects, List<JID> contacts) {
+  public void startSession(Set<IReferencePoint> referencePoints, List<JID> contacts) {
     Set<Project> sharedProjects = new HashSet<>();
 
-    for (IResource resource : projects) {
+    for (IResource resource : referencePoints) {
       sharedProjects.add(((IntellijReferencePoint) resource.getReferencePoint()).getProject());
     }
 
@@ -42,7 +42,7 @@ public class IntellijCollaborationUtilsImpl implements ICollaborationUtils {
     }
     SharedIDEContext.preregisterProject(sharedProjects.toArray(new Project[1])[0]);
 
-    CollaborationUtils.startSession(projects, contacts);
+    CollaborationUtils.startSession(referencePoints, contacts);
   }
 
   @Override
@@ -51,8 +51,8 @@ public class IntellijCollaborationUtilsImpl implements ICollaborationUtils {
   }
 
   @Override
-  public void addProjectsToSession(Set<IReferencePoint> projects) {
-    CollaborationUtils.addResourcesToSession(projects);
+  public void addReferencePointsToSession(Set<IReferencePoint> referencePoints) {
+    CollaborationUtils.addResourcesToSession(referencePoints);
   }
 
   @Override

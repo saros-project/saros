@@ -14,8 +14,8 @@ import saros.ui.util.ICollaborationUtils;
 public class EclipseCollaborationUtilsImpl implements ICollaborationUtils {
 
   @Override
-  public void startSession(Set<IReferencePoint> projects, List<JID> contacts) {
-    CollaborationUtils.startSession(ResourceAdapterFactory.convertBack(projects), contacts);
+  public void startSession(Set<IReferencePoint> referencePoints, List<JID> contacts) {
+    CollaborationUtils.startSession(ResourceAdapterFactory.convertBack(referencePoints), contacts);
   }
 
   @Override
@@ -24,8 +24,8 @@ public class EclipseCollaborationUtilsImpl implements ICollaborationUtils {
   }
 
   @Override
-  public void addProjectsToSession(Set<IReferencePoint> projects) {
-    CollaborationUtils.addResourcesToSession(ResourceAdapterFactory.convertBack(projects));
+  public void addReferencePointsToSession(Set<IReferencePoint> referencePoints) {
+    CollaborationUtils.addResourcesToSession(ResourceAdapterFactory.convertBack(referencePoints));
   }
 
   @Override
