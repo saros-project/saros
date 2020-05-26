@@ -17,7 +17,7 @@ import saros.intellij.ui.util.UIProjectUtils;
 import saros.intellij.ui.wizards.AddReferencePointToSessionWizard;
 import saros.intellij.ui.wizards.JoinSessionWizard;
 import saros.monitoring.IProgressMonitor;
-import saros.negotiation.AbstractIncomingProjectNegotiation;
+import saros.negotiation.AbstractIncomingResourceNegotiation;
 import saros.negotiation.AbstractOutgoingResourceNegotiation;
 import saros.negotiation.IncomingSessionNegotiation;
 import saros.negotiation.OutgoingSessionNegotiation;
@@ -69,7 +69,7 @@ public class NegotiationHandler implements INegotiationHandler {
   }
 
   @Override
-  public void handleIncomingProjectNegotiation(AbstractIncomingProjectNegotiation negotiation) {
+  public void handleIncomingProjectNegotiation(AbstractIncomingResourceNegotiation negotiation) {
     projectUtils.runWithProject(project -> showIncomingResourceNegotiationUI(project, negotiation));
   }
 
@@ -87,7 +87,7 @@ public class NegotiationHandler implements INegotiationHandler {
   }
 
   private void showIncomingResourceNegotiationUI(
-      Project project, final AbstractIncomingProjectNegotiation negotiation) {
+      Project project, final AbstractIncomingResourceNegotiation negotiation) {
 
     EDTExecutor.invokeLater(
         () -> {

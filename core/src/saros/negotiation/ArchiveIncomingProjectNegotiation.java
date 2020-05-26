@@ -28,10 +28,10 @@ import saros.session.ISarosSessionManager;
 import saros.util.CoreUtils;
 
 /**
- * Implementation of {@link AbstractIncomingProjectNegotiation} utilizing a transferred zip archive
+ * Implementation of {@link AbstractIncomingResourceNegotiation} utilizing a transferred zip archive
  * to exchange differences in the project files.
  */
-public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNegotiation {
+public class ArchiveIncomingProjectNegotiation extends AbstractIncomingResourceNegotiation {
 
   private static final Logger log = Logger.getLogger(ArchiveIncomingProjectNegotiation.class);
 

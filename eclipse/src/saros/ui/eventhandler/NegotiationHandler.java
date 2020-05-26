@@ -10,7 +10,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.ui.progress.IProgressConstants;
 import saros.Saros;
 import saros.monitoring.ProgressMonitorAdapterFactory;
-import saros.negotiation.AbstractIncomingProjectNegotiation;
+import saros.negotiation.AbstractIncomingResourceNegotiation;
 import saros.negotiation.AbstractOutgoingResourceNegotiation;
 import saros.negotiation.IncomingSessionNegotiation;
 import saros.negotiation.OutgoingSessionNegotiation;
@@ -219,7 +219,7 @@ public class NegotiationHandler implements INegotiationHandler {
   }
 
   @Override
-  public void handleIncomingProjectNegotiation(AbstractIncomingProjectNegotiation negotiation) {
+  public void handleIncomingProjectNegotiation(AbstractIncomingResourceNegotiation negotiation) {
     showIncomingProjectUI(negotiation);
   }
 
@@ -265,7 +265,7 @@ public class NegotiationHandler implements INegotiationHandler {
         });
   }
 
-  private void showIncomingProjectUI(final AbstractIncomingProjectNegotiation negotiation) {
+  private void showIncomingProjectUI(final AbstractIncomingResourceNegotiation negotiation) {
 
     SWTUtils.runSafeSWTAsync(
         log,

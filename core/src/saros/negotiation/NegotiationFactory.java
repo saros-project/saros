@@ -148,7 +148,7 @@ public final class NegotiationFactory {
     }
   }
 
-  public AbstractIncomingProjectNegotiation newIncomingProjectNegotiation(
+  public AbstractIncomingResourceNegotiation newIncomingProjectNegotiation(
       JID remoteAddress,
       String negotiationID,
       List<ProjectNegotiationData> projectNegotiationData,

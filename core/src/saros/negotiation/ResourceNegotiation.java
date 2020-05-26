@@ -24,7 +24,7 @@ import saros.session.ISarosSessionManager;
 
 /**
  * This abstract class is the superclass for {@link AbstractOutgoingResourceNegotiation} and {@link
- * AbstractIncomingProjectNegotiation}.
+ * AbstractIncomingResourceNegotiation}.
  */
 public abstract class ResourceNegotiation extends Negotiation {
 
