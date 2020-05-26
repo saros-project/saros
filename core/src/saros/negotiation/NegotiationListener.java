@@ -16,9 +16,9 @@ public interface NegotiationListener {
   public void negotiationTerminated(SessionNegotiation negotiation);
 
   /**
-   * Called when a project negotiation has been terminated.
+   * Called when a resource negotiation has been terminated.
    *
-   * @param negotiation the project negotiation that was terminated
+   * @param negotiation the resource negotiation that was terminated
    */
   public void negotiationTerminated(ResourceNegotiation negotiation);
 }
