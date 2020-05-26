@@ -10,8 +10,8 @@ import saros.communication.extensions.CancelResourceNegotiationExtension;
 import saros.communication.extensions.InvitationAcknowledgedExtension;
 import saros.communication.extensions.InvitationOfferingExtension;
 import saros.communication.extensions.ProjectNegotiationOfferingExtension;
-import saros.negotiation.ProjectNegotiationData;
 import saros.negotiation.ResourceNegotiation;
+import saros.negotiation.ResourceNegotiationData;
 import saros.negotiation.SessionNegotiation;
 import saros.net.IReceiver;
 import saros.net.ITransmitter;
@@ -140,7 +140,7 @@ final class NegotiationPacketListener {
           projectNegotiationRequest(
               new JID(packet.getFrom()),
               extension.getNegotiationID(),
-              extension.getProjectNegotiationData());
+              extension.getResourceNegotiationData());
         }
       };
 
@@ -305,11 +305,12 @@ final class NegotiationPacketListener {
   private void projectNegotiationRequest(
       final JID sender,
       final String negotiationID,
-      final List<ProjectNegotiationData> projectNegotiationData) {
+      final List<ResourceNegotiationData> resourceNegotiationData) {
 
     log.info(
         "received project negotiation from " + sender + " with negotiation id: " + negotiationID);
 
-    sessionManager.projectNegotiationRequestReceived(sender, projectNegotiationData, negotiationID);
+    sessionManager.projectNegotiationRequestReceived(
+        sender, resourceNegotiationData, negotiationID);
   }
 }

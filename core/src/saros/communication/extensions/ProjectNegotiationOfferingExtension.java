@@ -3,23 +3,25 @@ package saros.communication.extensions;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import java.util.List;
 import saros.negotiation.FileList;
-import saros.negotiation.ProjectNegotiationData;
+import saros.negotiation.ResourceNegotiationData;
 
 @XStreamAlias(/* ProjectNegotiationOffering */ "PNOF")
 public class ProjectNegotiationOfferingExtension extends ProjectNegotiationExtension {
 
   public static final Provider PROVIDER = new Provider();
 
-  private List<ProjectNegotiationData> projectNegotiationData;
+  private List<ResourceNegotiationData> resourceNegotiationData;
 
   public ProjectNegotiationOfferingExtension(
-      String sessionID, String negotiationID, List<ProjectNegotiationData> projectNegotiationData) {
+      String sessionID,
+      String negotiationID,
+      List<ResourceNegotiationData> resourceNegotiationData) {
     super(sessionID, negotiationID);
-    this.projectNegotiationData = projectNegotiationData;
+    this.resourceNegotiationData = resourceNegotiationData;
   }
 
-  public List<ProjectNegotiationData> getProjectNegotiationData() {
-    return projectNegotiationData;
+  public List<ResourceNegotiationData> getResourceNegotiationData() {
+    return resourceNegotiationData;
   }
 
   public static class Provider
@@ -29,7 +31,7 @@ public class ProjectNegotiationOfferingExtension extends ProjectNegotiationExten
       super(
           "pnof",
           ProjectNegotiationOfferingExtension.class,
-          ProjectNegotiationData.class,
+          ResourceNegotiationData.class,
           FileList.class);
     }
   }

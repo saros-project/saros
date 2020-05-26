@@ -38,7 +38,7 @@ public class ArchiveIncomingResourceNegotiation extends AbstractIncomingResource
   public ArchiveIncomingResourceNegotiation(
       final JID peer, //
       final String negotiationID, //
-      final List<ProjectNegotiationData> resourceNegotiationData, //
+      final List<ResourceNegotiationData> resourceNegotiationData, //
       final ISarosSessionManager sessionManager, //
       final ISarosSession session, //
       final FileReplacementInProgressObservable fileReplacementInProgressObservable, //

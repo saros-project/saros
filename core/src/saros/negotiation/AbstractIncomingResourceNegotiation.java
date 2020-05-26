@@ -49,7 +49,7 @@ public abstract class AbstractIncomingResourceNegotiation extends ResourceNegoti
 
   private static int MONITOR_WORK_SCALE = 1000;
 
-  private final Map<String, ProjectNegotiationData> resourceNegotiationData;
+  private final Map<String, ResourceNegotiationData> resourceNegotiationData;
 
   protected final FileReplacementInProgressObservable fileReplacementInProgressObservable;
 
@@ -62,7 +62,7 @@ public abstract class AbstractIncomingResourceNegotiation extends ResourceNegoti
   public AbstractIncomingResourceNegotiation(
       final JID peer, //
       final String negotiationID, //
-      final List<ProjectNegotiationData> resourceNegotiationData, //
+      final List<ResourceNegotiationData> resourceNegotiationData, //
       final ISarosSessionManager sessionManager, //
       final ISarosSession session, //
       final FileReplacementInProgressObservable fileReplacementInProgressObservable, //
@@ -83,10 +83,10 @@ public abstract class AbstractIncomingResourceNegotiation extends ResourceNegoti
         transmitter,
         receiver);
 
-    this.resourceNegotiationData = new HashMap<String, ProjectNegotiationData>();
+    this.resourceNegotiationData = new HashMap<String, ResourceNegotiationData>();
 
-    for (final ProjectNegotiationData data : resourceNegotiationData)
-      this.resourceNegotiationData.put(data.getProjectID(), data);
+    for (final ResourceNegotiationData data : resourceNegotiationData)
+      this.resourceNegotiationData.put(data.getReferencePointID(), data);
 
     this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
   }
@@ -258,22 +258,22 @@ public abstract class AbstractIncomingResourceNegotiation extends ResourceNegoti
   }
 
   /**
-   * Returns the {@link ProjectNegotiationData negotiation data} for all reference points which are
+   * Returns the {@link ResourceNegotiationData negotiation data} for all reference points which are
    * part of this negotiation.
    *
    * @return negotiation data for all reference points which are part of this negotiation.
    */
-  public List<ProjectNegotiationData> getResourceNegotiationData() {
-    return new ArrayList<ProjectNegotiationData>(resourceNegotiationData.values());
+  public List<ResourceNegotiationData> getResourceNegotiationData() {
+    return new ArrayList<ResourceNegotiationData>(resourceNegotiationData.values());
   }
 
   /**
-   * Returns the {@link ProjectNegotiationData negotiation data} for the given reference poin id.
+   * Returns the {@link ResourceNegotiationData negotiation data} for the given reference poin id.
    *
    * @return negotiation data for the given reference point id or <code>null</code> if no
    *     negotiation data exists for the given id.
    */
-  public ProjectNegotiationData getResourceNegotiationData(final String id) {
+  public ResourceNegotiationData getResourceNegotiationData(final String id) {
     return resourceNegotiationData.get(id);
   }
 
@@ -357,7 +357,7 @@ public abstract class AbstractIncomingResourceNegotiation extends ResourceNegoti
               new SubProgressMonitor(
                   monitor, 1 * MONITOR_WORK_SCALE, SubProgressMonitor.SUPPRESS_BEGINTASK));
 
-      final ProjectNegotiationData data = getResourceNegotiationData(id);
+      final ResourceNegotiationData data = getResourceNegotiationData(id);
 
       final FileListDiff diff = FileListDiff.diff(localReferencePointFileList, data.getFileList());
 
@@ -492,7 +492,7 @@ public abstract class AbstractIncomingResourceNegotiation extends ResourceNegoti
       final String id = entry.getKey();
       final IReferencePoint referencePoint = entry.getValue();
 
-      final ProjectNegotiationData data = getResourceNegotiationData(id);
+      final ResourceNegotiationData data = getResourceNegotiationData(id);
 
       if (data == null) throw new IllegalArgumentException("invalid reference point id: " + id);
 
