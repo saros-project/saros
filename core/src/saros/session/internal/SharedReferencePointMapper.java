@@ -20,9 +20,9 @@ import saros.session.User;
  * <p>The project IDs are used to identify shared projects across the network, even when the local
  * names of shared projects are different. The ID is determined by the project/file-host.
  */
-class SharedProjectMapper {
+class SharedReferencePointMapper {
 
-  private static final Logger log = Logger.getLogger(SharedProjectMapper.class);
+  private static final Logger log = Logger.getLogger(SharedReferencePointMapper.class);
 
   /** Mapping from project IDs to currently registered shared projects. */
   private final Map<String, IReferencePoint> idToProjectMapping =
@@ -47,7 +47,7 @@ class SharedProjectMapper {
    * @throws NullPointerException if the ID or project is <code>null</code>
    * @throws IllegalStateException if the ID is already in use or the project was already added
    */
-  public synchronized void addProject(String id, IReferencePoint project) {
+  public synchronized void addReferencePoint(String id, IReferencePoint project) {
     if (id == null) throw new NullPointerException("ID is null");
 
     if (project == null) throw new NullPointerException("project is null");
@@ -92,7 +92,7 @@ class SharedProjectMapper {
    *
    * @param id the ID of the project to remove
    */
-  public synchronized void removeProject(String id) {
+  public synchronized void removeReferencePoint(String id) {
     IReferencePoint project = idToProjectMapping.get(id);
 
     if (project == null) {
@@ -123,7 +123,7 @@ class SharedProjectMapper {
    * @return the shared project for the given ID or <code>null</code> if no shared project is
    *     registered with this ID
    */
-  public synchronized IReferencePoint getProject(String id) {
+  public synchronized IReferencePoint getReferencePoint(String id) {
     return idToProjectMapping.get(id);
   }
 
@@ -150,7 +150,7 @@ class SharedProjectMapper {
    *
    * @return a newly created {@link Set} with the shared projects
    */
-  public synchronized Set<IReferencePoint> getProjects() {
+  public synchronized Set<IReferencePoint> getReferencePoints() {
     return new HashSet<IReferencePoint>(idToProjectMapping.values());
   }
 
@@ -173,7 +173,7 @@ class SharedProjectMapper {
    * @param project The project to be checked
    * @return <code>true</code> if the user currently has the project, <code>false</code> if not
    */
-  public synchronized boolean userHasProject(User user, IReferencePoint project) {
+  public synchronized boolean userHasReferencePoint(User user, IReferencePoint project) {
     if (projectsOfUsers.containsKey(user)) {
       return projectsOfUsers.get(user).contains(getID(project));
     }
@@ -186,9 +186,9 @@ class SharedProjectMapper {
    * <p>This method should only be called by the session's host.
    *
    * @param user user who now has all projects
-   * @see #userHasProject(User, IReferencePoint)
+   * @see #userHasReferencePoint(User, IReferencePoint)
    */
-  public synchronized void addMissingProjectsToUser(User user) {
+  public synchronized void addMissingReferencePointsToUser(User user) {
     List<String> projects = new ArrayList<String>();
     for (String project : idToProjectMapping.keySet()) {
       projects.add(project);
@@ -203,7 +203,7 @@ class SharedProjectMapper {
    * <p>This method should only be called by the session's host.
    *
    * @param user user who left the session
-   * @see #userHasProject(User, IReferencePoint)
+   * @see #userHasReferencePoint(User, IReferencePoint)
    */
   public void userLeft(User user) {
     projectsOfUsers.remove(user);

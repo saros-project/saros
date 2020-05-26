@@ -105,7 +105,7 @@ public final class SarosSession implements ISarosSession {
 
   private final User hostUser;
 
-  private final SharedProjectMapper projectMapper;
+  private final SharedReferencePointMapper projectMapper;
 
   private final MutablePicoContainer sessionContainer;
 
@@ -222,7 +222,7 @@ public final class SarosSession implements ISarosSession {
   @Override
   public void addSharedProject(IReferencePoint project, String projectID) {
     if (!projectMapper.isShared(project)) {
-      projectMapper.addProject(projectID, project);
+      projectMapper.addReferencePoint(projectID, project);
 
       listenerDispatch.projectAdded(project);
     }
@@ -246,7 +246,7 @@ public final class SarosSession implements ISarosSession {
 
   @Override
   public boolean userHasProject(User user, IReferencePoint project) {
-    return projectMapper.userHasProject(user, project);
+    return projectMapper.userHasReferencePoint(user, project);
   }
 
   @Override
@@ -368,7 +368,7 @@ public final class SarosSession implements ISarosSession {
        * to decide whom to send activities to - they just send them to the
        * host, who decides for them.
        */
-      projectMapper.addMissingProjectsToUser(user);
+      projectMapper.addMissingReferencePointsToUser(user);
     }
 
     synchronizer.syncExec(
@@ -514,7 +514,7 @@ public final class SarosSession implements ISarosSession {
 
   @Override
   public Set<IReferencePoint> getProjects() {
-    return projectMapper.getProjects();
+    return projectMapper.getReferencePoints();
   }
 
   // FIXME synchronization
@@ -715,21 +715,21 @@ public final class SarosSession implements ISarosSession {
 
   @Override
   public IReferencePoint getProject(String projectID) {
-    return projectMapper.getProject(projectID);
+    return projectMapper.getReferencePoint(projectID);
   }
 
   @Override
   public void addProjectMapping(String projectID, IReferencePoint project) {
-    if (projectMapper.getProject(projectID) == null) {
-      projectMapper.addProject(projectID, project);
+    if (projectMapper.getReferencePoint(projectID) == null) {
+      projectMapper.addReferencePoint(projectID, project);
       listenerDispatch.projectAdded(project);
     }
   }
 
   @Override
   public void removeProjectMapping(String projectID, IReferencePoint project) {
-    if (projectMapper.getProject(projectID) != null) {
-      projectMapper.removeProject(projectID);
+    if (projectMapper.getReferencePoint(projectID) != null) {
+      projectMapper.removeReferencePoint(projectID);
       listenerDispatch.projectRemoved(project);
     }
   }
@@ -787,7 +787,7 @@ public final class SarosSession implements ISarosSession {
     context.initComponent(this);
 
     this.sessionID = id;
-    this.projectMapper = new SharedProjectMapper();
+    this.projectMapper = new SharedReferencePointMapper();
     this.activityQueuer = new ActivityQueuer();
     this.containerContext = context;
 
