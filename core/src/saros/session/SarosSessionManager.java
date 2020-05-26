@@ -41,10 +41,10 @@ import saros.negotiation.NegotiationFactory;
 import saros.negotiation.NegotiationListener;
 import saros.negotiation.NegotiationTools.CancelOption;
 import saros.negotiation.OutgoingSessionNegotiation;
-import saros.negotiation.ProjectSharingData;
 import saros.negotiation.ResourceNegotiation;
 import saros.negotiation.ResourceNegotiationCollector;
 import saros.negotiation.ResourceNegotiationData;
+import saros.negotiation.ResourceSharingData;
 import saros.negotiation.SessionNegotiation;
 import saros.negotiation.hooks.ISessionNegotiationHook;
 import saros.negotiation.hooks.SessionNegotiationHookManager;
@@ -137,17 +137,17 @@ public class SarosSessionManager implements ISarosSessionManager {
             AbstractIncomingResourceNegotiation ipn =
                 (AbstractIncomingResourceNegotiation) negotiation;
 
-            ProjectSharingData projectSharingData = new ProjectSharingData();
+            ResourceSharingData resourceSharingData = new ResourceSharingData();
             for (ResourceNegotiationData resourceNegotiationData :
                 ipn.getResourceNegotiationData()) {
               String projectID = resourceNegotiationData.getReferencePointID();
               IReferencePoint project = session.getProject(projectID);
 
-              projectSharingData.addProject(project, projectID);
+              resourceSharingData.addReferencePoint(project, projectID);
             }
 
             User originUser = session.getUser(negotiation.getPeer());
-            executeOutgoingProjectNegotiation(projectSharingData, originUser);
+            executeOutgoingProjectNegotiation(resourceSharingData, originUser);
           }
 
           if (currentProjectNegotiations.isEmpty()) {
@@ -570,7 +570,7 @@ public class SarosSessionManager implements ISarosSessionManager {
       return;
     }
 
-    ProjectSharingData projectsToShare = new ProjectSharingData();
+    ResourceSharingData projectsToShare = new ResourceSharingData();
     Set<IReferencePoint> projects = nextProjectNegotiation.getReferencePoints();
 
     /*
@@ -585,7 +585,7 @@ public class SarosSessionManager implements ISarosSessionManager {
       if (projectID == null) {
         projectID = String.valueOf(SESSION_ID_GENERATOR.nextInt(Integer.MAX_VALUE));
       }
-      projectsToShare.addProject(project, projectID);
+      projectsToShare.addReferencePoint(project, projectID);
 
       /*
        * If this is the host, add the project directly to the session
@@ -612,7 +612,7 @@ public class SarosSessionManager implements ISarosSessionManager {
   }
 
   private void executeOutgoingProjectNegotiation(
-      ProjectSharingData projectSharingData, User originUser) {
+      ResourceSharingData resourceSharingData, User originUser) {
     INegotiationHandler handler = negotiationHandler;
     if (handler == null) {
       log.warn("could not start a project negotiation because no handler is installed");
@@ -652,7 +652,7 @@ public class SarosSessionManager implements ISarosSessionManager {
       for (User user : recipients) {
         AbstractOutgoingResourceNegotiation negotiation =
             negotiationFactory.newOutgoingResourceNegotiation(
-                user.getJID(), projectSharingData, this, session);
+                user.getJID(), resourceSharingData, this, session);
 
         negotiation.setNegotiationListener(negotiationListener);
         currentProjectNegotiations.add(negotiation);
@@ -680,9 +680,9 @@ public class SarosSessionManager implements ISarosSessionManager {
       return;
     }
 
-    ProjectSharingData currentSharedProjects = new ProjectSharingData();
+    ResourceSharingData currentSharedProjects = new ResourceSharingData();
     for (IReferencePoint project : currentSession.getProjects()) {
-      currentSharedProjects.addProject(project, session.getProjectID(project));
+      currentSharedProjects.addReferencePoint(project, session.getProjectID(project));
     }
 
     if (currentSharedProjects.isEmpty()) return;

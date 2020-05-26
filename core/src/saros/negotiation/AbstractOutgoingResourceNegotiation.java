@@ -42,7 +42,7 @@ public abstract class AbstractOutgoingResourceNegotiation extends ResourceNegoti
 
   private static final Logger log = Logger.getLogger(AbstractOutgoingResourceNegotiation.class);
 
-  protected ProjectSharingData resourceSharingData;
+  protected ResourceSharingData resourceSharingData;
 
   private static final Random NEGOTIATION_ID_GENERATOR = new Random();
 
@@ -56,7 +56,7 @@ public abstract class AbstractOutgoingResourceNegotiation extends ResourceNegoti
 
   protected AbstractOutgoingResourceNegotiation( //
       final JID peer, //
-      final ProjectSharingData resourceSharingData, //
+      final ResourceSharingData resourceSharingData, //
       final ISarosSessionManager sessionManager, //
       final ISarosSession session, //
       final IEditorManager editorManager, //
@@ -109,7 +109,7 @@ public abstract class AbstractOutgoingResourceNegotiation extends ResourceNegoti
        */
       if (!session.isHost()) {
         for (IReferencePoint referencePoint : resourceSharingData) {
-          String referencePointID = resourceSharingData.getProjectID(referencePoint);
+          String referencePointID = resourceSharingData.getReferencePointID(referencePoint);
           session.addSharedProject(referencePoint, referencePointID);
         }
       }
@@ -308,7 +308,7 @@ public abstract class AbstractOutgoingResourceNegotiation extends ResourceNegoti
   }
 
   protected List<ResourceNegotiationData> createResourceNegotiationDataList(
-      final ProjectSharingData resourceSharingData, final IProgressMonitor monitor)
+      final ResourceSharingData resourceSharingData, final IProgressMonitor monitor)
       throws IOException, LocalCancellationException {
 
     // *stretch* progress bar so it will increment smoothly
@@ -326,7 +326,7 @@ public abstract class AbstractOutgoingResourceNegotiation extends ResourceNegoti
       if (monitor.isCanceled())
         throw new LocalCancellationException(null, CancelOption.DO_NOT_NOTIFY_PEER);
       try {
-        String referencePointID = resourceSharingData.getProjectID(referencePoint);
+        String referencePointID = resourceSharingData.getReferencePointID(referencePoint);
 
         /*
          * force editor buffer flush because we read the files from the
