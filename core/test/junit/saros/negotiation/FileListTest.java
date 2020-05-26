@@ -32,16 +32,17 @@ import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.misc.xstream.XStreamFactory;
 
-/*
- *Project Layout for test
+/**
+ * Reference point Layout for test
  *
- *  foo (Project)
+ * <pre>
+ *  foo (Reference Point)
  *      bar (Empty folder)
  *      info.txt (File, random content, UTF-8 encoding)
  *      foobar (Folder)
  *         foo (Empty Folder)
  *         info.txt (File, random content, ISO-8859-1 encoding)
- *
+ * </pre>
  */
 public class FileListTest {
 
@@ -52,17 +53,17 @@ public class FileListTest {
     xstream.processAnnotations(FileList.class);
   }
 
-  private IReferencePoint project;
+  private IReferencePoint referencePoint;
 
   @Before
   public void setUp() throws Exception {
-    project = createProjectLayout();
+    referencePoint = createReferencePointLayout();
   }
 
   @Test
-  public void testCreateFileListForProject() throws IOException {
+  public void testCreateFileListForReferencePoint() throws IOException {
 
-    final FileList fileList = FileListFactory.createFileList(project, null, null);
+    final FileList fileList = FileListFactory.createFileList(referencePoint, null, null);
 
     final List<String> paths = fileList.getPaths();
 
@@ -109,27 +110,27 @@ public class FileListTest {
     assertEquals(list, listFromXml);
   }
 
-  private static IReferencePoint createProjectLayout() {
+  private static IReferencePoint createReferencePointLayout() {
 
-    final IReferencePoint project = EasyMock.createMock(IReferencePoint.class);
+    final IReferencePoint referencePoint = EasyMock.createMock(IReferencePoint.class);
 
-    final IFolder barFolder = createFolderMock(project, "bar", Collections.emptyList());
+    final IFolder barFolder = createFolderMock(referencePoint, "bar", Collections.emptyList());
 
     final IFolder foobarfooFolder =
-        createFolderMock(project, "foobar/foo", Collections.emptyList());
+        createFolderMock(referencePoint, "foobar/foo", Collections.emptyList());
 
-    final IFile infoTxtFile = createFileMock(project, "info.txt", "1234", "UTF-8");
+    final IFile infoTxtFile = createFileMock(referencePoint, "info.txt", "1234", "UTF-8");
 
     final IFile foobarInfoTxtFile =
-        createFileMock(project, "foobar/info.txt", "12345", "ISO-8859-1");
+        createFileMock(referencePoint, "foobar/info.txt", "12345", "ISO-8859-1");
 
     List<IResource> fooBarFolderMembers = new ArrayList<>();
     fooBarFolderMembers.add(foobarfooFolder);
     fooBarFolderMembers.add(foobarInfoTxtFile);
 
-    final IFolder foobarFolder = createFolderMock(project, "foobar", fooBarFolderMembers);
+    final IFolder foobarFolder = createFolderMock(referencePoint, "foobar", fooBarFolderMembers);
 
-    EasyMock.expect(project.getName()).andStubReturn("foo");
+    EasyMock.expect(referencePoint.getName()).andStubReturn("foo");
 
     List<IResource> projectMembers = new ArrayList<>();
     projectMembers.add(barFolder);
@@ -137,18 +138,18 @@ public class FileListTest {
     projectMembers.add(foobarFolder);
 
     try {
-      EasyMock.expect(project.members()).andStubReturn(projectMembers);
+      EasyMock.expect(referencePoint.members()).andStubReturn(projectMembers);
     } catch (IOException e) {
       // cannot happen
     }
 
-    EasyMock.replay(project);
+    EasyMock.replay(referencePoint);
 
-    return project;
+    return referencePoint;
   }
 
   private static IFile createFileMock(
-      final IReferencePoint project,
+      final IReferencePoint referencePoint,
       final String path,
       final String content,
       final String encoding) {
@@ -157,7 +158,7 @@ public class FileListTest {
 
     final IFile fileMock = EasyMock.createMock(IFile.class);
 
-    EasyMock.expect(fileMock.getReferencePoint()).andStubReturn(project);
+    EasyMock.expect(fileMock.getReferencePoint()).andStubReturn(referencePoint);
     EasyMock.expect(fileMock.getReferencePointRelativePath()).andStubReturn(relativePath);
 
     EasyMock.expect(fileMock.isIgnored()).andStubReturn(false);
@@ -198,13 +199,13 @@ public class FileListTest {
   }
 
   private static IFolder createFolderMock(
-      final IReferencePoint project, final String path, final List<IResource> members) {
+      final IReferencePoint referencePoint, final String path, final List<IResource> members) {
 
     final IPath relativePath = createPathMock(path);
 
     final IFolder folderMock = EasyMock.createMock(IFolder.class);
 
-    EasyMock.expect(folderMock.getReferencePoint()).andStubReturn(project);
+    EasyMock.expect(folderMock.getReferencePoint()).andStubReturn(referencePoint);
     EasyMock.expect(folderMock.getReferencePointRelativePath()).andStubReturn(relativePath);
 
     EasyMock.expect(folderMock.isIgnored()).andStubReturn(false);

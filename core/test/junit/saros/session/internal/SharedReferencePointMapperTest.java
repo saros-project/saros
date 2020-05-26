@@ -22,88 +22,88 @@ public class SharedReferencePointMapperTest {
   }
 
   @Test(expected = NullPointerException.class)
-  public void testAddNullProject() {
+  public void testAddNullReferencePoint() {
     mapper.addReferencePoint("0", null);
   }
 
   @Test(expected = NullPointerException.class)
-  public void testAddProjectWithNullID() {
-    mapper.addReferencePoint(null, createProjectMock());
+  public void testAddReferencePointWithNullID() {
+    mapper.addReferencePoint(null, createReferencePointMock());
   }
 
   @Test
-  public void testAddCompletelySharedProject() {
-    IReferencePoint projectMock = createProjectMock();
+  public void testAddCompletelySharedReferencePoint() {
+    IReferencePoint referencePointMock = createReferencePointMock();
 
-    mapper.addReferencePoint("0", projectMock);
+    mapper.addReferencePoint("0", referencePointMock);
 
-    assertTrue("project is not shared at all", mapper.isShared(projectMock));
+    assertTrue("reference point is not shared at all", mapper.isShared(referencePointMock));
   }
 
   @Test(expected = IllegalStateException.class)
-  public void testAddCompletelySharedProjectTwice() {
-    IReferencePoint projectMock = createProjectMock();
+  public void testAddCompletelySharedReferencePointTwice() {
+    IReferencePoint referencePointMock = createReferencePointMock();
 
     try {
-      mapper.addReferencePoint("0", projectMock);
+      mapper.addReferencePoint("0", referencePointMock);
     } catch (RuntimeException e) {
       e.printStackTrace();
       fail(e.getMessage());
     }
-    mapper.addReferencePoint("0", projectMock);
+    mapper.addReferencePoint("0", referencePointMock);
   }
 
   @Test(expected = IllegalStateException.class)
-  public void testAddSameProjectWithDifferentID() {
-    IReferencePoint projectMock = createProjectMock();
+  public void testAddSameReferencePointWithDifferentID() {
+    IReferencePoint referencePointMock = createReferencePointMock();
 
     try {
-      mapper.addReferencePoint("0", projectMock);
-    } catch (RuntimeException e) {
-      e.printStackTrace();
-      fail(e.getMessage());
-    }
-
-    mapper.addReferencePoint("1", projectMock);
-  }
-
-  @Test(expected = IllegalStateException.class)
-  public void testAddNewProjectWithIDAlreadyInUse() {
-    IReferencePoint projectMockA = createProjectMock();
-    IReferencePoint projectMockB = createProjectMock();
-
-    try {
-      mapper.addReferencePoint("0", projectMockA);
+      mapper.addReferencePoint("0", referencePointMock);
     } catch (RuntimeException e) {
       e.printStackTrace();
       fail(e.getMessage());
     }
 
-    mapper.addReferencePoint("0", projectMockB);
+    mapper.addReferencePoint("1", referencePointMock);
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void testAddNewReferencePointWithIDAlreadyInUse() {
+    IReferencePoint referencePointMockA = createReferencePointMock();
+    IReferencePoint referencePointMockB = createReferencePointMock();
+
+    try {
+      mapper.addReferencePoint("0", referencePointMockA);
+    } catch (RuntimeException e) {
+      e.printStackTrace();
+      fail(e.getMessage());
+    }
+
+    mapper.addReferencePoint("0", referencePointMockB);
   }
 
   @Test
-  public void testRemoveProjects() {
-    IReferencePoint projectMockA = createProjectMock();
+  public void testRemoveReferencePoints() {
+    IReferencePoint referencePointMockA = createReferencePointMock();
 
-    mapper.addReferencePoint("0", projectMockA);
+    mapper.addReferencePoint("0", referencePointMockA);
 
     mapper.removeReferencePoint("0");
 
-    assertFalse("project is still shared", mapper.isShared(projectMockA));
+    assertFalse("reference point is still shared", mapper.isShared(referencePointMockA));
   }
 
   @Test
-  public void testIgnoredResourcesOnCompletelySharedProject() {
-    IReferencePoint projectMock = createProjectMock();
+  public void testIgnoredResourcesOnCompletelySharedReferencePoint() {
+    IReferencePoint referencePointMock = createReferencePointMock();
 
     IResource resourceMock = EasyMock.createNiceMock(IResource.class);
-    EasyMock.expect(resourceMock.getReferencePoint()).andStubReturn(projectMock);
+    EasyMock.expect(resourceMock.getReferencePoint()).andStubReturn(referencePointMock);
     EasyMock.expect(resourceMock.isIgnored()).andReturn(true);
 
     EasyMock.replay(resourceMock);
 
-    mapper.addReferencePoint("0", projectMock);
+    mapper.addReferencePoint("0", referencePointMock);
 
     assertFalse("ignored resource is marked as shared", mapper.isShared(resourceMock));
 
@@ -113,38 +113,38 @@ public class SharedReferencePointMapperTest {
   @Test
   public void testIsShared() {
 
-    IReferencePoint projectMockA = createProjectMock();
+    IReferencePoint referencePointMockA = createReferencePointMock();
 
     IResource resourceMockA = EasyMock.createNiceMock(IResource.class);
-    EasyMock.expect(resourceMockA.getReferencePoint()).andStubReturn(projectMockA);
+    EasyMock.expect(resourceMockA.getReferencePoint()).andStubReturn(referencePointMockA);
 
     EasyMock.replay(resourceMockA);
 
     assertFalse("resource should not be marked as shared", mapper.isShared(resourceMockA));
 
-    mapper.addReferencePoint("0", projectMockA);
+    mapper.addReferencePoint("0", referencePointMockA);
 
     assertTrue("resource is not marked as shared", mapper.isShared(resourceMockA));
   }
 
   @Test
-  public void testGetProjects() {
-    IReferencePoint projectMockA = createProjectMock();
-    IReferencePoint projectMockB = createProjectMock();
+  public void testGetReferencePoints() {
+    IReferencePoint referencePointMockA = createReferencePointMock();
+    IReferencePoint referencePointMockB = createReferencePointMock();
 
-    mapper.addReferencePoint("0", projectMockA);
-    mapper.addReferencePoint("1", projectMockB);
+    mapper.addReferencePoint("0", referencePointMockA);
+    mapper.addReferencePoint("1", referencePointMockB);
 
     assertEquals(2, mapper.getReferencePoints().size());
     assertEquals(2, mapper.size());
   }
 
   @Test
-  public void testIDToProjectMapping() {
-    IReferencePoint projectMock = createProjectMock();
-    mapper.addReferencePoint("0", projectMock);
-    assertEquals("0", mapper.getID(projectMock));
-    assertEquals(projectMock, mapper.getReferencePoint("0"));
+  public void testIDToReferencePointMapping() {
+    IReferencePoint referencePointMock = createReferencePointMock();
+    mapper.addReferencePoint("0", referencePointMock);
+    assertEquals("0", mapper.getID(referencePointMock));
+    assertEquals(referencePointMock, mapper.getReferencePoint("0"));
   }
 
   /*
@@ -152,10 +152,10 @@ public class SharedReferencePointMapperTest {
    * IllegalArgumentExceptions as well which may lead to false positive
    * (passed) test cases
    */
-  private IReferencePoint createProjectMock() {
-    IReferencePoint projectMock = EasyMock.createNiceMock(IReferencePoint.class);
-    EasyMock.expect(projectMock.getType()).andStubReturn(REFERENCE_POINT);
-    EasyMock.replay(projectMock);
-    return projectMock;
+  private IReferencePoint createReferencePointMock() {
+    IReferencePoint referencePointMock = EasyMock.createNiceMock(IReferencePoint.class);
+    EasyMock.expect(referencePointMock.getType()).andStubReturn(REFERENCE_POINT);
+    EasyMock.replay(referencePointMock);
+    return referencePointMock;
   }
 }

@@ -63,7 +63,7 @@ public class ActivityHandlerTest {
   // SessionUsers
   private List<User> participants;
   private List<User> remoteUsers;
-  private List<User> remoteUsersWithProjects;
+  private List<User> remoteUsersWithReferencePoints;
 
   private User alice;
   private User bob;
@@ -184,8 +184,9 @@ public class ActivityHandlerTest {
       } else {
         List<User> expectedUsers;
         if (activity instanceof IResourceActivity) {
-          expectedUsers = remoteUsersWithProjects;
-          assertFalse("User without Project received Activity" + activity, targets.contains(dave));
+          expectedUsers = remoteUsersWithReferencePoints;
+          assertFalse(
+              "User without reference point received Activity" + activity, targets.contains(dave));
         } else {
           expectedUsers = remoteUsers;
         }
@@ -294,12 +295,12 @@ public class ActivityHandlerTest {
 
     // Add users to the lists
 
-    remoteUsersWithProjects = new ArrayList<User>();
-    remoteUsersWithProjects.add(carl);
-    remoteUsersWithProjects.add(bob);
+    remoteUsersWithReferencePoints = new ArrayList<User>();
+    remoteUsersWithReferencePoints.add(carl);
+    remoteUsersWithReferencePoints.add(bob);
 
     remoteUsers = new ArrayList<User>();
-    remoteUsers.addAll(remoteUsersWithProjects);
+    remoteUsers.addAll(remoteUsersWithReferencePoints);
     remoteUsers.add(dave);
 
     participants = new ArrayList<User>();
@@ -335,11 +336,11 @@ public class ActivityHandlerTest {
             })
         .anyTimes();
 
-    IReferencePoint project = EasyMock.createMock(IReferencePoint.class);
+    IReferencePoint referencePoint = EasyMock.createMock(IReferencePoint.class);
 
-    EasyMock.expect(sessionMock.userHasReferencePoint(dave, project)).andStubReturn(false);
-    for (User user : remoteUsersWithProjects) {
-      EasyMock.expect(sessionMock.userHasReferencePoint(user, project)).andStubReturn(true);
+    EasyMock.expect(sessionMock.userHasReferencePoint(dave, referencePoint)).andStubReturn(false);
+    for (User user : remoteUsersWithReferencePoints) {
+      EasyMock.expect(sessionMock.userHasReferencePoint(user, referencePoint)).andStubReturn(true);
     }
 
     EasyMock.expect(sessionMock.getUsers()).andStubReturn(participants);
@@ -367,11 +368,11 @@ public class ActivityHandlerTest {
     activities.add(EasyMock.createNiceMock(ChecksumActivity.class));
 
     IFile file = EasyMock.createNiceMock(IFile.class);
-    EasyMock.expect(file.getReferencePoint()).andStubReturn(project);
+    EasyMock.expect(file.getReferencePoint()).andStubReturn(referencePoint);
     EasyMock.replay(file);
 
     IFolder folder = EasyMock.createNiceMock(IFolder.class);
-    EasyMock.expect(folder.getReferencePoint()).andStubReturn(project);
+    EasyMock.expect(folder.getReferencePoint()).andStubReturn(referencePoint);
     EasyMock.replay(folder);
 
     // Assign Targets and Source to activities
