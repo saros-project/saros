@@ -57,7 +57,7 @@ public class User {
   }
 
   /**
-   * set the current user {@link User.Permission} of this user inside the current project.
+   * set the current user {@link User.Permission} of this user inside the current session.
    *
    * @param permission
    */
@@ -66,7 +66,7 @@ public class User {
   }
 
   /**
-   * Gets current project {@link User.Permission} of this user.
+   * Gets current session {@link User.Permission} of this user.
    *
    * @return
    */
