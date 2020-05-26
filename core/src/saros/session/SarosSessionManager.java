@@ -41,10 +41,10 @@ import saros.negotiation.NegotiationFactory;
 import saros.negotiation.NegotiationListener;
 import saros.negotiation.NegotiationTools.CancelOption;
 import saros.negotiation.OutgoingSessionNegotiation;
-import saros.negotiation.ProjectNegotiationCollector;
 import saros.negotiation.ProjectNegotiationData;
 import saros.negotiation.ProjectSharingData;
 import saros.negotiation.ResourceNegotiation;
+import saros.negotiation.ResourceNegotiationCollector;
 import saros.negotiation.SessionNegotiation;
 import saros.negotiation.hooks.ISessionNegotiationHook;
 import saros.negotiation.hooks.SessionNegotiationHookManager;
@@ -102,8 +102,8 @@ public class SarosSessionManager implements ISarosSessionManager {
 
   private final ProjectNegotiationObservable currentProjectNegotiations;
 
-  private final ProjectNegotiationCollector nextProjectNegotiation =
-      new ProjectNegotiationCollector();
+  private final ResourceNegotiationCollector nextProjectNegotiation =
+      new ResourceNegotiationCollector();
   private Thread nextProjectNegotiationWorker;
 
   private final ConnectionHandler connectionHandler;

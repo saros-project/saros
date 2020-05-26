@@ -9,7 +9,7 @@ import saros.filesystem.IReferencePoint;
  * preparation of a new single project negotiation. The reason is to prevent multiple concurrent
  * running project negotiations per user.
  */
-public class ProjectNegotiationCollector {
+public class ResourceNegotiationCollector {
   private Set<IReferencePoint> projects = new HashSet<>();
 
   /**
