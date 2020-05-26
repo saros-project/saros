@@ -20,13 +20,13 @@ public class OutgoingStreamProtocol extends AbstractStreamProtocol {
   /** used for copy operations between streams * */
   private final byte[] buffer = new byte[BUFFER_SIZE];
 
-  private ProjectSharingData projectSharingData;
+  private ProjectSharingData resourceSharingData;
   private DataOutputStream out;
 
   public OutgoingStreamProtocol(
-      OutputStream out, ProjectSharingData projectSharingData, IProgressMonitor monitor) {
+      OutputStream out, ProjectSharingData resourceSharingData, IProgressMonitor monitor) {
     super(monitor);
-    this.projectSharingData = projectSharingData;
+    this.resourceSharingData = resourceSharingData;
     this.out = new DataOutputStream(out);
   }
 
@@ -62,10 +62,10 @@ public class OutgoingStreamProtocol extends AbstractStreamProtocol {
   }
 
   private void writeHeader(IFile file, long fileSize) throws IOException {
-    String projectID = projectSharingData.getProjectID(file.getReferencePoint());
+    String referencePointID = resourceSharingData.getProjectID(file.getReferencePoint());
     String fileName = file.getReferencePointRelativePath().toPortableString();
 
-    out.writeUTF(projectID);
+    out.writeUTF(referencePointID);
     out.writeUTF(fileName);
     out.writeLong(fileSize);
   }
