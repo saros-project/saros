@@ -1469,7 +1469,7 @@ public class EditorManager implements IEditorManager {
   }
 
   @Override
-  public void saveEditors(final IReferencePoint project) {
+  public void saveEditors(final IReferencePoint referencePoint) {
     SWTUtils.runSafeSWTSync(
         log,
         new Runnable() {
@@ -1488,7 +1488,8 @@ public class EditorManager implements IEditorManager {
             editorFiles.addAll(openEditorFiles);
 
             for (final saros.filesystem.IFile file : editorFiles) {
-              if (project == null || project.equals(file.getReferencePoint())) saveLazy(file);
+              if (referencePoint == null || referencePoint.equals(file.getReferencePoint()))
+                saveLazy(file);
             }
           }
         });

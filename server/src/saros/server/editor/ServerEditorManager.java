@@ -69,7 +69,7 @@ public class ServerEditorManager implements IEditorManager {
   }
 
   @Override
-  public void saveEditors(IReferencePoint project) {
+  public void saveEditors(IReferencePoint referencePoint) {
     // do nothing?
     // we do not keep dirty editors,
     // because the LRUMap might close Editors at any time

@@ -70,13 +70,13 @@ public interface IEditorManager {
   String getNormalizedContent(IFile file);
 
   /**
-   * Saves the local editors of all shared files belonging to the given project. If <code>null
-   * </code> is passed, the shared files of all projects will be saved.
+   * Saves the local editors of all shared files belonging to the given reference point. If <code>
+   * null</code> is passed, the shared files of all reference points will be saved.
    *
-   * @param project the project whose editors should be saved, or <code>null</code> to save all
-   *     editors
+   * @param referencePoint the reference point whose editors should be saved, or <code>null</code>
+   *     to save all editors
    */
-  void saveEditors(IReferencePoint project);
+  void saveEditors(IReferencePoint referencePoint);
 
   /**
    * Close the editor of given {@link IFile}.
