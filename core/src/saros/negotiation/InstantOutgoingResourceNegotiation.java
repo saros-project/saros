@@ -70,7 +70,7 @@ public class InstantOutgoingResourceNegotiation extends AbstractOutgoingResource
       final XMPPFileTransferManager fileTransferManager, //
       final ITransmitter transmitter, //
       final IReceiver receiver, //
-      final AdditionalProjectDataFactory additionalResourceDataFactory //
+      final AdditionalResourceDataFactory additionalResourceDataFactory //
       ) {
     super(
         peer,

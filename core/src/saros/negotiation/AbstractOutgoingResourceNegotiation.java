@@ -52,7 +52,7 @@ public abstract class AbstractOutgoingResourceNegotiation extends ResourceNegoti
 
   private PacketCollector startActivityQueuingResponseCollector;
 
-  private final AdditionalProjectDataFactory additionalResourceDataFactory;
+  private final AdditionalResourceDataFactory additionalResourceDataFactory;
 
   protected AbstractOutgoingResourceNegotiation( //
       final JID peer, //
@@ -65,7 +65,7 @@ public abstract class AbstractOutgoingResourceNegotiation extends ResourceNegoti
       final XMPPFileTransferManager fileTransferManager, //
       final ITransmitter transmitter, //
       final IReceiver receiver, //
-      final AdditionalProjectDataFactory additionalResourceDataFactory //
+      final AdditionalResourceDataFactory additionalResourceDataFactory //
       ) {
     super(
         String.valueOf(NEGOTIATION_ID_GENERATOR.nextLong()),
