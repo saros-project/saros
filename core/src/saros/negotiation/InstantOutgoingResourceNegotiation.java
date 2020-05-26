@@ -36,7 +36,7 @@ import saros.session.ISarosSessionManager;
 import saros.session.User;
 import saros.synchronize.StartHandle;
 
-/** Share Projects to display them instant on client side using a stream based solution. */
+/** Share resources to display them instant on client side using a stream based solution. */
 public class InstantOutgoingResourceNegotiation extends AbstractOutgoingResourceNegotiation {
 
   private static final Logger log = Logger.getLogger(InstantOutgoingResourceNegotiation.class);
@@ -61,7 +61,7 @@ public class InstantOutgoingResourceNegotiation extends AbstractOutgoingResource
 
   public InstantOutgoingResourceNegotiation(
       final JID peer, //
-      final ProjectSharingData projects, //
+      final ProjectSharingData resourceSharingData, //
       final ISarosSessionManager sessionManager, //
       final ISarosSession session, //
       final IEditorManager editorManager, //
@@ -70,11 +70,11 @@ public class InstantOutgoingResourceNegotiation extends AbstractOutgoingResource
       final XMPPFileTransferManager fileTransferManager, //
       final ITransmitter transmitter, //
       final IReceiver receiver, //
-      final AdditionalProjectDataFactory additionalProjectDataFactory //
+      final AdditionalProjectDataFactory additionalResourceDataFactory //
       ) {
     super(
         peer,
-        projects,
+        resourceSharingData,
         sessionManager,
         session,
         editorManager,
@@ -83,7 +83,7 @@ public class InstantOutgoingResourceNegotiation extends AbstractOutgoingResource
         fileTransferManager,
         transmitter,
         receiver,
-        additionalProjectDataFactory);
+        additionalResourceDataFactory);
   }
 
   @Override
@@ -115,12 +115,12 @@ public class InstantOutgoingResourceNegotiation extends AbstractOutgoingResource
     for (final FileList list : fileLists) {
       fileCount += list.getPaths().size();
 
-      final String projectID = list.getProjectID();
-      final IReferencePoint project = resourceSharingData.getProject(projectID);
+      final String referencePointID = list.getProjectID();
+      final IReferencePoint referencePoint = resourceSharingData.getProject(referencePointID);
 
-      if (project == null)
+      if (referencePoint == null)
         throw new LocalCancellationException(
-            "project with id " + projectID + " was unshared during synchronization",
+            "reference point with id " + referencePointID + " was unshared during synchronization",
             CancelOption.NOTIFY_PEER);
     }
 
@@ -151,7 +151,6 @@ public class InstantOutgoingResourceNegotiation extends AbstractOutgoingResource
       checkCancellation(CancelOption.NOTIFY_PEER);
 
       OutgoingStreamProtocol osp = new OutgoingStreamProtocol(out, resourceSharingData, monitor);
-      sendProjectConfigFiles(osp);
       sendRemainingPreferOpenedFirst(osp);
       osp.close();
 
@@ -189,9 +188,9 @@ public class InstantOutgoingResourceNegotiation extends AbstractOutgoingResource
   private void createTransferList(List<FileList> fileLists, int fileCount) {
     List<IFile> files = new ArrayList<>(fileCount);
     for (final FileList list : fileLists) {
-      IReferencePoint project = resourceSharingData.getProject(list.getProjectID());
+      IReferencePoint referencePoint = resourceSharingData.getProject(list.getProjectID());
       for (String file : list.getPaths()) {
-        files.add(project.getFile(file));
+        files.add(referencePoint.getFile(file));
       }
     }
 
@@ -215,26 +214,6 @@ public class InstantOutgoingResourceNegotiation extends AbstractOutgoingResource
     if (file != null) {
       openedFiles.addFirst(file);
       log.debug(this + ": added " + file + " to open files queue");
-    }
-  }
-
-  private void sendProjectConfigFiles(OutgoingStreamProtocol osp)
-      throws IOException, LocalCancellationException {
-    /* TODO should be configurable in future */
-    String[] eclipseProjFiles = {
-      ".settings/org.eclipse.core.resources.prefs" /* for file encoding! */,
-      ".classpath",
-      ".project",
-      ".settings/org.eclipse.core.runtime.prefs",
-      ".settings/org.eclipse.jdt.core.prefs",
-      ".settings/org.eclipse.jdt.ui.prefs"
-    };
-
-    for (String string : eclipseProjFiles) {
-      for (IReferencePoint project : resourceSharingData) {
-        IFile file = project.getFile(string);
-        sendIfRequired(osp, file);
-      }
     }
   }
 
