@@ -61,7 +61,7 @@ public class InstantOutgoingResourceNegotiation extends AbstractOutgoingResource
 
   public InstantOutgoingResourceNegotiation(
       final JID peer, //
-      final ProjectSharingData resourceSharingData, //
+      final ResourceSharingData resourceSharingData, //
       final ISarosSessionManager sessionManager, //
       final ISarosSession session, //
       final IEditorManager editorManager, //
@@ -116,7 +116,8 @@ public class InstantOutgoingResourceNegotiation extends AbstractOutgoingResource
       fileCount += list.getPaths().size();
 
       final String referencePointID = list.getReferencePointID();
-      final IReferencePoint referencePoint = resourceSharingData.getProject(referencePointID);
+      final IReferencePoint referencePoint =
+          resourceSharingData.getReferencePoint(referencePointID);
 
       if (referencePoint == null)
         throw new LocalCancellationException(
@@ -188,7 +189,8 @@ public class InstantOutgoingResourceNegotiation extends AbstractOutgoingResource
   private void createTransferList(List<FileList> fileLists, int fileCount) {
     List<IFile> files = new ArrayList<>(fileCount);
     for (final FileList list : fileLists) {
-      IReferencePoint referencePoint = resourceSharingData.getProject(list.getReferencePointID());
+      IReferencePoint referencePoint =
+          resourceSharingData.getReferencePoint(list.getReferencePointID());
       for (String file : list.getPaths()) {
         files.add(referencePoint.getFile(file));
       }

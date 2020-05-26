@@ -112,7 +112,7 @@ public final class NegotiationFactory {
 
   public AbstractOutgoingResourceNegotiation newOutgoingResourceNegotiation(
       JID remoteAddress,
-      ProjectSharingData resourceSharingData,
+      ResourceSharingData resourceSharingData,
       ISarosSessionManager sessionManager,
       ISarosSession session) {
 

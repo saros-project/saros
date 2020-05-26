@@ -10,7 +10,7 @@ import saros.filesystem.IReferencePoint;
  * Defines which projects and which of their resources) to share during a particular {@link
  * AbstractOutgoingResourceNegotiation}.
  */
-public class ProjectSharingData implements Iterable<IReferencePoint> {
+public class ResourceSharingData implements Iterable<IReferencePoint> {
 
   private Map<String, IReferencePoint> projectsById = new HashMap<>();
   private Map<IReferencePoint, String> idsByProject = new HashMap<>();
@@ -21,7 +21,7 @@ public class ProjectSharingData implements Iterable<IReferencePoint> {
    * @param project project that should be shared
    * @param projectId session-wide ID assigned to the project
    */
-  public void addProject(IReferencePoint project, String projectId) {
+  public void addReferencePoint(IReferencePoint project, String projectId) {
     projectsById.put(projectId, project);
     idsByProject.put(project, projectId);
   }
@@ -32,7 +32,7 @@ public class ProjectSharingData implements Iterable<IReferencePoint> {
    * @param id project ID
    * @return project with the ID
    */
-  public IReferencePoint getProject(String id) {
+  public IReferencePoint getReferencePoint(String id) {
     return projectsById.get(id);
   }
 
@@ -42,7 +42,7 @@ public class ProjectSharingData implements Iterable<IReferencePoint> {
    * @param id projectId
    * @return boolean indicating if the project is already contained in this collection
    */
-  public boolean hasProjectById(String id) {
+  public boolean hasReferencePointById(String id) {
     return projectsById.containsKey(id);
   }
 
@@ -52,7 +52,7 @@ public class ProjectSharingData implements Iterable<IReferencePoint> {
    * @param project
    * @return boolean indicating if the project is already contained in this collection
    */
-  public boolean hasProject(IReferencePoint project) {
+  public boolean hasReferencePoint(IReferencePoint project) {
     return idsByProject.containsKey(project);
   }
 
@@ -62,12 +62,12 @@ public class ProjectSharingData implements Iterable<IReferencePoint> {
    * @param project one of the to-be-shared projects
    * @return matching project ID
    */
-  public String getProjectID(IReferencePoint project) {
+  public String getReferencePointID(IReferencePoint project) {
     return idsByProject.get(project);
   }
 
   /**
-   * Returns the number of to-be-shared projects added to this {@link ProjectSharingData} instance.
+   * Returns the number of to-be-shared projects added to this {@link ResourceSharingData} instance.
    *
    * @return number of projects
    */
@@ -76,7 +76,7 @@ public class ProjectSharingData implements Iterable<IReferencePoint> {
   }
 
   /**
-   * Returns whether this {@link ProjectSharingData} instance contains any to-be-shared projects.
+   * Returns whether this {@link ResourceSharingData} instance contains any to-be-shared projects.
    *
    * @return true if there are no projects, false if there are
    */

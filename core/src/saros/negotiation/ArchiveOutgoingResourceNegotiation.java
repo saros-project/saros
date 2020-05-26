@@ -39,7 +39,7 @@ public class ArchiveOutgoingResourceNegotiation extends AbstractOutgoingResource
 
   public ArchiveOutgoingResourceNegotiation( //
       final JID peer, //
-      final ProjectSharingData resourceSharingData, //
+      final ResourceSharingData resourceSharingData, //
       final ISarosSessionManager sessionManager, //
       final ISarosSession session, //
       final IEditorManager editorManager, //
@@ -145,7 +145,8 @@ public class ArchiveOutgoingResourceNegotiation extends AbstractOutgoingResource
     for (final FileList list : fileLists) {
       final String referencePointID = list.getReferencePointID();
 
-      final IReferencePoint referencePoint = resourceSharingData.getProject(referencePointID);
+      final IReferencePoint referencePoint =
+          resourceSharingData.getReferencePoint(referencePointID);
 
       if (referencePoint == null)
         throw new LocalCancellationException(
