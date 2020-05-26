@@ -23,7 +23,7 @@ import saros.observables.FileReplacementInProgressObservable;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
 
-/** Receive shared Projects and display them instant using a stream based solution. */
+/** Receive shared resources and display them instant using a stream based solution. */
 public class InstantIncomingResourceNegotiation extends AbstractIncomingResourceNegotiation {
 
   private static final Logger log = Logger.getLogger(InstantIncomingResourceNegotiation.class);
@@ -31,7 +31,7 @@ public class InstantIncomingResourceNegotiation extends AbstractIncomingResource
   public InstantIncomingResourceNegotiation(
       final JID peer, //
       final String negotiationID, //
-      final List<ProjectNegotiationData> projectNegotiationData, //
+      final List<ProjectNegotiationData> resourceNegotiationData, //
       final ISarosSessionManager sessionManager, //
       final ISarosSession session, //
       final FileReplacementInProgressObservable fileReplacementInProgressObservable, //
@@ -44,7 +44,7 @@ public class InstantIncomingResourceNegotiation extends AbstractIncomingResource
     super(
         peer,
         negotiationID,
-        projectNegotiationData,
+        resourceNegotiationData,
         sessionManager,
         session,
         fileReplacementInProgressObservable,
@@ -58,7 +58,7 @@ public class InstantIncomingResourceNegotiation extends AbstractIncomingResource
   @Override
   protected void transfer(
       IProgressMonitor monitor,
-      Map<String, IReferencePoint> projectMapping,
+      Map<String, IReferencePoint> referencePointMapping,
       List<FileList> missingFiles)
       throws IOException, SarosCancellationException {
 
