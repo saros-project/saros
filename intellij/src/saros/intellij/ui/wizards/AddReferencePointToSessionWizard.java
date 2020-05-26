@@ -464,7 +464,7 @@ public class AddReferencePointToSessionWizard extends Wizard {
 
     this.setPreferredSize(new Dimension(650, 535));
 
-    List<ProjectNegotiationData> data = negotiation.getProjectNegotiationData();
+    List<ProjectNegotiationData> data = negotiation.getResourceNegotiationData();
 
     localReferencePoints = new HashMap<String, IReferencePoint>();
 
@@ -670,7 +670,8 @@ public class AddReferencePointToSessionWizard extends Wizard {
       IReferencePoint referencePoint = entry.getValue();
 
       try {
-        final ProjectNegotiationData data = negotiation.getProjectNegotiationData(referencePointID);
+        final ProjectNegotiationData data =
+            negotiation.getResourceNegotiationData(referencePointID);
 
         FileList localFileList =
             FileListFactory.createFileList(

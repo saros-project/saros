@@ -138,7 +138,7 @@ public class SarosSessionManager implements ISarosSessionManager {
                 (AbstractIncomingResourceNegotiation) negotiation;
 
             ProjectSharingData projectSharingData = new ProjectSharingData();
-            for (ProjectNegotiationData projectNegotiationData : ipn.getProjectNegotiationData()) {
+            for (ProjectNegotiationData projectNegotiationData : ipn.getResourceNegotiationData()) {
               String projectID = projectNegotiationData.getProjectID();
               IReferencePoint project = session.getProject(projectID);
 

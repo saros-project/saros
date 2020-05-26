@@ -171,7 +171,7 @@ public class AddProjectToSessionWizard extends Wizard {
             connectionManager,
             preferences,
             peer,
-            negotiation.getProjectNegotiationData(),
+            negotiation.getResourceNegotiationData(),
             lastProjectNameMapping);
 
     addPage(namePage);
@@ -588,7 +588,7 @@ public class AddProjectToSessionWizard extends Wizard {
                 IStatus.ERROR, Saros.PLUGIN_ID, "failed to compute local file list", e));
       }
 
-      final ProjectNegotiationData data = negotiation.getProjectNegotiationData(projectID);
+      final ProjectNegotiationData data = negotiation.getResourceNegotiationData(projectID);
 
       final FileListDiff diff = FileListDiff.diff(localFileList, data.getFileList());
 
@@ -627,7 +627,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
     final Map<String, IProject> result = new HashMap<String, IProject>();
 
-    for (final ProjectNegotiationData data : negotiation.getProjectNegotiationData()) {
+    for (final ProjectNegotiationData data : negotiation.getResourceNegotiationData()) {
       final String projectID = data.getProjectID();
 
       result.put(
@@ -681,7 +681,7 @@ public class AddProjectToSessionWizard extends Wizard {
   private void storeCurrentProjectNameMapping(final JID jid) {
     Map<String, String> currentProjectNameMapping = new HashMap<>();
 
-    for (final ProjectNegotiationData data : negotiation.getProjectNegotiationData()) {
+    for (final ProjectNegotiationData data : negotiation.getResourceNegotiationData()) {
       final String projectID = data.getProjectID();
       currentProjectNameMapping.put(
           data.getProjectName(), namePage.getTargetProjectName(projectID));

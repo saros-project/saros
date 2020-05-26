@@ -138,7 +138,7 @@ public class NegotiationHandler implements INegotiationHandler {
 
     Map<String, IReferencePoint> projectMapping = new HashMap<>();
 
-    for (ProjectNegotiationData data : negotiation.getProjectNegotiationData()) {
+    for (ProjectNegotiationData data : negotiation.getResourceNegotiationData()) {
       String projectName = data.getProjectName();
       IReferencePoint project = workspace.getProject(projectName);
 
