@@ -110,9 +110,9 @@ public final class NegotiationFactory {
         receiver);
   }
 
-  public AbstractOutgoingResourceNegotiation newOutgoingProjectNegotiation(
+  public AbstractOutgoingResourceNegotiation newOutgoingResourceNegotiation(
       JID remoteAddress,
-      ProjectSharingData projectSharingData,
+      ProjectSharingData resourceSharingData,
       ISarosSessionManager sessionManager,
       ISarosSession session) {
 
@@ -120,7 +120,7 @@ public final class NegotiationFactory {
       case ARCHIVE:
         return new ArchiveOutgoingResourceNegotiation(
             remoteAddress,
-            projectSharingData,
+            resourceSharingData,
             sessionManager,
             session,
             context.getComponent(IEditorManager.class),
@@ -133,7 +133,7 @@ public final class NegotiationFactory {
       case INSTANT:
         return new InstantOutgoingResourceNegotiation(
             remoteAddress,
-            projectSharingData,
+            resourceSharingData,
             sessionManager,
             session,
             context.getComponent(IEditorManager.class),
@@ -148,10 +148,10 @@ public final class NegotiationFactory {
     }
   }
 
-  public AbstractIncomingResourceNegotiation newIncomingProjectNegotiation(
+  public AbstractIncomingResourceNegotiation newIncomingResourceNegotiation(
       JID remoteAddress,
       String negotiationID,
-      List<ProjectNegotiationData> projectNegotiationData,
+      List<ProjectNegotiationData> resourceNegotiationData,
       ISarosSessionManager sessionManager,
       ISarosSession session) {
 
@@ -160,7 +160,7 @@ public final class NegotiationFactory {
         return new ArchiveIncomingResourceNegotiation(
             remoteAddress,
             negotiationID,
-            projectNegotiationData,
+            resourceNegotiationData,
             sessionManager,
             session,
             fileReplacementInProgressObservable,
@@ -173,7 +173,7 @@ public final class NegotiationFactory {
         return new InstantIncomingResourceNegotiation(
             remoteAddress,
             negotiationID,
-            projectNegotiationData,
+            resourceNegotiationData,
             sessionManager,
             session,
             fileReplacementInProgressObservable,
