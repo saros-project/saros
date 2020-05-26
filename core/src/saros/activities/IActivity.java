@@ -23,8 +23,8 @@ import saros.filesystem.IResource;
 import saros.session.User;
 
 /**
- * An interface for all things that occur in a shared project session such as editing a file,
- * opening or closing editors, changing permissions, etc.
+ * An interface for all things that occur in a shared reference point of the session such as editing
+ * a file, opening or closing editors, changing permissions, etc.
  *
  * <p>All {@link IActivity}s should be implemented using the value pattern, i.e. created {@link
  * IActivity} should be immutable.
