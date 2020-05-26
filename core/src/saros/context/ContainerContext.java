@@ -124,7 +124,7 @@ public class ContainerContext implements IContainerContext {
       Class.forName(InvitationCompletedExtension.class.getName());
       Class.forName(ConnectionEstablishedExtension.class.getName());
 
-      // Project negotiation extensions
+      // Resource negotiation extensions
       Class.forName(CancelResourceNegotiationExtension.class.getName());
       Class.forName(ProjectNegotiationOfferingExtension.class.getName());
       Class.forName(ProjectNegotiationMissingFilesExtension.class.getName());
