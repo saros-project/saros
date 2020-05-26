@@ -30,7 +30,7 @@ import saros.synchronize.StartHandle;
 
 /**
  * Implementation of {@link AbstractOutgoingResourceNegotiation} utilizing a transferred zip archive
- * to exchange differences in the project files.
+ * to exchange differences in the reference point files.
  */
 public class ArchiveOutgoingResourceNegotiation extends AbstractOutgoingResourceNegotiation {
 
@@ -39,7 +39,7 @@ public class ArchiveOutgoingResourceNegotiation extends AbstractOutgoingResource
 
   public ArchiveOutgoingResourceNegotiation( //
       final JID peer, //
-      final ProjectSharingData projects, //
+      final ProjectSharingData resourceSharingData, //
       final ISarosSessionManager sessionManager, //
       final ISarosSession session, //
       final IEditorManager editorManager, //
@@ -48,11 +48,11 @@ public class ArchiveOutgoingResourceNegotiation extends AbstractOutgoingResource
       final XMPPFileTransferManager fileTransferManager, //
       final ITransmitter transmitter, //
       final IReceiver receiver, //
-      final AdditionalProjectDataFactory additionalProjectDataFactory //
+      final AdditionalProjectDataFactory additionalResourceDataFactory //
       ) {
     super(
         peer,
-        projects,
+        resourceSharingData,
         sessionManager,
         session,
         editorManager,
@@ -61,7 +61,7 @@ public class ArchiveOutgoingResourceNegotiation extends AbstractOutgoingResource
         fileTransferManager,
         transmitter,
         receiver,
-        additionalProjectDataFactory);
+        additionalResourceDataFactory);
   }
 
   @Override
@@ -96,7 +96,7 @@ public class ArchiveOutgoingResourceNegotiation extends AbstractOutgoingResource
        */
       session.userStartedQueuing(user);
 
-      zipArchive = createProjectArchive(fileLists, monitor);
+      zipArchive = createResourceArchive(fileLists, monitor);
       monitor.subTask("");
     } finally {
       if (stoppedUsers != null) startUsers(stoppedUsers);
@@ -122,7 +122,7 @@ public class ArchiveOutgoingResourceNegotiation extends AbstractOutgoingResource
    * @return zip file containing all files denoted by the file lists or <code>null</code> if the
    *     file lists do not contain any files
    */
-  private File createProjectArchive(final List<FileList> fileLists, final IProgressMonitor monitor)
+  private File createResourceArchive(final List<FileList> fileLists, final IProgressMonitor monitor)
       throws IOException, SarosCancellationException {
 
     boolean skip = true;
@@ -140,29 +140,29 @@ public class ArchiveOutgoingResourceNegotiation extends AbstractOutgoingResource
 
     final List<Pair<IFile, String>> filesToCompress = new ArrayList<>(fileCount);
 
-    final List<IResource> projectsToLock = new ArrayList<IResource>();
+    final List<IResource> resourcesToLock = new ArrayList<IResource>();
 
     for (final FileList list : fileLists) {
-      final String projectID = list.getProjectID();
+      final String referencePointID = list.getProjectID();
 
-      final IReferencePoint project = resourceSharingData.getProject(projectID);
+      final IReferencePoint referencePoint = resourceSharingData.getProject(referencePointID);
 
-      if (project == null)
+      if (referencePoint == null)
         throw new LocalCancellationException(
-            "project with id " + projectID + " was unshared during synchronization",
+            "reference point with id " + referencePointID + " was unshared during synchronization",
             CancelOption.NOTIFY_PEER);
 
-      projectsToLock.add(project);
+      resourcesToLock.add(referencePoint);
 
       /*
        * force editor buffer flush because we read the files from the
        * underlying storage
        */
-      if (editorManager != null) editorManager.saveEditors(project);
+      if (editorManager != null) editorManager.saveEditors(referencePoint);
 
       final StringBuilder aliasBuilder = new StringBuilder();
 
-      aliasBuilder.append(projectID).append(PATH_DELIMITER);
+      aliasBuilder.append(referencePointID).append(PATH_DELIMITER);
 
       final int prefixLength = aliasBuilder.length();
 
@@ -170,7 +170,7 @@ public class ArchiveOutgoingResourceNegotiation extends AbstractOutgoingResource
         // assert path is relative !
         aliasBuilder.append(path);
 
-        IFile file = project.getFile(path);
+        IFile file = referencePoint.getFile(path);
         String qualifiedPath = aliasBuilder.toString();
 
         filesToCompress.add(new ImmutablePair<>(file, qualifiedPath));
@@ -187,7 +187,7 @@ public class ArchiveOutgoingResourceNegotiation extends AbstractOutgoingResource
       tempArchive = File.createTempFile("saros_" + getID(), ".zip");
       workspace.run(
           new CreateArchiveTask(tempArchive, filesToCompress, monitor),
-          projectsToLock.toArray(new IResource[0]));
+          resourcesToLock.toArray(new IResource[0]));
     } catch (OperationCanceledException e) {
       LocalCancellationException canceled = new LocalCancellationException();
       canceled.initCause(e);
