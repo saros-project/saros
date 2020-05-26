@@ -37,9 +37,9 @@ import saros.session.User;
 import saros.synchronize.StartHandle;
 
 /** Share Projects to display them instant on client side using a stream based solution. */
-public class InstantOutgoingProjectNegotiation extends AbstractOutgoingResourceNegotiation {
+public class InstantOutgoingResourceNegotiation extends AbstractOutgoingResourceNegotiation {
 
-  private static final Logger log = Logger.getLogger(InstantOutgoingProjectNegotiation.class);
+  private static final Logger log = Logger.getLogger(InstantOutgoingResourceNegotiation.class);
 
   /** used as LIFO queue * */
   private final Deque<IFile> openedFiles = new LinkedBlockingDeque<>();
@@ -59,7 +59,7 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingResourceN
   private List<StartHandle> stoppedUsers = null;
   private User remoteUser = null;
 
-  public InstantOutgoingProjectNegotiation(
+  public InstantOutgoingResourceNegotiation(
       final JID peer, //
       final ProjectSharingData projects, //
       final ISarosSessionManager sessionManager, //
