@@ -1,6 +1,6 @@
 package saros.session;
 
-import saros.negotiation.AbstractIncomingProjectNegotiation;
+import saros.negotiation.AbstractIncomingResourceNegotiation;
 import saros.negotiation.AbstractOutgoingResourceNegotiation;
 import saros.negotiation.IncomingSessionNegotiation;
 import saros.negotiation.OutgoingSessionNegotiation;
@@ -41,5 +41,5 @@ public interface INegotiationHandler {
    *
    * @param negotiation the negotiation to use for handling the project synchronization
    */
-  public void handleIncomingProjectNegotiation(AbstractIncomingProjectNegotiation negotiation);
+  public void handleIncomingProjectNegotiation(AbstractIncomingResourceNegotiation negotiation);
 }

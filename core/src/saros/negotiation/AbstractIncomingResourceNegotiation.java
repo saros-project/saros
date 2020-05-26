@@ -43,9 +43,9 @@ import saros.session.SessionEndReason;
  * <p>Concrete implementations need to provide an implementation to exchange the calculated
  * differences. This class only provides the initial setup and calculation.
  */
-public abstract class AbstractIncomingProjectNegotiation extends ResourceNegotiation {
+public abstract class AbstractIncomingResourceNegotiation extends ResourceNegotiation {
 
-  private static final Logger log = Logger.getLogger(AbstractIncomingProjectNegotiation.class);
+  private static final Logger log = Logger.getLogger(AbstractIncomingResourceNegotiation.class);
 
   private static int MONITOR_WORK_SCALE = 1000;
 
@@ -59,7 +59,7 @@ public abstract class AbstractIncomingProjectNegotiation extends ResourceNegotia
 
   protected Future<XMPPFileTransferRequest> expectedTransfer;
 
-  public AbstractIncomingProjectNegotiation(
+  public AbstractIncomingResourceNegotiation(
       final JID peer, //
       final String negotiationID, //
       final List<ProjectNegotiationData> projectNegotiationData, //

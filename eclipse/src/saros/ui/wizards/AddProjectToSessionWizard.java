@@ -48,7 +48,7 @@ import saros.filesystem.IReferencePoint;
 import saros.filesystem.ResourceAdapterFactory;
 import saros.filesystem.checksum.IChecksumCache;
 import saros.monitoring.ProgressMonitorAdapterFactory;
-import saros.negotiation.AbstractIncomingProjectNegotiation;
+import saros.negotiation.AbstractIncomingResourceNegotiation;
 import saros.negotiation.CancelListener;
 import saros.negotiation.FileList;
 import saros.negotiation.FileListDiff;
@@ -79,7 +79,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
   private EnterProjectNamePage namePage;
   private WizardDialogAccessable wizardDialog;
-  private AbstractIncomingProjectNegotiation negotiation;
+  private AbstractIncomingResourceNegotiation negotiation;
   private JID peer;
 
   private boolean isExceptionCancel;
@@ -129,7 +129,7 @@ public class AddProjectToSessionWizard extends Wizard {
         }
       };
 
-  public AddProjectToSessionWizard(AbstractIncomingProjectNegotiation negotiation) {
+  public AddProjectToSessionWizard(AbstractIncomingResourceNegotiation negotiation) {
 
     SarosPluginContext.initComponent(this);
 

@@ -34,7 +34,7 @@ import saros.communication.connection.ConnectionHandler;
 import saros.communication.connection.IConnectionStateListener;
 import saros.context.IContainerContext;
 import saros.filesystem.IReferencePoint;
-import saros.negotiation.AbstractIncomingProjectNegotiation;
+import saros.negotiation.AbstractIncomingResourceNegotiation;
 import saros.negotiation.AbstractOutgoingResourceNegotiation;
 import saros.negotiation.IncomingSessionNegotiation;
 import saros.negotiation.NegotiationFactory;
@@ -132,10 +132,10 @@ public class SarosSessionManager implements ISarosSessionManager {
 
           if (session != null
               && session.isHost()
-              && negotiation instanceof AbstractIncomingProjectNegotiation
+              && negotiation instanceof AbstractIncomingResourceNegotiation
               && !negotiation.isCanceled()) {
-            AbstractIncomingProjectNegotiation ipn =
-                (AbstractIncomingProjectNegotiation) negotiation;
+            AbstractIncomingResourceNegotiation ipn =
+                (AbstractIncomingResourceNegotiation) negotiation;
 
             ProjectSharingData projectSharingData = new ProjectSharingData();
             for (ProjectNegotiationData projectNegotiationData : ipn.getProjectNegotiationData()) {
@@ -424,7 +424,7 @@ public class SarosSessionManager implements ISarosSessionManager {
       return;
     }
 
-    AbstractIncomingProjectNegotiation negotiation;
+    AbstractIncomingResourceNegotiation negotiation;
     synchronized (this) {
       if (!startStopSessionLock.tryLock()) {
         log.warn(

@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 import saros.filesystem.IReferencePoint;
 import saros.monitoring.NullProgressMonitor;
-import saros.negotiation.AbstractIncomingProjectNegotiation;
+import saros.negotiation.AbstractIncomingResourceNegotiation;
 import saros.negotiation.AbstractOutgoingResourceNegotiation;
 import saros.negotiation.IncomingSessionNegotiation;
 import saros.negotiation.NegotiationTools;
@@ -134,7 +134,7 @@ public class NegotiationHandler implements INegotiationHandler {
 
   @Override
   public void handleIncomingProjectNegotiation(
-      final AbstractIncomingProjectNegotiation negotiation) {
+      final AbstractIncomingResourceNegotiation negotiation) {
 
     Map<String, IReferencePoint> projectMapping = new HashMap<>();
 

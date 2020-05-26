@@ -24,7 +24,7 @@ import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
 
 /** Receive shared Projects and display them instant using a stream based solution. */
-public class InstantIncomingProjectNegotiation extends AbstractIncomingProjectNegotiation {
+public class InstantIncomingProjectNegotiation extends AbstractIncomingResourceNegotiation {
 
   private static final Logger log = Logger.getLogger(InstantIncomingProjectNegotiation.class);
 

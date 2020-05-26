@@ -37,7 +37,7 @@ import saros.intellij.ui.wizards.pages.referencepointselection.SelectLocalRefere
 import saros.monitoring.IProgressMonitor;
 import saros.monitoring.NullProgressMonitor;
 import saros.monitoring.SubProgressMonitor;
-import saros.negotiation.AbstractIncomingProjectNegotiation;
+import saros.negotiation.AbstractIncomingResourceNegotiation;
 import saros.negotiation.CancelListener;
 import saros.negotiation.FileList;
 import saros.negotiation.FileListDiff;
@@ -78,7 +78,7 @@ public class AddReferencePointToSessionWizard extends Wizard {
   private final String remoteReferencePointID;
   private final String remoteReferencePointName;
 
-  private final AbstractIncomingProjectNegotiation negotiation;
+  private final AbstractIncomingResourceNegotiation negotiation;
   private final JID peer;
 
   private boolean triggered = false;
@@ -445,7 +445,7 @@ public class AddReferencePointToSessionWizard extends Wizard {
    * @param negotiation The IPN this wizard handles
    */
   public AddReferencePointToSessionWizard(
-      Project project, Window parent, AbstractIncomingProjectNegotiation negotiation) {
+      Project project, Window parent, AbstractIncomingResourceNegotiation negotiation) {
 
     super(
         project,
@@ -512,7 +512,7 @@ public class AddReferencePointToSessionWizard extends Wizard {
   }
 
   /**
-   * Runs {@link AbstractIncomingProjectNegotiation#run(java.util.Map, IProgressMonitor)} as a
+   * Runs {@link AbstractIncomingResourceNegotiation#run(java.util.Map, IProgressMonitor)} as a
    * background task through {@link #runTask(Runnable, String)}.
    *
    * <p>On success, a success notification is displayed, on error, a dialog is shown.
