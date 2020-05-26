@@ -56,12 +56,12 @@ public class UserInformationHandler implements Startable {
         }
       };
 
-  private final PacketListener userFinishedProjectNegotiations =
+  private final PacketListener userFinishedResourceNegotiations =
       new PacketListener() {
 
         @Override
         public void processPacket(Packet packet) {
-          handleUserFinishedProjectNegotiationPacket(packet);
+          handleUserFinishedResourceNegotiationPacket(packet);
         }
       };
 
@@ -80,7 +80,7 @@ public class UserInformationHandler implements Startable {
         userListListener, UserListExtension.PROVIDER.getPacketFilter(currentSessionID));
 
     receiver.addPacketListener(
-        userFinishedProjectNegotiations,
+        userFinishedResourceNegotiations,
         UserFinishedResourceNegotiationExtension.PROVIDER.getPacketFilter(currentSessionID));
 
     isRunning = true;
@@ -89,7 +89,7 @@ public class UserInformationHandler implements Startable {
   @Override
   public void stop() {
     receiver.removePacketListener(userListListener);
-    receiver.removePacketListener(userFinishedProjectNegotiations);
+    receiver.removePacketListener(userFinishedResourceNegotiations);
     isRunning = false;
   }
 
@@ -202,13 +202,13 @@ public class UserInformationHandler implements Startable {
   }
 
   /**
-   * Informs all clients about the fact that a user now has projects and is able to process {@link
-   * IResourceActivity}s.
+   * Informs all clients about the fact that a user now has reference points and is able to process
+   * {@link IResourceActivity}s.
    *
    * @param remoteUsers The users to be informed
    * @param jid The JID of the user this message is about
    */
-  public void sendUserFinishedProjectNegotiation(Collection<User> remoteUsers, JID jid) {
+  public void sendUserFinishedResourceNegotiation(Collection<User> remoteUsers, JID jid) {
 
     PacketExtension packet =
         UserFinishedResourceNegotiationExtension.PROVIDER.create(
@@ -218,18 +218,18 @@ public class UserInformationHandler implements Startable {
       try {
         transmitter.send(ISarosSession.SESSION_CONNECTION_ID, user.getJID(), packet);
       } catch (IOException e) {
-        log.error("failed to send userFinishedProjectNegotiation-message: " + user, e);
+        log.error("failed to send userFinishedResourceNegotiation-message: " + user, e);
         // TODO remove user from session
       }
     }
   }
 
   /**
-   * Handles incoming UserHasProjects-Packets and forwards the information to the session
+   * Handles incoming UserHasResource-Packets and forwards the information to the session
    *
    * @param packet
    */
-  private void handleUserFinishedProjectNegotiationPacket(Packet packet) {
+  private void handleUserFinishedResourceNegotiationPacket(Packet packet) {
 
     JID fromJID = new JID(packet.getFrom());
 
@@ -237,7 +237,7 @@ public class UserInformationHandler implements Startable {
         UserFinishedResourceNegotiationExtension.PROVIDER.getPayload(packet);
 
     if (payload == null) {
-      log.warn("UserFinishedProjectNegotiation-payload is corrupted");
+      log.warn("UserFinishedResourceNegotiation-payload is corrupted");
       return;
     }
 
@@ -245,7 +245,7 @@ public class UserInformationHandler implements Startable {
 
     if (fromUser == null) {
       log.warn(
-          "received UserFinishedProjectNegotiationPacket from "
+          "received UserFinishedResourceNegotiationPacket from "
               + fromJID
               + " who is not part of the current session");
       return;

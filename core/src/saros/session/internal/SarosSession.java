@@ -404,7 +404,7 @@ public final class SarosSession implements ISarosSession {
        * This informs all participants, that a user is now able to process IResourceActivities.
        * After receiving this message the participants will send their awareness information.
        */
-      userListHandler.sendUserFinishedProjectNegotiation(getRemoteUsers(), jid);
+      userListHandler.sendUserFinishedResourceNegotiation(getRemoteUsers(), jid);
     }
   }
 
