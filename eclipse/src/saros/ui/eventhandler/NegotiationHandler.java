@@ -211,7 +211,7 @@ public class NegotiationHandler implements INegotiationHandler {
   }
 
   @Override
-  public void handleOutgoingProjectNegotiation(AbstractOutgoingResourceNegotiation negotiation) {
+  public void handleOutgoingResourceNegotiation(AbstractOutgoingResourceNegotiation negotiation) {
 
     OutgoingProjectJob job = new OutgoingProjectJob(negotiation);
     job.setPriority(Job.SHORT);
@@ -219,7 +219,7 @@ public class NegotiationHandler implements INegotiationHandler {
   }
 
   @Override
-  public void handleIncomingProjectNegotiation(AbstractIncomingResourceNegotiation negotiation) {
+  public void handleIncomingResourceNegotiation(AbstractIncomingResourceNegotiation negotiation) {
     showIncomingProjectUI(negotiation);
   }
 

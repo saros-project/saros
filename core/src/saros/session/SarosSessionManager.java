@@ -445,7 +445,7 @@ public class SarosSessionManager implements ISarosSessionManager {
         startStopSessionLock.unlock();
       }
     }
-    handler.handleIncomingProjectNegotiation(negotiation);
+    handler.handleIncomingResourceNegotiation(negotiation);
   }
 
   @Override
@@ -663,7 +663,7 @@ public class SarosSessionManager implements ISarosSessionManager {
     }
 
     for (AbstractOutgoingResourceNegotiation negotiation : negotiations)
-      handler.handleOutgoingProjectNegotiation(negotiation);
+      handler.handleOutgoingResourceNegotiation(negotiation);
   }
 
   @Override
@@ -724,7 +724,7 @@ public class SarosSessionManager implements ISarosSessionManager {
         startStopSessionLock.unlock();
       }
     }
-    handler.handleOutgoingProjectNegotiation(negotiation);
+    handler.handleOutgoingResourceNegotiation(negotiation);
   }
 
   @Override
