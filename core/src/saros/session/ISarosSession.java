@@ -33,9 +33,9 @@ import saros.session.User.Permission;
 import saros.synchronize.StopManager;
 
 /**
- * A Saros session consists of one or more shared projects, which are the central concept of the
- * Saros plugin. They are associated with projects and make them available for synchronous/real-time
- * collaboration.
+ * A Saros session consists of one or more shared reference point(s), which are the central concept
+ * of the Saros plugin. They are associated with local directory trees and make them available for
+ * synchronous/real-time collaboration.
  *
  * @author rdjemili
  */
@@ -45,9 +45,9 @@ public interface ISarosSession {
    * @JTourBusStop 3, Architecture Overview, Session Management:
    *
    * <p>This Interface is the main entrance Point for the "Session Management"-Component. The
-   * Session Management is responsible for managing a Session and keeping the shared projects in a
-   * consistent state across the local copies of all participants. It functions as the core
-   * component in a running session and directs communication between all other components. In
+   * Session Management is responsible for managing a Session and keeping the shared reference
+   * points in a consistent state across the local copies of all participants. It functions as the
+   * core component in a running session and directs communication between all other components. In
    * general this component takes input from the User Interface, processes it, and afterwards passes
    * the result to the Network Layer.
    */
@@ -103,7 +103,8 @@ public interface ISarosSession {
   void addUser(User user);
 
   /**
-   * Informs all listeners that a user now has Projects and can process {@link IResourceActivity}s.
+   * Informs all listeners that a user now has reference points and can process {@link
+   * IResourceActivity}s.
    *
    * @host This method may only called by the host.
    * @param user
@@ -111,7 +112,7 @@ public interface ISarosSession {
   void userStartedQueuing(final User user);
 
   /**
-   * Informs all participants and listeners that a user now has finished the Project Negotiation.
+   * Informs all participants and listeners that a user now has finished the resource negotiation.
    *
    * @param user
    */
@@ -150,23 +151,24 @@ public interface ISarosSession {
   void removeListener(ISessionListener listener);
 
   /**
-   * Enables or disables the execution of received activities for the given project. If the
-   * execution is disabled, activities for resources of the given projects will be dropped without
-   * being applied.
+   * Enables or disables the execution of received activities for the given reference point. If the
+   * execution is disabled, activities for resources of the given reference point will be dropped
+   * without being applied.
    *
-   * <p>This method can be used to disable the execution of received activities for projects that
-   * are no longer available (i.e. are no longer part of the session or are no longer
+   * <p>This method can be used to disable the execution of received activities for reference points
+   * that are no longer available (i.e. are no longer part of the session or are no longer
    * present/accessible locally).
    *
-   * @param referencePoint the shared project to enable or disable the activity execution for
+   * @param referencePoint the shared reference point to enable or disable the activity execution
+   *     for
    * @param enabled <code>true</code> to enable or <code>false</code> to disable the activity
    *     execution
    */
   void setActivityExecution(IReferencePoint referencePoint, boolean enabled);
 
   /**
-   * @return the shared projects associated with this session, never <code>null</code> but may be
-   *     empty
+   * @return the shared reference points associated with this session, never <code>null</code> but
+   *     may be empty
    */
   Set<IReferencePoint> getReferencePoints();
 
@@ -280,7 +282,9 @@ public interface ISarosSession {
    */
   void removeActivityConsumer(IActivityConsumer consumer);
 
-  /** Checks if the user is ready to process {@link IResourceActivity}s for a given project */
+  /**
+   * Checks if the user is ready to process {@link IResourceActivity}s for a given reference point
+   */
   boolean userHasReferencePoint(User user, IReferencePoint referencePoint);
 
   /**
@@ -290,47 +294,50 @@ public interface ISarosSession {
   boolean isShared(IResource resource);
 
   /**
-   * Returns the global ID of the project.
+   * Returns the global ID of the reference point.
    *
-   * @return the global ID of the project or <code>null</code> if this project is not shared
+   * @return the global ID of the reference point or <code>null</code> if this reference point is
+   *     not shared
    */
   String getReferencePointId(IReferencePoint referencePoint);
 
   /**
-   * Returns the project with the given ID.
+   * Returns the reference point with the given ID.
    *
-   * @return the project with the given ID or <code>null</code> if no project with this ID is shared
+   * @return the reference point with the given ID or <code>null</code> if no reference point with
+   *     this ID is shared
    */
   IReferencePoint getReferencePoint(String referencePointID);
 
   /**
-   * Adds the specified project to this session.
+   * Adds the specified reference point to this session.
    *
-   * @param referencePoint The project to share
-   * @param referencePointId The global project ID
+   * @param referencePoint The reference point to share
+   * @param referencePointId The global reference point ID
    */
   void addSharedReferencePoint(IReferencePoint referencePoint, String referencePointId);
 
   /**
-   * Stores a bidirectional mapping between <code>project</code> and <code>projectID</code>.
+   * Stores a bidirectional mapping between <code>reference point</code> and <code>
+   * reference point ID</code>.
    *
-   * <p>This information is necessary for receiving (unserializing) resource-related activities.
+   * <p>This information is necessary for receiving (deserializing) resource-related activities.
    *
-   * @param referencePointId Session-wide ID of the project
-   * @param referencePoint the local representation of the project
+   * @param referencePointId Session-wide ID of the reference point
+   * @param referencePoint the local representation of the reference point
    * @see #removeReferencePointMapping(String, IReferencePoint)
    */
   void addReferencePointMapping(String referencePointId, IReferencePoint referencePoint);
 
   /**
-   * Removes the bidirectional mapping <code>project</code> and <code>projectId</code> that was
-   * created by {@link #addReferencePointMapping(String, IReferencePoint) addProjectMapping()} .
+   * Removes the bidirectional mapping <code>reference point</code> and <code>reference point ID
+   * </code> that was created by {@link #addReferencePointMapping(String, IReferencePoint)} .
    *
-   * <p>TODO Why is the project parameter needed here? This forces callers to store the mapping
-   * themselves (or retrieve it just before calling this method).
+   * <p>TODO Why is the reference point parameter needed here? This forces callers to store the
+   * mapping themselves (or retrieve it just before calling this method).
    *
-   * @param referencePointId Session-wide ID of the project
-   * @param referencePoint the local representation of the project
+   * @param referencePointId Session-wide ID of the reference point
+   * @param referencePoint the local representation of the reference point
    */
   void removeReferencePointMapping(String referencePointId, IReferencePoint referencePoint);
 
@@ -352,14 +359,16 @@ public interface ISarosSession {
   /**
    * FOR INTERNAL USE ONLY !
    *
-   * <p>Starts queuing of incoming {@linkplain IResourceActivity project-related activities}, since
-   * they cannot be applied before their corresponding project is received and extracted.
+   * <p>Starts queuing of incoming {@linkplain IResourceActivity reference-point-related
+   * activities}, since they cannot be applied before their corresponding reference point is
+   * received and extracted.
    *
-   * <p>That queuing relies on an existing project-to-projectID mapping (see {@link
+   * <p>That queuing relies on an existing reference point-to-reference-point-ID mapping (see {@link
    * #addReferencePointMapping(String, IReferencePoint)}), otherwise incoming activities cannot be
    * queued and will be lost.
    *
-   * @param referencePoint the project for which project-related activities should be queued
+   * @param referencePoint the reference point for which reference-point-related activities should
+   *     be queued
    * @see #disableQueuing
    */
   void enableQueuing(IReferencePoint referencePoint);
@@ -367,7 +376,7 @@ public interface ISarosSession {
   /**
    * FOR INTERNAL USE ONLY !
    *
-   * <p>Disables queuing for the given project and flushes all queued activities.
+   * <p>Disables queuing for the given reference point and flushes all queued activities.
    */
   void disableQueuing(IReferencePoint referencePoint);
 
