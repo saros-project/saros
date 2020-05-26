@@ -434,7 +434,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
       try {
         negotiation =
-            negotiationFactory.newIncomingProjectNegotiation(
+            negotiationFactory.newIncomingResourceNegotiation(
                 remoteAddress, negotiationID, projectNegotiationData, this, session);
 
         negotiation.setNegotiationListener(negotiationListener);
@@ -650,7 +650,7 @@ public class SarosSessionManager implements ISarosSessionManager {
     try {
       for (User user : recipients) {
         AbstractOutgoingResourceNegotiation negotiation =
-            negotiationFactory.newOutgoingProjectNegotiation(
+            negotiationFactory.newOutgoingResourceNegotiation(
                 user.getJID(), projectSharingData, this, session);
 
         negotiation.setNegotiationListener(negotiationListener);
@@ -713,7 +713,7 @@ public class SarosSessionManager implements ISarosSessionManager {
         }
 
         negotiation =
-            negotiationFactory.newOutgoingProjectNegotiation(
+            negotiationFactory.newOutgoingResourceNegotiation(
                 user, currentSharedProjects, this, currentSession);
 
         negotiation.setNegotiationListener(negotiationListener);
