@@ -35,7 +35,7 @@ public interface ISessionListener {
    *
    * @param user the user whose {@link Permission} changed.
    */
-  public default void permissionChanged(User user) {
+  default void permissionChanged(User user) {
     // NOP
   }
 
@@ -46,7 +46,7 @@ public interface ISessionListener {
    *
    * @param user the user that has joined.
    */
-  public default void userJoined(User user) {
+  default void userJoined(User user) {
     // NOP
   }
 
@@ -57,7 +57,7 @@ public interface ISessionListener {
    *
    * @param user the user that has joined.
    */
-  public default void userStartedQueuing(User user) {
+  default void userStartedQueuing(User user) {
     // NOP
   }
 
@@ -68,7 +68,7 @@ public interface ISessionListener {
    *
    * @param user the user that has joined.
    */
-  public default void userFinishedResourceNegotiation(User user) {
+  default void userFinishedResourceNegotiation(User user) {
     // NOP
   }
 
@@ -79,7 +79,7 @@ public interface ISessionListener {
    *
    * @param user the user whose color changed
    */
-  public default void userColorChanged(User user) {
+  default void userColorChanged(User user) {
     // NOP
   }
 
@@ -90,7 +90,7 @@ public interface ISessionListener {
    *
    * @param user the user that has left.
    */
-  public default void userLeft(User user) {
+  default void userLeft(User user) {
     // NOP
   }
 
@@ -102,7 +102,7 @@ public interface ISessionListener {
    *
    * @param referencePoint the project that was added
    */
-  public default void referencePointAdded(IReferencePoint referencePoint) {
+  default void referencePointAdded(IReferencePoint referencePoint) {
     // NOP
   }
 
@@ -114,7 +114,7 @@ public interface ISessionListener {
    *
    * @param referencePoint the project that was removed
    */
-  public default void referencePointRemoved(IReferencePoint referencePoint) {
+  default void referencePointRemoved(IReferencePoint referencePoint) {
     // NOP
   }
 
@@ -123,7 +123,7 @@ public interface ISessionListener {
    *
    * <p>This method might <i>not</i> be called on the UI thread.
    */
-  public default void resourcesAdded(IReferencePoint referencePoint) {
+  default void resourcesAdded(IReferencePoint referencePoint) {
     // NOP
   }
 }
