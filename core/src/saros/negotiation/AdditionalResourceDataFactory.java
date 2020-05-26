@@ -9,25 +9,27 @@ import org.apache.log4j.Logger;
 import saros.filesystem.IReferencePoint;
 
 /**
- * Factory class to build the additional project data used for the project negotiation data.
+ * Factory class to build the additional resource data used for the resource negotiation data.
  *
- * <p>To add entries to the additional project data mapping, a {@link
- * AdditionalResourceDataProvider} can be registered. These project data providers will be called
- * with the corresponding project object every time project negotiation data is created for a shared
- * project.
+ * <p>To add entries to the additional resource data mapping, a {@link
+ * AdditionalResourceDataProvider} can be registered. These additional resource data providers will
+ * be called with the corresponding reference point object every time resource negotiation data is
+ * created for a shared reference point.
  *
- * <p>The registered project data providers should provide a way of identifying their registered
- * options (e.g. by providing references to the used key values).
+ * <p>The registered additional resource data providers should provide a way of identifying their
+ * registered options (e.g. by providing references to the used key values).
  *
- * <p><b>NOTE:</b> This factory does not ensure that the keys used by different project data
- * providers are disjoint. If multiple providers use the same key, the mapping of the provider added
- * last will be used.
+ * <p><b>NOTE:</b> This factory does not ensure that the keys used by different additional resource
+ * data providers are disjoint. If multiple providers use the same key, the mapping of the provider
+ * added last will be used.
  */
 // TODO remove as no longer used?
 public class AdditionalResourceDataFactory {
   private static final Logger log = Logger.getLogger(AdditionalResourceDataFactory.class);
 
-  /** The held list of project data providers used to build the additional project data. */
+  /**
+   * The held list of additional resource data providers used to build the additional resource data.
+   */
   private final List<AdditionalResourceDataProvider> additionalResourceDataProviders;
 
   /**
@@ -39,52 +41,53 @@ public class AdditionalResourceDataFactory {
   }
 
   /**
-   * Adds the passed project data providers to the list of providers used to generate the additional
-   * project data for the project negotiation data.
+   * Adds the passed additional resource data providers to the list of providers used to generate
+   * the additional resource data for the resource negotiation data.
    *
-   * @param additionalResourceDataProvider the project data provider to add
+   * @param additionalResourceDataProvider the additional resource data provider to add
    */
-  public void registerProjectDataProvider(
+  public void registerAdditionalResourceDataProvider(
       AdditionalResourceDataProvider additionalResourceDataProvider) {
+
     if (additionalResourceDataProvider != null) {
       additionalResourceDataProviders.add(additionalResourceDataProvider);
     }
   }
 
   /**
-   * Builds the additional project data for the passed projects.
+   * Builds the additional resource data for the passed reference point.
    *
-   * @param project the project to build the additional project data for
-   * @return the additional project data for the passed project
+   * @param referencePoint the reference point to build the additional resource data for
+   * @return the additional resource data for the passed reference point
    */
-  Map<String, String> build(IReferencePoint project) {
-    Map<String, String> additionalProjectData = new HashMap<>();
+  Map<String, String> build(IReferencePoint referencePoint) {
+    Map<String, String> additionalResourceData = new HashMap<>();
 
     for (AdditionalResourceDataProvider additionalResourceDataProvider :
         additionalResourceDataProviders) {
-      Map<String, String> providerData = additionalResourceDataProvider.getMapping(project);
+      Map<String, String> providerData = additionalResourceDataProvider.getMapping(referencePoint);
 
-      if (!Collections.disjoint(additionalProjectData.keySet(), providerData.keySet())) {
+      if (!Collections.disjoint(additionalResourceData.keySet(), providerData.keySet())) {
         log.warn(
-            "Key sets used by project data providers are not disjoint! Noticed while processing "
+            "Key sets used by additional resource data providers are not disjoint! Noticed while processing "
                 + additionalResourceDataProvider.getClass().getSimpleName());
       }
 
-      additionalProjectData.putAll(providerData);
+      additionalResourceData.putAll(providerData);
     }
 
-    return additionalProjectData;
+    return additionalResourceData;
   }
 
-  /** A class used to provide additional project data for the project negotiation. */
+  /** A class used to provide additional resource data for the resource negotiation. */
   public interface AdditionalResourceDataProvider {
 
     /**
-     * Returns the mapping of additional project options for the given project.
+     * Returns the mapping of additional resource data for the given reference point.
      *
-     * @param project the project to provide additional project options for
-     * @return the mapping of additional project options for the given project
+     * @param referencePoint the reference point to provide additional resource data for
+     * @return the mapping of additional resource data for the given reference point
      */
-    Map<String, String> getMapping(IReferencePoint project);
+    Map<String, String> getMapping(IReferencePoint referencePoint);
   }
 }
