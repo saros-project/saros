@@ -118,7 +118,7 @@ public final class NegotiationFactory {
 
     switch (getTransferType(session, remoteAddress)) {
       case ARCHIVE:
-        return new ArchiveOutgoingProjectNegotiation(
+        return new ArchiveOutgoingResourceNegotiation(
             remoteAddress,
             projectSharingData,
             sessionManager,

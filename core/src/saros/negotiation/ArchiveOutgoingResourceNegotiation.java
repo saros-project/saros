@@ -32,12 +32,12 @@ import saros.synchronize.StartHandle;
  * Implementation of {@link AbstractOutgoingResourceNegotiation} utilizing a transferred zip archive
  * to exchange differences in the project files.
  */
-public class ArchiveOutgoingProjectNegotiation extends AbstractOutgoingResourceNegotiation {
+public class ArchiveOutgoingResourceNegotiation extends AbstractOutgoingResourceNegotiation {
 
-  private static final Logger log = Logger.getLogger(ArchiveOutgoingProjectNegotiation.class);
+  private static final Logger log = Logger.getLogger(ArchiveOutgoingResourceNegotiation.class);
   private File zipArchive = null;
 
-  public ArchiveOutgoingProjectNegotiation( //
+  public ArchiveOutgoingResourceNegotiation( //
       final JID peer, //
       final ProjectSharingData projects, //
       final ISarosSessionManager sessionManager, //
