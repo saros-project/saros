@@ -5,14 +5,14 @@ import java.util.List;
 import saros.negotiation.FileList;
 import saros.negotiation.ResourceNegotiationData;
 
-@XStreamAlias(/* ProjectNegotiationOffering */ "PNOF")
-public class ProjectNegotiationOfferingExtension extends ResourceNegotiationExtension {
+@XStreamAlias(/* ResourceNegotiationOffering */ "RNOF")
+public class ResourceNegotiationOfferingExtension extends ResourceNegotiationExtension {
 
   public static final Provider PROVIDER = new Provider();
 
   private List<ResourceNegotiationData> resourceNegotiationData;
 
-  public ProjectNegotiationOfferingExtension(
+  public ResourceNegotiationOfferingExtension(
       String sessionID,
       String negotiationID,
       List<ResourceNegotiationData> resourceNegotiationData) {
@@ -25,12 +25,12 @@ public class ProjectNegotiationOfferingExtension extends ResourceNegotiationExte
   }
 
   public static class Provider
-      extends ResourceNegotiationExtension.Provider<ProjectNegotiationOfferingExtension> {
+      extends ResourceNegotiationExtension.Provider<ResourceNegotiationOfferingExtension> {
 
     private Provider() {
       super(
-          "pnof",
-          ProjectNegotiationOfferingExtension.class,
+          "rnof",
+          ResourceNegotiationOfferingExtension.class,
           ResourceNegotiationData.class,
           FileList.class);
     }
