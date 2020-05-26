@@ -9,7 +9,7 @@ import saros.communication.extensions.CancelInviteExtension;
 import saros.communication.extensions.CancelResourceNegotiationExtension;
 import saros.communication.extensions.InvitationAcknowledgedExtension;
 import saros.communication.extensions.InvitationOfferingExtension;
-import saros.communication.extensions.ProjectNegotiationOfferingExtension;
+import saros.communication.extensions.ResourceNegotiationOfferingExtension;
 import saros.negotiation.ResourceNegotiation;
 import saros.negotiation.ResourceNegotiationData;
 import saros.negotiation.SessionNegotiation;
@@ -46,7 +46,7 @@ final class NegotiationPacketListener {
         public void sessionStarted(final ISarosSession session) {
           receiver.addPacketListener(
               projectNegotiationRequestListener,
-              ProjectNegotiationOfferingExtension.PROVIDER.getPacketFilter(session.getID()));
+              ResourceNegotiationOfferingExtension.PROVIDER.getPacketFilter(session.getID()));
 
           receiver.addPacketListener(
               projectNegotiationCanceledListener,
@@ -129,8 +129,8 @@ final class NegotiationPacketListener {
         @Override
         public void processPacket(final Packet packet) {
 
-          final ProjectNegotiationOfferingExtension extension =
-              ProjectNegotiationOfferingExtension.PROVIDER.getPayload(packet);
+          final ResourceNegotiationOfferingExtension extension =
+              ResourceNegotiationOfferingExtension.PROVIDER.getPayload(packet);
 
           if (extension == null) {
             log.warn("received malformed project negotiation packet from " + packet.getFrom());

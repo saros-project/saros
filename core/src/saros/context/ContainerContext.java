@@ -19,8 +19,8 @@ import saros.communication.extensions.KickUserExtension;
 import saros.communication.extensions.LeaveSessionExtension;
 import saros.communication.extensions.PingExtension;
 import saros.communication.extensions.PongExtension;
-import saros.communication.extensions.ProjectNegotiationOfferingExtension;
 import saros.communication.extensions.ResourceNegotiationMissingFilesExtension;
+import saros.communication.extensions.ResourceNegotiationOfferingExtension;
 import saros.communication.extensions.StartActivityQueuingRequest;
 import saros.communication.extensions.StartActivityQueuingResponse;
 import saros.communication.extensions.UserFinishedProjectNegotiationExtension;
@@ -126,7 +126,7 @@ public class ContainerContext implements IContainerContext {
 
       // Resource negotiation extensions
       Class.forName(CancelResourceNegotiationExtension.class.getName());
-      Class.forName(ProjectNegotiationOfferingExtension.class.getName());
+      Class.forName(ResourceNegotiationOfferingExtension.class.getName());
       Class.forName(ResourceNegotiationMissingFilesExtension.class.getName());
 
       // General session extensions

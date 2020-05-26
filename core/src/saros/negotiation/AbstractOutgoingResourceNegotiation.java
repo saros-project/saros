@@ -8,8 +8,8 @@ import java.util.Random;
 import java.util.concurrent.CancellationException;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.packet.Packet;
-import saros.communication.extensions.ProjectNegotiationOfferingExtension;
 import saros.communication.extensions.ResourceNegotiationMissingFilesExtension;
+import saros.communication.extensions.ResourceNegotiationOfferingExtension;
 import saros.communication.extensions.StartActivityQueuingRequest;
 import saros.communication.extensions.StartActivityQueuingResponse;
 import saros.editor.IEditorManager;
@@ -201,13 +201,13 @@ public abstract class AbstractOutgoingResourceNegotiation extends ResourceNegoti
      * instance and pass it to the installed callback handler (which in the
      * current implementation opens a wizard on the remote side)
      */
-    ProjectNegotiationOfferingExtension offering =
-        new ProjectNegotiationOfferingExtension(getSessionID(), getID(), resourceNegotiationData);
+    ResourceNegotiationOfferingExtension offering =
+        new ResourceNegotiationOfferingExtension(getSessionID(), getID(), resourceNegotiationData);
 
     transmitter.send(
         ISarosSession.SESSION_CONNECTION_ID,
         getPeer(),
-        ProjectNegotiationOfferingExtension.PROVIDER.create(offering));
+        ResourceNegotiationOfferingExtension.PROVIDER.create(offering));
   }
 
   /**
