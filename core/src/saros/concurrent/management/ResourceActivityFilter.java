@@ -118,7 +118,7 @@ class ResourceActivityFilter {
         }
 
         @Override
-        public void projectRemoved(IReferencePoint referencePoint) {
+        public void referencePointRemoved(IReferencePoint referencePoint) {
           Iterator<Entry<IFile, List<User>>> iterator = deletedFileFilter.entrySet().iterator();
           while (iterator.hasNext()) {
             IFile file = iterator.next().getKey();

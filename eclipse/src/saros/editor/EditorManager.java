@@ -268,7 +268,7 @@ public class EditorManager implements IEditorManager {
         }
 
         @Override
-        public void userFinishedProjectNegotiation(User user) {
+        public void userFinishedResourceNegotiation(User user) {
 
           // Send awareness information
 
@@ -323,7 +323,7 @@ public class EditorManager implements IEditorManager {
         }
 
         @Override
-        public void resourcesAdded(IReferencePoint project) {
+        public void resourcesAdded(IReferencePoint referencePoint) {
           SWTUtils.runSafeSWTSync(
               log,
               new Runnable() {

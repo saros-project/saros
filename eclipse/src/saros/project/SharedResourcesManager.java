@@ -92,17 +92,17 @@ public class SharedResourcesManager extends AbstractActivityProducer
       new ISessionListener() {
 
         @Override
-        public void projectAdded(IReferencePoint project) {
+        public void referencePointAdded(IReferencePoint referencePoint) {
           synchronized (projectStates) {
-            IProject eclipseProject = (IProject) ResourceAdapterFactory.convertBack(project);
+            IProject eclipseProject = (IProject) ResourceAdapterFactory.convertBack(referencePoint);
             projectStates.put(eclipseProject, eclipseProject.isOpen());
           }
         }
 
         @Override
-        public void projectRemoved(IReferencePoint project) {
+        public void referencePointRemoved(IReferencePoint referencePoint) {
           synchronized (projectStates) {
-            IProject eclipseProject = (IProject) ResourceAdapterFactory.convertBack(project);
+            IProject eclipseProject = (IProject) ResourceAdapterFactory.convertBack(referencePoint);
             projectStates.remove(eclipseProject);
           }
         }

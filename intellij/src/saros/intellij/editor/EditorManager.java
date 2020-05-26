@@ -383,7 +383,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
         }
 
         @Override
-        public void userFinishedProjectNegotiation(User user) {
+        public void userFinishedResourceNegotiation(User user) {
           sendAwarenessInformation(user);
         }
 

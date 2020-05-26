@@ -80,7 +80,7 @@ public final class SharedProjectDecorator implements ILightweightLabelDecorator 
   private final ISessionListener sessionListener =
       new ISessionListener() {
         @Override
-        public void resourcesAdded(IReferencePoint project) {
+        public void resourcesAdded(IReferencePoint referencePoint) {
           log.debug("updating project decoration for all shared projects");
           updateDecoratorsAsync(null); // update all labels
         }

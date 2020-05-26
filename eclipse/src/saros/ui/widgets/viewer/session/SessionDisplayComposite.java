@@ -57,7 +57,7 @@ public abstract class SessionDisplayComposite extends ViewerComposite<TreeViewer
   private final ISessionListener sessionListener =
       new ISessionListener() {
         @Override
-        public void resourcesAdded(IReferencePoint project) {
+        public void resourcesAdded(IReferencePoint referencePoint) {
           ViewerUtils.refresh(getViewer(), true);
         }
       };
