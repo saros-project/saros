@@ -12,7 +12,7 @@ import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
 import saros.activities.IResourceActivity;
 import saros.annotations.Component;
-import saros.communication.extensions.UserFinishedProjectNegotiationExtension;
+import saros.communication.extensions.UserFinishedResourceNegotiationExtension;
 import saros.communication.extensions.UserListExtension;
 import saros.communication.extensions.UserListExtension.UserListEntry;
 import saros.communication.extensions.UserListReceivedExtension;
@@ -81,7 +81,7 @@ public class UserInformationHandler implements Startable {
 
     receiver.addPacketListener(
         userFinishedProjectNegotiations,
-        UserFinishedProjectNegotiationExtension.PROVIDER.getPacketFilter(currentSessionID));
+        UserFinishedResourceNegotiationExtension.PROVIDER.getPacketFilter(currentSessionID));
 
     isRunning = true;
   }
@@ -211,8 +211,8 @@ public class UserInformationHandler implements Startable {
   public void sendUserFinishedProjectNegotiation(Collection<User> remoteUsers, JID jid) {
 
     PacketExtension packet =
-        UserFinishedProjectNegotiationExtension.PROVIDER.create(
-            new UserFinishedProjectNegotiationExtension(currentSessionID, jid));
+        UserFinishedResourceNegotiationExtension.PROVIDER.create(
+            new UserFinishedResourceNegotiationExtension(currentSessionID, jid));
 
     for (User user : remoteUsers) {
       try {
@@ -233,8 +233,8 @@ public class UserInformationHandler implements Startable {
 
     JID fromJID = new JID(packet.getFrom());
 
-    UserFinishedProjectNegotiationExtension payload =
-        UserFinishedProjectNegotiationExtension.PROVIDER.getPayload(packet);
+    UserFinishedResourceNegotiationExtension payload =
+        UserFinishedResourceNegotiationExtension.PROVIDER.getPayload(packet);
 
     if (payload == null) {
       log.warn("UserFinishedProjectNegotiation-payload is corrupted");
