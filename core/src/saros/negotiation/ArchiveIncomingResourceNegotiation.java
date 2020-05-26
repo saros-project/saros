@@ -29,7 +29,7 @@ import saros.util.CoreUtils;
 
 /**
  * Implementation of {@link AbstractIncomingResourceNegotiation} utilizing a transferred zip archive
- * to exchange differences in the project files.
+ * to exchange differences in the reference point files.
  */
 public class ArchiveIncomingResourceNegotiation extends AbstractIncomingResourceNegotiation {
 
@@ -38,7 +38,7 @@ public class ArchiveIncomingResourceNegotiation extends AbstractIncomingResource
   public ArchiveIncomingResourceNegotiation(
       final JID peer, //
       final String negotiationID, //
-      final List<ProjectNegotiationData> projectNegotiationData, //
+      final List<ProjectNegotiationData> resourceNegotiationData, //
       final ISarosSessionManager sessionManager, //
       final ISarosSession session, //
       final FileReplacementInProgressObservable fileReplacementInProgressObservable, //
@@ -51,7 +51,7 @@ public class ArchiveIncomingResourceNegotiation extends AbstractIncomingResource
     super(
         peer,
         negotiationID,
-        projectNegotiationData,
+        resourceNegotiationData,
         sessionManager,
         session,
         fileReplacementInProgressObservable,
@@ -65,7 +65,7 @@ public class ArchiveIncomingResourceNegotiation extends AbstractIncomingResource
   @Override
   protected void transfer(
       IProgressMonitor monitor,
-      Map<String, IReferencePoint> projectMapping,
+      Map<String, IReferencePoint> referencePointMapping,
       List<FileList> missingFiles)
       throws IOException, SarosCancellationException {
 
@@ -75,13 +75,13 @@ public class ArchiveIncomingResourceNegotiation extends AbstractIncomingResource
 
     // the host do not send an archive if we do not need any files
     if (filesMissing) {
-      receiveAndUnpackArchive(projectMapping, monitor);
+      receiveAndUnpackArchive(referencePointMapping, monitor);
     }
   }
 
   /** Receives the archive with all missing files and unpacks it. */
   private void receiveAndUnpackArchive(
-      final Map<String, IReferencePoint> localProjectMapping, final IProgressMonitor monitor)
+      final Map<String, IReferencePoint> localReferencePointMapping, final IProgressMonitor monitor)
       throws IOException, SarosCancellationException {
 
     // waiting for the big archive to come in
@@ -96,7 +96,7 @@ public class ArchiveIncomingResourceNegotiation extends AbstractIncomingResource
      */
 
     try {
-      unpackArchive(localProjectMapping, archiveFile, new SubProgressMonitor(monitor, 50));
+      unpackArchive(localReferencePointMapping, archiveFile, new SubProgressMonitor(monitor, 50));
       monitor.done();
     } finally {
       if (archiveFile != null && !archiveFile.delete()) {
@@ -106,18 +106,19 @@ public class ArchiveIncomingResourceNegotiation extends AbstractIncomingResource
   }
 
   private void unpackArchive(
-      final Map<String, IReferencePoint> localProjectMapping,
+      final Map<String, IReferencePoint> localReferencePointMapping,
       final File archiveFile,
       final IProgressMonitor monitor)
       throws LocalCancellationException, IOException {
 
-    final Map<String, IReferencePoint> projectMapping = new HashMap<String, IReferencePoint>();
+    final Map<String, IReferencePoint> referencePointMapping =
+        new HashMap<String, IReferencePoint>();
 
-    for (Entry<String, IReferencePoint> entry : localProjectMapping.entrySet())
-      projectMapping.put(entry.getKey(), entry.getValue());
+    for (Entry<String, IReferencePoint> entry : localReferencePointMapping.entrySet())
+      referencePointMapping.put(entry.getKey(), entry.getValue());
 
     final DecompressArchiveTask decompressTask =
-        new DecompressArchiveTask(archiveFile, projectMapping, PATH_DELIMITER, monitor);
+        new DecompressArchiveTask(archiveFile, referencePointMapping, PATH_DELIMITER, monitor);
 
     long startTime = System.currentTimeMillis();
 
@@ -132,7 +133,7 @@ public class ArchiveIncomingResourceNegotiation extends AbstractIncomingResource
      */
 
     try {
-      workspace.run(decompressTask, projectMapping.values().toArray(new IResource[0]));
+      workspace.run(decompressTask, referencePointMapping.values().toArray(new IResource[0]));
     } catch (saros.exceptions.OperationCanceledException e) {
       LocalCancellationException canceled =
           new LocalCancellationException(null, CancelOption.DO_NOT_NOTIFY_PEER);
@@ -152,7 +153,7 @@ public class ArchiveIncomingResourceNegotiation extends AbstractIncomingResource
     monitor.beginTask("Receiving archive file...", 100);
     log.debug("waiting for incoming archive stream request");
 
-    monitor.subTask("Host is compressing project files. Waiting for the archive file...");
+    monitor.subTask("Host is compressing resource files. Waiting for the archive file...");
     monitor.waitForCompletion(expectedTransfer);
     monitor.subTask("Receiving archive file...");
     log.debug(this + " : receiving archive");
