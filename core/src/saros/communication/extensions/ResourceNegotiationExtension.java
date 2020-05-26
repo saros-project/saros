@@ -6,13 +6,13 @@ import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Packet;
 
-public abstract class ProjectNegotiationExtension extends SarosSessionPacketExtension {
+public abstract class ResourceNegotiationExtension extends SarosSessionPacketExtension {
 
   @XStreamAlias("nid")
   @XStreamAsAttribute
   protected final String negotiationID;
 
-  protected ProjectNegotiationExtension(String sessionID, String negotiationID) {
+  protected ResourceNegotiationExtension(String sessionID, String negotiationID) {
     super(sessionID);
     this.negotiationID = negotiationID;
   }
@@ -21,7 +21,7 @@ public abstract class ProjectNegotiationExtension extends SarosSessionPacketExte
     return negotiationID;
   }
 
-  public abstract static class Provider<T extends ProjectNegotiationExtension>
+  public abstract static class Provider<T extends ResourceNegotiationExtension>
       extends SarosSessionPacketExtension.Provider<T> {
 
     public Provider(String elementName, Class<?>... classes) {
@@ -41,7 +41,7 @@ public abstract class ProjectNegotiationExtension extends SarosSessionPacketExte
           new PacketFilter() {
             @Override
             public boolean accept(Packet packet) {
-              ProjectNegotiationExtension extension = getPayload(packet);
+              ResourceNegotiationExtension extension = getPayload(packet);
 
               if (extension == null) return false;
 

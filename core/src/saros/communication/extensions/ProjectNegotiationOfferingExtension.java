@@ -6,7 +6,7 @@ import saros.negotiation.FileList;
 import saros.negotiation.ResourceNegotiationData;
 
 @XStreamAlias(/* ProjectNegotiationOffering */ "PNOF")
-public class ProjectNegotiationOfferingExtension extends ProjectNegotiationExtension {
+public class ProjectNegotiationOfferingExtension extends ResourceNegotiationExtension {
 
   public static final Provider PROVIDER = new Provider();
 
@@ -25,7 +25,7 @@ public class ProjectNegotiationOfferingExtension extends ProjectNegotiationExten
   }
 
   public static class Provider
-      extends ProjectNegotiationExtension.Provider<ProjectNegotiationOfferingExtension> {
+      extends ResourceNegotiationExtension.Provider<ProjectNegotiationOfferingExtension> {
 
     private Provider() {
       super(

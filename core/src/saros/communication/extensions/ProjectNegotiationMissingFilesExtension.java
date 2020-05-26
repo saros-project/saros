@@ -5,7 +5,7 @@ import java.util.List;
 import saros.negotiation.FileList;
 
 @XStreamAlias(/* ProjectNegotiationMissingFiles */ "PNMF")
-public class ProjectNegotiationMissingFilesExtension extends ProjectNegotiationExtension {
+public class ProjectNegotiationMissingFilesExtension extends ResourceNegotiationExtension {
 
   public static final Provider PROVIDER = new Provider();
 
@@ -22,7 +22,7 @@ public class ProjectNegotiationMissingFilesExtension extends ProjectNegotiationE
   }
 
   public static class Provider
-      extends ProjectNegotiationExtension.Provider<ProjectNegotiationMissingFilesExtension> {
+      extends ResourceNegotiationExtension.Provider<ProjectNegotiationMissingFilesExtension> {
 
     private Provider() {
       super("pnmf", ProjectNegotiationMissingFilesExtension.class, FileList.class);
