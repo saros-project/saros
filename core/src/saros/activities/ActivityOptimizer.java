@@ -38,7 +38,7 @@ public class ActivityOptimizer {
     Map<IFile, Integer> viewports = new HashMap<>();
 
     /*
-     * keep only the latest selection/viewport activities per project and file
+     * keep only the latest selection/viewport activities per reference point and file
      */
 
     int activityIdx = 0;
