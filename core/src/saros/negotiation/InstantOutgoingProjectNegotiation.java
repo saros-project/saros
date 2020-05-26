@@ -116,7 +116,7 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingResourceN
       fileCount += list.getPaths().size();
 
       final String projectID = list.getProjectID();
-      final IReferencePoint project = projects.getProject(projectID);
+      final IReferencePoint project = resourceSharingData.getProject(projectID);
 
       if (project == null)
         throw new LocalCancellationException(
@@ -150,7 +150,7 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingResourceN
 
       checkCancellation(CancelOption.NOTIFY_PEER);
 
-      OutgoingStreamProtocol osp = new OutgoingStreamProtocol(out, projects, monitor);
+      OutgoingStreamProtocol osp = new OutgoingStreamProtocol(out, resourceSharingData, monitor);
       sendProjectConfigFiles(osp);
       sendRemainingPreferOpenedFirst(osp);
       osp.close();
@@ -189,7 +189,7 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingResourceN
   private void createTransferList(List<FileList> fileLists, int fileCount) {
     List<IFile> files = new ArrayList<>(fileCount);
     for (final FileList list : fileLists) {
-      IReferencePoint project = projects.getProject(list.getProjectID());
+      IReferencePoint project = resourceSharingData.getProject(list.getProjectID());
       for (String file : list.getPaths()) {
         files.add(project.getFile(file));
       }
@@ -231,7 +231,7 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingResourceN
     };
 
     for (String string : eclipseProjFiles) {
-      for (IReferencePoint project : projects) {
+      for (IReferencePoint project : resourceSharingData) {
         IFile file = project.getFile(string);
         sendIfRequired(osp, file);
       }

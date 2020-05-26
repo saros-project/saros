@@ -145,7 +145,7 @@ public class ArchiveOutgoingProjectNegotiation extends AbstractOutgoingResourceN
     for (final FileList list : fileLists) {
       final String projectID = list.getProjectID();
 
-      final IReferencePoint project = projects.getProject(projectID);
+      final IReferencePoint project = resourceSharingData.getProject(projectID);
 
       if (project == null)
         throw new LocalCancellationException(

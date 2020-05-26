@@ -33,7 +33,7 @@ import saros.session.User;
 import saros.synchronize.StartHandle;
 
 /**
- * Handles outgoing ProjectNegotiations except for the actual file transfer.
+ * Handles outgoing ResourceNegotiations except for the actual file transfer.
  *
  * <p>Concrete implementations need to provide an implementation to exchange the calculated
  * differences. This class only provides the initial setup and calculation.
@@ -42,7 +42,7 @@ public abstract class AbstractOutgoingResourceNegotiation extends ResourceNegoti
 
   private static final Logger log = Logger.getLogger(AbstractOutgoingResourceNegotiation.class);
 
-  protected ProjectSharingData projects;
+  protected ProjectSharingData resourceSharingData;
 
   private static final Random NEGOTIATION_ID_GENERATOR = new Random();
 
@@ -52,11 +52,11 @@ public abstract class AbstractOutgoingResourceNegotiation extends ResourceNegoti
 
   private PacketCollector startActivityQueuingResponseCollector;
 
-  private final AdditionalProjectDataFactory additionalProjectDataFactory;
+  private final AdditionalProjectDataFactory additionalResourceDataFactory;
 
   protected AbstractOutgoingResourceNegotiation( //
       final JID peer, //
-      final ProjectSharingData projects, //
+      final ProjectSharingData resourceSharingData, //
       final ISarosSessionManager sessionManager, //
       final ISarosSession session, //
       final IEditorManager editorManager, //
@@ -65,7 +65,7 @@ public abstract class AbstractOutgoingResourceNegotiation extends ResourceNegoti
       final XMPPFileTransferManager fileTransferManager, //
       final ITransmitter transmitter, //
       final IReceiver receiver, //
-      final AdditionalProjectDataFactory additionalProjectDataFactory //
+      final AdditionalProjectDataFactory additionalResourceDataFactory //
       ) {
     super(
         String.valueOf(NEGOTIATION_ID_GENERATOR.nextLong()),
@@ -78,10 +78,10 @@ public abstract class AbstractOutgoingResourceNegotiation extends ResourceNegoti
         transmitter,
         receiver);
 
-    this.projects = projects;
+    this.resourceSharingData = resourceSharingData;
 
     this.editorManager = editorManager;
-    this.additionalProjectDataFactory = additionalProjectDataFactory;
+    this.additionalResourceDataFactory = additionalResourceDataFactory;
   }
 
   public Status run(IProgressMonitor monitor) {
@@ -95,7 +95,7 @@ public abstract class AbstractOutgoingResourceNegotiation extends ResourceNegoti
     try {
       setup(monitor);
 
-      sendFileList(createProjectNegotiationDataList(projects, monitor), monitor);
+      sendFileList(createResourceNegotiationDataList(resourceSharingData, monitor), monitor);
 
       monitor.subTask("");
 
@@ -103,14 +103,14 @@ public abstract class AbstractOutgoingResourceNegotiation extends ResourceNegoti
       monitor.subTask("");
 
       /*
-       * If we are a non-host sharing projects with the host, now is the
-       * time where we know that the host has accepted our projects. We
-       * can thus safely assume these projects to be shared now.
+       * If we are a non-host sharing resources with the host, now is the
+       * time where we know that the host has accepted our resources. We
+       * can thus safely assume these resources to be shared now.
        */
       if (!session.isHost()) {
-        for (IReferencePoint project : projects) {
-          String projectID = projects.getProjectID(project);
-          session.addSharedProject(project, projectID);
+        for (IReferencePoint referencePoint : resourceSharingData) {
+          String referencePointID = resourceSharingData.getProjectID(referencePoint);
+          session.addSharedProject(referencePoint, referencePointID);
         }
       }
 
@@ -134,7 +134,7 @@ public abstract class AbstractOutgoingResourceNegotiation extends ResourceNegoti
   }
 
   /**
-   * Preparation for the Project Negotiation. The negotiation can be aborted by canceling the given
+   * Preparation for the resource negotiation. The negotiation can be aborted by canceling the given
    * monitor.
    *
    * @param monitor monitor to show progress to the user
@@ -168,14 +168,15 @@ public abstract class AbstractOutgoingResourceNegotiation extends ResourceNegoti
    * Cleanup acquired resources during {@link #setup}, {@link #prepareTransfer} and {@link
    * #transfer}.
    *
-   * @param monitor mapping from remote project ids to the target local projects
+   * @param monitor the progress monitor
    */
   protected void cleanup(IProgressMonitor monitor) {
     deleteCollectors();
     monitor.done();
   }
 
-  protected void sendFileList(List<ProjectNegotiationData> projectInfos, IProgressMonitor monitor)
+  protected void sendFileList(
+      List<ProjectNegotiationData> resourceNegotiationData, IProgressMonitor monitor)
       throws IOException, SarosCancellationException {
 
     /*
@@ -196,12 +197,12 @@ public abstract class AbstractOutgoingResourceNegotiation extends ResourceNegoti
 
     /*
      * The Remote receives this message at the InvitationHandler which calls
-     * the SarosSessionManager which creates a IncomingProjectNegotiation
+     * the SarosSessionManager which creates a IncomingResourceNegotiation
      * instance and pass it to the installed callback handler (which in the
      * current implementation opens a wizard on the remote side)
      */
     ProjectNegotiationOfferingExtension offering =
-        new ProjectNegotiationOfferingExtension(getSessionID(), getID(), projectInfos);
+        new ProjectNegotiationOfferingExtension(getSessionID(), getID(), resourceNegotiationData);
 
     transmitter.send(
         ISarosSession.SESSION_CONNECTION_ID,
@@ -222,7 +223,7 @@ public abstract class AbstractOutgoingResourceNegotiation extends ResourceNegoti
     log.debug(this + " : waiting for remote file list");
 
     monitor.beginTask(
-        "Waiting for " + getPeer().getName() + " to choose project(s) location",
+        "Waiting for " + getPeer().getName() + " to choose reference point(s) location",
         IProgressMonitor.UNKNOWN);
 
     checkCancellation(CancelOption.NOTIFY_PEER);
@@ -306,8 +307,8 @@ public abstract class AbstractOutgoingResourceNegotiation extends ResourceNegoti
     startActivityQueuingResponseCollector.cancel();
   }
 
-  protected List<ProjectNegotiationData> createProjectNegotiationDataList(
-      final ProjectSharingData projectSharingData, final IProgressMonitor monitor)
+  protected List<ProjectNegotiationData> createResourceNegotiationDataList(
+      final ProjectSharingData resourceSharingData, final IProgressMonitor monitor)
       throws IOException, LocalCancellationException {
 
     // *stretch* progress bar so it will increment smoothly
@@ -315,27 +316,27 @@ public abstract class AbstractOutgoingResourceNegotiation extends ResourceNegoti
 
     monitor.beginTask(
         "Creating file list and calculating file checksums. This may take a while...",
-        projectSharingData.size() * scale);
+        resourceSharingData.size() * scale);
 
     List<ProjectNegotiationData> negData =
-        new ArrayList<ProjectNegotiationData>(projectSharingData.size());
+        new ArrayList<ProjectNegotiationData>(resourceSharingData.size());
 
-    for (IReferencePoint project : projectSharingData) {
+    for (IReferencePoint referencePoint : resourceSharingData) {
 
       if (monitor.isCanceled())
         throw new LocalCancellationException(null, CancelOption.DO_NOT_NOTIFY_PEER);
       try {
-        String projectID = projectSharingData.getProjectID(project);
+        String referencePointID = resourceSharingData.getProjectID(referencePoint);
 
         /*
          * force editor buffer flush because we read the files from the
          * underlying storage
          */
-        if (editorManager != null) editorManager.saveEditors(project);
+        if (editorManager != null) editorManager.saveEditors(referencePoint);
 
-        FileList projectFileList =
+        FileList referencePointFileList =
             FileListFactory.createFileList(
-                project,
+                referencePoint,
                 checksumCache,
                 new SubProgressMonitor(
                     monitor,
@@ -343,13 +344,17 @@ public abstract class AbstractOutgoingResourceNegotiation extends ResourceNegoti
                     SubProgressMonitor.SUPPRESS_BEGINTASK
                         | SubProgressMonitor.SUPPRESS_SETTASKNAME));
 
-        projectFileList.setProjectID(projectID);
+        referencePointFileList.setProjectID(referencePointID);
 
-        Map<String, String> additionalProjectData = additionalProjectDataFactory.build(project);
+        Map<String, String> additionalResourceData =
+            additionalResourceDataFactory.build(referencePoint);
 
         ProjectNegotiationData data =
             new ProjectNegotiationData(
-                projectID, project.getName(), projectFileList, additionalProjectData);
+                referencePointID,
+                referencePoint.getName(),
+                referencePointFileList,
+                additionalResourceData);
 
         negData.add(data);
 
@@ -357,7 +362,7 @@ public abstract class AbstractOutgoingResourceNegotiation extends ResourceNegoti
         /*
          * avoid that the error is send to remote side (which is default
          * for IOExceptions) at this point because the remote side has
-         * no existing project negotiation yet
+         * no existing resource negotiation yet
          */
         localCancel(e.getMessage(), CancelOption.DO_NOT_NOTIFY_PEER);
         // throw to log this error in the Negotiation class
