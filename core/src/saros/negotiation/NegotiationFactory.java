@@ -170,7 +170,7 @@ public final class NegotiationFactory {
             transmitter,
             receiver);
       case INSTANT:
-        return new InstantIncomingProjectNegotiation(
+        return new InstantIncomingResourceNegotiation(
             remoteAddress,
             negotiationID,
             projectNegotiationData,
