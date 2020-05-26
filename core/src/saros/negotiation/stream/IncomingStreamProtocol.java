@@ -36,13 +36,13 @@ public class IncomingStreamProtocol extends AbstractStreamProtocol implements Au
    */
   public void receiveStream() throws IOException, LocalCancellationException {
     while (true) {
-      String projectID = in.readUTF();
+      String referencePointID = in.readUTF();
 
       /* check stream end */
-      if (projectID.isEmpty()) break;
+      if (referencePointID.isEmpty()) break;
 
       String fileName = in.readUTF();
-      IFile file = session.getProject(projectID).getFile(fileName);
+      IFile file = session.getProject(referencePointID).getFile(fileName);
 
       String message = "receiving " + displayName(file);
       log.debug(message);

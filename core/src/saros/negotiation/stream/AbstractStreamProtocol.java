@@ -4,7 +4,8 @@ import saros.filesystem.IFile;
 import saros.monitoring.IProgressMonitor;
 
 /**
- * Stream consists of infinite Stream entries. Stream end is signaled by empty <em>projectID</em>.
+ * Stream consists of infinite Stream entries. Stream end is signaled by empty
+ * <em>referencePointID</em>.
  *
  * <p><b>Stream entry</b>
  *
@@ -15,7 +16,7 @@ import saros.monitoring.IProgressMonitor;
  * </tr>
  * <tr>
  * <td>varying</td>
- * <td>{@code String} of <em>projectID</em> encoded via
+ * <td>{@code String} of <em>referencePointID</em> encoded via
  * {@link java.io.DataOutputStream#writeUTF(String)}. If {@code String} is
  * empty, signals stream end.</td>
  * </tr>
@@ -37,8 +38,8 @@ import saros.monitoring.IProgressMonitor;
  * <b>Handle of Character Encoding</b>
  *
  * <p>The used Character Encoding for a file is an IDE/Editor handled setting. Eclipse is using
- * <em>.settings/org.eclipse.core.resources.prefs</em> for this. Thats why it should be one of the
- * first files transmitted in project sharing.
+ * <em>.settings/org.eclipse.core.resources.prefs</em> for this. That's why it should be one of the
+ * first files transmitted in reference point sharing.
  *
  * <p>Additionally, Eclipse handle rules like all <em>.properties</em> files till Java 9 use
  * <em>ISO-8859-1</em> Encoding per default (see <a href=
@@ -51,6 +52,8 @@ import saros.monitoring.IProgressMonitor;
  *
  * <p>Not forgetting to mention, this behavior is field tested in archive transfer mode.
  */
+// TODO rework section on encoding as it is outdated and the suggested approach no longer matches
+//  the used sharing model
 abstract class AbstractStreamProtocol {
 
   IProgressMonitor monitor;
@@ -60,15 +63,15 @@ abstract class AbstractStreamProtocol {
   }
 
   /**
-   * generates project and filename combination for user visualization
+   * generates reference point and filename combination for user visualization
    *
    * @param file
-   * @return String of local project name and filename
+   * @return String of local reference point name and filename
    */
   String displayName(IFile file) {
-    String projectName = file.getReferencePoint().getName();
+    String referencePointName = file.getReferencePoint().getName();
     String fileName = file.getReferencePointRelativePath().toOSString();
 
-    return projectName + ": " + fileName;
+    return referencePointName + ": " + fileName;
   }
 }
