@@ -112,7 +112,7 @@ public class NegotiationHandler implements INegotiationHandler {
   }
 
   @Override
-  public void handleOutgoingProjectNegotiation(
+  public void handleOutgoingResourceNegotiation(
       final AbstractOutgoingResourceNegotiation negotiation) {
 
     projectExecutor.execute(
@@ -133,7 +133,7 @@ public class NegotiationHandler implements INegotiationHandler {
   }
 
   @Override
-  public void handleIncomingProjectNegotiation(
+  public void handleIncomingResourceNegotiation(
       final AbstractIncomingResourceNegotiation negotiation) {
 
     Map<String, IReferencePoint> projectMapping = new HashMap<>();
