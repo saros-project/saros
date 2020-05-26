@@ -110,7 +110,7 @@ public abstract class AbstractOutgoingResourceNegotiation extends ResourceNegoti
       if (!session.isHost()) {
         for (IReferencePoint referencePoint : resourceSharingData) {
           String referencePointID = resourceSharingData.getReferencePointID(referencePoint);
-          session.addSharedProject(referencePoint, referencePointID);
+          session.addSharedReferencePoint(referencePoint, referencePointID);
         }
       }
 
@@ -123,7 +123,7 @@ public abstract class AbstractOutgoingResourceNegotiation extends ResourceNegoti
       User user = session.getUser(getPeer());
       if (user == null) throw new LocalCancellationException(null, CancelOption.DO_NOT_NOTIFY_PEER);
 
-      session.userFinishedProjectNegotiation(user);
+      session.userFinishedResourceNegotiation(user);
     } catch (Exception e) {
       exception = e;
     } finally {

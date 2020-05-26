@@ -42,7 +42,7 @@ public class IncomingStreamProtocol extends AbstractStreamProtocol implements Au
       if (referencePointID.isEmpty()) break;
 
       String fileName = in.readUTF();
-      IFile file = session.getProject(referencePointID).getFile(fileName);
+      IFile file = session.getReferencePoint(referencePointID).getFile(fileName);
 
       String message = "receiving " + displayName(file);
       log.debug(message);

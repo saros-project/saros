@@ -34,7 +34,7 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
    *
    * @param file Zip file containing the compressed data
    * @param idToReferencePointMapping map containing the id to reference point mapping (see also
-   *     {@link ISarosSession#getProjectID(IReferencePoint)}
+   *     {@link ISarosSession#getReferencePointId(IReferencePoint)}
    * @param monitor monitor that is used for progress report and cancellation or <code>null</code>
    *     to use the monitor provided by the {@link #run(IProgressMonitor)} method
    */

@@ -154,7 +154,7 @@ public class LocalEditorHandler {
    * @param virtualFile the file for which to close the editor
    */
   public void closeEditor(@NotNull VirtualFile virtualFile) {
-    Set<IReferencePoint> sharedReferencePoints = sarosSession.getProjects();
+    Set<IReferencePoint> sharedReferencePoints = sarosSession.getReferencePoints();
 
     IFile file = (IFile) VirtualFileConverter.convertToResource(sharedReferencePoints, virtualFile);
 
@@ -228,7 +228,7 @@ public class LocalEditorHandler {
       return;
     }
 
-    Set<IReferencePoint> sharedReferencePoints = sarosSession.getProjects();
+    Set<IReferencePoint> sharedReferencePoints = sarosSession.getReferencePoints();
 
     IFile file = (IFile) VirtualFileConverter.convertToResource(sharedReferencePoints, virtualFile);
 

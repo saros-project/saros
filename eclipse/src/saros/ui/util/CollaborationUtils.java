@@ -283,7 +283,7 @@ public class CollaborationUtils {
    */
   private static String getSessionDescription(ISarosSession sarosSession) {
 
-    final Set<IReferencePoint> projects = sarosSession.getProjects();
+    final Set<IReferencePoint> projects = sarosSession.getReferencePoints();
 
     final StringBuilder result = new StringBuilder();
 

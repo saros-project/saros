@@ -88,8 +88,8 @@ public class ResourceTransportWrapperConverterTest {
   public void conversionRunningSession() {
     /* Mocks */
     ISarosSession session = EasyMock.createMock(ISarosSession.class);
-    expect(session.getProjectID(project)).andStubReturn("ABC");
-    expect(session.getProject("ABC")).andStubReturn(project);
+    expect(session.getReferencePointId(project)).andStubReturn("ABC");
+    expect(session.getReferencePoint("ABC")).andStubReturn(project);
 
     EasyMock.replay(session);
 
@@ -126,14 +126,14 @@ public class ResourceTransportWrapperConverterTest {
   public void conversionLeavingReceiver() {
     /* Mocks */
     ISarosSession senderSession = EasyMock.createMock(ISarosSession.class);
-    expect(senderSession.getProjectID(project)).andStubReturn("ABC");
-    expect(senderSession.getProject("ABC")).andStubReturn(project);
+    expect(senderSession.getReferencePointId(project)).andStubReturn("ABC");
+    expect(senderSession.getReferencePoint("ABC")).andStubReturn(project);
 
     ISarosSession receiverSession = EasyMock.createMock(ISarosSession.class);
-    expect(receiverSession.getProjectID(project)).andReturn("ABC");
-    expect(receiverSession.getProject("ABC")).andReturn(project);
-    expect(receiverSession.getProjectID(project)).andReturn(null);
-    expect(receiverSession.getProject("ABC")).andReturn(null);
+    expect(receiverSession.getReferencePointId(project)).andReturn("ABC");
+    expect(receiverSession.getReferencePoint("ABC")).andReturn(project);
+    expect(receiverSession.getReferencePointId(project)).andReturn(null);
+    expect(receiverSession.getReferencePoint("ABC")).andReturn(null);
 
     EasyMock.replay(senderSession, receiverSession);
 
@@ -160,15 +160,15 @@ public class ResourceTransportWrapperConverterTest {
   public void conversionLeavingSender() {
     /* Mocks */
     ISarosSession senderSession = EasyMock.createMock(ISarosSession.class);
-    expect(senderSession.getProjectID(project)).andReturn("ABC");
-    expect(senderSession.getProject("ABC")).andReturn(project);
-    expect(senderSession.getProjectID(project)).andReturn(null);
-    expect(senderSession.getProject("ABC")).andReturn(null);
+    expect(senderSession.getReferencePointId(project)).andReturn("ABC");
+    expect(senderSession.getReferencePoint("ABC")).andReturn(project);
+    expect(senderSession.getReferencePointId(project)).andReturn(null);
+    expect(senderSession.getReferencePoint("ABC")).andReturn(null);
 
     ISarosSession receiverSession = EasyMock.createMock(ISarosSession.class);
-    expect(receiverSession.getProjectID(project)).andStubReturn("ABC");
-    expect(receiverSession.getProject("ABC")).andStubReturn(project);
-    expect(receiverSession.getProject(EasyMock.isNull(String.class))).andStubReturn(null);
+    expect(receiverSession.getReferencePointId(project)).andStubReturn("ABC");
+    expect(receiverSession.getReferencePoint("ABC")).andStubReturn(project);
+    expect(receiverSession.getReferencePoint(EasyMock.isNull(String.class))).andStubReturn(null);
 
     EasyMock.replay(senderSession, receiverSession);
 

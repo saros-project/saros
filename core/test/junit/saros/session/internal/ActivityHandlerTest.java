@@ -337,9 +337,9 @@ public class ActivityHandlerTest {
 
     IReferencePoint project = EasyMock.createMock(IReferencePoint.class);
 
-    EasyMock.expect(sessionMock.userHasProject(dave, project)).andStubReturn(false);
+    EasyMock.expect(sessionMock.userHasReferencePoint(dave, project)).andStubReturn(false);
     for (User user : remoteUsersWithProjects) {
-      EasyMock.expect(sessionMock.userHasProject(user, project)).andStubReturn(true);
+      EasyMock.expect(sessionMock.userHasReferencePoint(user, project)).andStubReturn(true);
     }
 
     EasyMock.expect(sessionMock.getUsers()).andStubReturn(participants);

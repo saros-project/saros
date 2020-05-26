@@ -256,7 +256,7 @@ public class UserInformationHandler implements Startable {
      * thread context and thus blocking the dispatching for network packets
      * for an unknown time.
      */
-    session.userFinishedProjectNegotiation(fromUser);
+    session.userFinishedResourceNegotiation(fromUser);
   }
 
   private void handleUserListUpdate(Packet packet) {

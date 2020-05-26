@@ -67,7 +67,7 @@ public class ResourceTransportWrapperConverter implements Converter, Startable {
     ResourceTransportWrapper<?> wrapper = (ResourceTransportWrapper<?>) value;
     IResource resource = wrapper.getResource();
 
-    String i = session.getProjectID(resource.getReferencePoint());
+    String i = session.getReferencePointId(resource.getReferencePoint());
     if (i == null) {
       log.error(
           "Could not retrieve reference point id for reference point '"
@@ -102,7 +102,7 @@ public class ResourceTransportWrapperConverter implements Converter, Startable {
     String p = URLCodec.decode(reader.getAttribute(PATH));
     String t = reader.getAttribute(TYPE);
 
-    IReferencePoint referencePoint = session.getProject(i);
+    IReferencePoint referencePoint = session.getReferencePoint(i);
     if (referencePoint == null) {
       log.error(
           "Could not create resource because there is no shared reference point for id '"

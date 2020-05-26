@@ -220,14 +220,14 @@ public final class SarosSession implements ISarosSession {
   }
 
   @Override
-  public void addSharedProject(IReferencePoint project, String projectID) {
-    if (!projectMapper.isShared(project)) {
-      projectMapper.addReferencePoint(projectID, project);
+  public void addSharedReferencePoint(IReferencePoint referencePoint, String referencePointId) {
+    if (!projectMapper.isShared(referencePoint)) {
+      projectMapper.addReferencePoint(referencePointId, referencePoint);
 
-      listenerDispatch.projectAdded(project);
+      listenerDispatch.projectAdded(referencePoint);
     }
 
-    listenerDispatch.resourcesAdded(project);
+    listenerDispatch.resourcesAdded(referencePoint);
   }
 
   @Override
@@ -245,8 +245,8 @@ public final class SarosSession implements ISarosSession {
   }
 
   @Override
-  public boolean userHasProject(User user, IReferencePoint project) {
-    return projectMapper.userHasReferencePoint(user, project);
+  public boolean userHasReferencePoint(User user, IReferencePoint referencePoint) {
+    return projectMapper.userHasReferencePoint(user, referencePoint);
   }
 
   @Override
@@ -383,7 +383,7 @@ public final class SarosSession implements ISarosSession {
   }
 
   @Override
-  public void userFinishedProjectNegotiation(final User user) {
+  public void userFinishedResourceNegotiation(final User user) {
 
     log.info("user " + user + " now has Projects and can process IResourceActivities");
 
@@ -502,18 +502,18 @@ public final class SarosSession implements ISarosSession {
   }
 
   @Override
-  public void setActivityExecution(IReferencePoint project, boolean enabled) {
-    if (project != null) {
+  public void setActivityExecution(IReferencePoint referencePoint, boolean enabled) {
+    if (referencePoint != null) {
       if (!enabled) {
-        filteredProjects.add(project);
+        filteredProjects.add(referencePoint);
       } else {
-        filteredProjects.remove(project);
+        filteredProjects.remove(referencePoint);
       }
     }
   }
 
   @Override
-  public Set<IReferencePoint> getProjects() {
+  public Set<IReferencePoint> getReferencePoints() {
     return projectMapper.getReferencePoints();
   }
 
@@ -709,28 +709,28 @@ public final class SarosSession implements ISarosSession {
   }
 
   @Override
-  public String getProjectID(IReferencePoint project) {
-    return projectMapper.getID(project);
+  public String getReferencePointId(IReferencePoint referencePoint) {
+    return projectMapper.getID(referencePoint);
   }
 
   @Override
-  public IReferencePoint getProject(String projectID) {
-    return projectMapper.getReferencePoint(projectID);
+  public IReferencePoint getReferencePoint(String referencePointID) {
+    return projectMapper.getReferencePoint(referencePointID);
   }
 
   @Override
-  public void addProjectMapping(String projectID, IReferencePoint project) {
-    if (projectMapper.getReferencePoint(projectID) == null) {
-      projectMapper.addReferencePoint(projectID, project);
-      listenerDispatch.projectAdded(project);
+  public void addReferencePointMapping(String referencePointId, IReferencePoint referencePoint) {
+    if (projectMapper.getReferencePoint(referencePointId) == null) {
+      projectMapper.addReferencePoint(referencePointId, referencePoint);
+      listenerDispatch.projectAdded(referencePoint);
     }
   }
 
   @Override
-  public void removeProjectMapping(String projectID, IReferencePoint project) {
-    if (projectMapper.getReferencePoint(projectID) != null) {
-      projectMapper.removeReferencePoint(projectID);
-      listenerDispatch.projectRemoved(project);
+  public void removeReferencePointMapping(String referencePointId, IReferencePoint referencePoint) {
+    if (projectMapper.getReferencePoint(referencePointId) != null) {
+      projectMapper.removeReferencePoint(referencePointId);
+      listenerDispatch.projectRemoved(referencePoint);
     }
   }
 
@@ -766,13 +766,13 @@ public final class SarosSession implements ISarosSession {
   }
 
   @Override
-  public void enableQueuing(IReferencePoint project) {
-    activityQueuer.enableQueuing(project);
+  public void enableQueuing(IReferencePoint referencePoint) {
+    activityQueuer.enableQueuing(referencePoint);
   }
 
   @Override
-  public void disableQueuing(IReferencePoint project) {
-    activityQueuer.disableQueuing(project);
+  public void disableQueuing(IReferencePoint referencePoint) {
+    activityQueuer.disableQueuing(referencePoint);
     // send us a dummy activity to ensure the queues get flushed
     sendActivity(Collections.singletonList(localUser), new NOPActivity(localUser, localUser, 0));
   }

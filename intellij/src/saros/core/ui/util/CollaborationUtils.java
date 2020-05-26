@@ -226,7 +226,7 @@ public class CollaborationUtils {
    * @return the message that invitees see on an incoming resource negotiation request
    */
   private static String getShareReferencePointsDescription(ISarosSession sarosSession) {
-    Set<IReferencePoint> referencePoints = sarosSession.getProjects();
+    Set<IReferencePoint> referencePoints = sarosSession.getReferencePoints();
 
     StringBuilder result = new StringBuilder();
 

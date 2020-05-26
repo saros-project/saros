@@ -382,7 +382,7 @@ public class EnterProjectNamePage extends WizardPage {
       String projectID = entry.getKey();
       ProjectOptionComposite projectOptionComposite = entry.getValue();
 
-      IReferencePoint project = session.getProject(projectID);
+      IReferencePoint project = session.getReferencePoint(projectID);
 
       // not shared yet
       if (project == null) continue;
@@ -398,7 +398,7 @@ public class EnterProjectNamePage extends WizardPage {
       String projectID = entry.getKey();
       ProjectOptionComposite projectOptionComposite = entry.getValue();
 
-      IReferencePoint project = session.getProject(projectID);
+      IReferencePoint project = session.getReferencePoint(projectID);
 
       // already shared
       if (project != null) continue;
