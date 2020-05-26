@@ -24,7 +24,7 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
 
   private final File file;
   private final IProgressMonitor monitor;
-  private final Map<String, IReferencePoint> idToProjectMapping;
+  private final Map<String, IReferencePoint> idToReferencePointMapping;
   private final String delimiter;
 
   /**
@@ -33,18 +33,18 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
    * <b>overwritten without confirmation</b>!
    *
    * @param file Zip file containing the compressed data
-   * @param idToProjectMapping map containing the id to project mapping (see also {@link
-   *     ISarosSession#getProjectID(IReferencePoint)}
+   * @param idToReferencePointMapping map containing the id to reference point mapping (see also
+   *     {@link ISarosSession#getProjectID(IReferencePoint)}
    * @param monitor monitor that is used for progress report and cancellation or <code>null</code>
    *     to use the monitor provided by the {@link #run(IProgressMonitor)} method
    */
   public DecompressArchiveTask(
       final File file,
-      final Map<String, IReferencePoint> idToProjectMapping,
+      final Map<String, IReferencePoint> idToReferencePointMapping,
       final String delimiter,
       final IProgressMonitor monitor) {
     this.file = file;
-    this.idToProjectMapping = idToProjectMapping;
+    this.idToReferencePointMapping = idToReferencePointMapping;
     this.delimiter = delimiter;
     this.monitor = monitor;
   }
@@ -88,16 +88,16 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
 
         final String path = entryName.substring(delimiterIdx + 1, entryName.length());
 
-        final IReferencePoint project = idToProjectMapping.get(id);
+        final IReferencePoint referencePoint = idToReferencePointMapping.get(id);
 
-        if (project == null) {
-          log.warn("skipping zip entry " + entryName + ", unknown project id: " + id);
+        if (referencePoint == null) {
+          log.warn("skipping zip entry " + entryName + ", unknown reference point id: " + id);
 
           monitor.worked(1);
           continue;
         }
 
-        final IFile decompressedFile = project.getFile(path);
+        final IFile decompressedFile = referencePoint.getFile(path);
 
         FileSystem.createFolder(decompressedFile);
 
