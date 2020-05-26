@@ -31,11 +31,11 @@ import saros.util.CoreUtils;
  * Implementation of {@link AbstractIncomingResourceNegotiation} utilizing a transferred zip archive
  * to exchange differences in the project files.
  */
-public class ArchiveIncomingProjectNegotiation extends AbstractIncomingResourceNegotiation {
+public class ArchiveIncomingResourceNegotiation extends AbstractIncomingResourceNegotiation {
 
-  private static final Logger log = Logger.getLogger(ArchiveIncomingProjectNegotiation.class);
+  private static final Logger log = Logger.getLogger(ArchiveIncomingResourceNegotiation.class);
 
-  public ArchiveIncomingProjectNegotiation(
+  public ArchiveIncomingResourceNegotiation(
       final JID peer, //
       final String negotiationID, //
       final List<ProjectNegotiationData> projectNegotiationData, //
