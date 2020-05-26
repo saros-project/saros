@@ -514,7 +514,7 @@ public class SarosSessionManager implements ISarosSessionManager {
      * negotiation with all collected resources.
      */
 
-    nextProjectNegotiation.addProjects(projects);
+    nextProjectNegotiation.addReferencePoints(projects);
 
     if (nextProjectNegotiationWorker != null && nextProjectNegotiationWorker.isAlive()) {
       return;
@@ -570,7 +570,7 @@ public class SarosSessionManager implements ISarosSessionManager {
     }
 
     ProjectSharingData projectsToShare = new ProjectSharingData();
-    Set<IReferencePoint> projects = nextProjectNegotiation.getProjects();
+    Set<IReferencePoint> projects = nextProjectNegotiation.getReferencePoints();
 
     /*
      * Put all information about which projects and resources to share into
