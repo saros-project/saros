@@ -11,9 +11,10 @@ import saros.filesystem.IReferencePoint;
 /**
  * Factory class to build the additional project data used for the project negotiation data.
  *
- * <p>To add entries to the additional project data mapping, a {@link ProjectDataProvider} can be
- * registered. These project data providers will be called with the corresponding project object
- * every time project negotiation data is created for a shared project.
+ * <p>To add entries to the additional project data mapping, a {@link
+ * AdditionalResourceDataProvider} can be registered. These project data providers will be called
+ * with the corresponding project object every time project negotiation data is created for a shared
+ * project.
  *
  * <p>The registered project data providers should provide a way of identifying their registered
  * options (e.g. by providing references to the used key values).
@@ -23,29 +24,30 @@ import saros.filesystem.IReferencePoint;
  * last will be used.
  */
 // TODO remove as no longer used?
-public class AdditionalProjectDataFactory {
-  private static final Logger log = Logger.getLogger(AdditionalProjectDataFactory.class);
+public class AdditionalResourceDataFactory {
+  private static final Logger log = Logger.getLogger(AdditionalResourceDataFactory.class);
 
   /** The held list of project data providers used to build the additional project data. */
-  private final List<ProjectDataProvider> projectDataProviders;
+  private final List<AdditionalResourceDataProvider> additionalResourceDataProviders;
 
   /**
    * This class should only be instantiated by the core application context. This constructor must
    * not be called directly. Instead, request the object from the plugin context.
    */
-  public AdditionalProjectDataFactory() {
-    this.projectDataProviders = new CopyOnWriteArrayList<>();
+  public AdditionalResourceDataFactory() {
+    this.additionalResourceDataProviders = new CopyOnWriteArrayList<>();
   }
 
   /**
    * Adds the passed project data providers to the list of providers used to generate the additional
    * project data for the project negotiation data.
    *
-   * @param projectDataProvider the project data provider to add
+   * @param additionalResourceDataProvider the project data provider to add
    */
-  public void registerProjectDataProvider(ProjectDataProvider projectDataProvider) {
-    if (projectDataProvider != null) {
-      projectDataProviders.add(projectDataProvider);
+  public void registerProjectDataProvider(
+      AdditionalResourceDataProvider additionalResourceDataProvider) {
+    if (additionalResourceDataProvider != null) {
+      additionalResourceDataProviders.add(additionalResourceDataProvider);
     }
   }
 
@@ -58,13 +60,14 @@ public class AdditionalProjectDataFactory {
   Map<String, String> build(IReferencePoint project) {
     Map<String, String> additionalProjectData = new HashMap<>();
 
-    for (ProjectDataProvider projectDataProvider : projectDataProviders) {
-      Map<String, String> providerData = projectDataProvider.getMapping(project);
+    for (AdditionalResourceDataProvider additionalResourceDataProvider :
+        additionalResourceDataProviders) {
+      Map<String, String> providerData = additionalResourceDataProvider.getMapping(project);
 
       if (!Collections.disjoint(additionalProjectData.keySet(), providerData.keySet())) {
         log.warn(
             "Key sets used by project data providers are not disjoint! Noticed while processing "
-                + projectDataProvider.getClass().getSimpleName());
+                + additionalResourceDataProvider.getClass().getSimpleName());
       }
 
       additionalProjectData.putAll(providerData);
@@ -74,7 +77,7 @@ public class AdditionalProjectDataFactory {
   }
 
   /** A class used to provide additional project data for the project negotiation. */
-  public interface ProjectDataProvider {
+  public interface AdditionalResourceDataProvider {
 
     /**
      * Returns the mapping of additional project options for the given project.

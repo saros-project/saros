@@ -15,7 +15,7 @@ import java.util.Map;
  * needed when creating a local representation of the project as part of the project negotiation.
  *
  * @see FileList
- * @see AdditionalProjectDataFactory
+ * @see AdditionalResourceDataFactory
  */
 @XStreamAlias("PJNGDATA")
 public class ProjectNegotiationData {
