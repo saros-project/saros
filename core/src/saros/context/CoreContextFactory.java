@@ -36,7 +36,7 @@ import saros.observables.FileReplacementInProgressObservable;
 import saros.repackaged.picocontainer.BindKey;
 import saros.repackaged.picocontainer.MutablePicoContainer;
 import saros.session.ColorNegotiationHook;
-import saros.session.ProjectNegotiationTypeHook;
+import saros.session.ResourceNegotiationTypeHook;
 import saros.session.SarosSessionManager;
 import saros.versioning.VersionManager;
 
@@ -75,7 +75,7 @@ public class CoreContextFactory extends AbstractContextFactory {
       // Negotiation hooks
       Component.create(SessionNegotiationHookManager.class),
       Component.create(ColorNegotiationHook.class),
-      Component.create(ProjectNegotiationTypeHook.class),
+      Component.create(ResourceNegotiationTypeHook.class),
 
       // Network
       Component.create(DispatchThreadContext.class),

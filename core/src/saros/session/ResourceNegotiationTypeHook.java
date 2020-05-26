@@ -12,26 +12,26 @@ import saros.preferences.Preferences;
 
 /**
  * Hooks for negotiating the used {@link TransferType} to determine a strategy used between two
- * {@link User}s to transfer files during a project negotiation.
+ * {@link User}s to transfer files during a resource negotiation.
  *
  * <p>Host and Client tell a preference, the host decides if they are the same and use it. Otherwise
  * defaults to Archive. This approach is good enough and works best for two supported types, like
  * now {@link TransferType#ARCHIVE} and {@link TransferType#INSTANT}.
  */
-public class ProjectNegotiationTypeHook implements ISessionNegotiationHook {
-  private static final String HOOK_IDENTIFIER = "projectNegotiationTypeHook";
-  private static final String KEY_PREFERRED_TYPE = "preferredProjectNegotiationType";
+public class ResourceNegotiationTypeHook implements ISessionNegotiationHook {
+  private static final String HOOK_IDENTIFIER = "resourceNegotiationTypeHook";
+  private static final String KEY_PREFERRED_TYPE = "preferredResourceNegotiationType";
 
-  public static final String KEY_TYPE = "projectNegotiationType";
+  public static final String KEY_TYPE = "resourceNegotiationType";
 
   private static final String TYPE_ARCHIVE = TransferType.ARCHIVE.name();
   private static final String TYPE_INSTANT = TransferType.INSTANT.name();
 
-  private static final Logger log = Logger.getLogger(ProjectNegotiationTypeHook.class);
+  private static final Logger log = Logger.getLogger(ResourceNegotiationTypeHook.class);
 
   private Preferences localPref;
 
-  public ProjectNegotiationTypeHook(
+  public ResourceNegotiationTypeHook(
       SessionNegotiationHookManager hookManager, Preferences localPref) {
     this.localPref = localPref;
     hookManager.addHook(this);
