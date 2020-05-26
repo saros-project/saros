@@ -115,7 +115,7 @@ public interface ISarosSession {
    *
    * @param user
    */
-  public void userFinishedProjectNegotiation(final User user);
+  public void userFinishedResourceNegotiation(final User user);
 
   /**
    * Removes a user from this session.
@@ -158,17 +158,17 @@ public interface ISarosSession {
    * are no longer available (i.e. are no longer part of the session or are no longer
    * present/accessible locally).
    *
-   * @param project the shared project to enable or disable the activity execution for
+   * @param referencePoint the shared project to enable or disable the activity execution for
    * @param enabled <code>true</code> to enable or <code>false</code> to disable the activity
    *     execution
    */
-  public void setActivityExecution(IReferencePoint project, boolean enabled);
+  public void setActivityExecution(IReferencePoint referencePoint, boolean enabled);
 
   /**
    * @return the shared projects associated with this session, never <code>null</code> but may be
    *     empty
    */
-  public Set<IReferencePoint> getProjects();
+  public Set<IReferencePoint> getReferencePoints();
 
   /**
    * FOR INTERNAL USE ONLY !
@@ -281,7 +281,7 @@ public interface ISarosSession {
   public void removeActivityConsumer(IActivityConsumer consumer);
 
   /** Checks if the user is ready to process {@link IResourceActivity}s for a given project */
-  public boolean userHasProject(User user, IReferencePoint project);
+  public boolean userHasReferencePoint(User user, IReferencePoint referencePoint);
 
   /**
    * @return <code>true</code> if the given {@link IResource resource} is currently shared in this
@@ -294,45 +294,45 @@ public interface ISarosSession {
    *
    * @return the global ID of the project or <code>null</code> if this project is not shared
    */
-  public String getProjectID(IReferencePoint project);
+  public String getReferencePointId(IReferencePoint referencePoint);
 
   /**
    * Returns the project with the given ID.
    *
    * @return the project with the given ID or <code>null</code> if no project with this ID is shared
    */
-  public IReferencePoint getProject(String projectID);
+  public IReferencePoint getReferencePoint(String referencePointID);
 
   /**
    * Adds the specified project to this session.
    *
-   * @param project The project to share
-   * @param projectID The global project ID
+   * @param referencePoint The project to share
+   * @param referencePointId The global project ID
    */
-  void addSharedProject(IReferencePoint project, String projectID);
+  void addSharedReferencePoint(IReferencePoint referencePoint, String referencePointId);
 
   /**
    * Stores a bidirectional mapping between <code>project</code> and <code>projectID</code>.
    *
    * <p>This information is necessary for receiving (unserializing) resource-related activities.
    *
-   * @param projectID Session-wide ID of the project
-   * @param project the local representation of the project
-   * @see #removeProjectMapping(String, IReferencePoint)
+   * @param referencePointId Session-wide ID of the project
+   * @param referencePoint the local representation of the project
+   * @see #removeReferencePointMapping(String, IReferencePoint)
    */
-  public void addProjectMapping(String projectID, IReferencePoint project);
+  public void addReferencePointMapping(String referencePointId, IReferencePoint referencePoint);
 
   /**
    * Removes the bidirectional mapping <code>project</code> and <code>projectId</code> that was
-   * created by {@link #addProjectMapping(String, IReferencePoint) addProjectMapping()} .
+   * created by {@link #addReferencePointMapping(String, IReferencePoint) addProjectMapping()} .
    *
    * <p>TODO Why is the project parameter needed here? This forces callers to store the mapping
    * themselves (or retrieve it just before calling this method).
    *
-   * @param projectID Session-wide ID of the project
-   * @param project the local representation of the project
+   * @param referencePointId Session-wide ID of the project
+   * @param referencePoint the local representation of the project
    */
-  public void removeProjectMapping(String projectID, IReferencePoint project);
+  public void removeReferencePointMapping(String referencePointId, IReferencePoint referencePoint);
 
   /**
    * Return the stop manager of this session.
@@ -356,20 +356,20 @@ public interface ISarosSession {
    * they cannot be applied before their corresponding project is received and extracted.
    *
    * <p>That queuing relies on an existing project-to-projectID mapping (see {@link
-   * #addProjectMapping(String, IReferencePoint)}), otherwise incoming activities cannot be queued
-   * and will be lost.
+   * #addReferencePointMapping(String, IReferencePoint)}), otherwise incoming activities cannot be
+   * queued and will be lost.
    *
-   * @param project the project for which project-related activities should be queued
+   * @param referencePoint the project for which project-related activities should be queued
    * @see #disableQueuing
    */
-  public void enableQueuing(IReferencePoint project);
+  public void enableQueuing(IReferencePoint referencePoint);
 
   /**
    * FOR INTERNAL USE ONLY !
    *
    * <p>Disables queuing for the given project and flushes all queued activities.
    */
-  public void disableQueuing(IReferencePoint project);
+  public void disableQueuing(IReferencePoint referencePoint);
 
   /**
    * Returns the id of the current session.

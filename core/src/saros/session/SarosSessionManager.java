@@ -141,7 +141,7 @@ public class SarosSessionManager implements ISarosSessionManager {
             for (ResourceNegotiationData resourceNegotiationData :
                 ipn.getResourceNegotiationData()) {
               String projectID = resourceNegotiationData.getReferencePointID();
-              IReferencePoint project = session.getProject(projectID);
+              IReferencePoint project = session.getReferencePoint(projectID);
 
               resourceSharingData.addReferencePoint(project, projectID);
             }
@@ -267,7 +267,7 @@ public class SarosSessionManager implements ISarosSessionManager {
       for (IReferencePoint project : projects) {
         String projectID = String.valueOf(SESSION_ID_GENERATOR.nextInt(Integer.MAX_VALUE));
 
-        session.addSharedProject(project, projectID);
+        session.addSharedReferencePoint(project, projectID);
       }
 
       log.info("session started");
@@ -580,7 +580,7 @@ public class SarosSessionManager implements ISarosSessionManager {
      * for the projects that don't have them yet.
      */
     for (IReferencePoint project : projects) {
-      String projectID = currentSession.getProjectID(project);
+      String projectID = currentSession.getReferencePointId(project);
 
       if (projectID == null) {
         projectID = String.valueOf(SESSION_ID_GENERATOR.nextInt(Integer.MAX_VALUE));
@@ -598,7 +598,7 @@ public class SarosSessionManager implements ISarosSessionManager {
        * lists of shared resources may have changed.
        */
       if (currentSession.isHost() && !currentSession.isShared(project)) {
-        currentSession.addSharedProject(project, projectID);
+        currentSession.addSharedReferencePoint(project, projectID);
       }
     }
 
@@ -681,8 +681,8 @@ public class SarosSessionManager implements ISarosSessionManager {
     }
 
     ResourceSharingData currentSharedProjects = new ResourceSharingData();
-    for (IReferencePoint project : currentSession.getProjects()) {
-      currentSharedProjects.addReferencePoint(project, session.getProjectID(project));
+    for (IReferencePoint project : currentSession.getReferencePoints()) {
+      currentSharedProjects.addReferencePoint(project, session.getReferencePointId(project));
     }
 
     if (currentSharedProjects.isEmpty()) return;

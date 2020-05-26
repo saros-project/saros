@@ -34,7 +34,7 @@ public class ProjectClosedHandler implements Disposable {
         public void projectClosing(@NotNull Project project) {
           boolean closedProjectContainedSharedResources = false;
 
-          for (IReferencePoint referencePoint : sarosSession.getProjects()) {
+          for (IReferencePoint referencePoint : sarosSession.getReferencePoints()) {
             IntellijReferencePoint intellijReferencePoint = (IntellijReferencePoint) referencePoint;
 
             if (intellijReferencePoint.getProject().equals(project)) {

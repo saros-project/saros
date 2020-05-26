@@ -61,7 +61,7 @@ public class PreexistingSelectionDispatcher extends AbstractLocalEditorStatusCha
    * @param virtualFile the file to send the current selection information for
    */
   private void sendExistingSelection(@NotNull VirtualFile virtualFile) {
-    Set<IReferencePoint> sharedReferencePoints = sarosSession.getProjects();
+    Set<IReferencePoint> sharedReferencePoints = sarosSession.getReferencePoints();
 
     IFile file = (IFile) VirtualFileConverter.convertToResource(sharedReferencePoints, virtualFile);
 

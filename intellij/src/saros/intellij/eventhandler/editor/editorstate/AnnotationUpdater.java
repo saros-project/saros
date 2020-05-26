@@ -67,7 +67,7 @@ public class AnnotationUpdater extends AbstractLocalEditorStatusChangeHandler {
    * @see FileEditorManagerListener#fileOpened(FileEditorManager, VirtualFile)
    */
   private void setUpOpenedEditor(@NotNull VirtualFile virtualFile) {
-    Set<IReferencePoint> sharedReferencePoints = sarosSession.getProjects();
+    Set<IReferencePoint> sharedReferencePoints = sarosSession.getReferencePoints();
 
     IFile file = (IFile) VirtualFileConverter.convertToResource(sharedReferencePoints, virtualFile);
 
@@ -89,7 +89,7 @@ public class AnnotationUpdater extends AbstractLocalEditorStatusChangeHandler {
    * @see FileEditorManagerListener.Before#beforeFileClosed(FileEditorManager, VirtualFile)
    */
   private void cleanUpAnnotations(@NotNull VirtualFile virtualFile) {
-    Set<IReferencePoint> sharedReferencePoints = sarosSession.getProjects();
+    Set<IReferencePoint> sharedReferencePoints = sarosSession.getReferencePoints();
 
     IFile file = (IFile) VirtualFileConverter.convertToResource(sharedReferencePoints, virtualFile);
 

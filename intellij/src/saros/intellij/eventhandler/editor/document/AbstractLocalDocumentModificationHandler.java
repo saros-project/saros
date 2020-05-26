@@ -135,7 +135,7 @@ public abstract class AbstractLocalDocumentModificationHandler implements IProje
       return null;
     }
 
-    Set<IReferencePoint> sharedReferencePoints = sarosSession.getProjects();
+    Set<IReferencePoint> sharedReferencePoints = sarosSession.getReferencePoints();
 
     file = (IFile) VirtualFileConverter.convertToResource(sharedReferencePoints, virtualFile);
 

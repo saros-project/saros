@@ -149,7 +149,7 @@ public abstract class AbstractIncomingResourceNegotiation extends ResourceNegoti
          *  consumer of queuing functionality. This will enable a specific Queuing mechanism per
          *  TransferType (see github issue #137).
          */
-        session.addProjectMapping(referencePointID, referencePoint);
+        session.addReferencePointMapping(referencePointID, referencePoint);
         /* TODO change queuing to resource based queuing */
         session.enableQueuing(referencePoint);
       }
@@ -189,7 +189,7 @@ public abstract class AbstractIncomingResourceNegotiation extends ResourceNegoti
         final String referencePointID = entry.getKey();
         final IReferencePoint referencePoint = entry.getValue();
 
-        session.addSharedProject(referencePoint, referencePointID);
+        session.addSharedReferencePoint(referencePoint, referencePointID);
       }
     } catch (Exception e) {
       exception = e;

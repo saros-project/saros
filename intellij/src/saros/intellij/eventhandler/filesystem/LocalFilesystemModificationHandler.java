@@ -214,7 +214,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       log.trace("Reacting before resource contents changed: " + virtualFile);
     }
 
-    Set<IReferencePoint> sharedReferencePoints = session.getProjects();
+    Set<IReferencePoint> sharedReferencePoints = session.getReferencePoints();
 
     IFile file = (IFile) VirtualFileConverter.convertToResource(sharedReferencePoints, virtualFile);
 
@@ -285,7 +285,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       log.trace("Reacting to resource creation: " + createdVirtualFile);
     }
 
-    Set<IReferencePoint> sharedReferencePoints = session.getProjects();
+    Set<IReferencePoint> sharedReferencePoints = session.getReferencePoints();
 
     IResource resource =
         VirtualFileConverter.convertToResource(sharedReferencePoints, createdVirtualFile);
@@ -354,7 +354,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
               + copy);
     }
 
-    Set<IReferencePoint> sharedReferencePoints = session.getProjects();
+    Set<IReferencePoint> sharedReferencePoints = session.getReferencePoints();
 
     IFile copyWrapper = (IFile) VirtualFileConverter.convertToResource(sharedReferencePoints, copy);
 
@@ -415,7 +415,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
    * @param deletedFolder the folder that was deleted
    */
   private void generateFolderDeletionActivity(@NotNull VirtualFile deletedFolder) {
-    Set<IReferencePoint> sharedReferencePoints = session.getProjects();
+    Set<IReferencePoint> sharedReferencePoints = session.getReferencePoints();
 
     IContainer container =
         (IContainer) VirtualFileConverter.convertToResource(sharedReferencePoints, deletedFolder);
@@ -505,7 +505,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
    * @param deletedFile the file that was deleted
    */
   private void generateFileDeletionActivity(VirtualFile deletedFile) {
-    Set<IReferencePoint> sharedReferencePoints = session.getProjects();
+    Set<IReferencePoint> sharedReferencePoints = session.getReferencePoints();
 
     IFile file = (IFile) VirtualFileConverter.convertToResource(sharedReferencePoints, deletedFile);
 
@@ -609,7 +609,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     String folderName = newFolderName != null ? newFolderName : oldFile.getName();
 
-    Set<IReferencePoint> sharedReferencePoints = session.getProjects();
+    Set<IReferencePoint> sharedReferencePoints = session.getReferencePoints();
 
     IContainer oldFolderWrapper =
         (IContainer) VirtualFileConverter.convertToResource(sharedReferencePoints, oldFile);
@@ -782,7 +782,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     String encoding = oldFile.getCharset().name();
 
-    Set<IReferencePoint> sharedReferencePoints = session.getProjects();
+    Set<IReferencePoint> sharedReferencePoints = session.getReferencePoints();
 
     IFile oldFileWrapper =
         (IFile) VirtualFileConverter.convertToResource(sharedReferencePoints, oldFile);
@@ -961,7 +961,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
         VirtualFile parent = file.getParent();
 
         if (parent == null) {
-          Set<IReferencePoint> sharedReferencePoints = session.getProjects();
+          Set<IReferencePoint> sharedReferencePoints = session.getReferencePoints();
           IResource resource = VirtualFileConverter.convertToResource(sharedReferencePoints, file);
 
           if (resource != null && session.isShared(resource)) {
