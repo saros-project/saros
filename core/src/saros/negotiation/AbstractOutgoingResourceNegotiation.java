@@ -8,8 +8,8 @@ import java.util.Random;
 import java.util.concurrent.CancellationException;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.packet.Packet;
-import saros.communication.extensions.ProjectNegotiationMissingFilesExtension;
 import saros.communication.extensions.ProjectNegotiationOfferingExtension;
+import saros.communication.extensions.ResourceNegotiationMissingFilesExtension;
 import saros.communication.extensions.StartActivityQueuingRequest;
 import saros.communication.extensions.StartActivityQueuingResponse;
 import saros.editor.IEditorManager;
@@ -236,7 +236,7 @@ public abstract class AbstractOutgoingResourceNegotiation extends ResourceNegoti
           CancelOption.DO_NOT_NOTIFY_PEER);
 
     List<FileList> remoteFileLists =
-        ProjectNegotiationMissingFilesExtension.PROVIDER.getPayload(packet).getFileLists();
+        ResourceNegotiationMissingFilesExtension.PROVIDER.getPayload(packet).getFileLists();
 
     log.debug(this + " : remote file list has been received");
 
@@ -294,7 +294,7 @@ public abstract class AbstractOutgoingResourceNegotiation extends ResourceNegoti
   protected void createCollectors() {
     remoteFileListResponseCollector =
         receiver.createCollector(
-            ProjectNegotiationMissingFilesExtension.PROVIDER.getPacketFilter(
+            ResourceNegotiationMissingFilesExtension.PROVIDER.getPacketFilter(
                 getSessionID(), getID()));
 
     startActivityQueuingResponseCollector =
