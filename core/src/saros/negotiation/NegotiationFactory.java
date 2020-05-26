@@ -131,7 +131,7 @@ public final class NegotiationFactory {
             receiver,
             additionalProjectDataFactory);
       case INSTANT:
-        return new InstantOutgoingProjectNegotiation(
+        return new InstantOutgoingResourceNegotiation(
             remoteAddress,
             projectSharingData,
             sessionManager,
