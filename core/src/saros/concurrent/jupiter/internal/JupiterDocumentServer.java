@@ -54,7 +54,7 @@ public class JupiterDocumentServer {
     final Jupiter sourceProxy = proxies.get(source);
 
     /*
-     * TODO maybe just silently add a proxy ? currently the project is
+     * TODO maybe just silently add a proxy ? currently the reference point is
      * registered before decompression so it is possible to start working on
      * the files during this phase and this is why this can return null
      */

@@ -93,7 +93,7 @@ class ResourceActivityFilter {
 
   /**
    * Session listener updating the held map of filtered files when participants leave the session or
-   * project are removed from the session.
+   * reference points are removed from the session.
    */
   private final ISessionListener sessionListener =
       new ISessionListener() {
@@ -118,12 +118,12 @@ class ResourceActivityFilter {
         }
 
         @Override
-        public void projectRemoved(IReferencePoint project) {
+        public void projectRemoved(IReferencePoint referencePoint) {
           Iterator<Entry<IFile, List<User>>> iterator = deletedFileFilter.entrySet().iterator();
           while (iterator.hasNext()) {
             IFile file = iterator.next().getKey();
 
-            if (file.getReferencePoint().equals(project)) {
+            if (file.getReferencePoint().equals(referencePoint)) {
               log.debug(
                   "Dropping activity filter for "
                       + file
