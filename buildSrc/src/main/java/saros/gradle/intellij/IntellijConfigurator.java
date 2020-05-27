@@ -28,7 +28,7 @@ class IntellijConfigurator {
    * intellij instances via gradle with the {@code runIde} task.
    */
   void configure(SarosIntellijExtension sarosExtension, IntelliJPluginExtension intellijExtension) {
-    configureDefaultParams(intellijExtension, sarosExtension);
+    configureDefaultParams(intellijExtension);
     configureRunIdeIntellijInstallation(intellijExtension, sarosExtension);
   }
 
@@ -59,8 +59,7 @@ class IntellijConfigurator {
   }
 
   /** Sets the default parameters of the intellij plugin */
-  private void configureDefaultParams(
-      IntelliJPluginExtension intellijExtension, SarosIntellijExtension sarosExtension) {
+  private void configureDefaultParams(IntelliJPluginExtension intellijExtension) {
     intellijExtension.setUpdateSinceUntilBuild(false);
   }
 
