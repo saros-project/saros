@@ -56,7 +56,7 @@
       </decorator>
    </extension>
    <extension
-         point="org.eclipse.ui.preference_pages">
+         point="org.eclipse.ui.preferencePages">
       <page
             class="saros.ui.preference_pages.GeneralPreferencePage"
             id="saros.preferences"
