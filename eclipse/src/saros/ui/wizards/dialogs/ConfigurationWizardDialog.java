@@ -52,8 +52,10 @@ public class ConfigurationWizardDialog extends WizardDialog {
 
   @Override
   protected void firePageChanging(PageChangingEvent event) {
-    createAccountButton.setVisible(
-        (!accountCreated) && event.getTargetPage() instanceof EnterXMPPAccountWizardPage);
+    if (CreateXMPPAccountWizard.CREATE_DIALOG_ENABLED) {
+      createAccountButton.setVisible(
+          (!accountCreated) && event.getTargetPage() instanceof EnterXMPPAccountWizardPage);
+    }
     super.firePageChanging(event);
   }
 
