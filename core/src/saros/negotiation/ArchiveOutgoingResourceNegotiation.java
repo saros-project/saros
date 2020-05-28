@@ -47,8 +47,7 @@ public class ArchiveOutgoingResourceNegotiation extends AbstractOutgoingResource
       final IChecksumCache checksumCache, //
       final XMPPFileTransferManager fileTransferManager, //
       final ITransmitter transmitter, //
-      final IReceiver receiver, //
-      final AdditionalResourceDataFactory additionalResourceDataFactory //
+      final IReceiver receiver //
       ) {
     super(
         peer,
@@ -60,8 +59,7 @@ public class ArchiveOutgoingResourceNegotiation extends AbstractOutgoingResource
         checksumCache,
         fileTransferManager,
         transmitter,
-        receiver,
-        additionalResourceDataFactory);
+        receiver);
   }
 
   @Override

@@ -3,7 +3,6 @@ package saros.negotiation;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.CancellationException;
 import org.apache.log4j.Logger;
@@ -52,8 +51,6 @@ public abstract class AbstractOutgoingResourceNegotiation extends ResourceNegoti
 
   private PacketCollector startActivityQueuingResponseCollector;
 
-  private final AdditionalResourceDataFactory additionalResourceDataFactory;
-
   protected AbstractOutgoingResourceNegotiation( //
       final JID peer, //
       final ResourceSharingData resourceSharingData, //
@@ -64,8 +61,7 @@ public abstract class AbstractOutgoingResourceNegotiation extends ResourceNegoti
       final IChecksumCache checksumCache, //
       final XMPPFileTransferManager fileTransferManager, //
       final ITransmitter transmitter, //
-      final IReceiver receiver, //
-      final AdditionalResourceDataFactory additionalResourceDataFactory //
+      final IReceiver receiver //
       ) {
     super(
         String.valueOf(NEGOTIATION_ID_GENERATOR.nextLong()),
@@ -81,7 +77,6 @@ public abstract class AbstractOutgoingResourceNegotiation extends ResourceNegoti
     this.resourceSharingData = resourceSharingData;
 
     this.editorManager = editorManager;
-    this.additionalResourceDataFactory = additionalResourceDataFactory;
   }
 
   public Status run(IProgressMonitor monitor) {
@@ -346,15 +341,9 @@ public abstract class AbstractOutgoingResourceNegotiation extends ResourceNegoti
 
         referencePointFileList.setReferencePointID(referencePointID);
 
-        Map<String, String> additionalResourceData =
-            additionalResourceDataFactory.build(referencePoint);
-
         ResourceNegotiationData data =
             new ResourceNegotiationData(
-                referencePointID,
-                referencePoint.getName(),
-                referencePointFileList,
-                additionalResourceData);
+                referencePointID, referencePoint.getName(), referencePointFileList);
 
         negData.add(data);
 

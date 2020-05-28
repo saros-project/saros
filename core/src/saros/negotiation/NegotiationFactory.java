@@ -35,8 +35,6 @@ public final class NegotiationFactory {
   private final ITransmitter transmitter;
   private final IReceiver receiver;
 
-  private final AdditionalResourceDataFactory additionalResourceDataFactory;
-
   public NegotiationFactory(
       VersionManager versionManager,
       SessionNegotiationHookManager hookManager,
@@ -48,7 +46,6 @@ public final class NegotiationFactory {
       IConnectionManager connectionManager,
       ITransmitter transmitter,
       IReceiver receiver,
-      AdditionalResourceDataFactory additionalResourceDataFactory,
 
       /*
        * FIXME HACK for now to avoid cyclic dependencies between this class,
@@ -68,7 +65,6 @@ public final class NegotiationFactory {
     this.connectionManager = connectionManager;
     this.transmitter = transmitter;
     this.receiver = receiver;
-    this.additionalResourceDataFactory = additionalResourceDataFactory;
   }
 
   public OutgoingSessionNegotiation newOutgoingSessionNegotiation(
@@ -128,8 +124,7 @@ public final class NegotiationFactory {
             checksumCache,
             fileTransferManager,
             transmitter,
-            receiver,
-            additionalResourceDataFactory);
+            receiver);
       case INSTANT:
         return new InstantOutgoingResourceNegotiation(
             remoteAddress,
@@ -141,8 +136,7 @@ public final class NegotiationFactory {
             checksumCache,
             fileTransferManager,
             transmitter,
-            receiver,
-            additionalResourceDataFactory);
+            receiver);
       default:
         throw new UnsupportedOperationException("transferType not implemented");
     }
