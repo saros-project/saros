@@ -7,6 +7,9 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -25,6 +28,7 @@ import saros.preferences.Preferences;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.ui.Messages;
 import saros.ui.widgets.decoration.JIDCombo;
+import saros.ui.wizards.CreateXMPPAccountWizard;
 
 /**
  * Gives the user the possibility to enter a {@link JID}, the corresponding password and optionally
@@ -34,6 +38,8 @@ public class EnterXMPPAccountComposite extends Composite {
 
   private List<ModifyListener> modifyListeners = new ArrayList<ModifyListener>();
   private List<FocusListener> focusListeners = new ArrayList<FocusListener>();
+  private List<SelectionListener> createAccountSelectionListeners =
+      new ArrayList<SelectionListener>();
 
   private JIDCombo jidCombo;
   private Text passwordText;
@@ -43,6 +49,7 @@ public class EnterXMPPAccountComposite extends Composite {
 
   private Button useTLSButton;
   private Button useSASLButton;
+  private Button createAccountButton;
 
   @Inject private Preferences preferences;
 
@@ -90,6 +97,20 @@ public class EnterXMPPAccountComposite extends Composite {
           }
         });
 
+    createServerExpandableCompositeContent();
+
+    if (CreateXMPPAccountWizard.CREATE_DIALOG_ENABLED) {
+      /*
+       * Row 4: Create Account Button
+       */
+
+      createAccountButton = new Button(this, SWT.PUSH);
+      createAccountButton.setText(Messages.ConfigurationWizard_button_create_account);
+    }
+    hookListeners();
+  }
+
+  private void createServerExpandableCompositeContent() {
     Composite expandableCompositeContent =
         new Composite(serverOptionsExpandableComposite, SWT.NONE);
     expandableCompositeContent.setLayout(new GridLayout(2, false));
@@ -130,8 +151,6 @@ public class EnterXMPPAccountComposite extends Composite {
     data.heightHint = defaultSize.y;
 
     serverOptionsExpandableComposite.setLayoutData(data);
-
-    hookListeners();
   }
 
   public void addModifyListener(ModifyListener modifyListener) {
@@ -140,6 +159,10 @@ public class EnterXMPPAccountComposite extends Composite {
 
   public void removeModifyListener(ModifyListener modifyListener) {
     modifyListeners.remove(modifyListener);
+  }
+
+  public void addCreateAccountSelectionListeners(SelectionListener selectionListener) {
+    createAccountSelectionListeners.add(selectionListener);
   }
 
   @Override
@@ -170,6 +193,9 @@ public class EnterXMPPAccountComposite extends Composite {
     portText.setEnabled(enabled);
     useTLSButton.setEnabled(enabled);
     useSASLButton.setEnabled(enabled);
+    if (CreateXMPPAccountWizard.CREATE_DIALOG_ENABLED) {
+      createAccountButton.setEnabled(enabled);
+    }
   }
 
   /**
@@ -271,6 +297,10 @@ public class EnterXMPPAccountComposite extends Composite {
     return server.equalsIgnoreCase(preferences.getSarosXMPPServer());
   }
 
+  public void setCreateAccountButtonVisible(boolean visible) {
+    createAccountButton.setVisible(visible);
+  }
+
   private void hookListeners() {
 
     ModifyListener modifyListener =
@@ -303,6 +333,22 @@ public class EnterXMPPAccountComposite extends Composite {
     passwordText.addFocusListener(focusListener);
     serverText.addFocusListener(focusListener);
     portText.addFocusListener(focusListener);
+
+    if (CreateXMPPAccountWizard.CREATE_DIALOG_ENABLED) {
+      createAccountButton.addSelectionListener(
+          new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+              notifyCreateAccountSelected(e);
+            }
+          });
+    }
+  }
+
+  private void notifyCreateAccountSelected(SelectionEvent e) {
+    for (SelectionListener selectionListener : createAccountSelectionListeners) {
+      selectionListener.widgetSelected(e);
+    }
   }
 
   private void notifyModifyText(ModifyEvent e) {

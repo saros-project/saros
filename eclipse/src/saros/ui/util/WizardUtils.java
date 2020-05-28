@@ -21,7 +21,6 @@ import saros.ui.wizards.ConfigurationWizard;
 import saros.ui.wizards.CreateXMPPAccountWizard;
 import saros.ui.wizards.EditXMPPAccountWizard;
 import saros.ui.wizards.StartSessionWizard;
-import saros.ui.wizards.dialogs.ConfigurationWizardDialog;
 
 /** Utility class for {@link IWizard}s */
 public class WizardUtils {
@@ -98,32 +97,7 @@ public class WizardUtils {
    * @return the wizard if it was successfully finished; null otherwise
    */
   public static ConfigurationWizard openSarosConfigurationWizard() {
-    final ConfigurationWizard wizard = new ConfigurationWizard();
-
-    /*
-     * must open the wizard with a ConfigurationWizardDialog because of an
-     * extra Create Account button in the WizardDialog button bar
-     */
-    try {
-      int code =
-          SWTUtils.runSWTSync(
-              new Callable<Integer>() {
-                @Override
-                public Integer call() {
-                  WizardDialog wizardDialog = new ConfigurationWizardDialog(null, wizard);
-                  wizardDialog.setHelpAvailable(false);
-                  return wizardDialog.open();
-                }
-              });
-
-      if (code != Window.OK) return null;
-
-    } catch (Exception e) {
-      log.warn("Error opening wizard " + wizard.getWindowTitle(), e);
-      return null;
-    }
-
-    return wizard;
+    return openWizardSuccessfully(new ConfigurationWizard());
   }
 
   /**
