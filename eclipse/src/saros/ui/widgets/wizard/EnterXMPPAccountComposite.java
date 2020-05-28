@@ -99,14 +99,14 @@ public class EnterXMPPAccountComposite extends Composite {
 
     createServerExpandableCompositeContent();
 
-    if (CreateXMPPAccountWizard.CREATE_DIALOG_ENABLED) {
-      /*
-       * Row 4: Create Account Button
-       */
+    /*
+     * Row 4: Create Account Button
+     */
 
-      createAccountButton = new Button(this, SWT.PUSH);
-      createAccountButton.setText(Messages.ConfigurationWizard_button_create_account);
-    }
+    createAccountButton = new Button(this, SWT.PUSH);
+    createAccountButton.setText(Messages.ConfigurationWizard_button_create_account);
+    createAccountButton.setVisible(CreateXMPPAccountWizard.CREATE_DIALOG_ENABLED);
+
     hookListeners();
   }
 
@@ -193,9 +193,7 @@ public class EnterXMPPAccountComposite extends Composite {
     portText.setEnabled(enabled);
     useTLSButton.setEnabled(enabled);
     useSASLButton.setEnabled(enabled);
-    if (CreateXMPPAccountWizard.CREATE_DIALOG_ENABLED) {
-      createAccountButton.setEnabled(enabled);
-    }
+    createAccountButton.setEnabled(enabled);
   }
 
   /**
@@ -334,15 +332,13 @@ public class EnterXMPPAccountComposite extends Composite {
     serverText.addFocusListener(focusListener);
     portText.addFocusListener(focusListener);
 
-    if (CreateXMPPAccountWizard.CREATE_DIALOG_ENABLED) {
-      createAccountButton.addSelectionListener(
-          new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-              notifyCreateAccountSelected(e);
-            }
-          });
-    }
+    createAccountButton.addSelectionListener(
+        new SelectionAdapter() {
+          @Override
+          public void widgetSelected(SelectionEvent e) {
+            notifyCreateAccountSelected(e);
+          }
+        });
   }
 
   private void notifyCreateAccountSelected(SelectionEvent e) {
