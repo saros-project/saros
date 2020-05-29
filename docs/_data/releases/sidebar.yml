@@ -1,5 +1,7 @@
 - title: Saros for Eclipse
   sublinks:
+  - title: 16.0.1
+    url: /releases/saros-e_16.0.1.html
   - title: 16.0.0
     url: /releases/saros-e_16.0.0.html
   - title: 15.0.0
