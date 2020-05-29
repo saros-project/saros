@@ -31,6 +31,7 @@ public class Messages extends NLS {
 
   public static String ConfigurationWizard_account_created;
   public static String ConfigurationWizard_account_created_text;
+  public static String ConfigurationWizard_button_create_account;
   public static String ConfigurationWizard_info_already_created_account;
 
   public static String AddXMPPAccountWizard_title;
