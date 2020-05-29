@@ -6,6 +6,8 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -15,8 +17,10 @@ import saros.account.XMPPAccountStore;
 import saros.net.xmpp.JID;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.ui.Messages;
+import saros.ui.util.WizardUtils;
 import saros.ui.widgets.SimpleNoteComposite;
 import saros.ui.widgets.wizard.EnterXMPPAccountComposite;
+import saros.ui.wizards.CreateXMPPAccountWizard;
 
 /**
  * Allows the user to enter an XMPP account defined by a {@link JID}, a password and an optional
@@ -115,6 +119,33 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
              */
           }
         });
+
+    enterXMPPAccountComposite.addCreateAccountSelectionListeners(
+        new SelectionAdapter() {
+          @Override
+          public void widgetSelected(SelectionEvent e) {
+            openCreateXMPPAccountWizard();
+          }
+        });
+  }
+
+  /** Opens a {@link CreateXMPPAccountWizard} and takes over the created account. */
+  private void openCreateXMPPAccountWizard() {
+
+    getShell().setVisible(false);
+
+    CreateXMPPAccountWizard createXMPPAccountWizard =
+        WizardUtils.openCreateXMPPAccountWizard(false);
+
+    if (createXMPPAccountWizard != null
+        && createXMPPAccountWizard.getCreatedXMPPAccount() != null) {
+      enterXMPPAccountComposite.setCreateAccountButtonVisible(false);
+
+      setAccount(createXMPPAccountWizard.getCreatedXMPPAccount(), true);
+    }
+
+    getShell().setVisible(true);
+    getShell().setFocus();
   }
 
   /**
