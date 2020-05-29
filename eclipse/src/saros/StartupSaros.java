@@ -1,13 +1,11 @@
 package saros;
 
 import org.apache.log4j.Logger;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ui.IStartup;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.intro.IIntroManager;
 import org.eclipse.ui.intro.IIntroPart;
 import saros.account.XMPPAccountStore;
-import saros.feedback.FeedbackPreferences;
 import saros.preferences.Preferences;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.ui.util.SWTUtils;
@@ -25,8 +23,6 @@ public class StartupSaros implements IStartup {
 
   private static final Logger log = Logger.getLogger(StartupSaros.class);
 
-  @Inject private IPreferenceStore preferenceStore;
-
   @Inject private Preferences preferences;
 
   @Inject private XMPPAccountStore xmppAccountStore;
@@ -42,14 +38,6 @@ public class StartupSaros implements IStartup {
 
   @Override
   public void earlyStartup() {
-
-    /*
-     * HACK as the preferences are initialized after the context is created
-     * and the default preferences does not affect the global preferences
-     * needed by the Feedback component we have to initialize them here
-     */
-
-    FeedbackPreferences.applyDefaults(preferenceStore);
 
     if (xmppAccountStore.isEmpty()) SWTUtils.runSafeSWTAsync(log, StartupSaros::openSarosView);
 

@@ -41,9 +41,6 @@ import saros.context.CoreContextFactory;
 import saros.context.IContainerContext;
 import saros.context.IContextKeyBindings;
 import saros.editor.EditorManager;
-import saros.feedback.FeedbackManager;
-import saros.feedback.FeedbackPreferences;
-import saros.feedback.StatisticManager;
 import saros.filesystem.IPathFactory;
 import saros.net.IConnectionManager;
 import saros.net.IReceiver;
@@ -51,7 +48,6 @@ import saros.net.ITransmitter;
 import saros.net.PacketCollector;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
-import saros.preferences.EclipsePreferenceConstants;
 import saros.preferences.EclipsePreferences;
 import saros.preferences.PreferenceStore;
 import saros.project.internal.SarosEclipseSessionContextFactory;
@@ -72,7 +68,7 @@ import saros.test.mocks.EclipseMocker;
 import saros.test.mocks.EditorManagerMock;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({StatisticManager.class, ResourcesPlugin.class})
+@PrepareForTest({ResourcesPlugin.class})
 @PowerMockIgnore({"javax.xml.*"})
 public class SarosSessionTest {
 
@@ -276,18 +272,10 @@ public class SarosSessionTest {
 
     final Preferences preferences = EclipseMocker.initPreferences();
 
-    // triggers SWTUtils if not disabled and causes issues
-    preferences.putInt(
-        EclipsePreferenceConstants.FEEDBACK_SURVEY_DISABLED, FeedbackManager.FEEDBACK_DISABLED);
-
-    // Init Feedback
-    FeedbackPreferences.setPreferences(preferences);
-
     EclipseMocker.mockSarosWithPreferences(container, store, preferences);
 
     container.addComponent(AwarenessInformationCollector.class);
     container.addComponent(EclipsePreferences.class);
-    container.addComponent(FeedbackManager.class);
     container.addComponent(NonUISynchronizer.class);
 
     /*

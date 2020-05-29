@@ -8,9 +8,6 @@ import saros.SarosPluginContext;
 import saros.account.XMPPAccount;
 import saros.account.XMPPAccountStore;
 import saros.editor.colorstorage.UserColorID;
-import saros.feedback.ErrorLogManager;
-import saros.feedback.FeedbackManager;
-import saros.feedback.StatisticManagerConfiguration;
 import saros.net.xmpp.JID;
 import saros.preferences.PreferenceConstants;
 import saros.repackaged.picocontainer.annotations.Inject;
@@ -76,8 +73,9 @@ public class ConfigurationWizard extends Wizard {
 
     assert (accountToConnect != null);
 
-    /* it is possible to finish the wizard multiple times
-     * (also it makes no sense) so ensure the behavior is always the same.
+    /*
+     * it is possible to finish the wizard multiple times (also it makes no
+     * sense) so ensure the behavior is always the same.
      */
 
     accountStore.setDefaultAccount(accountToConnect);
@@ -125,16 +123,6 @@ public class ConfigurationWizard extends Wizard {
 
     if (UserColorID.isValid(colorID))
       preferences.setValue(PreferenceConstants.FAVORITE_SESSION_COLOR_ID, colorID);
-
-    if (FeedbackManager.isFeedbackFeatureRequired()) {
-      boolean statisticSubmissionAllowed =
-          configurationSettingsWizardPage.isStatisticSubmissionAllowed();
-      boolean errorLogSubmissionAllowed =
-          configurationSettingsWizardPage.isErrorLogSubmissionAllowed();
-
-      StatisticManagerConfiguration.setStatisticSubmissionAllowed(statisticSubmissionAllowed);
-      ErrorLogManager.setErrorLogSubmissionAllowed(errorLogSubmissionAllowed);
-    }
 
     GatewayDevice gatewayDevice = configurationSettingsWizardPage.getPortmappingDevice();
 

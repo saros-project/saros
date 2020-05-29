@@ -71,11 +71,6 @@
             class="saros.ui.preference_pages.NetworkPreferencePage"
             id="saros.preferences.network"
             name="Network"/>
-      <!--page
-            category="saros.preferences"
-            class="saros.ui.preference_pages.FeedbackPreferencePage"
-            id="saros.preferences.feedback"
-            name="Feedback"/-->
       <page
             category="saros.preferences"
             class="saros.ui.preference_pages.CommunicationPreferencePage"

@@ -15,20 +15,15 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import saros.SarosPluginContext;
-import saros.feedback.ErrorLogManager;
-import saros.feedback.FeedbackManager;
-import saros.feedback.StatisticManagerConfiguration;
 import saros.net.upnp.IUPnPService;
 import saros.preferences.Preferences;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.ui.ImageManager;
 import saros.ui.Messages;
 import saros.ui.util.LayoutUtils;
-import saros.ui.util.LinkListener;
 import saros.ui.util.SWTUtils;
 import saros.ui.widgets.IllustratedComposite;
 import saros.util.ThreadUtils;
@@ -74,16 +69,11 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
   @Override
   public void createControl(Composite parent) {
     Composite composite = new Composite(parent, SWT.NONE);
-    int columnNr = FeedbackManager.isFeedbackFeatureRequired() ? 2 : 1;
-    composite.setLayout(LayoutUtils.createGridLayout(columnNr, true, 5, 10));
+    composite.setLayout(LayoutUtils.createGridLayout(1, true, 5, 10));
     setControl(composite);
 
     Composite leftColumn = createLeftColumn(composite);
     leftColumn.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-    if (FeedbackManager.isFeedbackFeatureRequired()) {
-      Composite rightColumn = createRightColumn(composite);
-      rightColumn.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-    }
     setInitialValues();
     populateGatewayCombo();
     hookListeners();
@@ -180,64 +170,6 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
     return leftColumn;
   }
 
-  protected Composite createRightColumn(Composite composite) {
-    Group rightColumn = new Group(composite, SWT.NONE);
-    rightColumn.setLayout(LayoutUtils.createGridLayout(5, 0));
-    rightColumn.setText(saros.ui.Messages.ConfigurationSettingsWizardPage_statistic);
-
-    /*
-     * statistic submission
-     */
-    Composite statisticSubmissionComposite =
-        new IllustratedComposite(rightColumn, SWT.TOP, ImageManager.ETOOL_STATISTIC);
-    statisticSubmissionComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
-    statisticSubmissionComposite.setLayout(LayoutUtils.createGridLayout(0, 5));
-    statisticSubmissionComposite.setBackgroundMode(SWT.INHERIT_NONE);
-
-    Link message = new Link(statisticSubmissionComposite, SWT.NONE);
-    GridData data = new GridData(SWT.FILL, SWT.CENTER, false, false);
-
-    /*
-     * Link composites always use as much horizontal space as they get.
-     * Restrict the width here or otherwise this page will blow up
-     * (horizontal) depending on the text that is used for this link.
-     */
-    data.widthHint = 400;
-
-    message.setLayoutData(data);
-    message.setText(saros.ui.Messages.ConfigurationSettingsWizardPage_feedback_descr);
-    message.addListener(SWT.Selection, new LinkListener());
-
-    statisticSubmissionButton = new Button(statisticSubmissionComposite, SWT.CHECK | SWT.WRAP);
-    statisticSubmissionButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-    statisticSubmissionButton.setText(
-        saros.ui.Messages.ConfigurationSettingsWizardPage_feedback_allow_data);
-    statisticSubmissionButton.setSelection(true);
-
-    /*
-     * separator
-     */
-    Label separator = new Label(rightColumn, SWT.SEPARATOR | SWT.HORIZONTAL);
-    separator.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-
-    /*
-     * crash report submission
-     */
-    Composite crashReportSubmissionComposite =
-        new IllustratedComposite(rightColumn, SWT.NONE, ImageManager.ETOOL_CRASH_REPORT);
-    crashReportSubmissionComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
-    crashReportSubmissionComposite.setLayout(LayoutUtils.createGridLayout(0, 5));
-    crashReportSubmissionComposite.setBackgroundMode(SWT.INHERIT_NONE);
-
-    errorLogSubmissionButton = new Button(crashReportSubmissionComposite, SWT.CHECK | SWT.WRAP);
-    errorLogSubmissionButton.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, false, false));
-    errorLogSubmissionButton.setText(
-        saros.ui.Messages.ConfigurationSettingsWizardPage_feedback_allow_crash);
-    errorLogSubmissionButton.setSelection(true);
-
-    return rightColumn;
-  }
-
   protected void setInitialValues() {
     this.autoConnectButton.setSelection(preferences.isAutoConnecting());
     this.setupPortmappingButton.setSelection(preferences.isAutoPortmappingEnabled());
@@ -245,13 +177,6 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
     String skypeUsername = preferences.getSkypeUserName();
     this.skypeUsageButton.setSelection(!skypeUsername.isEmpty());
     this.skypeUsernameText.setText(skypeUsername);
-
-    if (FeedbackManager.isFeedbackFeatureRequired()) {
-      this.statisticSubmissionButton.setSelection(
-          StatisticManagerConfiguration.isStatisticSubmissionAllowed());
-
-      this.errorLogSubmissionButton.setSelection(ErrorLogManager.isErrorLogSubmissionAllowed());
-    }
   }
 
   protected void hookListeners() {
@@ -278,11 +203,6 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
     this.setupPortmappingButton.addListener(SWT.Selection, listener);
     this.skypeUsageButton.addListener(SWT.Selection, listener);
     this.skypeUsernameText.addListener(SWT.Modify, listener);
-
-    if (FeedbackManager.isFeedbackFeatureRequired()) {
-      this.statisticSubmissionButton.addListener(SWT.Selection, listener);
-      this.errorLogSubmissionButton.addListener(SWT.Selection, listener);
-    }
   }
 
   protected void updateGatewaysComboEnablement() {
@@ -357,16 +277,6 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
 
   public String getSkypeUsername() {
     return this.skypeUsernameText.getText();
-  }
-
-  public boolean isStatisticSubmissionAllowed() {
-    return FeedbackManager.isFeedbackFeatureRequired()
-        && this.statisticSubmissionButton.getSelection();
-  }
-
-  public boolean isErrorLogSubmissionAllowed() {
-    return FeedbackManager.isFeedbackFeatureRequired()
-        && this.errorLogSubmissionButton.getSelection();
   }
 
   /**

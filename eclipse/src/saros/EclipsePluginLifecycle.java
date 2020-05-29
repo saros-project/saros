@@ -7,7 +7,6 @@ import saros.communication.connection.ConnectionHandler;
 import saros.context.AbstractContextLifecycle;
 import saros.context.ContainerContext;
 import saros.context.IContextFactory;
-import saros.feedback.FeedbackPreferences;
 import saros.session.SarosSessionManager;
 import saros.session.SessionEndReason;
 
@@ -45,12 +44,6 @@ public class EclipsePluginLifecycle extends AbstractContextLifecycle {
     nonCoreFactories.add(new SarosEclipseContextFactory(saros));
 
     return nonCoreFactories;
-  }
-
-  @Override
-  protected void initializeContext(final ContainerContext containerContext) {
-    FeedbackPreferences.setPreferences(
-        containerContext.getComponent(org.osgi.service.prefs.Preferences.class));
   }
 
   @Override

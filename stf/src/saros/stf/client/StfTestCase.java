@@ -315,7 +315,6 @@ public abstract class StfTestCase {
 
     for (AbstractTester tester : currentTesters) {
       try {
-        tester.superBot().menuBar().saros().preferences().disableAutomaticReminder();
         tester.superBot().menuBar().saros().preferences().restoreDefaults();
         Util.openSarosView(tester);
 
