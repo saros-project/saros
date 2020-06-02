@@ -11,20 +11,21 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 
-/** @deprecated use {@link EclipseFileImplV2} instead */
-@Deprecated
-public class EclipseFileImpl extends EclipseResourceImpl implements IFile {
+/** Eclipse implementation of the Saros file interface. */
+// TODO rename to EclipseFile
+public class EclipseFileImplV2 extends EclipseResourceImplV2 implements IFile {
+  private static final Logger log = Logger.getLogger(EclipseFileImplV2.class);
 
-  private static final Logger log = Logger.getLogger(EclipseFileImpl.class);
-
-  EclipseFileImpl(org.eclipse.core.resources.IFile delegate) {
-    super(delegate);
+  /** @see EclipseResourceImplV2#EclipseResourceImplV2(EclipseReferencePointImpl, IPath) */
+  EclipseFileImplV2(EclipseReferencePointImpl referencePoint, IPath relativePath) {
+    super(referencePoint, relativePath);
   }
 
   @Override
   public String getCharset() throws IOException {
     try {
       return getDelegate().getCharset();
+
     } catch (CoreException e) {
       throw new IOException(e);
     }
@@ -95,6 +96,7 @@ public class EclipseFileImpl extends EclipseResourceImpl implements IFile {
   public InputStream getContents() throws IOException {
     try {
       return getDelegate().getContents();
+
     } catch (CoreException e) {
       throw new IOException(e);
     }
@@ -114,19 +116,20 @@ public class EclipseFileImpl extends EclipseResourceImpl implements IFile {
   public void create(InputStream input) throws IOException {
     try {
       getDelegate().create(input, false, null);
+
     } catch (CoreException | OperationCanceledException e) {
       throw new IOException(e);
     }
   }
 
   /**
-   * Returns the original {@link org.eclipse.core.resources.IFile IFile} object.
+   * Returns an {@link org.eclipse.core.resources.IFile} object representing this file.
    *
-   * @return
+   * @return an {@link org.eclipse.core.resources.IFile} object representing this file
    */
   @Override
   public org.eclipse.core.resources.IFile getDelegate() {
-    return (org.eclipse.core.resources.IFile) delegate;
+    return referencePoint.getFileDelegate(relativePath);
   }
 
   @Override
