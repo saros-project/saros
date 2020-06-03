@@ -1,8 +1,8 @@
 package saros.filesystem.checksum;
 
 import org.eclipse.core.runtime.IPath;
-import saros.filesystem.EclipseFileImpl;
 import saros.filesystem.IFile;
+import saros.filesystem.ResourceConverter;
 
 /**
  * Helper class returning the location of the given <code>IFile</code>.
@@ -13,7 +13,7 @@ public class EclipseAbsolutePathResolver implements IAbsolutePathResolver {
 
   @Override
   public String getAbsolutePath(IFile file) {
-    org.eclipse.core.resources.IFile eclipseFile = ((EclipseFileImpl) file).getDelegate();
+    org.eclipse.core.resources.IFile eclipseFile = ResourceConverter.getDelegate(file);
 
     IPath eclipsePath = eclipseFile.getLocation();
 

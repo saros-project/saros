@@ -42,8 +42,8 @@ import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import saros.editor.text.LineRange;
 import saros.editor.text.TextPosition;
 import saros.editor.text.TextSelection;
-import saros.filesystem.EclipseFileImpl;
 import saros.filesystem.ResourceAdapterFactory;
+import saros.filesystem.ResourceConverter;
 import saros.ui.dialogs.WarningMessageDialog;
 import saros.ui.util.SWTUtils;
 import saros.ui.views.SarosView;
@@ -104,7 +104,7 @@ public class EditorAPI {
    * @return the opened editor or <code>null</code> if the editor couldn't be opened.
    */
   public static IEditorPart openEditor(saros.filesystem.IFile wrappedFile, boolean activate) {
-    IFile file = ((EclipseFileImpl) wrappedFile).getDelegate();
+    IFile file = ResourceConverter.getDelegate(wrappedFile);
 
     if (!file.exists()) {
       log.error("EditorAPI cannot open file which does not exist: " + file, new StackTrace());
