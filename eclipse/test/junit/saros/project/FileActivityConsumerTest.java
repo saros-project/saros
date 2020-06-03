@@ -23,7 +23,7 @@ import org.junit.Test;
 import saros.activities.FileActivity;
 import saros.activities.FileActivity.Purpose;
 import saros.activities.FileActivity.Type;
-import saros.filesystem.EclipseFileImpl;
+import saros.filesystem.EclipseFileImplV2;
 import saros.net.xmpp.JID;
 import saros.session.User;
 
@@ -43,7 +43,7 @@ public class FileActivityConsumerTest {
   private IFile file;
 
   /** Mocked saros file wrapper to test. */
-  private EclipseFileImpl eclipseFileWrapper;
+  private EclipseFileImplV2 eclipseFileWrapper;
 
   private SharedResourcesManager resourceChangeListener;
 
@@ -65,7 +65,7 @@ public class FileActivityConsumerTest {
 
     // set up eclipse resource mock
     file = createMock(IFile.class);
-    eclipseFileWrapper = createNiceMock(EclipseFileImpl.class);
+    eclipseFileWrapper = createNiceMock(EclipseFileImplV2.class);
 
     expect(file.getContents()).andStubReturn(new ByteArrayInputStream(FILE_CONTENT));
 

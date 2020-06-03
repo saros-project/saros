@@ -11,7 +11,7 @@ import org.eclipse.core.runtime.CoreException;
 import saros.activities.FileActivity;
 import saros.activities.IActivity;
 import saros.editor.EditorManager;
-import saros.filesystem.ResourceAdapterFactory;
+import saros.filesystem.ResourceConverter;
 import saros.repackaged.picocontainer.Startable;
 import saros.session.AbstractActivityConsumer;
 import saros.session.ISarosSession;
@@ -136,9 +136,9 @@ public class FileActivityConsumer extends AbstractActivityConsumer implements St
   private void handleFileMove(FileActivity activity)
       throws CoreException, IOException, IllegalCharsetNameException, UnsupportedCharsetException {
 
-    final IFile fileDestination = toEclipseIFile(activity.getResource());
+    final IFile fileDestination = ResourceConverter.getDelegate(activity.getResource());
 
-    final IFile fileToMove = toEclipseIFile(activity.getOldResource());
+    final IFile fileToMove = ResourceConverter.getDelegate(activity.getOldResource());
 
     FileUtils.mkdirs(fileDestination);
 
@@ -154,7 +154,7 @@ public class FileActivityConsumer extends AbstractActivityConsumer implements St
 
     editorManager.closeEditor(fileWrapper, false);
 
-    final IFile file = toEclipseIFile(fileWrapper);
+    final IFile file = ResourceConverter.getDelegate(fileWrapper);
 
     if (file.exists()) FileUtils.delete(file);
     else log.warn("could not delete file " + file + " because it does not exist");
@@ -165,7 +165,7 @@ public class FileActivityConsumer extends AbstractActivityConsumer implements St
 
     saros.filesystem.IFile sarosFile = activity.getResource();
 
-    final IFile file = toEclipseIFile(sarosFile);
+    final IFile file = ResourceConverter.getDelegate(sarosFile);
 
     final String encoding = activity.getEncoding();
     final byte[] newContent = activity.getContent();
@@ -181,9 +181,5 @@ public class FileActivityConsumer extends AbstractActivityConsumer implements St
     }
 
     if (encoding != null) sarosFile.setCharset(encoding);
-  }
-
-  private static IFile toEclipseIFile(saros.filesystem.IFile file) {
-    return (IFile) ResourceAdapterFactory.convertBack(file);
   }
 }
