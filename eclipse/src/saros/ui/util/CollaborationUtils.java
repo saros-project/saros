@@ -23,9 +23,9 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Shell;
 import saros.Saros;
 import saros.SarosPluginContext;
-import saros.filesystem.EclipseProjectImpl;
+import saros.filesystem.EclipseReferencePointImpl;
 import saros.filesystem.IReferencePoint;
-import saros.filesystem.ResourceAdapterFactory;
+import saros.filesystem.ResourceConverter;
 import saros.net.xmpp.JID;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.ISarosSession;
@@ -66,6 +66,7 @@ public class CollaborationUtils {
    * @nonBlocking
    */
   public static void startSession(final List<IResource> resources, final List<JID> contacts) {
+    // TODO remove assertion that only projects are shared (resolved in followup PR)
     assert resources.stream().allMatch(resource -> resource instanceof IProject)
         : "Encountered non-project resource to share";
 
@@ -177,6 +178,7 @@ public class CollaborationUtils {
 
     if (resourcesToAdd.isEmpty()) return;
 
+    // TODO remove assertion that only projects are shared (resolved in followup PR)
     assert resourcesToAdd.stream().allMatch(resource -> resource instanceof IProject)
         : "Encountered non-project resource to share";
 
@@ -220,8 +222,9 @@ public class CollaborationUtils {
             final List<IProject> projectsToRefresh = new ArrayList<IProject>();
 
             for (IProject project : projectsToAdd) {
-              if (!session.isShared(ResourceAdapterFactory.create(project)))
+              if (!session.isShared(new EclipseReferencePointImpl(project))) {
                 projectsToRefresh.add(project);
+              }
             }
 
             try {
@@ -292,7 +295,7 @@ public class CollaborationUtils {
       final Pair<Long, Long> fileCountAndSize;
 
       final List<IResource> resources =
-          Collections.singletonList(((EclipseProjectImpl) project).getDelegate());
+          Collections.singletonList(ResourceConverter.getDelegate(project));
 
       fileCountAndSize = FileUtils.getFileCountAndSize(resources, true, IContainer.EXCLUDE_DERIVED);
 
@@ -321,7 +324,7 @@ public class CollaborationUtils {
   }
 
   private static Set<IReferencePoint> convert(Set<IProject> projects) {
-    return projects.stream().map(ResourceAdapterFactory::create).collect(Collectors.toSet());
+    return projects.stream().map(EclipseReferencePointImpl::new).collect(Collectors.toSet());
   }
 
   private static void refreshProjects(
