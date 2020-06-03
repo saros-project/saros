@@ -6,7 +6,7 @@ import org.eclipse.core.runtime.CoreException;
 import saros.activities.FolderCreatedActivity;
 import saros.activities.FolderDeletedActivity;
 import saros.activities.IActivity;
-import saros.filesystem.EclipseFolderImpl;
+import saros.filesystem.EclipseFolderImplV2;
 import saros.repackaged.picocontainer.Startable;
 import saros.session.AbstractActivityConsumer;
 import saros.session.ISarosSession;
@@ -56,7 +56,7 @@ public final class FolderActivityConsumer extends AbstractActivityConsumer imple
 
     saros.filesystem.IFolder folderWrapper = activity.getResource();
 
-    IFolder folder = ((EclipseFolderImpl) folderWrapper).getDelegate();
+    IFolder folder = ((EclipseFolderImplV2) folderWrapper).getDelegate();
 
     try {
       FileUtils.create(folder);
@@ -70,7 +70,7 @@ public final class FolderActivityConsumer extends AbstractActivityConsumer imple
 
     saros.filesystem.IFolder folderWrapper = activity.getResource();
 
-    IFolder folder = ((EclipseFolderImpl) folderWrapper).getDelegate();
+    IFolder folder = ((EclipseFolderImplV2) folderWrapper).getDelegate();
 
     try {
       if (folder.exists()) FileUtils.delete(folder);
