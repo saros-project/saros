@@ -9,8 +9,8 @@ import org.apache.log4j.Logger;
 import org.eclipse.ui.part.FileEditorInput;
 import saros.activities.EditorActivity;
 import saros.editor.internal.EditorAPI;
-import saros.filesystem.EclipseFileImpl;
 import saros.filesystem.IFile;
+import saros.filesystem.ResourceConverter;
 import saros.session.AbstractActivityConsumer;
 import saros.session.IActivityConsumer;
 import saros.session.ISarosSession;
@@ -127,7 +127,7 @@ public class RemoteWriteAccessManager extends AbstractActivityConsumer {
 
     assert !connectedUserWithWriteAccessFiles.contains(fileWrapper);
 
-    org.eclipse.core.resources.IFile file = ((EclipseFileImpl) fileWrapper).getDelegate();
+    org.eclipse.core.resources.IFile file = ResourceConverter.getDelegate(fileWrapper);
     if (!file.exists()) {
       log.error(
           "Attempting to connect to file which" + " is not available locally: " + fileWrapper,
@@ -150,7 +150,7 @@ public class RemoteWriteAccessManager extends AbstractActivityConsumer {
 
     connectedUserWithWriteAccessFiles.remove(fileWrapper);
 
-    org.eclipse.core.resources.IFile file = ((EclipseFileImpl) fileWrapper).getDelegate();
+    org.eclipse.core.resources.IFile file = ResourceConverter.getDelegate(fileWrapper);
     EditorAPI.disconnect(new FileEditorInput(file));
   }
 

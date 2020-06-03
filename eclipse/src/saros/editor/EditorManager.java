@@ -54,9 +54,9 @@ import saros.editor.remote.UserEditorStateManager;
 import saros.editor.text.LineRange;
 import saros.editor.text.TextPosition;
 import saros.editor.text.TextSelection;
-import saros.filesystem.EclipseFileImpl;
 import saros.filesystem.IReferencePoint;
 import saros.filesystem.ResourceAdapterFactory;
+import saros.filesystem.ResourceConverter;
 import saros.observables.FileReplacementInProgressObservable;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.AbstractActivityConsumer;
@@ -441,7 +441,7 @@ public class EditorManager implements IEditorManager {
   }
 
   private String doGetContent(saros.filesystem.IFile wrappedFile) {
-    IFile file = ((EclipseFileImpl) wrappedFile).getDelegate();
+    IFile file = ResourceConverter.getDelegate(wrappedFile);
     FileEditorInput input = new FileEditorInput(file);
 
     IDocumentProvider provider = EditorAPI.connect(input);
@@ -467,7 +467,7 @@ public class EditorManager implements IEditorManager {
       return null;
     }
 
-    IFile file = ((EclipseFileImpl) wrappedFile).getDelegate();
+    IFile file = ResourceConverter.getDelegate(wrappedFile);
 
     String lineSeparator = FileUtil.getLineSeparator(file);
 
@@ -703,7 +703,7 @@ public class EditorManager implements IEditorManager {
     log.trace(".execTextEdit invoked");
 
     saros.filesystem.IFile fileWrapper = textEdit.getResource();
-    IFile file = ((EclipseFileImpl) fileWrapper).getDelegate();
+    IFile file = ResourceConverter.getDelegate(fileWrapper);
 
     if (!file.exists()) {
       log.error("TextEditActivity refers to file which" + " is not available locally: " + textEdit);
@@ -1169,7 +1169,7 @@ public class EditorManager implements IEditorManager {
    */
   private boolean isDirty(saros.filesystem.IFile wrappedFile) throws FileNotFoundException {
 
-    IFile file = ((EclipseFileImpl) wrappedFile).getDelegate();
+    IFile file = ResourceConverter.getDelegate(wrappedFile);
 
     if (file == null || !file.exists()) {
       throw new FileNotFoundException("File not found: " + wrappedFile);
@@ -1197,7 +1197,7 @@ public class EditorManager implements IEditorManager {
   public void saveEditor(saros.filesystem.IFile wrappedFile) {
     checkThreadAccess();
 
-    IFile file = ((EclipseFileImpl) wrappedFile).getDelegate();
+    IFile file = ResourceConverter.getDelegate(wrappedFile);
 
     log.trace(".saveEditor (" + file.getName() + ") invoked");
 

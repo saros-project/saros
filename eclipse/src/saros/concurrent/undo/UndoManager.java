@@ -38,8 +38,8 @@ import saros.concurrent.undo.OperationHistory.Type;
 import saros.editor.EditorManager;
 import saros.editor.ISharedEditorListener;
 import saros.editor.internal.EditorAPI;
-import saros.filesystem.EclipseFileImpl;
 import saros.filesystem.IFile;
+import saros.filesystem.ResourceConverter;
 import saros.preferences.Preferences;
 import saros.repackaged.picocontainer.Disposable;
 import saros.repackaged.picocontainer.annotations.Inject;
@@ -487,7 +487,7 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
 
     List<ITextOperation> textOps = activity.toOperation().getTextOperations();
 
-    org.eclipse.core.resources.IFile file = ((EclipseFileImpl) currentActiveEditor).getDelegate();
+    org.eclipse.core.resources.IFile file = ResourceConverter.getDelegate(currentActiveEditor);
 
     FileEditorInput input = new FileEditorInput(file);
     IDocumentProvider provider = EditorAPI.connect(input);
