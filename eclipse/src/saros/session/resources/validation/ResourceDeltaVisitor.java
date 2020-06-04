@@ -1,10 +1,13 @@
 package saros.session.resources.validation;
 
+import java.util.Set;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.runtime.CoreException;
-import saros.filesystem.ResourceAdapterFactory;
+import saros.filesystem.IReferencePoint;
+import saros.filesystem.IResource.Type;
+import saros.filesystem.ResourceConverter;
 import saros.session.ISarosSession;
 
 /**
@@ -32,17 +35,23 @@ final class ResourceDeltaVisitor implements IResourceDeltaVisitor {
 
     if (resource.getType() == IResource.ROOT) return true;
 
-    if (!session.isShared(ResourceAdapterFactory.create(resource))) return true;
+    Set<IReferencePoint> sharedReferencePoints = session.getReferencePoints();
+    saros.filesystem.IResource resourceWrapper =
+        ResourceConverter.convertToResource(sharedReferencePoints, resource);
 
-    if (resource.getType() != IResource.PROJECT) {
+    if (resourceWrapper == null || !session.isShared(resourceWrapper)) return true;
+
+    if (resourceWrapper.getType() != Type.REFERENCE_POINT) {
       isModifyingResources = true;
       return false;
     }
 
     if (delta.getKind() == IResourceDelta.REMOVED) {
-
-      if ((delta.getFlags() & IResourceDelta.MOVED_TO) != 0) isMovingProject = true;
-      else isDeletingProject = true;
+      if ((delta.getFlags() & IResourceDelta.MOVED_TO) != 0) {
+        isMovingProject = true;
+      } else {
+        isDeletingProject = true;
+      }
 
       return false;
     }
