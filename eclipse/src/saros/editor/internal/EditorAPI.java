@@ -42,7 +42,6 @@ import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import saros.editor.text.LineRange;
 import saros.editor.text.TextPosition;
 import saros.editor.text.TextSelection;
-import saros.filesystem.ResourceAdapterFactory;
 import saros.filesystem.ResourceConverter;
 import saros.ui.dialogs.WarningMessageDialog;
 import saros.ui.util.SWTUtils;
@@ -678,16 +677,6 @@ public class EditorAPI {
       log.error("could not get active window", e);
       return null;
     }
-  }
-
-  /**
-   * @return the file the given editor is displaying or null if the given editor is not showing a
-   *     file or the file is not referenced via a path in the project.
-   */
-  public static saros.filesystem.IFile getEditorFile(IEditorPart editorPart) {
-    IFile resource = getEditorResource(editorPart).getAdapter(IFile.class);
-
-    return (resource == null) ? null : ResourceAdapterFactory.create(resource);
   }
 
   /**
