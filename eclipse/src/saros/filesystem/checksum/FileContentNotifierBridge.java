@@ -3,14 +3,21 @@ package saros.filesystem.checksum;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
+import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ResourcesPlugin;
-import saros.filesystem.ResourceAdapterFactory;
+import saros.SarosPluginContext;
+import saros.filesystem.IReferencePoint;
+import saros.filesystem.ResourceConverter;
+import saros.repackaged.picocontainer.annotations.Inject;
+import saros.session.ISarosSession;
+import saros.session.ISarosSessionManager;
 
 /**
  * Bridge class that maps Eclipse Resource change events to unique identifiers by retrieving the
@@ -21,6 +28,10 @@ import saros.filesystem.ResourceAdapterFactory;
 public class FileContentNotifierBridge
     implements IFileContentChangedNotifier, IResourceChangeListener {
 
+  private static final Logger log = Logger.getLogger(FileContentNotifierBridge.class);
+
+  @Inject private ISarosSessionManager sarosSessionManager;
+
   private CopyOnWriteArrayList<IFileContentChangedListener> fileContentChangedListeners =
       new CopyOnWriteArrayList<IFileContentChangedListener>();
 
@@ -29,9 +40,21 @@ public class FileContentNotifierBridge
         .addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE);
   }
 
+  private void initialize() {
+    SarosPluginContext.initComponent(this);
+  }
+
   @Override
   public void resourceChanged(IResourceChangeEvent event) {
     if (event.getDelta() == null) return;
+
+    if (sarosSessionManager == null) {
+      initialize();
+
+      if (sarosSessionManager == null) {
+        throw new IllegalStateException("Failed to inject saros session manager instance");
+      }
+    }
 
     Deque<IResourceDelta> stack = new LinkedList<IResourceDelta>();
 
@@ -51,8 +74,32 @@ public class FileContentNotifierBridge
 
         final IFile file = delta.getResource().getAdapter(IFile.class);
 
-        for (IFileContentChangedListener listener : fileContentChangedListeners)
-          listener.fileContentChanged(ResourceAdapterFactory.create(file));
+        final ISarosSession sarosSession = sarosSessionManager.getSession();
+        if (sarosSession == null) {
+          if (log.isTraceEnabled()) {
+            log.trace("Ignoring resource change without a running session for file " + file);
+          }
+          return;
+        }
+
+        Set<IReferencePoint> sharedReferencePoints = sarosSession.getReferencePoints();
+        saros.filesystem.IFile fileWrapper =
+            ResourceConverter.convertToFile(sharedReferencePoints, file);
+
+        if (fileWrapper == null) {
+          if (log.isTraceEnabled()) {
+            log.trace("Ignoring resource change for non-shared file " + file);
+          }
+          return;
+        }
+
+        for (IFileContentChangedListener listener : fileContentChangedListeners) {
+          try {
+            listener.fileContentChanged(fileWrapper);
+          } catch (RuntimeException e) {
+            log.error("internal error in listener: " + listener, e);
+          }
+        }
       }
     }
   }
