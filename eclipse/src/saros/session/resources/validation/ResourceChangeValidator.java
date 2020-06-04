@@ -71,14 +71,13 @@ public class ResourceChangeValidator extends ModelProvider {
 
       IResourceDelta referencePointDelta = delta.findMember(referencePointDelegate.getFullPath());
 
-      final ResourceDeltaVisitor visitor = new ResourceDeltaVisitor(referencePoint, currentSession);
-
-      if (referencePointDelta != null) {
+      if (referencePointDelta == null) {
         continue;
       }
 
+      final ResourceDeltaVisitor visitor = new ResourceDeltaVisitor(referencePoint, currentSession);
       try {
-        delta.accept(visitor);
+        referencePointDelta.accept(visitor);
       } catch (CoreException e) {
         log.warn(
             "error occurred during delta visitation, some resources might have not been checked", //$NON-NLS-1$
