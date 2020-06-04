@@ -1,6 +1,5 @@
 package saros.session.resources.validation;
 
-import java.util.Set;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
@@ -22,9 +21,13 @@ final class ResourceDeltaVisitor implements IResourceDeltaVisitor {
 
   private boolean isMovingProject = false;
 
+  /** The reference point whose resources the delta visitor is iterating. */
+  private final IReferencePoint referencePoint;
+
   private final ISarosSession session;
 
-  ResourceDeltaVisitor(final ISarosSession session) {
+  ResourceDeltaVisitor(final IReferencePoint referencePoint, final ISarosSession session) {
+    this.referencePoint = referencePoint;
     this.session = session;
   }
 
@@ -35,9 +38,8 @@ final class ResourceDeltaVisitor implements IResourceDeltaVisitor {
 
     if (resource.getType() == IResource.ROOT) return true;
 
-    Set<IReferencePoint> sharedReferencePoints = session.getReferencePoints();
     saros.filesystem.IResource resourceWrapper =
-        ResourceConverter.convertToResource(sharedReferencePoints, resource);
+        ResourceConverter.convertToResource(referencePoint, resource);
 
     if (resourceWrapper == null || !session.isShared(resourceWrapper)) return true;
 
