@@ -1,11 +1,14 @@
 package saros.editor.internal;
 
+import java.util.Set;
 import org.apache.log4j.Logger;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 import saros.SarosPluginContext;
 import saros.annotations.Component;
-import saros.filesystem.ResourceAdapterFactory;
+import saros.filesystem.IReferencePoint;
+import saros.filesystem.IResource;
+import saros.filesystem.ResourceConverter;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
@@ -93,7 +96,10 @@ public final class SharedDocumentProvider extends TextFileDocumentProvider {
 
     IFileEditorInput fileEditorInput = (IFileEditorInput) element;
 
-    return currentSession.isShared(
-        ResourceAdapterFactory.create(fileEditorInput.getFile().getProject()));
+    final Set<IReferencePoint> sharedReferencePoints = currentSession.getReferencePoints();
+    final IResource resource =
+        ResourceConverter.convertToResource(sharedReferencePoints, fileEditorInput.getFile());
+
+    return resource != null && currentSession.isShared(resource);
   }
 }
