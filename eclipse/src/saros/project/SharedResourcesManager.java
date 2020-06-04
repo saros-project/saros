@@ -1,9 +1,7 @@
 package saros.project;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
@@ -19,7 +17,6 @@ import saros.activities.IActivity;
 import saros.activities.IResourceActivity;
 import saros.annotations.Component;
 import saros.editor.EditorManager;
-import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.filesystem.ResourceAdapterFactory;
 import saros.observables.FileReplacementInProgressObservable;
@@ -27,7 +24,6 @@ import saros.repackaged.picocontainer.Startable;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.AbstractActivityProducer;
 import saros.session.ISarosSession;
-import saros.session.ISessionListener;
 import saros.synchronize.Blockable;
 import saros.synchronize.StopManager;
 
@@ -85,29 +81,6 @@ public class SharedResourcesManager extends AbstractActivityProducer
 
   private final ProjectDeltaVisitor projectDeltaVisitor;
 
-  /** map that holds the current open or closed state for every shared project */
-  private final Map<IProject, Boolean> projectStates = new HashMap<IProject, Boolean>();
-
-  private final ISessionListener sessionListener =
-      new ISessionListener() {
-
-        @Override
-        public void referencePointAdded(IReferencePoint referencePoint) {
-          synchronized (projectStates) {
-            IProject eclipseProject = (IProject) ResourceAdapterFactory.convertBack(referencePoint);
-            projectStates.put(eclipseProject, eclipseProject.isOpen());
-          }
-        }
-
-        @Override
-        public void referencePointRemoved(IReferencePoint referencePoint) {
-          synchronized (projectStates) {
-            IProject eclipseProject = (IProject) ResourceAdapterFactory.convertBack(referencePoint);
-            projectStates.remove(eclipseProject);
-          }
-        }
-      };
-
   private final Blockable stopManagerListener =
       new Blockable() {
         @Override
@@ -123,7 +96,6 @@ public class SharedResourcesManager extends AbstractActivityProducer
 
   @Override
   public void start() {
-    sarosSession.addListener(sessionListener);
     sarosSession.addActivityProducer(this);
     stopManager.addBlockable(stopManagerListener);
     ResourcesPlugin.getWorkspace().addResourceChangeListener(this, INTERESTING_EVENTS);
@@ -134,7 +106,6 @@ public class SharedResourcesManager extends AbstractActivityProducer
     ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
     stopManager.removeBlockable(stopManagerListener);
     sarosSession.removeActivityProducer(this);
-    sarosSession.removeListener(sessionListener);
   }
 
   public SharedResourcesManager(
@@ -231,10 +202,10 @@ public class SharedResourcesManager extends AbstractActivityProducer
 
       if (!sarosSession.isShared(ResourceAdapterFactory.create(project))) continue;
 
-      if (!checkOpenClosed(project)) {
-
-        if (log.isDebugEnabled())
+      if (isProjectOpenedDelta(projectDelta)) {
+        if (log.isDebugEnabled()) {
           log.debug("ignoring delta changes for project " + project + " as it was only opened");
+        }
 
         continue;
       }
@@ -273,38 +244,28 @@ public class SharedResourcesManager extends AbstractActivityProducer
     for (final IActivity activity : resourceActivities) fireActivity(activity);
   }
 
-  private boolean checkOpenClosed(IProject project) {
-
-    boolean newProjectState = project.isOpen();
-
-    Boolean oldProjectState;
-
-    synchronized (projectStates) {
-      oldProjectState = projectStates.get(project);
-
-      if (oldProjectState == null) return false;
-
-      projectStates.put(project, newProjectState);
+  /**
+   * Returns whether the resource delta describes a project being opened.
+   *
+   * @param resourceDelta the resource delta to check
+   * @return whether the resource delta describes a project being opened
+   * @see IResourceDelta#ADDED
+   * @see IResourceDelta#OPEN
+   */
+  private boolean isProjectOpenedDelta(IResourceDelta resourceDelta) {
+    if ((resourceDelta.getKind() & IResourceDelta.ADDED) == IResourceDelta.ADDED) {
+      return false;
     }
 
-    boolean stateChanged = newProjectState != oldProjectState;
+    IProject project = resourceDelta.getResource().getAdapter(IProject.class);
 
-    /*
-     * Since the project was just opened, we would get a notification that
-     * each file in the project was just added, so we're simply going to
-     * ignore this delta. Any resources that were modified externally would
-     * be out-of-sync anyways, so when the user refreshes them we'll get
-     * notified.
-     */
+    if (project == null) {
+      return false;
+    }
 
-    if (stateChanged && /* open */ newProjectState) return false;
+    boolean isOpenDelta = (resourceDelta.getFlags() & IResourceDelta.OPEN) == IResourceDelta.OPEN;
 
-    /*
-     * TODO report file events in a closed project? Can this happen anyways
-     * ?
-     */
-
-    return newProjectState;
+    return isOpenDelta && project.isOpen();
   }
 
   /*
