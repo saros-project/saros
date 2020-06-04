@@ -3,6 +3,7 @@ package saros.filesystem;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -81,7 +82,11 @@ public class EclipseWorkspaceImpl implements IWorkspace {
         new EclipseRunnableAdapter(runnable);
 
     final List<org.eclipse.core.resources.IResource> eclipseResources =
-        ResourceAdapterFactory.convertBack(resources != null ? Arrays.asList(resources) : null);
+        resources == null
+            ? null
+            : Arrays.stream(resources)
+                .map(ResourceConverter::getDelegate)
+                .collect(Collectors.toList());
 
     final ISchedulingRule schedulingRule;
 
