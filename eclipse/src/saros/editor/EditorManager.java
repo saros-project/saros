@@ -375,7 +375,7 @@ public class EditorManager implements IEditorManager {
 
     this.preferenceStore = preferenceStore;
 
-    editorPool = new EditorPool(this);
+    editorPool = new EditorPool(this, sessionManager);
     partListener = new SafePartListener2(log, new EditorPartListener(this));
 
     registerCustomAnnotations();
@@ -997,7 +997,7 @@ public class EditorManager implements IEditorManager {
   }
 
   private void partClosedOfFile(IEditorPart editorPart, saros.filesystem.IFile file) {
-    editorPool.remove(editorPart);
+    editorPool.remove(editorPart, file);
     openEditorFiles.remove(file);
 
     ITextViewer viewer = EditorAPI.getViewer(editorPart);
