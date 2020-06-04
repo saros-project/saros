@@ -526,7 +526,9 @@ public class EditorManager implements IEditorManager {
       return;
     }
 
-    saros.filesystem.IFile wrappedFile = EditorAPI.getEditorFile(part);
+    IFile file = EditorAPI.getEditorResource(part).getAdapter(IFile.class);
+    saros.filesystem.IFile wrappedFile = convertToFile(file);
+
     if (wrappedFile == null) {
       log.warn("Could not find file for editor " + part.getTitle());
       return;
@@ -553,17 +555,18 @@ public class EditorManager implements IEditorManager {
    *     selected text in editor.
    */
   void generateSelection(IEditorPart part, TextSelection newSelection) {
+    IFile file = EditorAPI.getEditorResource(part).getAdapter(IFile.class);
+    saros.filesystem.IFile wrappedFile = convertToFile(file);
 
-    saros.filesystem.IFile file = EditorAPI.getEditorFile(part);
-    if (file == null) {
+    if (wrappedFile == null) {
       log.warn("Could not find file for editor " + part.getTitle());
       return;
     }
 
-    if (file.equals(locallyActiveEditor)) localSelection = newSelection;
+    if (wrappedFile.equals(locallyActiveEditor)) localSelection = newSelection;
 
     activityDelayer.fireActivity(
-        new TextSelectionActivity(session.getLocalUser(), newSelection, file));
+        new TextSelectionActivity(session.getLocalUser(), newSelection, wrappedFile));
   }
 
   /**
@@ -913,7 +916,8 @@ public class EditorManager implements IEditorManager {
       return;
     }
 
-    saros.filesystem.IFile editorFile = EditorAPI.getEditorFile(editorPart);
+    IFile file = EditorAPI.getEditorResource(editorPart).getAdapter(IFile.class);
+    saros.filesystem.IFile editorFile = convertToFile(file);
 
     if (Objects.equals(editorFile, locallyActiveEditor)) {
       log.debug(
@@ -991,9 +995,12 @@ public class EditorManager implements IEditorManager {
       return;
     }
 
-    saros.filesystem.IFile file = EditorAPI.getEditorFile(editorPart);
+    IFile file = EditorAPI.getEditorResource(editorPart).getAdapter(IFile.class);
+    saros.filesystem.IFile wrappedFile = convertToFile(file);
 
-    partClosedOfFile(editorPart, file);
+    if (wrappedFile != null) {
+      partClosedOfFile(editorPart, wrappedFile);
+    }
   }
 
   private void partClosedOfFile(IEditorPart editorPart, saros.filesystem.IFile file) {
@@ -1326,7 +1333,9 @@ public class EditorManager implements IEditorManager {
     IEditorPart activeEditor = EditorAPI.getActiveEditor();
 
     if (activeEditor != null) {
-      locallyActiveEditor = EditorAPI.getEditorFile(activeEditor);
+      IFile file = EditorAPI.getEditorResource(activeEditor).getAdapter(IFile.class);
+      locallyActiveEditor = convertToFile(file);
+
       partActivated(activeEditor);
     }
   }
@@ -1345,8 +1354,10 @@ public class EditorManager implements IEditorManager {
    */
   private void refreshAnnotations(IEditorPart editorPart) {
 
-    saros.filesystem.IFile file = EditorAPI.getEditorFile(editorPart);
-    if (file == null) {
+    IFile file = EditorAPI.getEditorResource(editorPart).getAdapter(IFile.class);
+    saros.filesystem.IFile wrappedFile = convertToFile(file);
+
+    if (wrappedFile == null) {
       log.warn("Could not find file for editor " + editorPart.getTitle());
       return;
     }
@@ -1377,7 +1388,7 @@ public class EditorManager implements IEditorManager {
         continue;
       }
 
-      EditorState remoteEditor = userEditorStateManager.getState(user).getEditorState(file);
+      EditorState remoteEditor = userEditorStateManager.getState(user).getEditorState(wrappedFile);
 
       if (remoteEditor == null) continue;
 
@@ -1788,5 +1799,26 @@ public class EditorManager implements IEditorManager {
    */
   public IActivityProducer getActivityProducer() {
     return activityDelayer;
+  }
+
+  /**
+   * Converts the given file delegate to a Saros file object.
+   *
+   * @param fileDelegate the file delegate to convert
+   * @return a Saros file object representing the given file delegate or <code>null</code> if there
+   *     is not running session or the delegate does not belong to a shared reference point
+   * @throws NullPointerException if the given file delegate is <code>null</code>
+   * @see ResourceConverter#convertToFile(Set, IFile)
+   */
+  private saros.filesystem.IFile convertToFile(IFile fileDelegate) {
+    ISarosSession currentSession = session;
+
+    if (currentSession == null) {
+      return null;
+    }
+
+    Set<IReferencePoint> referencePoints = session.getReferencePoints();
+
+    return ResourceConverter.convertToFile(referencePoints, fileDelegate);
   }
 }
