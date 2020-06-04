@@ -3,12 +3,11 @@ package saros.project;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.log4j.Logger;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import saros.activities.FileActivity;
 import saros.activities.FileActivity.Purpose;
@@ -19,7 +18,7 @@ import saros.activities.IResourceActivity;
 import saros.editor.EditorManager;
 import saros.filesystem.IFolder;
 import saros.filesystem.IReferencePoint;
-import saros.filesystem.ResourceAdapterFactory;
+import saros.filesystem.ResourceConverter;
 import saros.session.ISarosSession;
 import saros.session.User;
 import saros.util.FileUtils;
@@ -40,6 +39,8 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
   /** The reference point whose resources the delta visitor is iterating. */
   private final IReferencePoint referencePoint;
 
+  private final IContainer referencePointDelegate;
+
   private final List<IResourceActivity<? extends saros.filesystem.IResource>> resourceActivities;
 
   public ProjectDeltaVisitor(
@@ -47,6 +48,7 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
     this.session = session;
     this.editorManager = editorManager;
     this.referencePoint = referencePoint;
+    this.referencePointDelegate = ResourceConverter.getDelegate(referencePoint);
     this.user = session.getLocalUser();
 
     this.resourceActivities = new ArrayList<>(CAPACITY_THRESHOLD);
@@ -99,7 +101,6 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
     IResource resource = delta.getResource();
     int kind = delta.getKind();
 
-    IProject project = resource.getProject();
     boolean contentChange = isContentChange(delta);
 
     /*
@@ -121,17 +122,16 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
 
           // Adds have getMovedFrom set:
           IPath oldFullPath = delta.getMovedFromPath();
-          IProject oldProject = getProject(oldFullPath);
 
-          if (project.equals(oldProject)) {
-            // Moving inside this project
-            generateMoved(resource, oldFullPath, oldProject, contentChange);
+          if (isSameReferencePoint(oldFullPath)) {
+            // Moving inside this reference point
+            generateMoved(resource, oldFullPath, contentChange);
             return;
           }
 
           /*
-           * else moving a file into the shared project , treat like an
-           * add! Fall-through ...
+           * else moving a file into (or between) the shared reference point(s), treat like an add!
+           * Fall-through ...
            */
         }
 
@@ -144,14 +144,13 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
 
           // REMOVED deltas have MovedTo set
           IPath newPath = delta.getMovedToPath();
-          IProject newProject = ProjectDeltaVisitor.getProject(newPath);
 
-          // Ignore "REMOVED" while moving into shared project
-          if (project.equals(newProject)) return;
+          // Ignore "REMOVED" while moving in shared reference point
+          if (isSameReferencePoint(newPath)) return;
 
           /*
-           * else moving file away from shared project, need to tell
-           * others to delete! Fall-through...
+           * else moving file out of (or between) shared reference point(s), treat like a delete!
+           * Fall-through...
            */
         }
 
@@ -165,7 +164,18 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
 
   private void generateCreated(IResource resource) {
 
-    saros.filesystem.IResource wrappedResource = ResourceAdapterFactory.create(resource);
+    saros.filesystem.IResource wrappedResource =
+        ResourceConverter.convertToResource(referencePoint, resource);
+
+    if (wrappedResource == null) {
+      log.error(
+          "Could not create resource creation activity for "
+              + resource
+              + " as no Saros resource object could be obtained - used reference point: "
+              + referencePoint);
+
+      return;
+    }
 
     if (isFile(resource)) {
       IFile file = resource.getAdapter(IFile.class);
@@ -197,8 +207,7 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
     }
   }
 
-  private void generateMoved(
-      IResource resource, IPath oldFullPath, IProject oldProject, boolean contentChange) {
+  private void generateMoved(IResource resource, IPath oldFullPath, boolean contentChange) {
 
     byte[] content = null;
     String charset = null;
@@ -217,11 +226,34 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
       }
     }
 
-    saros.filesystem.IFile newFile = ResourceAdapterFactory.create(file);
+    saros.filesystem.IFile newFile = ResourceConverter.convertToFile(referencePoint, file);
+
+    if (newFile == null) {
+      log.error(
+          "Could not create file move activity for "
+              + file
+              + " as no Saros file object could be obtained - used reference point: "
+              + referencePoint);
+
+      return;
+    }
+
+    IPath referencePointRelativePath = getReferencePointRelativePath(oldFullPath);
+
+    if (referencePointRelativePath.equals(oldFullPath)) {
+      log.error(
+          "Could not create file move activity for "
+              + file
+              + " as no reference-point-relative path could be calculated for the old location "
+              + oldFullPath
+              + " - used reference point path: "
+              + referencePointRelativePath);
+
+      return;
+    }
 
     saros.filesystem.IFile oldFile =
-        ResourceAdapterFactory.create(oldProject)
-            .getFile(ResourceAdapterFactory.create(oldFullPath.removeFirstSegments(1)));
+        referencePoint.getFile(ResourceConverter.convertToPath(referencePointRelativePath));
 
     addActivity(
         new FileActivity(user, Type.MOVED, Purpose.ACTIVITY, newFile, oldFile, content, charset));
@@ -229,7 +261,18 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
 
   private void generateRemoved(IResource resource) {
 
-    saros.filesystem.IResource removedResource = ResourceAdapterFactory.create(resource);
+    saros.filesystem.IResource removedResource =
+        ResourceConverter.convertToResource(referencePoint, resource);
+
+    if (removedResource == null) {
+      log.error(
+          "Could not create resource deletion activity for "
+              + resource
+              + " as no Saros resource object could be obtained - used reference point: "
+              + referencePoint);
+
+      return;
+    }
 
     if (resource instanceof IFile) {
       saros.filesystem.IFile removedFile = (saros.filesystem.IFile) removedResource;
@@ -261,7 +304,17 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
 
     IFile file = resource.getAdapter(IFile.class);
 
-    saros.filesystem.IFile wrappedFile = ResourceAdapterFactory.create(file);
+    saros.filesystem.IFile wrappedFile = ResourceConverter.convertToFile(referencePoint, file);
+
+    if (wrappedFile == null) {
+      log.error(
+          "Could not create content change activity for "
+              + file
+              + " as no Saros file object could be obtained - used reference point: "
+              + referencePoint);
+
+      return;
+    }
 
     if (!session.isShared(wrappedFile)) return;
 
@@ -286,9 +339,27 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
 
   // Utility methods
 
-  private static IProject getProject(IPath path) {
-    assert path != null && path.segmentCount() > 0;
-    return ResourcesPlugin.getWorkspace().getRoot().getProject(path.segment(0));
+  /**
+   * Returns whether the given full resource path points to a child resource of the reference point.
+   *
+   * @param fullResourcePath the full resource path to check
+   * @return whether the given full resource path points to a child resource of the reference point
+   */
+  private boolean isSameReferencePoint(IPath fullResourcePath) {
+    return referencePointDelegate.getFullPath().isPrefixOf(fullResourcePath);
+  }
+
+  /**
+   * Returns the reference-point-relative path representing the given full path.
+   *
+   * @param fullResourcePath the full resource path to relativize
+   * @return the reference-point-relative path representing the given full path or the given full
+   *     path if no such path could be constructed
+   */
+  private IPath getReferencePointRelativePath(IPath fullResourcePath) {
+    IPath referencePointPath = referencePointDelegate.getFullPath();
+
+    return fullResourcePath.makeRelativeTo(referencePointPath);
   }
 
   private static boolean isMoved(IResourceDelta delta) {
