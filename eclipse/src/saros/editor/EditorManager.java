@@ -55,7 +55,6 @@ import saros.editor.text.LineRange;
 import saros.editor.text.TextPosition;
 import saros.editor.text.TextSelection;
 import saros.filesystem.IReferencePoint;
-import saros.filesystem.ResourceAdapterFactory;
 import saros.filesystem.ResourceConverter;
 import saros.observables.FileReplacementInProgressObservable;
 import saros.repackaged.picocontainer.annotations.Inject;
@@ -633,7 +632,7 @@ public class EditorManager implements IEditorManager {
     String normalizedReplacedText =
         LineSeparatorNormalizationUtil.normalize(replacedText, lineSeparator);
 
-    saros.filesystem.IFile wrappedFile = ResourceAdapterFactory.create(file);
+    saros.filesystem.IFile wrappedFile = editorPool.getFile(changedEditor);
 
     TextEditActivity textEdit =
         TextEditActivity.buildTextEditActivity(
@@ -1066,11 +1065,13 @@ public class EditorManager implements IEditorManager {
 
     if (EditorAPI.getViewer(editorPart) == null) return false;
 
-    final IResource resource = EditorAPI.getEditorResource(editorPart);
+    final IFile file = EditorAPI.getEditorResource(editorPart).getAdapter(IFile.class);
 
-    if (resource == null) return false;
+    if (file == null) return false;
 
-    return session.isShared(ResourceAdapterFactory.create(resource));
+    final saros.filesystem.IFile fileWrapper = convertToFile(file);
+
+    return fileWrapper != null && session.isShared(fileWrapper);
   }
 
   /**
@@ -1268,12 +1269,19 @@ public class EditorManager implements IEditorManager {
   /**
    * Sends an Activity for clients to save the editor of given file.
    *
+   * <p>Does nothing if the file does not represent a shared resource.
+   *
    * @param file the saved file
    */
   void sendEditorActivitySaved(IFile file) {
+    saros.filesystem.IFile fileWrapper = convertToFile(file);
+
+    if (fileWrapper == null || !session.isShared(fileWrapper)) {
+      return;
+    }
+
     activityDelayer.fireActivity(
-        new EditorActivity(
-            session.getLocalUser(), Type.SAVED, ResourceAdapterFactory.create(file)));
+        new EditorActivity(session.getLocalUser(), Type.SAVED, fileWrapper));
   }
 
   /**
@@ -1455,7 +1463,7 @@ public class EditorManager implements IEditorManager {
 
       if (resource == null) continue;
 
-      if (ResourceAdapterFactory.create(resource).equals(file)) return true;
+      if (ResourceConverter.getDelegate(file).equals(resource)) return true;
     }
 
     return false;
