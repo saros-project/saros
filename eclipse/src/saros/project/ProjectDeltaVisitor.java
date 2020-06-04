@@ -18,16 +18,13 @@ import saros.activities.FolderDeletedActivity;
 import saros.activities.IResourceActivity;
 import saros.editor.EditorManager;
 import saros.filesystem.IFolder;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.ResourceAdapterFactory;
 import saros.session.ISarosSession;
 import saros.session.User;
 import saros.util.FileUtils;
 
-/**
- * Visits the resource changes in a shared project.
- *
- * <p><b>Note:</b> The visitor has to be reset in order to be reused.
- */
+/** Visits the resource changes in a shared project. */
 final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
 
   private static final Logger log = Logger.getLogger(ProjectDeltaVisitor.class);
@@ -40,25 +37,23 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
 
   private final ISarosSession session;
 
-  private List<IResourceActivity<? extends saros.filesystem.IResource>> resourceActivities =
-      new ArrayList<>(CAPACITY_THRESHOLD);
+  /** The reference point whose resources the delta visitor is iterating. */
+  private final IReferencePoint referencePoint;
 
-  public ProjectDeltaVisitor(ISarosSession session, EditorManager editorManager) {
+  private final List<IResourceActivity<? extends saros.filesystem.IResource>> resourceActivities;
+
+  public ProjectDeltaVisitor(
+      ISarosSession session, EditorManager editorManager, IReferencePoint referencePoint) {
     this.session = session;
     this.editorManager = editorManager;
+    this.referencePoint = referencePoint;
     this.user = session.getLocalUser();
+
+    this.resourceActivities = new ArrayList<>(CAPACITY_THRESHOLD);
   }
 
   public List<IResourceActivity<? extends saros.filesystem.IResource>> getActivities() {
     return sort(resourceActivities);
-  }
-
-  public void reset() {
-    if (resourceActivities.size() > CAPACITY_THRESHOLD) {
-      resourceActivities = new ArrayList<>(CAPACITY_THRESHOLD);
-    } else {
-      resourceActivities.clear();
-    }
   }
 
   @Override

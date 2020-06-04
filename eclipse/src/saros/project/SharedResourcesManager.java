@@ -1,7 +1,11 @@
 package saros.project;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
@@ -17,8 +21,9 @@ import saros.activities.IActivity;
 import saros.activities.IResourceActivity;
 import saros.annotations.Component;
 import saros.editor.EditorManager;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
-import saros.filesystem.ResourceAdapterFactory;
+import saros.filesystem.ResourceConverter;
 import saros.observables.FileReplacementInProgressObservable;
 import saros.repackaged.picocontainer.Startable;
 import saros.repackaged.picocontainer.annotations.Inject;
@@ -79,7 +84,7 @@ public class SharedResourcesManager extends AbstractActivityProducer
    */
   @Inject private FileReplacementInProgressObservable fileReplacementInProgressObservable;
 
-  private final ProjectDeltaVisitor projectDeltaVisitor;
+  private final EditorManager editorManager;
 
   private final Blockable stopManagerListener =
       new Blockable() {
@@ -111,8 +116,8 @@ public class SharedResourcesManager extends AbstractActivityProducer
   public SharedResourcesManager(
       ISarosSession sarosSession, EditorManager editorManager, StopManager stopManager) {
     this.sarosSession = sarosSession;
+    this.editorManager = editorManager;
     this.stopManager = stopManager;
-    this.projectDeltaVisitor = new ProjectDeltaVisitor(sarosSession, editorManager);
   }
 
   /** This method is called from Eclipse when changes to resource are detected */
@@ -194,13 +199,13 @@ public class SharedResourcesManager extends AbstractActivityProducer
 
     final List<IResourceActivity<? extends IResource>> resourceActivities = new ArrayList<>();
 
+    Map<IProject, Set<IReferencePoint>> projectReferencePointMap = createProjectReferencePointMap();
+
     for (IResourceDelta projectDelta : delta.getAffectedChildren()) {
 
       assert projectDelta.getResource() instanceof IProject;
 
       IProject project = (IProject) projectDelta.getResource();
-
-      if (!sarosSession.isShared(ResourceAdapterFactory.create(project))) continue;
 
       if (isProjectOpenedDelta(projectDelta)) {
         if (log.isDebugEnabled()) {
@@ -210,23 +215,43 @@ public class SharedResourcesManager extends AbstractActivityProducer
         continue;
       }
 
-      try {
-        /*
-         * There is some magic involved here. The ProjectDeltaVisitor
-         * will ignore changed files that are currently opened in an
-         * editor to prevent transmitting the whole file content of the
-         * modified file.
-         *
-         * FIXME document this behavior in the ProjectDeltaVisitor !
-         */
-        projectDeltaVisitor.reset();
-        projectDelta.accept(projectDeltaVisitor, IContainer.INCLUDE_HIDDEN);
-      } catch (CoreException e) {
-        // cannot be thrown by our custom visitor
-        log.warn("ProjectDeltaVisitor class is not supposed to throw a CoreException", e);
+      Set<IReferencePoint> projectReferencePoints = projectReferencePointMap.get(project);
+
+      if (projectReferencePoints == null) {
+        continue;
       }
 
-      resourceActivities.addAll(projectDeltaVisitor.getActivities());
+      for (IReferencePoint referencePoint : projectReferencePoints) {
+        ProjectDeltaVisitor projectDeltaVisitor =
+            new ProjectDeltaVisitor(sarosSession, editorManager, referencePoint);
+
+        IContainer referencePointDelegate = ResourceConverter.getDelegate(referencePoint);
+
+        IResourceDelta referencePointDelta =
+            projectDelta.findMember(referencePointDelegate.getProjectRelativePath());
+
+        if (referencePointDelta == null) {
+          continue;
+        }
+
+        try {
+          /*
+           * There is some magic involved here. The ProjectDeltaVisitor
+           * will ignore changed files that are currently opened in an
+           * editor to prevent transmitting the whole file content of the
+           * modified file.
+           *
+           * FIXME document this behavior in the ProjectDeltaVisitor !
+           */
+          referencePointDelta.accept(projectDeltaVisitor, IContainer.INCLUDE_HIDDEN);
+
+        } catch (CoreException e) {
+          // cannot be thrown by our custom visitor
+          log.warn("ProjectDeltaVisitor class is not supposed to throw a CoreException", e);
+        }
+
+        resourceActivities.addAll(projectDeltaVisitor.getActivities());
+      }
     }
 
     if (log.isTraceEnabled()) {
@@ -242,6 +267,21 @@ public class SharedResourcesManager extends AbstractActivityProducer
      * offer a bulk method ?
      */
     for (final IActivity activity : resourceActivities) fireActivity(activity);
+  }
+
+  private Map<IProject, Set<IReferencePoint>> createProjectReferencePointMap() {
+    Map<IProject, Set<IReferencePoint>> projectReferencePointMap = new HashMap<>();
+
+    for (IReferencePoint referencePoint : sarosSession.getReferencePoints()) {
+      IProject referencePointProject = ResourceConverter.getDelegate(referencePoint).getProject();
+
+      Set<IReferencePoint> projectReferencePoints =
+          projectReferencePointMap.computeIfAbsent(referencePointProject, (key) -> new HashSet<>());
+
+      projectReferencePoints.add(referencePoint);
+    }
+
+    return projectReferencePointMap;
   }
 
   /**
