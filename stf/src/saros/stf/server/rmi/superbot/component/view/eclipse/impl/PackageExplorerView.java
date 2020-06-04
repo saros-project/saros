@@ -10,6 +10,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
@@ -22,7 +23,8 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
-import saros.filesystem.ResourceAdapterFactory;
+import saros.filesystem.IReferencePoint;
+import saros.filesystem.ResourceConverter;
 import saros.session.ISarosSession;
 import saros.stf.server.StfRemoteObject;
 import saros.stf.server.bot.condition.SarosConditions;
@@ -258,13 +260,21 @@ public final class PackageExplorerView extends StfRemoteObject implements IPacka
   public boolean isResourceShared(String path) throws RemoteException {
     IResource resource = ResourcesPlugin.getWorkspace().getRoot().findMember(new Path(path));
 
+    if (resource == null) {
+      return false;
+    }
+
     ISarosSession session = getSessionManager().getSession();
 
     if (session == null)
       throw new IllegalStateException(
           "cannot query shared resource status without a running session");
 
-    return session.isShared(ResourceAdapterFactory.create(resource));
+    Set<IReferencePoint> sharedReferencePoints = session.getReferencePoints();
+    saros.filesystem.IResource resourceWrapper =
+        ResourceConverter.convertToResource(sharedReferencePoints, resource);
+
+    return resourceWrapper != null && session.isShared(resourceWrapper);
   }
 
   @Override
