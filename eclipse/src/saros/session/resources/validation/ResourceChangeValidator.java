@@ -1,6 +1,8 @@
 package saros.session.resources.validation;
 
+import java.util.Set;
 import org.apache.log4j.Logger;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.mapping.ModelProvider;
 import org.eclipse.core.runtime.CoreException;
@@ -8,6 +10,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import saros.Saros;
+import saros.filesystem.IReferencePoint;
+import saros.filesystem.ResourceConverter;
 import saros.session.ISarosSession;
 import saros.session.User.Permission;
 
@@ -60,22 +64,34 @@ public class ResourceChangeValidator extends ModelProvider {
 
     if (currentSession == null) return Status.OK_STATUS;
 
-    final ResourceDeltaVisitor visitor = new ResourceDeltaVisitor(currentSession);
+    Set<IReferencePoint> sharedReferencePoints = session.getReferencePoints();
 
-    try {
-      delta.accept(visitor);
-    } catch (CoreException e) {
-      log.warn(
-          "error occured during delta visiting, some resources might have not been checked", //$NON-NLS-1$
-          e);
+    for (IReferencePoint referencePoint : sharedReferencePoints) {
+      IContainer referencePointDelegate = ResourceConverter.getDelegate(referencePoint);
+
+      IResourceDelta referencePointDelta = delta.findMember(referencePointDelegate.getFullPath());
+
+      final ResourceDeltaVisitor visitor = new ResourceDeltaVisitor(referencePoint, currentSession);
+
+      if (referencePointDelta != null) {
+        continue;
+      }
+
+      try {
+        delta.accept(visitor);
+      } catch (CoreException e) {
+        log.warn(
+            "error occurred during delta visitation, some resources might have not been checked", //$NON-NLS-1$
+            e);
+      }
+
+      if (!currentSession.hasWriteAccess() && visitor.isModifyingResources())
+        return MODIFYING_RESOURCES_ERROR_STATUS;
+
+      if (visitor.isDeletingProject()) return DELETE_PROJECT_ERROR_STATUS;
+
+      if (visitor.isMovingProject()) return MOVE_OR_RENAME_PROJECT_ERROR_STATUS;
     }
-
-    if (!currentSession.hasWriteAccess() && visitor.isModifyingResources())
-      return MODIFYING_RESOURCES_ERROR_STATUS;
-
-    if (visitor.isDeletingProject()) return DELETE_PROJECT_ERROR_STATUS;
-
-    if (visitor.isMovingProject()) return MOVE_OR_RENAME_PROJECT_ERROR_STATUS;
 
     return Status.OK_STATUS;
   }
