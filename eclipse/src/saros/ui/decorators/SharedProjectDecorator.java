@@ -1,6 +1,7 @@
 package saros.ui.decorators;
 
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IResource;
@@ -12,7 +13,8 @@ import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 import saros.SarosPluginContext;
 import saros.annotations.Component;
 import saros.filesystem.IReferencePoint;
-import saros.filesystem.ResourceAdapterFactory;
+import saros.filesystem.IResource.Type;
+import saros.filesystem.ResourceConverter;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
@@ -106,11 +108,15 @@ public final class SharedProjectDecorator implements ILightweightLabelDecorator 
 
     IResource resource = (IResource) element;
 
-    if (!currentSession.isShared(ResourceAdapterFactory.create(resource))) return;
+    Set<IReferencePoint> referencePoints = session.getReferencePoints();
+    saros.filesystem.IResource resourceWrapper =
+        ResourceConverter.convertToResource(referencePoints, resource);
+
+    if (resourceWrapper == null || !currentSession.isShared(resourceWrapper)) return;
 
     decoration.addOverlay(SharedProjectDecorator.PROJECT_DESCRIPTOR, IDecoration.TOP_LEFT);
 
-    if (resource.getType() == IResource.PROJECT) {
+    if (resourceWrapper.getType() == Type.REFERENCE_POINT) {
       decoration.addSuffix(Messages.SharedProjectDecorator_shared);
     }
   }
