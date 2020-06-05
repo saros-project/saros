@@ -1,10 +1,11 @@
 package saros.ui.expressions;
 
+import java.util.Set;
 import org.eclipse.core.expressions.PropertyTester;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import saros.SarosPluginContext;
-import saros.filesystem.ResourceAdapterFactory;
+import saros.filesystem.IReferencePoint;
+import saros.filesystem.ResourceConverter;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
@@ -34,11 +35,11 @@ public class ProjectPropertyTester extends PropertyTester {
 
     if ("isInSarosSession".equals(property)) {
 
-      if (resource.getType() == IResource.PROJECT) {
-        return session.isShared(ResourceAdapterFactory.create((IProject) resource));
-      }
+      Set<IReferencePoint> sharedReferencePoints = session.getReferencePoints();
+      saros.filesystem.IResource wrappedResource =
+          ResourceConverter.convertToResource(sharedReferencePoints, resource);
 
-      return session.isShared(ResourceAdapterFactory.create(resource));
+      return session.isShared(wrappedResource);
     }
 
     return false;
