@@ -26,7 +26,7 @@ import saros.editor.EditorManager;
 import saros.editor.ISharedEditorListener;
 import saros.editor.annotations.SarosAnnotation;
 import saros.filesystem.IFile;
-import saros.filesystem.ResourceAdapterFactory;
+import saros.filesystem.ResourceConverter;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
@@ -148,7 +148,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
 
           if (file != null) {
 
-            IResource resource = ResourceAdapterFactory.convertBack(file);
+            IResource resource = ResourceConverter.getDelegate(file);
 
             if (resource != null) activeEditorResources.put(user, getResources(resource));
             else log.warn("resource for editor " + file + " does not exist locally");
