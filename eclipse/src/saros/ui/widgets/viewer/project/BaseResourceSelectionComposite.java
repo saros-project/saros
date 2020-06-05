@@ -30,7 +30,8 @@ import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import saros.Saros;
 import saros.SarosPluginContext;
-import saros.filesystem.ResourceAdapterFactory;
+import saros.filesystem.IReferencePoint;
+import saros.filesystem.ResourceConverter;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
@@ -472,13 +473,15 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
         @Override
         public boolean select(Viewer viewer, Object parentElement, Object element) {
           ISarosSession sarosSession = sessionManager.getSession();
-          if (sarosSession != null) {
-            if (element instanceof IFile || element instanceof IFolder) {
-              return !sarosSession.isShared(ResourceAdapterFactory.create((IResource) element));
-            } else if (element instanceof IProject) {
-              return !(sarosSession.isShared(ResourceAdapterFactory.create((IProject) element)));
-            }
+
+          if (sarosSession != null && element instanceof IResource) {
+            Set<IReferencePoint> sharedReferencePoints = sarosSession.getReferencePoints();
+            saros.filesystem.IResource wrappedResource =
+                ResourceConverter.convertToResource(sharedReferencePoints, (IResource) element);
+
+            return !sarosSession.isShared(wrappedResource);
           }
+
           return true;
         }
       };
