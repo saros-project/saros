@@ -1,27 +1,14 @@
 package saros.stf.test.stf.menubar;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static saros.stf.client.tester.SarosTester.ALICE;
-import static saros.stf.shared.Constants.CANCEL;
-import static saros.stf.shared.Constants.ERROR_MESSAGE_ACCOUNT_ALREADY_EXISTS;
-import static saros.stf.shared.Constants.ERROR_MESSAGE_PASSWORDS_NOT_MATCH;
-import static saros.stf.shared.Constants.FINISH;
-import static saros.stf.shared.Constants.LABEL_PASSWORD;
-import static saros.stf.shared.Constants.LABEL_REPEAT_PASSWORD;
-import static saros.stf.shared.Constants.LABEL_USER_NAME;
-import static saros.stf.shared.Constants.LABEL_XMPP_JABBER_SERVER;
-import static saros.stf.shared.Constants.MENU_CREATE_ACCOUNT;
-import static saros.stf.shared.Constants.MENU_SAROS;
-import static saros.stf.shared.Constants.SHELL_CREATE_XMPP_JABBER_ACCOUNT;
 
 import java.rmi.RemoteException;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import saros.stf.client.StfTestCase;
-import saros.stf.server.rmi.remotebot.widget.IRemoteBotShell;
 import saros.stf.test.stf.Constants;
 
 public class SarosPreferencesTest extends StfTestCase {
@@ -36,6 +23,10 @@ public class SarosPreferencesTest extends StfTestCase {
     closeAllShells();
     ALICE.controlBot().getAccountManipulator().deleteAllAccounts();
   }
+
+  /*
+  TODO: The create account logic is currently disabled. Furthermore, we should check
+        whether these are "self tests" (testing the framework, not the plugin)
 
   @Test(expected = RuntimeException.class)
   public void createAlreadyExistingAccountWithMenuSarosCreateAccount() throws RemoteException {
@@ -63,7 +54,6 @@ public class SarosPreferencesTest extends StfTestCase {
     shell.waitShortUntilIsClosed();
   }
 
-  /** @throws RemoteException */
   @Test
   public void createAccountWithDismatchedPassword() throws RemoteException {
     ALICE.remoteBot().menu(MENU_SAROS).menu(MENU_CREATE_ACCOUNT).click();
@@ -82,6 +72,8 @@ public class SarosPreferencesTest extends StfTestCase {
     shell.waitShortUntilIsClosed();
     assertEquals(ERROR_MESSAGE_PASSWORDS_NOT_MATCH, errorMessage);
   }
+
+  */
 
   @Test
   public void addAccountAndSetToDefault() throws RemoteException {
