@@ -33,13 +33,13 @@ public final class WorkTogetherOnContextMenu extends StfRemoteObject
   public void multipleProjects(String projectName, JID... baseJIDOfInvitees)
       throws RemoteException {
     treeItem.select();
-    ContextMenuHelper.clickContextMenu(tree, CM_WORK_TOGETHER_ON, CM_MULTIPLE_PROJECTS);
+    ContextMenuHelper.clickContextMenu(tree, SHARE_PROJECTS, CM_MULTIPLE_PROJECTS);
     SuperBot.getInstance().confirmShellShareProjects(projectName, baseJIDOfInvitees);
   }
 
   @Override
   public void project(String projectName) throws RemoteException {
     treeItem.select();
-    ContextMenuHelper.clickContextMenu(tree, CM_WORK_TOGETHER_ON, projectName);
+    ContextMenuHelper.clickContextMenu(tree, SHARE_PROJECTS, projectName);
   }
 }
