@@ -44,6 +44,7 @@ public interface Constants {
    */
   // Title of Buttons
   public static final String YES = "Yes";
+  public static final String COPY = "Copy";
   public static final String OK = "OK";
   public static final String APPLY_AND_CLOSE = "Apply and Close";
   public static final String NO = "No";

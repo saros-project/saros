@@ -101,7 +101,7 @@ public final class ContextMenusInPEView extends StfRemoteObject implements ICont
 
     shell.activate();
     shell.bot().textWithLabel("Project name:").setText(target);
-    shell.bot().button(OK).click();
+    shell.bot().button(COPY).click();
     shell.bot().waitUntil(Conditions.shellCloses(shell), SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
 
     new SWTBot().sleep(1000);
