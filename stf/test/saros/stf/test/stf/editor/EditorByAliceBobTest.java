@@ -7,6 +7,7 @@ import static saros.stf.client.tester.SarosTester.BOB;
 import static saros.stf.shared.Constants.SUFFIX_JAVA;
 
 import java.rmi.RemoteException;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -19,6 +20,11 @@ public class EditorByAliceBobTest extends StfTestCase {
   @BeforeClass
   public static void selectTester() throws Exception {
     select(ALICE, BOB);
+  }
+
+  @Before
+  public void setup() throws Exception {
+    clearWorkspaces();
 
     Util.setUpSessionWithJavaProjectAndClass(
         Constants.PROJECT1, Constants.PKG1, Constants.CLS1, ALICE, BOB);
@@ -27,10 +33,8 @@ public class EditorByAliceBobTest extends StfTestCase {
         .views()
         .packageExplorerView()
         .waitUntilClassExists(Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
-  }
 
-  @Before
-  public void openAliceEditor() throws Exception {
+    // Open Alice's editor
     ALICE
         .superBot()
         .views()
@@ -39,6 +43,11 @@ public class EditorByAliceBobTest extends StfTestCase {
         .open();
 
     ALICE.remoteBot().editor(Constants.CLS1 + SUFFIX_JAVA).waitUntilIsActive();
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    leaveSessionPeersFirst(ALICE);
   }
 
   @Test
@@ -107,7 +116,12 @@ public class EditorByAliceBobTest extends StfTestCase {
 
     assertTrue(BOB.remoteBot().editor(Constants.CLS1_SUFFIX).isActive());
 
-    ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).closeWithoutSave();
+    ALICE
+        .superBot()
+        .views()
+        .packageExplorerView()
+        .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
+        .delete();
 
     BOB.remoteBot().waitUntilEditorClosed(Constants.CLS1_SUFFIX);
     assertFalse(BOB.remoteBot().isEditorOpen(Constants.CLS1));
