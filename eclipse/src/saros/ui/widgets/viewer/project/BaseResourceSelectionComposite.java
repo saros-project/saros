@@ -12,6 +12,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
@@ -70,6 +71,9 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
   protected List<BaseResourceSelectionListener> resourceSelectionListeners =
       new ArrayList<BaseResourceSelectionListener>();
   protected final CheckboxTreeViewer checkboxTreeViewer;
+
+  /** List of base resources checked by the user. */
+  private final List<IResource> selectedBaseResources;
 
   /*
    * Stacks used for saving previous selections in the tree view, enabling
@@ -161,7 +165,49 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
 
     checkboxTreeViewer.setSubtreeChecked(resourceToCheck, checked);
 
+    updateCheckedBaseResources(resourceToCheck, checked);
+
     return true;
+  }
+
+  /**
+   * Updates the list of base resources checked by the user.
+   *
+   * <p>If <code>checked==false</code>, the given resource is removed from the list of checked base
+   * resources.
+   *
+   * <p>If <code>checked==true</code>, the given resource is added to the list of checked base
+   * resources. Furthermore, all child resources of the given resources are removed from the list as
+   * they are now represented by the new base resource.
+   *
+   * @param resource the base resource entry changed by the user
+   * @param checked the new state of the resource
+   */
+  private void updateCheckedBaseResources(IResource resource, boolean checked) {
+    if (!checked) {
+      selectedBaseResources.remove(resource);
+
+      return;
+    }
+
+    selectedBaseResources.removeIf(
+        selectedBaseResource -> isChildResource(resource, selectedBaseResource));
+
+    selectedBaseResources.add(resource);
+  }
+
+  /**
+   * Returns whether the given resource is a child resource of the given base resource.
+   *
+   * @param base the base resource to use for the check
+   * @param other the potential child resource
+   * @return whether the given resource is a child resource of the given base resource
+   */
+  boolean isChildResource(IResource base, IResource other) {
+    IPath basePath = base.getFullPath();
+    IPath otherPath = other.getFullPath();
+
+    return basePath.isPrefixOf(otherPath);
   }
 
   /**
@@ -453,6 +499,8 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
 
     SarosPluginContext.initComponent(this);
     checkboxTreeViewer.addFilter(sharedProjectsFilter);
+
+    this.selectedBaseResources = new ArrayList<>();
   }
 
   @Inject protected ISarosSessionManager sessionManager;
@@ -529,25 +577,18 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
   }
 
   /**
-   * Returns the currently selected {@link IResource}s. If you only want to know if at least one
-   * resource is selected, use hasSelectedResources()
+   * Returns the base resources currently checked by the user.
    *
-   * @return
+   * @return the base resources currently checked by the user
+   * @see #hasSelectedResources()
    */
   public List<IResource> getSelectedResources() {
-
-    List<IResource> resources =
-        ArrayUtils.getAdaptableObjects(
-            checkboxTreeViewer.getCheckedElements(), IResource.class, Platform.getAdapterManager());
-    resources.removeAll(
-        ArrayUtils.getAdaptableObjects(
-            checkboxTreeViewer.getGrayedElements(), IResource.class, Platform.getAdapterManager()));
-    return resources;
+    return new ArrayList<>(selectedBaseResources);
   }
 
-  /** Returns true if at least one resource is selected */
+  /** Returns true if at least one base resource is selected */
   public boolean hasSelectedResources() {
-    return checkboxTreeViewer.getCheckedElements().length > 0;
+    return !selectedBaseResources.isEmpty();
   }
 
   /**
