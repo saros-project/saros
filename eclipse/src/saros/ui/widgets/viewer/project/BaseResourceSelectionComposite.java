@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 import org.apache.log4j.Logger;
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -95,39 +94,74 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
 
           IResource resource = (IResource) element;
 
-          handleCheckStateChanged(resource, isChecked);
-          notifyResourceSelectionChanged(resource, isChecked);
+          boolean isValidChange = handleCheckStateChanged(resource, isChecked);
+
+          if (isValidChange) {
+            notifyResourceSelectionChanged(resource, isChecked);
+          }
 
           rememberSelection();
         }
       };
 
   /**
-   * Handles the tree selection behavior. That means:
+   * Updates the tree on user input. Returns whether the change made by the user was valid.
+   * Non-valid changes are reverted.
+   *
+   * <p>The tree is updates as follows:
    *
    * <ul>
-   *   <li>If folder or project root is selected, check subtree
-   *   <li>If one (or more) element(s) of project selected, select <b>.classpath</b> and
-   *       <b>.project</b> file as well (if exists)
-   *   <li>If selected resource is not project root, handle gray status of checkboxes in the higher
-   *       tree levels
+   *   <li>If a folder is checked, its complete subtree is checked as well.
+   *   <li>If a file is checked, its parent folder as well as its other children are checked as
+   *       well.
+   *   <li>If a resource is no longer checked while its parent resource is still checked, the user
+   *       action is reverted by re-checking the resource.
    * </ul>
    *
-   * @param resource
-   * @param checked
+   * Reverting the un-checking of a resource whose parent resource is still checked is necessary to
+   * ensure that only complete trees are shared. As the {@link CheckboxTreeViewer} does not allow
+   * disabling elements, reverting the user changes is the only option to enforce this.
+   *
+   * <p>This method is only called for changes caused by user actions.
+   *
+   * @param resource the resource element whose state changed
+   * @param checked the new state of the resource element
+   * @return whether the change is valid
    */
-  protected void handleCheckStateChanged(IResource resource, boolean checked) {
-    if (resource instanceof IFile) {
-      this.checkboxTreeViewer.setChecked(resource, checked);
-      setParentsCheckedORGrayed(resource);
-    } else if (resource instanceof IFolder) {
-      this.checkboxTreeViewer.setChecked(resource, checked);
-      this.checkboxTreeViewer.setSubtreeChecked(resource, checked);
-      setParentsCheckedORGrayed(resource);
-    } else if (resource instanceof IProject) {
-      this.checkboxTreeViewer.setGrayChecked(resource, false);
-      this.checkboxTreeViewer.setSubtreeChecked(resource, checked);
+  private boolean handleCheckStateChanged(IResource resource, boolean checked) {
+    IResource parentResource = resource.getParent();
+
+    boolean parentChecked = checkboxTreeViewer.getChecked(parentResource);
+
+    if (parentChecked && !checked) {
+      checkboxTreeViewer.setChecked(resource, true);
+
+      // TODO inform user about preventing illegal selection; whole tree must always be selected
+
+      return false;
     }
+
+    IResource resourceToCheck;
+
+    if (resource.getType() == IResource.FILE) {
+      if (parentResource == null) {
+        log.error("Encountered file without parent resource: " + resource);
+
+        if (checked) {
+          checkboxTreeViewer.setChecked(resource, false);
+        }
+
+        return false;
+      }
+
+      resourceToCheck = parentResource;
+    } else {
+      resourceToCheck = resource;
+    }
+
+    checkboxTreeViewer.setSubtreeChecked(resourceToCheck, checked);
+
+    return true;
   }
 
   /**
@@ -394,49 +428,6 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
     return !lastChecked.isEmpty();
   }
 
-  /**
-   * Traverses the upper levels of tree element to:
-   *
-   * <ul>
-   *   <li>Check them if all resources are checked
-   *   <li>Gray them if some resources are checked
-   *   <li>Ungray or uncheck them if no resources are checked.
-   * </ul>
-   *
-   * @param resource
-   */
-  protected void setParentsCheckedORGrayed(IResource resource) {
-    IContainer parentResource = resource.getParent();
-
-    if (parentResource != resource.getWorkspace().getRoot()) {
-      int checkedChildren = 0;
-      int grayedChildren = 0;
-      Object[] childs =
-          ((WorkbenchContentProvider) checkboxTreeViewer.getContentProvider())
-              .getChildren(parentResource);
-      for (int i = 0; i < childs.length; i++) {
-        if (this.checkboxTreeViewer.getChecked(childs[i])) {
-          checkedChildren++;
-        }
-        if (this.checkboxTreeViewer.getGrayed(childs[i])) {
-          grayedChildren++;
-        }
-      }
-      checkedChildren = checkedChildren - grayedChildren;
-      if (childs.length == checkedChildren) {
-        checkboxTreeViewer.setGrayed(parentResource, false);
-        checkboxTreeViewer.setChecked(parentResource, true);
-      } else if ((grayedChildren > 0) || (checkedChildren > 0)) {
-        checkboxTreeViewer.setChecked(parentResource, true);
-        checkboxTreeViewer.setGrayed(parentResource, true);
-      } else {
-        checkboxTreeViewer.setGrayChecked(parentResource, false);
-      }
-      setParentsCheckedORGrayed(parentResource);
-    }
-    return;
-  }
-
   public BaseResourceSelectionComposite(Composite parent, int style) {
     super(parent, style | SWT.CHECK);
 
@@ -462,7 +453,6 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
 
     SarosPluginContext.initComponent(this);
     checkboxTreeViewer.addFilter(sharedProjectsFilter);
-    checkboxTreeViewer.addFilter(nonProjectFilter);
   }
 
   @Inject protected ISarosSessionManager sessionManager;
@@ -483,22 +473,6 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
           }
 
           return true;
-        }
-      };
-
-  /**
-   * Filter out any non-project resources.
-   *
-   * <p>Dirty workaround to restrict the menu to project elements for the migration period where
-   * partial sharing was removed but the reference point logic (and the subsequent rework of the
-   * sharing UI) has not been introduced yet.
-   */
-  // TODO remove one reference point sharing has been introduced
-  protected ViewerFilter nonProjectFilter =
-      new ViewerFilter() {
-        @Override
-        public boolean select(Viewer viewer, Object parentElement, Object element) {
-          return element instanceof IProject;
         }
       };
 
