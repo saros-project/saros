@@ -4,7 +4,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static saros.stf.client.tester.SarosTester.ALICE;
 import static saros.stf.client.tester.SarosTester.BOB;
-import static saros.stf.shared.Constants.SUFFIX_JAVA;
 import static saros.stf.shared.Constants.VIEW_SAROS;
 import static saros.stf.shared.Constants.VIEW_SAROS_ID;
 
@@ -90,14 +89,6 @@ public class SessionAliceBobTest extends StfTestCase {
 
     BOB.remoteBot().waitUntilEditorOpen(Constants.CLS1_SUFFIX);
     assertTrue(BOB.remoteBot().isEditorOpen(Constants.CLS1_SUFFIX));
-
-    ALICE.superBot().views().sarosView().selectUser(BOB.getJID()).followParticipant();
-
-    assertTrue(ALICE.superBot().views().sarosView().selectUser(BOB.getJID()).isFollowing());
-
-    BOB.remoteBot().editor(Constants.CLS1 + SUFFIX_JAVA).closeWithSave();
-    ALICE.remoteBot().waitUntilEditorClosed(Constants.CLS1_SUFFIX);
-    assertFalse(ALICE.remoteBot().isEditorOpen(Constants.CLS1_SUFFIX));
   }
 
   @Test
