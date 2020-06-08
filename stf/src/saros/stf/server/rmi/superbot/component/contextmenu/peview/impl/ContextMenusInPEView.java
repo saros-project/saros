@@ -125,7 +125,7 @@ public final class ContextMenusInPEView extends StfRemoteObject implements ICont
     SWTBotShell shell = new SWTBot().shell(SHELL_EDITOR_SELECTION);
 
     shell.activate();
-    shell.bot().table().getTableItem(editorType).select();
+    shell.bot().tree().getTreeItem(editorType).select();
     shell.bot().button(OK).click();
     shell.bot().waitUntil(Conditions.shellCloses(shell));
   }
