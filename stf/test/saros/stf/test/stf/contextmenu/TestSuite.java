@@ -7,7 +7,7 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
   ContextMenuDeleteTest.class,
   ContextMenuOpenTest.class,
-  ContextMenuShareWithTest.class,
+  ContextMenuShareProjectsTest.class,
   ContextMenuRunAsTest.class
 })
 public class TestSuite {

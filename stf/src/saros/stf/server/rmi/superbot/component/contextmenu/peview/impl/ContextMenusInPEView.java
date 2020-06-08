@@ -112,6 +112,12 @@ public final class ContextMenusInPEView extends StfRemoteObject implements ICont
   }
 
   @Override
+  public void openShareProjects() {
+    treeItem.select();
+    ContextMenuHelper.clickContextMenu(tree, SHARE_PROJECTS);
+  }
+
+  @Override
   public void openWith(String editorType) throws RemoteException {
     treeItem.select();
     ContextMenuHelper.clickContextMenu(tree, CM_OPEN_WITH, CM_OTHER);

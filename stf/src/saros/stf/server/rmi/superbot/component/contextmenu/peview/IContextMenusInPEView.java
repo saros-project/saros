@@ -8,7 +8,14 @@ import saros.stf.server.rmi.superbot.component.contextmenu.peview.submenu.IRunAs
 import saros.stf.server.rmi.superbot.component.contextmenu.peview.submenu.IShareWithC;
 
 public interface IContextMenusInPEView extends Remote {
+  /*
+   * This context menu does not exist anymore (was removed, because of issues
+   * after the switch to eclipse >= 4).
+   * TODO: Decide whether to re-implement the context menu or remove this method.
+   */
   public IShareWithC shareWith() throws RemoteException;
+
+  public void openShareProjects() throws RemoteException;
 
   public void open() throws RemoteException;
 
