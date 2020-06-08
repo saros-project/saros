@@ -73,7 +73,7 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
   protected final CheckboxTreeViewer checkboxTreeViewer;
 
   /** List of base resources checked by the user. */
-  private final List<IResource> selectedBaseResources;
+  private List<IResource> selectedBaseResources;
 
   /*
    * Stacks used for saving previous selections in the tree view, enabling
@@ -390,7 +390,7 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
       }
     }
 
-    setSelectedResources(checkedList);
+    setSelectedResourcesInternal(checkedList);
 
     return true;
   }
@@ -538,42 +538,96 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
   }
 
   /**
-   * Sets the currently selected {@link IResource}s.
+   * Sets selects the given resources. This selection is handled as though it were made by the user,
+   * meaning all necessary listeners and internal handlers are called.
    *
-   * @param resources
+   * @param resources the resources to select
+   * @see #handleCheckStateChanged(IResource, boolean)
+   * @see #notifyResourceSelectionChanged(IResource, boolean)
    */
   public void setSelectedResources(List<IResource> resources) {
+    List<IResource> baseResources = determineBaseResources(resources);
 
-    List<IResource> checkedResourcesBeforeUpdate =
-        ArrayUtils.getAdaptableObjects(
-            checkboxTreeViewer.getCheckedElements(), IResource.class, Platform.getAdapterManager());
+    setSelectedResourcesInternal(baseResources);
+  }
+
+  /**
+   * Returns the base resources contained in the given list of resources.
+   *
+   * <p>In the returned list, it is guaranteed that none of the resources contained in the set is a
+   * child resource of another resource in the set.
+   *
+   * @param resources the list of resources
+   * @return the base resources contained in the given list of resources
+   */
+  private List<IResource> determineBaseResources(List<IResource> resources) {
+    List<IResource> baseResources = new ArrayList<>();
+
+    resources.sort(
+        (r1, r2) -> {
+          IPath path1 = r1.getFullPath();
+          IPath path2 = r2.getFullPath();
+
+          return Integer.compare(path1.segmentCount(), path2.segmentCount());
+        });
+
+    for (IResource resource : resources) {
+      boolean isChild =
+          baseResources
+              .stream()
+              .anyMatch((baseResource) -> isChildResource(baseResource, resource));
+
+      if (!isChild) {
+        baseResources.add(resource);
+      }
+    }
+
+    return baseResources;
+  }
+
+  /**
+   * Sets selects the given resources. This selection is handled as though it were made by the user,
+   * meaning all necessary listeners and internal handlers are called.
+   *
+   * <p><b>NOTE:</b> This method expects that the list of given resources only contains base
+   * resources, i.e. that none of the contained resources is a child resource of another contained
+   * resource.
+   *
+   * @param resources the resources to select
+   * @see #handleCheckStateChanged(IResource, boolean)
+   * @see #notifyResourceSelectionChanged(IResource, boolean)
+   */
+  private void setSelectedResourcesInternal(List<IResource> resources) {
+
+    List<IResource> checkedResourcesBeforeUpdate = selectedBaseResources;
+    selectedBaseResources = new ArrayList<>(resources);
 
     /*
      * Does not fire events...
      */
     checkboxTreeViewer.setCheckedElements(resources.toArray());
 
-    for (int i = 0; i < resources.size(); i++) handleCheckStateChanged(resources.get(i), true);
+    for (IResource resource : resources) {
+      handleCheckStateChanged(resource, true);
+    }
 
     /*
      * ... therefore we have to fire them.
      */
 
-    List<IResource> checkedResourcesAfterUpdate =
-        ArrayUtils.getAdaptableObjects(
-            checkboxTreeViewer.getCheckedElements(), IResource.class, Platform.getAdapterManager());
+    Set<IResource> newCheckedResources = new HashSet<>(resources);
+    newCheckedResources.removeAll(checkedResourcesBeforeUpdate);
 
-    Set<IResource> checkedResources = new HashSet<IResource>(checkedResourcesAfterUpdate);
+    Set<IResource> newUncheckedResources = new HashSet<>(checkedResourcesBeforeUpdate);
+    newUncheckedResources.removeAll(resources);
 
-    checkedResources.removeAll(checkedResourcesBeforeUpdate);
+    for (IResource resource : newCheckedResources) {
+      notifyResourceSelectionChanged(resource, true);
+    }
 
-    Set<IResource> uncheckedResources = new HashSet<IResource>(checkedResourcesBeforeUpdate);
-
-    uncheckedResources.removeAll(checkedResourcesAfterUpdate);
-
-    for (IResource resource : checkedResources) notifyResourceSelectionChanged(resource, true);
-
-    for (IResource resource : uncheckedResources) notifyResourceSelectionChanged(resource, false);
+    for (IResource resource : newUncheckedResources) {
+      notifyResourceSelectionChanged(resource, false);
+    }
   }
 
   /**
