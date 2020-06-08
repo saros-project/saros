@@ -1,7 +1,5 @@
 package saros.stf.test.stf.editor;
 
-import static org.eclipse.swtbot.swt.finder.SWTBotAssert.assertContains;
-import static org.eclipse.swtbot.swt.finder.SWTBotAssert.assertDoesNotContain;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -119,21 +117,27 @@ public class EditorByAliceTest extends StfTestCase {
         .open();
     ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).waitUntilIsActive();
     ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).navigateTo(3, 0);
-    assertDoesNotContain(
-        "public static void main",
-        ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).getTextOnLine(3));
+    assertFalse(
+        ALICE
+            .remoteBot()
+            .editor(Constants.CLS1_SUFFIX)
+            .getTextOnLine(3)
+            .contains("public static void main"));
 
     ALICE
         .remoteBot()
         .editor(Constants.CLS1_SUFFIX)
         .autoCompleteProposal("main", "main - main method");
-    assertContains(
-        "public static void main",
-        ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).getTextOnLine(3));
+    assertTrue(
+        ALICE
+            .remoteBot()
+            .editor(Constants.CLS1_SUFFIX)
+            .getTextOnLine(3)
+            .contains("public static void main"));
   }
 
   @Test
-  public void getAutoComplateProposal() throws RemoteException {
+  public void getAutoCompleteProposal() throws RemoteException {
     ALICE
         .superBot()
         .views()
@@ -151,11 +155,8 @@ public class EditorByAliceTest extends StfTestCase {
     ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).navigateTo(3, 0);
     List<String> autoCompleteProposals =
         ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).getAutoCompleteProposals("JFr");
-    assertEquals(autoCompleteProposals.toString(), 2, autoCompleteProposals.size());
-    assertEquals("JFrame - javax.swing", autoCompleteProposals.get(0));
-    String string = autoCompleteProposals.get(1);
-    assertTrue(
-        string.equals("JFr()  void - Method stub") || string.equals("JFr() : void - Method stub"));
+    assertTrue(autoCompleteProposals.toString(), autoCompleteProposals.size() > 0);
+    assertTrue(autoCompleteProposals.stream().anyMatch(p -> p.contains("Fr()")));
   }
 
   @Test
@@ -208,8 +209,12 @@ public class EditorByAliceTest extends StfTestCase {
     ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).pressShortCutNextAnnotation();
 
     ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).quickfix("Add unimplemented methods");
-    assertContains(
-        "public void run()", ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).getTextOnLine(5));
+    assertTrue(
+        ALICE
+            .remoteBot()
+            .editor(Constants.CLS1_SUFFIX)
+            .getTextOnLine(5)
+            .contains("public void run()"));
 
     ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).navigateTo(7, 0);
     ALICE
@@ -252,6 +257,6 @@ public class EditorByAliceTest extends StfTestCase {
     Thread.sleep(3000);
     ALICE.remoteBot().editor("readme.txt").quickfix(0);
 
-    assertContains("please", ALICE.remoteBot().editor("readme.txt").getTextOnLine(0));
+    assertTrue(ALICE.remoteBot().editor("readme.txt").getTextOnLine(0).contains("please"));
   }
 }
