@@ -1,10 +1,11 @@
 package saros.ui.widgets.viewer.project;
 
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.Stack;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -79,10 +80,8 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
    * Stacks used for saving previous selections in the tree view, enabling
    * undo/redo functionality
    */
-  protected Stack<Object[]> lastChecked = new Stack<Object[]>();
-  protected Stack<Object[]> lastGrayed = new Stack<Object[]>();
-  protected Stack<Object[]> prevChecked = new Stack<Object[]>();
-  protected Stack<Object[]> prevGrayed = new Stack<Object[]>();
+  protected Deque<List<IResource>> lastChecked = new LinkedList<>();
+  protected Deque<List<IResource>> prevChecked = new LinkedList<>();
 
   protected static final String SERIALIZATION_SEPARATOR = "**#**";
   protected static final String SERIALIZATION_SEPARATOR_REGEX = "\\*\\*#\\*\\*";
@@ -100,10 +99,12 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
 
           boolean isValidChange = handleCheckStateChanged(resource, isChecked);
 
-          if (isValidChange) {
-            notifyResourceSelectionChanged(resource, isChecked);
+          if (!isValidChange) {
+            return;
           }
 
+          notifyResourceSelectionChanged(resource, isChecked);
+          updateCheckedBaseResources(resource, isChecked);
           rememberSelection();
         }
       };
@@ -165,8 +166,6 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
 
     checkboxTreeViewer.setSubtreeChecked(resourceToCheck, checked);
 
-    updateCheckedBaseResources(resourceToCheck, checked);
-
     return true;
   }
 
@@ -219,16 +218,12 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
   public void rememberSelection() {
     if (isRedoEnabled()) {
       prevChecked.clear();
-      prevGrayed.clear();
     }
 
-    lastGrayed.push(checkboxTreeViewer.getGrayedElements());
-    lastChecked.push(checkboxTreeViewer.getCheckedElements());
+    lastChecked.push(new ArrayList<>(selectedBaseResources));
     log.debug(
-        "Remembered checked/grayed items: "
-            + lastChecked.lastElement().length
-            + "/"
-            + lastGrayed.lastElement().length
+        "Remembered checked items: "
+            + lastChecked.peek().size()
             + " Saved "
             + lastChecked.size()
             + " snapshots");
@@ -315,8 +310,8 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
   }
 
   /**
-   * Save the current selection as a selection preset with the given name using the preferences api,
-   * serializing all URIs of the selected iResources.
+   * Save the current base resource selection as a selection preset with the given name using the
+   * preferences api, serializing all URIs of the selected iResources.
    *
    * <p>Overwrites any existing selections with the same name without warning. Use
    * hasSelectionWithName(String name) to find out if the user would overwrite an existing selection
@@ -328,20 +323,10 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
    * @param name
    */
   public void saveSelectionWithName(String name) {
-    /*
-     * Load all checked elements, remove the ones that are grayed and store
-     * the rest as selection preset. SetSelection() automatically handles
-     * setting the grayed status AND fires the changelisteners which is
-     * important for the wizards next button to activate
-     */
-    Object[] checked = checkboxTreeViewer.getCheckedElements();
-
     StringBuilder checkedString = new StringBuilder();
 
-    for (Object resource : checked) {
-      if (!checkboxTreeViewer.getGrayed(resource)) {
-        checkedString.append(((IResource) resource).getFullPath()).append(SERIALIZATION_SEPARATOR);
-      }
+    for (IResource selectedBaseResource : selectedBaseResources) {
+      checkedString.append(selectedBaseResource.getFullPath()).append(SERIALIZATION_SEPARATOR);
     }
 
     String checkedSelectionName = "Saros.resource_selection.checked." + name;
@@ -408,24 +393,29 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
        * selection which the user wants to undo) which we need to push
        * onto the redo-stacks.
        */
-      Object[] checked = lastChecked.pop();
-      Object[] grayed = lastGrayed.pop();
+      List<IResource> checked = lastChecked.pop();
 
       prevChecked.push(checked);
-      prevGrayed.push(grayed);
     }
+
+    selectedBaseResources = new ArrayList<>();
+
     /*
      * Do not combine the two ifs! lastChecked can be empty now because of
      * the modifications...
      */
     if (!lastChecked.isEmpty()) {
       /*
-       * Not using the checked/grayed variable as they contain the CURRENT
-       * selection (which we want to undo). Using them would not undo
+       * Not using the checked variable as it contains the CURRENT
+       * selection (which we want to undo). Using it would not undo
        * anything.
        */
-      checkboxTreeViewer.setGrayedElements(lastGrayed.lastElement());
-      checkboxTreeViewer.setCheckedElements(lastChecked.lastElement());
+      List<IResource> newChecked = lastChecked.peek();
+
+      checkboxTreeViewer.setCheckedElements(newChecked.toArray());
+      applyAdditionalSelections(newChecked);
+
+      selectedBaseResources.addAll(newChecked);
 
     } else {
       /*
@@ -433,7 +423,6 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
        * initial state)
        */
       checkboxTreeViewer.setCheckedElements(new Object[0]);
-      checkboxTreeViewer.setGrayedElements(new Object[0]);
     }
 
     // Need to update the controls (if there are any)
@@ -446,14 +435,14 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
    */
   protected void redoSelection() {
     if (!prevChecked.isEmpty()) {
-      Object[] checkedElements = prevChecked.pop();
-      Object[] grayedElements = prevGrayed.pop();
+      List<IResource> checkedElements = prevChecked.pop();
 
       lastChecked.push(checkedElements);
-      lastGrayed.push(grayedElements);
 
-      checkboxTreeViewer.setGrayedElements(grayedElements);
-      checkboxTreeViewer.setCheckedElements(checkedElements);
+      checkboxTreeViewer.setCheckedElements(checkedElements.toArray());
+      applyAdditionalSelections(checkedElements);
+
+      selectedBaseResources = new ArrayList<>(checkedElements);
 
       // Disable redo button if no redo possible anymore
 
@@ -606,10 +595,7 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
      * Does not fire events...
      */
     checkboxTreeViewer.setCheckedElements(resources.toArray());
-
-    for (IResource resource : resources) {
-      handleCheckStateChanged(resource, true);
-    }
+    applyAdditionalSelections(resources);
 
     /*
      * ... therefore we have to fire them.
@@ -627,6 +613,19 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
 
     for (IResource resource : newUncheckedResources) {
       notifyResourceSelectionChanged(resource, false);
+    }
+  }
+
+  /**
+   * Calls {@link #handleCheckStateChanged(IResource, boolean)} with <code>checked=true</code> for
+   * every passed resource. Subsequently expands the tree to show every selected base resource.
+   *
+   * @param selectedBaseResources the new selected resources
+   */
+  private void applyAdditionalSelections(List<IResource> selectedBaseResources) {
+    for (IResource selectedBaseResource : selectedBaseResources) {
+      handleCheckStateChanged(selectedBaseResource, true);
+      checkboxTreeViewer.expandToLevel(selectedBaseResource, 0);
     }
   }
 
