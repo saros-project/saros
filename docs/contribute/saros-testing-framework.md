@@ -72,6 +72,18 @@ Each simultaneously execution of `runIde` creates a sandbox directory in the `bu
 If you want to configure the parent directory of the sandbox directories you have to set the environment variable `SAROS_INTELLIJ_SANDBOX`
 to the corresponding directory.
 
+### Debugging Saros/E using IntelliJ
+
+Even though it is currently not possible to run the STF (or start a new Eclipse instance with the built plugin) from within IntelliJ IDEA,
+it is possible to use IntelliJ as the debugging client.
+
+To do so, you will first have to start the needed Eclipse tasks.
+The tasks are named `Remore Debugging - Saros_STF_[USER]` (e.g. `Remore Debugging - Saros_STF_Alice`).
+The tasks will hold until a debugger is attached.
+
+To attach the IntelliJ debugger, call the matching run configuration `Saros/E Debugging - STF [USER]` (e.g. `Saros/E Debugging - STF Alice`).
+
+
 ## Without an IDE
 
 ### Test IntelliJ by Hand
