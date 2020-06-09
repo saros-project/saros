@@ -66,7 +66,7 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
   private static final String SERIALIZATION_SEPARATOR = "**#**";
   private static final String SERIALIZATION_SEPARATOR_REGEX = "\\*\\*#\\*\\*";
 
-  protected final CheckboxTreeViewer checkboxTreeViewer;
+  private final CheckboxTreeViewer checkboxTreeViewer;
 
   protected final List<BaseResourceSelectionListener> resourceSelectionListeners;
 

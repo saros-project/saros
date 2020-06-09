@@ -378,8 +378,7 @@ public class ResourceSelectionComposite extends BaseResourceSelectionComposite {
     // If a project was successfully added: select it
     if (newProject != null) {
       getViewer().refresh();
-      List<IResource> selectedResources = new ArrayList<IResource>();
-      selectedResources.addAll(this.getSelectedBaseContainers());
+      List<IResource> selectedResources = new ArrayList<>(getSelectedBaseContainers());
       /*
        * HINT: do not directly use the return value of
        * getSelectedResources because that is an abstract collection which
@@ -387,8 +386,7 @@ public class ResourceSelectionComposite extends BaseResourceSelectionComposite {
        */
       selectedResources.add(newProject);
 
-      checkboxTreeViewer.setCheckedElements(selectedResources.toArray());
-      checkboxTreeViewer.setSubtreeChecked(newProject, true);
+      setSelectedResources(selectedResources);
     }
   }
 
