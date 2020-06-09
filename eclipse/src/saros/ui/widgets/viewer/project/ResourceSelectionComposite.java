@@ -379,7 +379,7 @@ public class ResourceSelectionComposite extends BaseResourceSelectionComposite {
     if (newProject != null) {
       getViewer().refresh();
       List<IResource> selectedResources = new ArrayList<IResource>();
-      selectedResources.addAll(this.getSelectedResources());
+      selectedResources.addAll(this.getSelectedBaseContainers());
       /*
        * HINT: do not directly use the return value of
        * getSelectedResources because that is an abstract collection which

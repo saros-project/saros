@@ -1,7 +1,9 @@
 package saros.ui.wizards;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
@@ -41,9 +43,10 @@ public class AddResourcesToSessionWizard extends Wizard {
     addPage(resourceSelectionWizardPage);
   }
 
+  // TODO adjust once CollaborationUtils has been migrated
   @Override
   public boolean performFinish() {
-    List<IResource> selectedResources = resourceSelectionWizardPage.getSelectedResources();
+    List<IContainer> selectedResources = resourceSelectionWizardPage.getSelectedResources();
 
     if (selectedResources == null || selectedResources.isEmpty()) return false;
 
@@ -51,7 +54,7 @@ public class AddResourcesToSessionWizard extends Wizard {
 
     SarosView.clearNotifications();
 
-    CollaborationUtils.addResourcesToSession(selectedResources);
+    CollaborationUtils.addResourcesToSession(new ArrayList<>(selectedResources));
 
     return true;
   }

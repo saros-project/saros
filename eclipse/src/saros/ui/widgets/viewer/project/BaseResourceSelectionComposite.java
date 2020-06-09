@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import org.apache.log4j.Logger;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -69,15 +70,15 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
 
   protected final List<BaseResourceSelectionListener> resourceSelectionListeners;
 
-  /** List of base resources selected by the user. */
-  private List<IResource> selectedBaseResources;
+  /** List of base containers selected by the user. */
+  private List<IContainer> selectedBaseContainers;
 
   /*
    * Stacks used for saving previous selections in the tree view, enabling
    * undo/redo functionality
    */
-  private final Deque<List<IResource>> lastSelected;
-  private final Deque<List<IResource>> prevSelected;
+  private final Deque<List<IContainer>> lastSelected;
+  private final Deque<List<IContainer>> prevSelected;
 
   @Inject private Saros saros;
 
@@ -101,15 +102,15 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
             return;
           }
 
-          IResource resourceToSelect;
+          IContainer containerToSelect;
 
           if (resource.getType() != IResource.FILE) {
-            resourceToSelect = resource;
+            containerToSelect = (IContainer) resource;
 
           } else {
-            IResource parentResource = resource.getParent();
+            IContainer parentContainer = resource.getParent();
 
-            if (parentResource == null) {
+            if (parentContainer == null) {
               log.error("Could not determine parent resource of selected file " + resource);
 
               checkboxTreeViewer.setChecked(resource, !isSelected);
@@ -117,12 +118,12 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
               return;
             }
 
-            resourceToSelect = parentResource;
+            containerToSelect = parentContainer;
           }
 
-          checkboxTreeViewer.setSubtreeChecked(resourceToSelect, isSelected);
-          updateSelectedBaseResources(resourceToSelect, isSelected);
-          notifyResourceSelectionChanged(resourceToSelect, isSelected);
+          checkboxTreeViewer.setSubtreeChecked(containerToSelect, isSelected);
+          updateSelectedBaseResources(containerToSelect, isSelected);
+          notifyResourceSelectionChanged(containerToSelect, isSelected);
 
           rememberSelection();
         }
@@ -168,7 +169,7 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
 
     this.resourceSelectionListeners = new ArrayList<>();
 
-    this.selectedBaseResources = new ArrayList<>();
+    this.selectedBaseContainers = new ArrayList<>();
 
     this.lastSelected = new LinkedList<>();
     this.prevSelected = new LinkedList<>();
@@ -205,20 +206,20 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
    * resources. Furthermore, all child resources of the given resources are removed from the list as
    * they are now represented by the new base resource.
    *
-   * @param resource the base resource entry changed by the user
+   * @param container the base resource entry changed by the user
    * @param selected the new state of the resource
    */
-  private void updateSelectedBaseResources(IResource resource, boolean selected) {
+  private void updateSelectedBaseResources(IContainer container, boolean selected) {
     if (!selected) {
-      selectedBaseResources.remove(resource);
+      selectedBaseContainers.remove(container);
 
       return;
     }
 
-    selectedBaseResources.removeIf(
-        selectedBaseResource -> isChildResource(resource, selectedBaseResource));
+    selectedBaseContainers.removeIf(
+        selectedBaseContainer -> isChildResource(container, selectedBaseContainer));
 
-    selectedBaseResources.add(resource);
+    selectedBaseContainers.add(container);
   }
 
   /**
@@ -246,7 +247,7 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
       prevSelected.clear();
     }
 
-    lastSelected.push(new ArrayList<>(selectedBaseResources));
+    lastSelected.push(new ArrayList<>(selectedBaseContainers));
     log.debug(
         "Remembered selected items: "
             + lastSelected.peek().size()
@@ -353,8 +354,8 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
   public void saveSelectionWithName(String name) {
     StringBuilder selectedString = new StringBuilder();
 
-    for (IResource selectedBaseResource : selectedBaseResources) {
-      selectedString.append(selectedBaseResource.getFullPath()).append(SERIALIZATION_SEPARATOR);
+    for (IContainer selectedBaseContainer : selectedBaseContainers) {
+      selectedString.append(selectedBaseContainer.getFullPath()).append(SERIALIZATION_SEPARATOR);
     }
 
     String selectionName = SAROS_RESOURCE_SELECTION_SETTINGS_KEY_PREFIX + name;
@@ -387,7 +388,7 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
       return false;
     }
 
-    List<IResource> selectedList = new ArrayList<>();
+    List<IContainer> selectedList = new ArrayList<>();
 
     String[] uris;
 
@@ -396,8 +397,12 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
     uris = selected.split(SERIALIZATION_SEPARATOR_REGEX);
     for (String uri : uris) {
       IResource resource = root.findMember(uri);
-      if (resource != null) {
-        selectedList.add(resource);
+      if (resource != null && resource.getType() != IResource.FILE) {
+        selectedList.add((IContainer) resource);
+
+      } else if (resource != null && resource.getType() == IResource.FILE) {
+        log.error("Resource for saved uri " + uri + "is not a container: " + resource);
+
       } else {
         log.error("Did not find resource with uri in workspace root to apply selection: " + uri);
       }
@@ -421,12 +426,12 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
        * selection which the user wants to undo) which we need to push
        * onto the redo-stacks.
        */
-      List<IResource> selected = lastSelected.pop();
+      List<IContainer> selected = lastSelected.pop();
 
       prevSelected.push(selected);
     }
 
-    List<IResource> newSelectedResources;
+    List<IContainer> newSelectedContainers;
     /*
      * Do not combine the two ifs! lastSelected can be empty now because of
      * the modifications...
@@ -437,17 +442,17 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
        * selection (which we want to undo). Using it would not undo
        * anything.
        */
-      newSelectedResources = lastSelected.peek();
+      newSelectedContainers = lastSelected.peek();
 
     } else {
       /*
        * No previous selection available, so unset all selections (set to
        * initial state)
        */
-      newSelectedResources = new ArrayList<>();
+      newSelectedContainers = new ArrayList<>();
     }
 
-    setSelectedResourcesInternal(newSelectedResources);
+    setSelectedResourcesInternal(newSelectedContainers);
 
     // Need to update the controls (if there are any)
     updateRedoUndoControls();
@@ -459,11 +464,11 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
    */
   protected void redoSelection() {
     if (!prevSelected.isEmpty()) {
-      List<IResource> newSelectedResources = prevSelected.pop();
+      List<IContainer> newSelectedContainers = prevSelected.pop();
 
-      lastSelected.push(newSelectedResources);
+      lastSelected.push(newSelectedContainers);
 
-      setSelectedResourcesInternal(newSelectedResources);
+      setSelectedResourcesInternal(newSelectedContainers);
 
     } else {
       log.debug("Cannot redo, no more snapshots!");
@@ -503,45 +508,45 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
    * @see #notifyResourceSelectionChanged(IResource, boolean)
    */
   public void setSelectedResources(List<IResource> resources) {
-    Set<IResource> sanitizedResources = new HashSet<>();
+    Set<IContainer> sanitizedResources = new HashSet<>();
 
     for (IResource resource : resources) {
       if (resource.getType() != IResource.FILE) {
-        sanitizedResources.add(resource);
+        sanitizedResources.add((IContainer) resource);
 
         continue;
       }
 
-      IResource parentResource = resource.getParent();
+      IContainer parentContainer = resource.getParent();
 
-      if (parentResource == null) {
+      if (parentContainer == null) {
         log.error("Could not determine parent resource of selected file " + resource);
 
         continue;
       }
 
-      sanitizedResources.add(parentResource);
+      sanitizedResources.add(parentContainer);
     }
 
-    List<IResource> sanitizedBaseResources =
-        determineBaseResources(new ArrayList<>(sanitizedResources));
+    List<IContainer> sanitizedBaseContainers =
+        determineBaseContainers(new ArrayList<>(sanitizedResources));
 
-    setSelectedResourcesInternal(sanitizedBaseResources);
+    setSelectedResourcesInternal(sanitizedBaseContainers);
   }
 
   /**
-   * Returns the base resources contained in the given list of resources.
+   * Returns the base containers contained in the given list of containers.
    *
-   * <p>In the returned list, it is guaranteed that none of the resources contained in the set is a
-   * child resource of another resource in the set.
+   * <p>In the returned list, it is guaranteed that none of the containers contained in the set is a
+   * child resource of another container in the set.
    *
-   * @param resources the list of resources
-   * @return the base resources contained in the given list of resources
+   * @param containers the list of containers
+   * @return the base containers contained in the given list of containers
    */
-  private List<IResource> determineBaseResources(List<IResource> resources) {
-    List<IResource> baseResources = new ArrayList<>();
+  private List<IContainer> determineBaseContainers(List<IContainer> containers) {
+    List<IContainer> baseContainers = new ArrayList<>();
 
-    resources.sort(
+    containers.sort(
         (r1, r2) -> {
           IPath path1 = r1.getFullPath();
           IPath path2 = r2.getFullPath();
@@ -549,87 +554,86 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
           return Integer.compare(path1.segmentCount(), path2.segmentCount());
         });
 
-    for (IResource resource : resources) {
+    for (IContainer container : containers) {
       boolean isChild =
-          baseResources
+          baseContainers
               .stream()
-              .anyMatch((baseResource) -> isChildResource(baseResource, resource));
+              .anyMatch((baseContainer) -> isChildResource(baseContainer, container));
 
       if (!isChild) {
-        baseResources.add(resource);
+        baseContainers.add(container);
       }
     }
 
-    return baseResources;
+    return baseContainers;
   }
 
   /**
-   * Sets selects the given resources. This selection is handled as though it were made by the user,
-   * meaning all necessary listeners and internal handlers are called.
+   * Sets the given containers and its children as selected. This selection is handled as though it
+   * were made by the user, meaning all necessary listeners and internal handlers are called.
    *
-   * <p><b>NOTE:</b> This method expects that the list of given resources only contains base
+   * <p><b>NOTE:</b> This method expects that the list of given containers only contains base
    * resources, i.e. that none of the contained resources is a child resource of another contained
-   * resource. Furthermore, it expects that all given resources are containers.
+   * resource.
    *
-   * @param resources the resources to select
+   * @param containers the containers to select
    * @see #notifyResourceSelectionChanged(IResource, boolean)
    */
-  private void setSelectedResourcesInternal(List<IResource> resources) {
-
-    List<IResource> selectedResourcesBeforeUpdate = selectedBaseResources;
-    selectedBaseResources = new ArrayList<>(resources);
+  private void setSelectedResourcesInternal(List<IContainer> containers) {
+    List<IContainer> selectedResourcesBeforeUpdate = selectedBaseContainers;
+    selectedBaseContainers = new ArrayList<>(containers);
 
     /*
      * Does not fire events...
      */
-    checkboxTreeViewer.setCheckedElements(resources.toArray());
-    applyAdditionalSelections(resources);
+    checkboxTreeViewer.setCheckedElements(containers.toArray());
+    applyAdditionalSelections(containers);
 
     /*
      * ... therefore we have to fire them.
      */
 
-    Set<IResource> newSelectedResources = new HashSet<>(resources);
+    Set<IContainer> newSelectedResources = new HashSet<>(containers);
     newSelectedResources.removeAll(selectedResourcesBeforeUpdate);
 
-    Set<IResource> newDeselectedResources = new HashSet<>(selectedResourcesBeforeUpdate);
-    newDeselectedResources.removeAll(resources);
+    Set<IContainer> newDeselectedResources = new HashSet<>(selectedResourcesBeforeUpdate);
+    newDeselectedResources.removeAll(containers);
 
-    for (IResource resource : newSelectedResources) {
+    for (IContainer resource : newSelectedResources) {
       notifyResourceSelectionChanged(resource, true);
     }
 
-    for (IResource resource : newDeselectedResources) {
+    for (IContainer resource : newDeselectedResources) {
       notifyResourceSelectionChanged(resource, false);
     }
   }
 
   /**
-   * Sets the subtree for every given selected base resource as selected. Subsequently expands the
-   * tree to show every selected base resource.
+   * Sets the subtree for every given selected base container as selected. Subsequently expands the
+   * tree to show every selected base container.
    *
-   * @param selectedBaseResources the new selected resources
+   * @param selectedBaseContainers the new selected base containers
    */
-  private void applyAdditionalSelections(List<IResource> selectedBaseResources) {
-    for (IResource selectedBaseResource : selectedBaseResources) {
+  private void applyAdditionalSelections(List<IContainer> selectedBaseContainers) {
+    for (IContainer selectedBaseResource : selectedBaseContainers) {
       checkboxTreeViewer.setSubtreeChecked(selectedBaseResource, true);
       checkboxTreeViewer.expandToLevel(selectedBaseResource, 0);
     }
   }
 
   /**
-   * Returns the base resources selected by the user.
+   * Returns the base containers selected by the user.
    *
-   * @return the base resources selected by the user
+   * @return the base containers selected by the user
    * @see #hasSelectedResources()
    */
-  public List<IResource> getSelectedResources() {
-    return new ArrayList<>(selectedBaseResources);
+  public List<IContainer> getSelectedBaseContainers() {
+    return new ArrayList<>(selectedBaseContainers);
   }
 
   /** Returns true if at least one base resource is selected. */
   public boolean hasSelectedResources() {
-    return !selectedBaseResources.isEmpty();
+    return !selectedBaseContainers.isEmpty();
   }
 
   /**
