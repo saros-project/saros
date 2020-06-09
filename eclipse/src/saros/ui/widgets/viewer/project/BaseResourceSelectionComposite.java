@@ -442,8 +442,7 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
       prevSelected.push(selected);
     }
 
-    selectedBaseResources = new ArrayList<>();
-
+    List<IResource> newSelectedResources;
     /*
      * Do not combine the two ifs! lastSelected can be empty now because of
      * the modifications...
@@ -454,20 +453,17 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
        * selection (which we want to undo). Using it would not undo
        * anything.
        */
-      List<IResource> newSelected = lastSelected.peek();
-
-      checkboxTreeViewer.setCheckedElements(newSelected.toArray());
-      applyAdditionalSelections(newSelected);
-
-      selectedBaseResources.addAll(newSelected);
+      newSelectedResources = lastSelected.peek();
 
     } else {
       /*
        * No previous selection available, so unset all selections (set to
        * initial state)
        */
-      checkboxTreeViewer.setCheckedElements(new Object[0]);
+      newSelectedResources = new ArrayList<>();
     }
+
+    setSelectedResourcesInternal(newSelectedResources);
 
     // Need to update the controls (if there are any)
     updateRedoUndoControls();
@@ -479,16 +475,11 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
    */
   protected void redoSelection() {
     if (!prevSelected.isEmpty()) {
-      List<IResource> selectedElements = prevSelected.pop();
+      List<IResource> newSelectedResources = prevSelected.pop();
 
-      lastSelected.push(selectedElements);
+      lastSelected.push(newSelectedResources);
 
-      checkboxTreeViewer.setCheckedElements(selectedElements.toArray());
-      applyAdditionalSelections(selectedElements);
-
-      selectedBaseResources = new ArrayList<>(selectedElements);
-
-      // Disable redo button if no redo possible anymore
+      setSelectedResourcesInternal(newSelectedResources);
 
     } else {
       log.debug("Cannot redo, no more snapshots!");
