@@ -92,14 +92,37 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
 
           IResource resource = (IResource) element;
 
-          boolean isValidChange = handleSelectionStateChanged(resource, isSelected);
+          if (isInvalidStateChange(resource, isSelected)) {
 
-          if (!isValidChange) {
+            checkboxTreeViewer.setChecked(resource, !isSelected);
+
+            // TODO inform user about reverted change
+
             return;
           }
 
-          notifyResourceSelectionChanged(resource, isSelected);
-          updateSelectedBaseResources(resource, isSelected);
+          IResource resourceToSelect;
+
+          if (resource.getType() != IResource.FILE) {
+            resourceToSelect = resource;
+
+          } else {
+            IResource parentResource = resource.getParent();
+
+            if (parentResource == null) {
+              log.error("Could not determine parent resource of selected file " + resource);
+
+              checkboxTreeViewer.setChecked(resource, !isSelected);
+
+              return;
+            }
+
+            resourceToSelect = parentResource;
+          }
+
+          checkboxTreeViewer.setSubtreeChecked(resourceToSelect, isSelected);
+          updateSelectedBaseResources(resourceToSelect, isSelected);
+          notifyResourceSelectionChanged(resourceToSelect, isSelected);
 
           rememberSelection();
         }
@@ -152,63 +175,24 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
   }
 
   /**
-   * Updates the tree on user input. Returns whether the change made by the user was valid.
-   * Non-valid changes are reverted.
+   * Returns whether the change made by the user was invalid.
    *
-   * <p>The tree is updates as follows:
+   * <p>Invalid changes are:
    *
    * <ul>
-   *   <li>If a folder is selected, its complete subtree is selected as well.
-   *   <li>If a file is selected, its parent folder as well as its other children are selected as
-   *       well.
-   *   <li>If a resource is deselected while its parent resource is still selected, the user action
-   *       is reverted by re-selecting the resource.
+   *   <li>A resource being deselected while its parent resource is still selected.
    * </ul>
-   *
-   * Reverting the deselection of a resource whose parent resource is still selected is necessary to
-   * ensure that only complete resource trees are shared. As the {@link CheckboxTreeViewer} does not
-   * allow disabling elements, reverting the user changes is the only option to enforce this.
-   *
-   * <p>This method is only called for changes caused by user actions.
    *
    * @param resource the resource element whose state changed
    * @param selected the new state of the resource element
-   * @return whether the change is valid
+   * @return whether the change is invalid
    */
-  private boolean handleSelectionStateChanged(IResource resource, boolean selected) {
+  private boolean isInvalidStateChange(IResource resource, boolean selected) {
     IResource parentResource = resource.getParent();
 
     boolean parentSelected = checkboxTreeViewer.getChecked(parentResource);
 
-    if (parentSelected && !selected) {
-      checkboxTreeViewer.setChecked(resource, true);
-
-      // TODO inform user about preventing illegal selection; whole tree must always be selected
-
-      return false;
-    }
-
-    IResource resourceToSelect;
-
-    if (resource.getType() == IResource.FILE) {
-      if (parentResource == null) {
-        log.error("Encountered file without parent resource: " + resource);
-
-        if (selected) {
-          checkboxTreeViewer.setChecked(resource, false);
-        }
-
-        return false;
-      }
-
-      resourceToSelect = parentResource;
-    } else {
-      resourceToSelect = resource;
-    }
-
-    checkboxTreeViewer.setSubtreeChecked(resourceToSelect, selected);
-
-    return true;
+    return parentSelected && !selected;
   }
 
   /**
@@ -516,13 +500,33 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
    * meaning all necessary listeners and internal handlers are called.
    *
    * @param resources the resources to select
-   * @see #handleSelectionStateChanged(IResource, boolean)
    * @see #notifyResourceSelectionChanged(IResource, boolean)
    */
   public void setSelectedResources(List<IResource> resources) {
-    List<IResource> baseResources = determineBaseResources(resources);
+    Set<IResource> sanitizedResources = new HashSet<>();
 
-    setSelectedResourcesInternal(baseResources);
+    for (IResource resource : resources) {
+      if (resource.getType() != IResource.FILE) {
+        sanitizedResources.add(resource);
+
+        continue;
+      }
+
+      IResource parentResource = resource.getParent();
+
+      if (parentResource == null) {
+        log.error("Could not determine parent resource of selected file " + resource);
+
+        continue;
+      }
+
+      sanitizedResources.add(parentResource);
+    }
+
+    List<IResource> sanitizedBaseResources =
+        determineBaseResources(new ArrayList<>(sanitizedResources));
+
+    setSelectedResourcesInternal(sanitizedBaseResources);
   }
 
   /**
@@ -565,10 +569,9 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
    *
    * <p><b>NOTE:</b> This method expects that the list of given resources only contains base
    * resources, i.e. that none of the contained resources is a child resource of another contained
-   * resource.
+   * resource. Furthermore, it expects that all given resources are containers.
    *
    * @param resources the resources to select
-   * @see #handleSelectionStateChanged(IResource, boolean)
    * @see #notifyResourceSelectionChanged(IResource, boolean)
    */
   private void setSelectedResourcesInternal(List<IResource> resources) {
@@ -602,14 +605,14 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
   }
 
   /**
-   * Calls {@link #handleSelectionStateChanged(IResource, boolean)} with <code>selected=true</code>
-   * for every passed resource. Subsequently expands the tree to show every selected base resource.
+   * Sets the subtree for every given selected base resource as selected. Subsequently expands the
+   * tree to show every selected base resource.
    *
    * @param selectedBaseResources the new selected resources
    */
   private void applyAdditionalSelections(List<IResource> selectedBaseResources) {
     for (IResource selectedBaseResource : selectedBaseResources) {
-      handleSelectionStateChanged(selectedBaseResource, true);
+      checkboxTreeViewer.setSubtreeChecked(selectedBaseResource, true);
       checkboxTreeViewer.expandToLevel(selectedBaseResource, 0);
     }
   }
