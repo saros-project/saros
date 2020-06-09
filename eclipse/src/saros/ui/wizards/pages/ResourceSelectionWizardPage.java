@@ -102,36 +102,28 @@ public class ResourceSelectionWizardPage extends WizardPage {
         new Runnable() {
           @Override
           public void run() {
+            resourceSelectionComposite.addResourceSelectionListener(resourceSelectionListener);
 
-            final List<IResource> selectedResources = new ArrayList<IResource>();
-
-            if (preselectedResources != null && preselectedResources.size() > 0) {
-
-              selectedResources.addAll(preselectedResources);
-              resourceSelectionComposite.setSelectedResources(selectedResources);
+            if (preselectedResources != null && !preselectedResources.isEmpty()) {
+              resourceSelectionComposite.setSelectedResources(
+                  new ArrayList<>(preselectedResources));
             }
 
             preselectedResources = null; // GC
 
-            resourceSelectionComposite.addResourceSelectionListener(resourceSelectionListener);
-            /*
-             * If nothing is selected and only one project exists in the
-             * workspace, select it in the Wizard.
-             */
-            if (selectedResources.size() == 0
-                && resourceSelectionComposite.getProjectsCount() == 1) {
+            if (!resourceSelectionComposite.getSelectedBaseContainers().isEmpty()) {
+              /*
+               * Add the current automatically applied selection to the
+               * undo-stack, so the user can undo it, and undo/redo works
+               * properly.
+               */
+              resourceSelectionComposite.rememberSelection();
 
-              selectedResources.addAll(resourceSelectionComposite.getResources());
+              setPageComplete(true);
 
-              resourceSelectionComposite.setSelectedResources(selectedResources);
+            } else {
+              setPageComplete(false);
             }
-            /*
-             * Add the current automatically applied selection to the
-             * undo-stack, so the user can undo it, and undo/redo works
-             * properly.
-             */
-            resourceSelectionComposite.rememberSelection();
-            setPageComplete(selectedResources.size() > 0);
           }
         };
 
