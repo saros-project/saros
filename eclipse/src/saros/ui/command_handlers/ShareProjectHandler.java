@@ -4,7 +4,6 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IResource;
-import saros.ui.menu_contributions.StartSessionWithContacts;
 import saros.ui.menu_contributions.StartSessionWithProjects;
 import saros.ui.util.WizardUtils;
 import saros.ui.util.selection.retriever.SelectionRetrieverFactory;
@@ -20,8 +19,7 @@ import saros.ui.util.selection.retriever.SelectionRetrieverFactory;
  * <p>As it happens, only one resource does this: plugin.xml, an important configuration file for
  * the project. Take a look at plugin.xml to see how it works.
  *
- * <p>(Also see {@link StartSessionWithProjects} and {@link StartSessionWithContacts} for
- * alternative invitation methods.)
+ * <p>(Also see {@link StartSessionWithProjects} for alternative invitation methods.)
  *
  * <p>This begins a process that includes:
  *
