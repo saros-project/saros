@@ -8,12 +8,10 @@ import java.util.List;
 import java.util.Set;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
@@ -37,7 +35,6 @@ import saros.ui.util.LayoutUtils;
 import saros.ui.widgets.viewer.ViewerComposite;
 import saros.ui.widgets.viewer.project.events.BaseResourceSelectionListener;
 import saros.ui.widgets.viewer.project.events.ResourceSelectionChangedEvent;
-import saros.util.ArrayUtils;
 
 /**
  * Base UI allowing the user to select (complete) resource trees in the current workspace.
@@ -658,33 +655,6 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
         this.resourceSelectionListeners) {
       resourceSelectionListener.resourceSelectionChanged(event);
     }
-  }
-
-  /**
-   * Returns the displayed resources.
-   *
-   * @return the displayed resources
-   */
-  public List<IResource> getResources() {
-    WorkbenchContentProvider contentProvider =
-        (WorkbenchContentProvider) getViewer().getContentProvider();
-
-    Object[] objects = contentProvider.getElements(getViewer().getInput());
-    return ArrayUtils.getAdaptableObjects(objects, IResource.class, Platform.getAdapterManager());
-  }
-
-  /**
-   * Returns how many projects are displayed.
-   *
-   * @return how many projects are displayed
-   */
-  public int getProjectsCount() {
-    WorkbenchContentProvider contentProvider =
-        (WorkbenchContentProvider) getViewer().getContentProvider();
-
-    Object[] objects = contentProvider.getElements(getViewer().getInput());
-    return ArrayUtils.getAdaptableObjects(objects, IProject.class, Platform.getAdapterManager())
-        .size();
   }
 
   @Override
