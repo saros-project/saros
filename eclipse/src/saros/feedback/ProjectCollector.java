@@ -3,7 +3,7 @@ package saros.feedback;
 import java.util.HashMap;
 import java.util.Map;
 import saros.annotations.Component;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.session.ISarosSession;
 import saros.session.ISessionListener;
 
@@ -29,8 +29,8 @@ public class ProjectCollector extends AbstractStatisticCollector {
   private final ISessionListener sessionListener =
       new ISessionListener() {
         @Override
-        public void resourcesAdded(IProject project) {
-          String projectID = sarosSession.getProjectID(project);
+        public void resourcesAdded(IReferencePoint referencePoint) {
+          String projectID = sarosSession.getReferencePointId(referencePoint);
 
           ProjectInformation info = sharedProjects.get(projectID);
 

@@ -1,6 +1,6 @@
 package saros.filesystem;
 
-public class EclipseProjectImpl extends EclipseContainerImpl implements IProject {
+public class EclipseProjectImpl extends EclipseContainerImpl implements IReferencePoint {
 
   EclipseProjectImpl(org.eclipse.core.resources.IProject delegate) {
     super(delegate);

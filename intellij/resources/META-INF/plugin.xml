@@ -53,8 +53,8 @@
     <group keep-content="true" compact="false" popup="true"
       id="saros.ShareWith"
       icon="/icons/famfamfam/session_tsk.png" text="_Share With..."
-      description="Share this module using Saros"
-      class="saros.intellij.ui.menu.SarosFileShareGroup">
+      description="Share this directory using Saros"
+      class="saros.intellij.ui.menu.SarosResourceShareGroup">
       <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
     </group>
   </actions>

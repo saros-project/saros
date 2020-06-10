@@ -73,7 +73,7 @@ public abstract class Wizard extends JDialog {
   /**
    * Initializes the base structure of a wizard.
    *
-   * @param project the Intellij project to use for the wizard
+   * @param project the project to use for the wizard
    * @param parent the parent window relative to which the dialog is positioned
    * @param title window title
    * @param headerPanel header panel of the wizard

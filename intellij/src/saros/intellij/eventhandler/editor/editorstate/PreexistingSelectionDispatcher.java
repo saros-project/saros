@@ -6,8 +6,10 @@ import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.messages.MessageBusConnection;
+import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import saros.filesystem.IFile;
+import saros.filesystem.IReferencePoint;
 import saros.intellij.editor.EditorManager;
 import saros.intellij.editor.LocalEditorHandler;
 import saros.intellij.filesystem.VirtualFileConverter;
@@ -59,11 +61,17 @@ public class PreexistingSelectionDispatcher extends AbstractLocalEditorStatusCha
    * @param virtualFile the file to send the current selection information for
    */
   private void sendExistingSelection(@NotNull VirtualFile virtualFile) {
-    Editor editor = localEditorHandler.openEditor(project, virtualFile, false);
+    Set<IReferencePoint> sharedReferencePoints = sarosSession.getReferencePoints();
 
-    IFile file = (IFile) VirtualFileConverter.convertToResource(project, virtualFile);
+    IFile file = (IFile) VirtualFileConverter.convertToResource(sharedReferencePoints, virtualFile);
 
-    if (file != null && sarosSession.isShared(file) && editor != null) {
+    if (file == null || !sarosSession.isShared(file)) {
+      return;
+    }
+
+    Editor editor = localEditorHandler.openEditor(file, virtualFile, false);
+
+    if (editor != null) {
       editorManager.sendExistingSelection(file, editor);
     }
   }

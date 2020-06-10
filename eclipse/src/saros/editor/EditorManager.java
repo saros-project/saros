@@ -55,7 +55,7 @@ import saros.editor.text.LineRange;
 import saros.editor.text.TextPosition;
 import saros.editor.text.TextSelection;
 import saros.filesystem.EclipseFileImpl;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.ResourceAdapterFactory;
 import saros.observables.FileReplacementInProgressObservable;
 import saros.repackaged.picocontainer.annotations.Inject;
@@ -268,7 +268,7 @@ public class EditorManager implements IEditorManager {
         }
 
         @Override
-        public void userFinishedProjectNegotiation(User user) {
+        public void userFinishedResourceNegotiation(User user) {
 
           // Send awareness information
 
@@ -323,7 +323,7 @@ public class EditorManager implements IEditorManager {
         }
 
         @Override
-        public void resourcesAdded(IProject project) {
+        public void resourcesAdded(IReferencePoint referencePoint) {
           SWTUtils.runSafeSWTSync(
               log,
               new Runnable() {
@@ -1469,7 +1469,7 @@ public class EditorManager implements IEditorManager {
   }
 
   @Override
-  public void saveEditors(final IProject project) {
+  public void saveEditors(final IReferencePoint referencePoint) {
     SWTUtils.runSafeSWTSync(
         log,
         new Runnable() {
@@ -1488,7 +1488,8 @@ public class EditorManager implements IEditorManager {
             editorFiles.addAll(openEditorFiles);
 
             for (final saros.filesystem.IFile file : editorFiles) {
-              if (project == null || project.equals(file.getProject())) saveLazy(file);
+              if (referencePoint == null || referencePoint.equals(file.getReferencePoint()))
+                saveLazy(file);
             }
           }
         });

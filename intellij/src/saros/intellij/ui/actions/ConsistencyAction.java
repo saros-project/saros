@@ -7,7 +7,7 @@ import saros.intellij.ui.widgets.progress.ProgressFrame;
 import saros.monitoring.IProgressMonitor;
 import saros.util.ThreadUtils;
 
-/** Performs project recovery, when inconsistency was detected. */
+/** Performs a resource recovery to resolve detected inconsistencies. */
 public class ConsistencyAction extends AbstractSarosAction {
   public static final String NAME = "consistency";
 

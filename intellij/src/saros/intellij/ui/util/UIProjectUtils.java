@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.concurrency.Promise;
 import saros.intellij.context.SharedIDEContext;
+import saros.intellij.filesystem.IntellijReferencePoint;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
 import saros.session.ISessionLifecycleListener;
@@ -15,8 +16,10 @@ import saros.session.SessionEndReason;
 
 /**
  * Class to provide access to an active project object. This class should only be used for UI
- * purposes. To interact with the project whose module is shared as part of a Saros session, please
- * use the Project object contained in the session context.
+ * purposes.
+ *
+ * <p>To interact with the project of a shared reference point, please use {@link
+ * IntellijReferencePoint#getProject()} instead.
  */
 public class UIProjectUtils {
   private volatile ISarosSession sarosSession;
@@ -44,8 +47,8 @@ public class UIProjectUtils {
    * if there currently is no session.
    *
    * <p><b>NOTE:</b> This method should only be used to for UI purposes. To interact with the
-   * project whose module is shared as part of a Saros session, please use the Project object
-   * contained in the session context.
+   * project of a shared reference point, please use {@link IntellijReferencePoint#getProject()}
+   * instead.
    *
    * @return the <code>Project</code> object contained in the session context or <code>null</code>
    *     if there currently is no session.
@@ -76,8 +79,8 @@ public class UIProjectUtils {
    * can be <code>null</code> if the request fails.
    *
    * <p><b>NOTE:</b> This method should only be used to for UI purposes. To interact with the
-   * project whose module is shared as part of a Saros session, please use the Project object
-   * contained in the session context.
+   * project of a shared reference point, please use {@link IntellijReferencePoint#getProject()}
+   * instead.
    *
    * @param projectRunner the method to call with the currently focused project
    */

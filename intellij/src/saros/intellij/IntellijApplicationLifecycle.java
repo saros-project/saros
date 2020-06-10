@@ -21,7 +21,7 @@ public class IntellijApplicationLifecycle extends AbstractContextLifecycle {
    * Returns the current intellij application lifecycle instance. The returned instance is
    * singleton. If no instance is present, a new instance is instantiated.
    *
-   * @return the current intellij project lifecycle instance
+   * @return the current intellij application lifecycle instance
    */
   public static synchronized IntellijApplicationLifecycle getInstance() {
     if (instance == null) {

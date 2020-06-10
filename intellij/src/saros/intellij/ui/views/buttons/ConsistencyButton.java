@@ -221,10 +221,12 @@ public class ConsistencyButton extends AbstractSessionToolbarButton {
     StringBuilder sbInconsistentFiles = new StringBuilder();
 
     for (IFile file : files) {
-      sbInconsistentFiles.append(Messages.ConsistencyButton_inconsistent_list_module).append(": ");
-      sbInconsistentFiles.append(file.getProject().getName()).append(", ");
+      sbInconsistentFiles
+          .append(Messages.ConsistencyButton_inconsistent_list_reference_point)
+          .append(": ");
+      sbInconsistentFiles.append(file.getReferencePoint().getName()).append(", ");
       sbInconsistentFiles.append(Messages.ConsistencyButton_inconsistent_list_file).append(": ");
-      sbInconsistentFiles.append(file.getProjectRelativePath().toOSString());
+      sbInconsistentFiles.append(file.getReferencePointRelativePath().toOSString());
       sbInconsistentFiles.append("\n");
     }
 
@@ -239,7 +241,9 @@ public class ConsistencyButton extends AbstractSessionToolbarButton {
         sb.append(", ");
       }
 
-      sb.append(file.getProject().getName()).append(" - ").append(file.getProjectRelativePath());
+      sb.append(file.getReferencePoint().getName())
+          .append(" - ")
+          .append(file.getReferencePointRelativePath());
     }
 
     return sb.toString();

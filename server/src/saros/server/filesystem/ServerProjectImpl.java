@@ -1,13 +1,13 @@
 package saros.server.filesystem;
 
-import static saros.filesystem.IResource.Type.PROJECT;
+import static saros.filesystem.IResource.Type.REFERENCE_POINT;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 
-/** Server implementation of the {@link IProject} interface. */
-public class ServerProjectImpl extends ServerContainerImpl implements IProject {
+/** Server implementation of the {@link IReferencePoint} interface. */
+public class ServerProjectImpl extends ServerContainerImpl implements IReferencePoint {
   /**
    * Creates a ServerProjectImpl.
    *
@@ -20,7 +20,7 @@ public class ServerProjectImpl extends ServerContainerImpl implements IProject {
 
   @Override
   public Type getType() {
-    return PROJECT;
+    return REFERENCE_POINT;
   }
 
   /**

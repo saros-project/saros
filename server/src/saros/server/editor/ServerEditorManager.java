@@ -18,7 +18,7 @@ import saros.editor.text.TextPositionUtils;
 import saros.editor.text.TextSelection;
 import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.server.filesystem.ServerFileImpl;
 import saros.server.filesystem.ServerFolderImpl;
 import saros.session.User;
@@ -69,7 +69,7 @@ public class ServerEditorManager implements IEditorManager {
   }
 
   @Override
-  public void saveEditors(IProject project) {
+  public void saveEditors(IReferencePoint referencePoint) {
     // do nothing?
     // we do not keep dirty editors,
     // because the LRUMap might close Editors at any time

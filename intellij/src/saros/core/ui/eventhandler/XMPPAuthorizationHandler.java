@@ -10,7 +10,7 @@ import saros.net.xmpp.JID;
 import saros.net.xmpp.subscription.SubscriptionHandler;
 import saros.net.xmpp.subscription.SubscriptionListener;
 
-/** Handler for accepting or rejecting incoming XMPP subscription requests */
+/** Handler for accepting or rejecting incoming XMPP subscription requests. */
 public class XMPPAuthorizationHandler {
   private final UIProjectUtils projectUtils;
 

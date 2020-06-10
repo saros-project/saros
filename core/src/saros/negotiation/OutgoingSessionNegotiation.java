@@ -98,13 +98,13 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
    *
    * <p>- Sending invitation to a session (OutgoingSessionNegotiation)
    *
-   * <p>- Sending project resources included in a session (OutgoingProjectNegotiation)
+   * <p>- Sending resource resources included in a session (OutgoingResourceNegotiation)
    *
    * <p>All other participants need negotiations for:
    *
    * <p>- Dealing with a received invitation to a session (IncomingSessionNegotiation)
    *
-   * <p>- Handling incoming shared project resources (IncomingProjectNegotiation)
+   * <p>- Handling incoming shared resource resources (IncomingResourceNegotiation)
    */
   public Status start(IProgressMonitor monitor) {
     log.debug(this + " : starting negotiation");
@@ -198,7 +198,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
 
   /**
    * Check the remote side for Saros support. When this method returns, the remote JID (see {@link
-   * SessionNegotiation#peer}) has been properly updated to a full resource qualified JID.
+   * SessionNegotiation#getPeer()}) has been properly updated to a full resource qualified JID.
    */
   private void checkAvailability(IProgressMonitor monitor) throws LocalCancellationException {
 

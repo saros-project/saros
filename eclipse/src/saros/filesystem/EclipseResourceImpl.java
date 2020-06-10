@@ -2,7 +2,7 @@ package saros.filesystem;
 
 import static saros.filesystem.IResource.Type.FILE;
 import static saros.filesystem.IResource.Type.FOLDER;
-import static saros.filesystem.IResource.Type.PROJECT;
+import static saros.filesystem.IResource.Type.REFERENCE_POINT;
 import static saros.filesystem.IResource.Type.ROOT;
 
 import java.io.IOException;
@@ -48,7 +48,7 @@ public class EclipseResourceImpl implements IResource {
   }
 
   @Override
-  public IProject getProject() {
+  public IReferencePoint getReferencePoint() {
     org.eclipse.core.resources.IProject project = delegate.getProject();
 
     if (project == null) return null;
@@ -57,7 +57,7 @@ public class EclipseResourceImpl implements IResource {
   }
 
   @Override
-  public IPath getProjectRelativePath() {
+  public IPath getReferencePointRelativePath() {
     return new EclipsePathImpl(delegate.getProjectRelativePath());
   }
 
@@ -73,7 +73,7 @@ public class EclipseResourceImpl implements IResource {
         return FOLDER;
 
       case org.eclipse.core.resources.IResource.PROJECT:
-        return PROJECT;
+        return REFERENCE_POINT;
 
       case org.eclipse.core.resources.IResource.ROOT:
         return ROOT;
@@ -104,7 +104,7 @@ public class EclipseResourceImpl implements IResource {
    * @return whether this resource is part of the git configuration directory
    */
   private boolean isGitConfig() {
-    String path = getProjectRelativePath().toPortableString();
+    String path = getReferencePointRelativePath().toPortableString();
 
     return (path.startsWith(".git/")
         || path.contains("/.git/")

@@ -19,7 +19,7 @@
  */
 package saros.session;
 
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.session.User.Permission;
 
 /**
@@ -35,18 +35,18 @@ public interface ISessionListener {
    *
    * @param user the user whose {@link Permission} changed.
    */
-  public default void permissionChanged(User user) {
+  default void permissionChanged(User user) {
     // NOP
   }
 
   /**
-   * Is fired when an user joins the shared project.
+   * Is fired when an user joins the session.
    *
    * <p>This method is called on the UI thread.
    *
    * @param user the user that has joined.
    */
-  public default void userJoined(User user) {
+  default void userJoined(User user) {
     // NOP
   }
 
@@ -57,18 +57,18 @@ public interface ISessionListener {
    *
    * @param user the user that has joined.
    */
-  public default void userStartedQueuing(User user) {
+  default void userStartedQueuing(User user) {
     // NOP
   }
 
   /**
-   * Is fired when a finished the Project Negotiation
+   * Is fired when a finished the resource negotiation
    *
    * <p>This method is called on the UI thread.
    *
    * @param user the user that has joined.
    */
-  public default void userFinishedProjectNegotiation(User user) {
+  default void userFinishedResourceNegotiation(User user) {
     // NOP
   }
 
@@ -79,42 +79,42 @@ public interface ISessionListener {
    *
    * @param user the user whose color changed
    */
-  public default void userColorChanged(User user) {
+  default void userColorChanged(User user) {
     // NOP
   }
 
   /**
-   * Is fired when an user leaves the shared project.
+   * Is fired when an user leaves the session.
    *
    * <p>This method is called on the UI thread.
    *
    * @param user the user that has left.
    */
-  public default void userLeft(User user) {
+  default void userLeft(User user) {
     // NOP
   }
 
   /**
-   * Is fired then a project has been made part of the session, either because the local user began
-   * sharing it or because it is being shared by a remote user.
+   * Is fired then a reference point has been made part of the session, either because the local
+   * user began sharing it or because it is being shared by a remote user.
    *
    * <p>This method might <i>not</i> be called on the UI thread.
    *
-   * @param project the project that was added
+   * @param referencePoint the reference point that was added
    */
-  public default void projectAdded(IProject project) {
+  default void referencePointAdded(IReferencePoint referencePoint) {
     // NOP
   }
 
   /**
-   * Is fired then a project has been removed from the session, meaning it is not shared between the
-   * session's users anymore.
+   * Is fired then a reference point has been removed from the session, meaning it is not shared
+   * between the session's users anymore.
    *
    * <p>This method might <i>not</i> be called on the UI thread.
    *
-   * @param project the project that was removed
+   * @param referencePoint the reference point that was removed
    */
-  public default void projectRemoved(IProject project) {
+  default void referencePointRemoved(IReferencePoint referencePoint) {
     // NOP
   }
 
@@ -123,7 +123,7 @@ public interface ISessionListener {
    *
    * <p>This method might <i>not</i> be called on the UI thread.
    */
-  public default void resourcesAdded(IProject project) {
+  default void resourcesAdded(IReferencePoint referencePoint) {
     // NOP
   }
 }

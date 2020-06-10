@@ -37,7 +37,7 @@ import saros.communication.extensions.KickUserExtension;
 import saros.communication.extensions.LeaveSessionExtension;
 import saros.concurrent.management.ConcurrentDocumentClient;
 import saros.context.IContainerContext;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.net.IConnectionManager;
 import saros.net.ITransmitter;
@@ -89,7 +89,7 @@ public final class SarosSession implements ISarosSession {
   private final CopyOnWriteArrayList<IActivityProducer> activityProducers =
       new CopyOnWriteArrayList<IActivityProducer>();
 
-  private final Set<IProject> filteredProjects = new CopyOnWriteArraySet<>();
+  private final Set<IReferencePoint> filteredReferencePoints = new CopyOnWriteArraySet<>();
 
   private final List<IActivityConsumer> activeActivityConsumers =
       new CopyOnWriteArrayList<IActivityConsumer>();
@@ -105,7 +105,7 @@ public final class SarosSession implements ISarosSession {
 
   private final User hostUser;
 
-  private final SharedProjectMapper projectMapper;
+  private final SharedReferencePointMapper referencePointMapper;
 
   private final MutablePicoContainer sessionContainer;
 
@@ -156,12 +156,14 @@ public final class SarosSession implements ISarosSession {
 
         @Override
         public void execute(IActivity activity) {
-          // Filters out resource activities for projects whose activity execution is disabled
+          // Filters out resource activities for reference points whose activity execution is
+          // disabled
           if (activity instanceof IResourceActivity) {
             IResource resource = ((IResourceActivity<? extends IResource>) activity).getResource();
 
-            if (resource != null && filteredProjects.contains(resource.getProject())) {
-              log.debug("Dropped activity for resource of filtered project: " + activity);
+            if (resource != null
+                && filteredReferencePoints.contains(resource.getReferencePoint())) {
+              log.debug("Dropped activity for resource of filtered reference point: " + activity);
 
               return;
             }
@@ -220,14 +222,14 @@ public final class SarosSession implements ISarosSession {
   }
 
   @Override
-  public void addSharedProject(IProject project, String projectID) {
-    if (!projectMapper.isShared(project)) {
-      projectMapper.addProject(projectID, project);
+  public void addSharedReferencePoint(IReferencePoint referencePoint, String referencePointId) {
+    if (!referencePointMapper.isShared(referencePoint)) {
+      referencePointMapper.addReferencePoint(referencePointId, referencePoint);
 
-      listenerDispatch.projectAdded(project);
+      listenerDispatch.referencePointAdded(referencePoint);
     }
 
-    listenerDispatch.resourcesAdded(project);
+    listenerDispatch.resourcesAdded(referencePoint);
   }
 
   @Override
@@ -245,8 +247,8 @@ public final class SarosSession implements ISarosSession {
   }
 
   @Override
-  public boolean userHasProject(User user, IProject project) {
-    return projectMapper.userHasProject(user, project);
+  public boolean userHasReferencePoint(User user, IReferencePoint referencePoint) {
+    return referencePointMapper.userHasReferencePoint(user, referencePoint);
   }
 
   @Override
@@ -356,19 +358,20 @@ public final class SarosSession implements ISarosSession {
   @Override
   public void userStartedQueuing(final User user) {
 
-    log.info("user " + user + " started queuing projects and can receive IResourceActivities");
+    log.info(
+        "user " + user + " started queuing reference points and can receive IResourceActivities");
 
     if (isHost()) {
       /*
        * Notify the system that the user's client now knows about all
-       * currently shared projects and can handle (process or queue)
+       * currently shared reference points and can handle (process or queue)
        * activities related to them.
        *
        * Only the host needs this information because non-hosts don't have
        * to decide whom to send activities to - they just send them to the
        * host, who decides for them.
        */
-      projectMapper.addMissingProjectsToUser(user);
+      referencePointMapper.addMissingReferencePointsToUser(user);
     }
 
     synchronizer.syncExec(
@@ -383,9 +386,9 @@ public final class SarosSession implements ISarosSession {
   }
 
   @Override
-  public void userFinishedProjectNegotiation(final User user) {
+  public void userFinishedResourceNegotiation(final User user) {
 
-    log.info("user " + user + " now has Projects and can process IResourceActivities");
+    log.info("user " + user + " now has reference points and can process IResourceActivities");
 
     synchronizer.syncExec(
         ThreadUtils.wrapSafe(
@@ -393,7 +396,7 @@ public final class SarosSession implements ISarosSession {
             new Runnable() {
               @Override
               public void run() {
-                listenerDispatch.userFinishedProjectNegotiation(user);
+                listenerDispatch.userFinishedResourceNegotiation(user);
               }
             }));
 
@@ -404,7 +407,7 @@ public final class SarosSession implements ISarosSession {
        * This informs all participants, that a user is now able to process IResourceActivities.
        * After receiving this message the participants will send their awareness information.
        */
-      userListHandler.sendUserFinishedProjectNegotiation(getRemoteUsers(), jid);
+      userListHandler.sendUserFinishedResourceNegotiation(getRemoteUsers(), jid);
     }
   }
 
@@ -431,7 +434,7 @@ public final class SarosSession implements ISarosSession {
 
     activitySequencer.unregisterUser(user);
 
-    projectMapper.userLeft(user);
+    referencePointMapper.userLeft(user);
 
     List<User> currentRemoteUsers = getRemoteUsers();
 
@@ -502,19 +505,19 @@ public final class SarosSession implements ISarosSession {
   }
 
   @Override
-  public void setActivityExecution(IProject project, boolean enabled) {
-    if (project != null) {
+  public void setActivityExecution(IReferencePoint referencePoint, boolean enabled) {
+    if (referencePoint != null) {
       if (!enabled) {
-        filteredProjects.add(project);
+        filteredReferencePoints.add(referencePoint);
       } else {
-        filteredProjects.remove(project);
+        filteredReferencePoints.remove(referencePoint);
       }
     }
   }
 
   @Override
-  public Set<IProject> getProjects() {
-    return projectMapper.getProjects();
+  public Set<IReferencePoint> getReferencePoints() {
+    return referencePointMapper.getReferencePoints();
   }
 
   // FIXME synchronization
@@ -660,8 +663,8 @@ public final class SarosSession implements ISarosSession {
 
     if (activity == null) throw new IllegalArgumentException();
 
-    // If we don't have any shared projects don't send ResourceActivities
-    if (projectMapper.size() == 0 && (activity instanceof IResourceActivity)) {
+    // If we don't have any shared reference points don't send ResourceActivities
+    if (referencePointMapper.size() == 0 && (activity instanceof IResourceActivity)) {
       return;
     }
 
@@ -705,32 +708,32 @@ public final class SarosSession implements ISarosSession {
 
   @Override
   public boolean isShared(IResource resource) {
-    return projectMapper.isShared(resource);
+    return referencePointMapper.isShared(resource);
   }
 
   @Override
-  public String getProjectID(IProject project) {
-    return projectMapper.getID(project);
+  public String getReferencePointId(IReferencePoint referencePoint) {
+    return referencePointMapper.getID(referencePoint);
   }
 
   @Override
-  public IProject getProject(String projectID) {
-    return projectMapper.getProject(projectID);
+  public IReferencePoint getReferencePoint(String referencePointID) {
+    return referencePointMapper.getReferencePoint(referencePointID);
   }
 
   @Override
-  public void addProjectMapping(String projectID, IProject project) {
-    if (projectMapper.getProject(projectID) == null) {
-      projectMapper.addProject(projectID, project);
-      listenerDispatch.projectAdded(project);
+  public void addReferencePointMapping(String referencePointId, IReferencePoint referencePoint) {
+    if (referencePointMapper.getReferencePoint(referencePointId) == null) {
+      referencePointMapper.addReferencePoint(referencePointId, referencePoint);
+      listenerDispatch.referencePointAdded(referencePoint);
     }
   }
 
   @Override
-  public void removeProjectMapping(String projectID, IProject project) {
-    if (projectMapper.getProject(projectID) != null) {
-      projectMapper.removeProject(projectID);
-      listenerDispatch.projectRemoved(project);
+  public void removeReferencePointMapping(String referencePointId, IReferencePoint referencePoint) {
+    if (referencePointMapper.getReferencePoint(referencePointId) != null) {
+      referencePointMapper.removeReferencePoint(referencePointId);
+      listenerDispatch.referencePointRemoved(referencePoint);
     }
   }
 
@@ -766,13 +769,13 @@ public final class SarosSession implements ISarosSession {
   }
 
   @Override
-  public void enableQueuing(IProject project) {
-    activityQueuer.enableQueuing(project);
+  public void enableQueuing(IReferencePoint referencePoint) {
+    activityQueuer.enableQueuing(referencePoint);
   }
 
   @Override
-  public void disableQueuing(IProject project) {
-    activityQueuer.disableQueuing(project);
+  public void disableQueuing(IReferencePoint referencePoint) {
+    activityQueuer.disableQueuing(referencePoint);
     // send us a dummy activity to ensure the queues get flushed
     sendActivity(Collections.singletonList(localUser), new NOPActivity(localUser, localUser, 0));
   }
@@ -787,7 +790,7 @@ public final class SarosSession implements ISarosSession {
     context.initComponent(this);
 
     this.sessionID = id;
-    this.projectMapper = new SharedProjectMapper();
+    this.referencePointMapper = new SharedReferencePointMapper();
     this.activityQueuer = new ActivityQueuer();
     this.containerContext = context;
 

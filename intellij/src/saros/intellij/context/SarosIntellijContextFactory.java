@@ -13,12 +13,10 @@ import saros.filesystem.IWorkspace;
 import saros.filesystem.checksum.IChecksumCache;
 import saros.filesystem.checksum.NullChecksumCache;
 import saros.intellij.editor.EditorManager;
-import saros.intellij.negotiation.ModuleConfigurationProvider;
-import saros.intellij.negotiation.hooks.ModuleTypeNegotiationHook;
+import saros.intellij.filesystem.IntellijWorkspace;
+import saros.intellij.filesystem.PathFactory;
 import saros.intellij.preferences.IntelliJPreferences;
 import saros.intellij.preferences.PropertiesComponentAdapter;
-import saros.intellij.project.filesystem.IntelliJWorkspaceImpl;
-import saros.intellij.project.filesystem.PathFactory;
 import saros.intellij.runtime.IntellijUISynchronizer;
 import saros.intellij.ui.eventhandler.ConnectingFailureHandler;
 import saros.intellij.ui.eventhandler.SessionStatusChangeHandler;
@@ -45,9 +43,6 @@ public class SarosIntellijContextFactory extends AbstractContextFactory {
       // Core Managers
       Component.create(IEditorManager.class, EditorManager.class),
       Component.create(ISarosSessionContextFactory.class, SarosIntellijSessionContextFactory.class),
-
-      // additional project negotiation data providers
-      Component.create(ModuleConfigurationProvider.class),
 
       // UI handlers
       Component.create(NegotiationHandler.class),
@@ -78,7 +73,7 @@ public class SarosIntellijContextFactory extends AbstractContextFactory {
     // Saros Core Path Support
     container.addComponent(IPathFactory.class, new PathFactory());
 
-    container.addComponent(IWorkspace.class, IntelliJWorkspaceImpl.class);
+    container.addComponent(IWorkspace.class, IntellijWorkspace.class);
 
     for (Component component : getContextComponents()) {
       container.addComponent(component.getBindKey(), component.getImplementation());
@@ -86,12 +81,10 @@ public class SarosIntellijContextFactory extends AbstractContextFactory {
 
     container.addComponent(
         BindKey.bindKey(String.class, IContextKeyBindings.SarosVersion.class),
-        IntelliJVersionProvider.getPluginVersion());
+        IntellijVersionProvider.getPluginVersion());
 
     container.addComponent(
         BindKey.bindKey(String.class, IContextKeyBindings.PlatformVersion.class),
-        IntelliJVersionProvider.getBuildNumber());
-
-    container.addComponent(ModuleTypeNegotiationHook.class);
+        IntellijVersionProvider.getBuildNumber());
   }
 }

@@ -10,7 +10,7 @@ import java.util.Map;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import saros.SarosPluginContext;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.intellij.ui.util.IconManager;
 import saros.intellij.ui.views.SarosMainPanelView;
 import saros.repackaged.picocontainer.annotations.Inject;
@@ -68,12 +68,12 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode implements Dispo
         }
 
         @Override
-        public void resourcesAdded(final IProject project) {
+        public void resourcesAdded(final IReferencePoint referencePoint) {
           UIUtil.invokeLaterIfNeeded(
               new Runnable() {
                 @Override
                 public void run() {
-                  addProjectNode(project);
+                  addReferencePointNode(referencePoint);
                 }
               });
         }
@@ -185,14 +185,14 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode implements Dispo
     treeView.expandRow(2);
   }
 
-  private void addProjectNode(IProject project) {
-    for (DefaultMutableTreeNode nSession : sessionNodeList.values()) {
-      ProjectInfo projInfo = new ProjectInfo(project);
+  private void addReferencePointNode(IReferencePoint referencePoint) {
+    for (DefaultMutableTreeNode sessionNode : sessionNodeList.values()) {
+      ReferencePointInfo referencePointInfo = new ReferencePointInfo(referencePoint);
 
-      DefaultMutableTreeNode nProject = new DefaultMutableTreeNode(projInfo);
-      treeModel.insertNodeInto(nProject, nSession, nSession.getChildCount());
+      DefaultMutableTreeNode referencePointNode = new DefaultMutableTreeNode(referencePointInfo);
+      treeModel.insertNodeInto(referencePointNode, sessionNode, sessionNode.getChildCount());
 
-      treeModel.reload(nSession);
+      treeModel.reload(sessionNode);
     }
   }
 
@@ -229,7 +229,7 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode implements Dispo
     private final ISarosSession session;
 
     private SessionInfo(ISarosSession session) {
-      super("Shared Modules and Projects");
+      super("Shared Root Directories");
       this.session = session;
     }
 
@@ -253,22 +253,21 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode implements Dispo
     }
   }
 
-  protected class ProjectInfo extends LeafInfo {
-    private final IProject project;
+  private static class ReferencePointInfo extends LeafInfo {
+    private final IReferencePoint referencePoint;
 
-    public ProjectInfo(IProject project) {
-      super(project.getName());
-      this.project = project;
+    public ReferencePointInfo(IReferencePoint referencePoint) {
+      super(referencePoint.getName());
+      this.referencePoint = referencePoint;
     }
 
-    public IProject getProject() {
-      return project;
+    public IReferencePoint getReferencePoint() {
+      return referencePoint;
     }
 
     @Override
     public String toString() {
-
-      return project.getName();
+      return referencePoint.getName();
     }
   }
 }

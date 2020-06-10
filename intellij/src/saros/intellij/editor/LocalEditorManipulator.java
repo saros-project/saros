@@ -14,7 +14,7 @@ import saros.editor.text.LineRange;
 import saros.editor.text.TextSelection;
 import saros.filesystem.IFile;
 import saros.intellij.editor.annotations.AnnotationManager;
-import saros.intellij.filesystem.IntelliJProjectImpl;
+import saros.intellij.filesystem.IntellijReferencePoint;
 import saros.intellij.filesystem.VirtualFileConverter;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.util.NotificationPanel;
@@ -72,13 +72,12 @@ public class LocalEditorManipulator {
       log.warn(
           "Could not open Editor for file "
               + file
-              + " as a "
-              + "matching VirtualFile does not exist or could not be found");
+              + " as a matching virtual file does not exist or could not be found");
 
       return null;
     }
 
-    Project project = ((IntelliJProjectImpl) file.getProject()).getModule().getProject();
+    Project project = ((IntellijReferencePoint) file.getReferencePoint()).getProject();
 
     Editor editor = ProjectAPI.openEditor(project, virtualFile, activate);
 
@@ -112,13 +111,12 @@ public class LocalEditorManipulator {
       log.warn(
           "Could not close Editor for file "
               + file
-              + " as a "
-              + "matching VirtualFile does not exist or could not be found");
+              + " as a matching virtual file does not exist or could not be found");
 
       return;
     }
 
-    Project project = ((IntelliJProjectImpl) file.getProject()).getModule().getProject();
+    Project project = ((IntellijReferencePoint) file.getReferencePoint()).getProject();
 
     if (ProjectAPI.isOpen(project, virtualFile)) {
       ProjectAPI.closeEditor(project, virtualFile);
@@ -199,8 +197,8 @@ public class LocalEditorManipulator {
   /**
    * Returns the center file of the given line range.
    *
-   * <p>Intellij sets the center position of an editor at 1/3 of the visible line range. This is
-   * taken into account for the calculations.
+   * <p>From experimentation, it looks like Intellij sets the center position of an editor at 1/3 of
+   * the visible line range. This is taken into account for the calculations.
    *
    * @param startLine the first line of the section
    * @param endLine the last line of the section
@@ -230,19 +228,19 @@ public class LocalEditorManipulator {
       log.warn(
           "Could not recover file content of "
               + file
-              + " as it could not be converted to a VirtualFile.");
+              + " as it could not be converted to a virtual file.");
 
       return;
     }
 
-    Project project = ((IntelliJProjectImpl) file.getProject()).getModule().getProject();
+    Project project = ((IntellijReferencePoint) file.getReferencePoint()).getProject();
 
     Document document = DocumentAPI.getDocument(virtualFile);
     if (document == null) {
       log.warn(
           "Could not recover file content of "
               + file
-              + " as no valid Document representation was returned by the Intellij API.");
+              + " as no valid document representation was returned by the Intellij API.");
 
       return;
     }
@@ -260,7 +258,7 @@ public class LocalEditorManipulator {
       text = new String(content);
 
       String qualifiedResource =
-          file.getProject().getName() + " - " + file.getProjectRelativePath();
+          file.getReferencePoint().getName() + " - " + file.getReferencePointRelativePath();
 
       NotificationPanel.showWarning(
           String.format(

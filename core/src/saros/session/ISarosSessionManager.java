@@ -2,7 +2,7 @@ package saros.session;
 
 import java.util.Collection;
 import java.util.Set;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.net.xmpp.JID;
 import saros.preferences.IPreferenceStore;
 
@@ -13,14 +13,14 @@ import saros.preferences.IPreferenceStore;
 public interface ISarosSessionManager {
 
   /** @return the active session or <code>null</code> if there is no active session. */
-  public ISarosSession getSession();
+  ISarosSession getSession();
 
   /**
    * Starts a new Saros session with the local user as the only participant.
    *
-   * @param projects the local projects which should be shared
+   * @param referencePoints the local reference points which should be shared
    */
-  void startSession(Set<IProject> projects);
+  void startSession(Set<IReferencePoint> referencePoints);
 
   // FIXME this method is error prone and only used by the IPN, find a better
   // abstraction
@@ -30,7 +30,7 @@ public interface ISarosSessionManager {
    * @param host the host of the session.
    * @return a new session.
    */
-  public ISarosSession joinSession(
+  ISarosSession joinSession(
       final String id,
       JID host,
       IPreferenceStore hostProperties,
@@ -42,29 +42,29 @@ public interface ISarosSessionManager {
    *
    * @param reason the reason why the session ended.
    */
-  public void stopSession(SessionEndReason reason);
+  void stopSession(SessionEndReason reason);
 
   /**
    * Add the given session life-cycle listener.
    *
    * @param listener the listener that is to be added.
    */
-  public void addSessionLifecycleListener(ISessionLifecycleListener listener);
+  void addSessionLifecycleListener(ISessionLifecycleListener listener);
 
   /**
    * Removes the given session life-cycle listener.
    *
    * @param listener the listener that is to be removed.
    */
-  public void removeSessionLifecycleListener(ISessionLifecycleListener listener);
+  void removeSessionLifecycleListener(ISessionLifecycleListener listener);
 
   /**
-   * Starts sharing all projects of the current session with the given session user. This should be
-   * called after the user joined the current session.
+   * Starts sharing all reference points of the current session with the given session user. This
+   * should be called after the user joined the current session.
    *
-   * @param user JID of the user to share projects with
+   * @param user JID of the user to share reference points with
    */
-  public void startSharingProjects(JID user);
+  void startSharingReferencePoints(JID user);
 
   /**
    * Invites a user to a running session. Does nothing if no session is running, the user is already
@@ -72,21 +72,21 @@ public interface ISarosSessionManager {
    *
    * @param toInvite the JID of the user that is to be invited.
    */
-  public void invite(JID toInvite, String description);
+  void invite(JID toInvite, String description);
 
   /**
-   * Invites users to the shared project.
+   * Invites users to the shared reference point.
    *
    * @param jidsToInvite the JIDs of the users that should be invited.
    */
-  public void invite(Collection<JID> jidsToInvite, String description);
+  void invite(Collection<JID> jidsToInvite, String description);
 
   /**
-   * Adds projects to an existing session.
+   * Adds reference points to an existing session.
    *
-   * @param projects the projects to add
+   * @param referencePoints the reference points to add
    */
-  void addProjectsToSession(Set<IProject> projects);
+  void addReferencePointsToSession(Set<IReferencePoint> referencePoints);
 
   /**
    * Call this before a ISarosSession is started.
@@ -106,10 +106,10 @@ public interface ISarosSessionManager {
 
   /**
    * Sets the {@link INegotiationHandler negotiation handler} that will handle incoming and outgoing
-   * session and project negotiations requests.
+   * session and resource negotiations requests.
    *
    * @param handler a handler to handle negotiation request or <code>null</code> if requests should
    *     not be handled at all.
    */
-  public void setNegotiationHandler(INegotiationHandler handler);
+  void setNegotiationHandler(INegotiationHandler handler);
 }

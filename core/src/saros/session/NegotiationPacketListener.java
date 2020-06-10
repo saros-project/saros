@@ -6,12 +6,12 @@ import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
 import saros.communication.extensions.CancelInviteExtension;
-import saros.communication.extensions.CancelProjectNegotiationExtension;
+import saros.communication.extensions.CancelResourceNegotiationExtension;
 import saros.communication.extensions.InvitationAcknowledgedExtension;
 import saros.communication.extensions.InvitationOfferingExtension;
-import saros.communication.extensions.ProjectNegotiationOfferingExtension;
-import saros.negotiation.ProjectNegotiation;
-import saros.negotiation.ProjectNegotiationData;
+import saros.communication.extensions.ResourceNegotiationOfferingExtension;
+import saros.negotiation.ResourceNegotiation;
+import saros.negotiation.ResourceNegotiationData;
 import saros.negotiation.SessionNegotiation;
 import saros.net.IReceiver;
 import saros.net.ITransmitter;
@@ -34,7 +34,7 @@ final class NegotiationPacketListener {
   private final SarosSessionManager sessionManager;
 
   private final SessionNegotiationObservable sessionNegotiations;
-  private final ProjectNegotiationObservable projectNegotiations;
+  private final ResourceNegotiationObservable resourceNegotiations;
 
   private boolean rejectSessionNegotiationRequests;
 
@@ -45,18 +45,18 @@ final class NegotiationPacketListener {
         @Override
         public void sessionStarted(final ISarosSession session) {
           receiver.addPacketListener(
-              projectNegotiationRequestListener,
-              ProjectNegotiationOfferingExtension.PROVIDER.getPacketFilter(session.getID()));
+              resourceNegotiationRequestListener,
+              ResourceNegotiationOfferingExtension.PROVIDER.getPacketFilter(session.getID()));
 
           receiver.addPacketListener(
-              projectNegotiationCanceledListener,
-              CancelProjectNegotiationExtension.PROVIDER.getPacketFilter(session.getID()));
+              resourceNegotiationCanceledListener,
+              CancelResourceNegotiationExtension.PROVIDER.getPacketFilter(session.getID()));
         }
 
         @Override
         public void sessionEnded(ISarosSession session, SessionEndReason reason) {
-          receiver.removePacketListener(projectNegotiationRequestListener);
-          receiver.removePacketListener(projectNegotiationCanceledListener);
+          receiver.removePacketListener(resourceNegotiationRequestListener);
+          receiver.removePacketListener(resourceNegotiationCanceledListener);
         }
       };
 
@@ -104,43 +104,43 @@ final class NegotiationPacketListener {
         }
       };
 
-  private final PacketListener projectNegotiationCanceledListener =
+  private final PacketListener resourceNegotiationCanceledListener =
       new PacketListener() {
 
         @Override
         public void processPacket(Packet packet) {
 
-          final CancelProjectNegotiationExtension extension =
-              CancelProjectNegotiationExtension.PROVIDER.getPayload(packet);
+          final CancelResourceNegotiationExtension extension =
+              CancelResourceNegotiationExtension.PROVIDER.getPayload(packet);
 
           if (extension == null) {
-            log.warn("received malformed project negotiation packet from " + packet.getFrom());
+            log.warn("received malformed resource negotiation packet from " + packet.getFrom());
             return;
           }
 
-          projectNegotiationCanceled(
+          resourceNegotiationCanceled(
               new JID(packet.getFrom()), extension.getNegotiationID(), extension.getErrorMessage());
         }
       };
 
-  private final PacketListener projectNegotiationRequestListener =
+  private final PacketListener resourceNegotiationRequestListener =
       new PacketListener() {
 
         @Override
         public void processPacket(final Packet packet) {
 
-          final ProjectNegotiationOfferingExtension extension =
-              ProjectNegotiationOfferingExtension.PROVIDER.getPayload(packet);
+          final ResourceNegotiationOfferingExtension extension =
+              ResourceNegotiationOfferingExtension.PROVIDER.getPayload(packet);
 
           if (extension == null) {
-            log.warn("received malformed project negotiation packet from " + packet.getFrom());
+            log.warn("received malformed resource negotiation packet from " + packet.getFrom());
             return;
           }
 
-          projectNegotiationRequest(
+          resourceNegotiationRequest(
               new JID(packet.getFrom()),
               extension.getNegotiationID(),
-              extension.getProjectNegotiationData());
+              extension.getResourceNegotiationData());
         }
       };
 
@@ -151,13 +151,13 @@ final class NegotiationPacketListener {
   NegotiationPacketListener(
       final SarosSessionManager sessionManager,
       final SessionNegotiationObservable sessionNegotiations,
-      final ProjectNegotiationObservable projectNegotiations,
+      final ResourceNegotiationObservable resourceNegotiations,
       final ITransmitter transmitter,
       final IReceiver receiver) {
     this.sessionManager = sessionManager;
 
     this.sessionNegotiations = sessionNegotiations;
-    this.projectNegotiations = projectNegotiations;
+    this.resourceNegotiations = resourceNegotiations;
     this.transmitter = transmitter;
     this.receiver = receiver;
 
@@ -278,15 +278,15 @@ final class NegotiationPacketListener {
         sender, sessionID, negotiationID, remoteVersion, description);
   }
 
-  private void projectNegotiationCanceled(
+  private void resourceNegotiationCanceled(
       final JID sender, final String negotiationID, final String errorMessage) {
 
-    final ProjectNegotiation negotiation = projectNegotiations.get(sender, negotiationID);
+    final ResourceNegotiation negotiation = resourceNegotiations.get(sender, negotiationID);
 
     if (negotiation != null) {
       log.debug(
           sender
-              + " canceled project negotiation [id="
+              + " canceled resource negotiation [id="
               + negotiationID
               + ", reason="
               + errorMessage
@@ -295,21 +295,22 @@ final class NegotiationPacketListener {
       negotiation.remoteCancel(errorMessage);
     } else {
       log.warn(
-          "received project negotiation cancel from "
+          "received resource negotiation cancel from "
               + sender
-              + " for a nonexisting instance with id: "
+              + " for a nonexistent instance with id: "
               + negotiationID);
     }
   }
 
-  private void projectNegotiationRequest(
+  private void resourceNegotiationRequest(
       final JID sender,
       final String negotiationID,
-      final List<ProjectNegotiationData> projectNegotiationData) {
+      final List<ResourceNegotiationData> resourceNegotiationData) {
 
     log.info(
-        "received project negotiation from " + sender + " with negotiation id: " + negotiationID);
+        "received resource negotiation from " + sender + " with negotiation id: " + negotiationID);
 
-    sessionManager.projectNegotiationRequestReceived(sender, projectNegotiationData, negotiationID);
+    sessionManager.resourceNegotiationRequestReceived(
+        sender, resourceNegotiationData, negotiationID);
   }
 }

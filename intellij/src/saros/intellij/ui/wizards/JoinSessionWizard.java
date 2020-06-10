@@ -67,7 +67,7 @@ public class JoinSessionWizard extends Wizard {
   /**
    * Instantiates the wizard and its pages.
    *
-   * @param project the Intellij project to use for the wizard
+   * @param project the project to use for the wizard
    * @param parent the parent window relative to which the dialog is positioned
    * @param negotiation The negotiation this wizard displays
    */

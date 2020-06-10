@@ -5,10 +5,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import saros.core.ui.util.CollaborationUtils;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.intellij.context.SharedIDEContext;
-import saros.intellij.filesystem.IntelliJProjectImpl;
+import saros.intellij.filesystem.IntellijReferencePoint;
 import saros.intellij.ui.util.UIProjectUtils;
 import saros.net.xmpp.JID;
 import saros.ui.util.ICollaborationUtils;
@@ -27,14 +27,14 @@ public class IntellijCollaborationUtilsImpl implements ICollaborationUtils {
   }
 
   @Override
-  public void startSession(Set<IProject> projects, List<JID> contacts) {
+  public void startSession(Set<IReferencePoint> referencePoints, List<JID> contacts) {
     Set<Project> sharedProjects = new HashSet<>();
 
-    for (IResource resource : projects) {
-      sharedProjects.add(((IntelliJProjectImpl) resource.getProject()).getModule().getProject());
+    for (IResource resource : referencePoints) {
+      sharedProjects.add(((IntellijReferencePoint) resource.getReferencePoint()).getProject());
     }
 
-    // Workaround while we only allow a single module (-> single project) to be shared
+    // Workaround while we only allow a single reference point (-> single project) to be shared
     if (sharedProjects.size() != 1) {
       throw new IllegalStateException(
           "Saros/I currently only supports sharing of a single project. Found projects: "
@@ -42,7 +42,7 @@ public class IntellijCollaborationUtilsImpl implements ICollaborationUtils {
     }
     SharedIDEContext.preregisterProject(sharedProjects.toArray(new Project[1])[0]);
 
-    CollaborationUtils.startSession(projects, contacts);
+    CollaborationUtils.startSession(referencePoints, contacts);
   }
 
   @Override
@@ -51,8 +51,8 @@ public class IntellijCollaborationUtilsImpl implements ICollaborationUtils {
   }
 
   @Override
-  public void addProjectsToSession(Set<IProject> projects) {
-    CollaborationUtils.addResourcesToSession(projects);
+  public void addReferencePointsToSession(Set<IReferencePoint> referencePoints) {
+    CollaborationUtils.addResourcesToSession(referencePoints);
   }
 
   @Override

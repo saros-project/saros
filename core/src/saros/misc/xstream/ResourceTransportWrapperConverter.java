@@ -12,7 +12,7 @@ import saros.communication.extensions.ActivitiesExtension;
 import saros.filesystem.IFile;
 import saros.filesystem.IPath;
 import saros.filesystem.IPathFactory;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.filesystem.IResource.Type;
 import saros.repackaged.picocontainer.Startable;
@@ -22,9 +22,9 @@ import saros.session.ISarosSession;
  * Converts session- and IDE-dependent IResource objects to a session- and IDE-independent XML
  * representation and vice versa.
  *
- * <p><b>Example:</b> The XML representation of an {@link IFile} belonging to a {@linkplain IProject
- * project} with the id <code>"ABC"</code> and having the {@linkplain IPath relative project path}
- * <code>"src/Main.java"</code> is:
+ * <p><b>Example:</b> The XML representation of an {@link IFile} belonging to a {@linkplain
+ * IReferencePoint reference point} with the id <code>"ABC"</code> and having the {@linkplain IPath
+ * reference-point-relative path} <code>"src/Main.java"</code> is:
  *
  * <pre>
  * &lt;saros.activities.ResourceTransportWrapper i="ABC" p="%2Fsrc%2FMain.java" t="FILE"/&gt;
@@ -36,7 +36,7 @@ public class ResourceTransportWrapperConverter implements Converter, Startable {
   private static final Logger log = Logger.getLogger(ResourceTransportWrapperConverter.class);
 
   private static final String PATH = "p";
-  private static final String PROJECT_ID = "i";
+  private static final String REFERENCE_POINT_ID = "i";
   private static final String TYPE = "t";
 
   private final ISarosSession session;
@@ -67,17 +67,19 @@ public class ResourceTransportWrapperConverter implements Converter, Startable {
     ResourceTransportWrapper<?> wrapper = (ResourceTransportWrapper<?>) value;
     IResource resource = wrapper.getResource();
 
-    String i = session.getProjectID(resource.getProject());
+    String i = session.getReferencePointId(resource.getReferencePoint());
     if (i == null) {
       log.error(
-          "Could not retrieve project id for project '"
-              + resource.getProject().getName()
-              + "'. Make sure you don't create activities for non-shared projects");
+          "Could not retrieve reference point id for reference point '"
+              + resource.getReferencePoint().getName()
+              + "' of resource "
+              + resource
+              + ". Make sure you don't create activities for non-shared resources");
       return;
     }
 
     // TODO use IPath.toPortableString() instead?
-    String p = URLCodec.encode(pathFactory.fromPath(resource.getProjectRelativePath()));
+    String p = URLCodec.encode(pathFactory.fromPath(resource.getReferencePointRelativePath()));
 
     Type type = resource.getType();
 
@@ -88,7 +90,7 @@ public class ResourceTransportWrapperConverter implements Converter, Startable {
 
     String t = type.name();
 
-    writer.addAttribute(PROJECT_ID, i);
+    writer.addAttribute(REFERENCE_POINT_ID, i);
     writer.addAttribute(PATH, p);
     writer.addAttribute(TYPE, t);
   }
@@ -96,13 +98,16 @@ public class ResourceTransportWrapperConverter implements Converter, Startable {
   @Override
   public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
 
-    String i = reader.getAttribute(PROJECT_ID);
+    String i = reader.getAttribute(REFERENCE_POINT_ID);
     String p = URLCodec.decode(reader.getAttribute(PATH));
     String t = reader.getAttribute(TYPE);
 
-    IProject project = session.getProject(i);
-    if (project == null) {
-      log.error("Could not create resource because there is no shared project for id '" + i + "'");
+    IReferencePoint referencePoint = session.getReferencePoint(i);
+    if (referencePoint == null) {
+      log.error(
+          "Could not create resource because there is no shared reference point for id '"
+              + i
+              + "'");
       return null;
     }
 
@@ -111,9 +116,9 @@ public class ResourceTransportWrapperConverter implements Converter, Startable {
     Type type = Type.valueOf(t);
 
     if (type == Type.FILE) {
-      return new ResourceTransportWrapper<>(project.getFile(path));
+      return new ResourceTransportWrapper<>(referencePoint.getFile(path));
     } else if (type == Type.FOLDER) {
-      return new ResourceTransportWrapper<>(project.getFolder(path));
+      return new ResourceTransportWrapper<>(referencePoint.getFolder(path));
     } else {
       throw new IllegalStateException(
           "Illegal resource type "

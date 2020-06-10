@@ -5,10 +5,13 @@ import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import java.util.Collection;
+import java.util.Set;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import saros.filesystem.IFile;
+import saros.filesystem.IReferencePoint;
 import saros.intellij.editor.DocumentAPI;
 import saros.intellij.editor.EditorManager;
 import saros.intellij.eventhandler.IProjectEventHandler;
@@ -108,7 +111,7 @@ public abstract class AbstractLocalDocumentModificationHandler implements IProje
    * @return the file for the given document or <code>null</code> if no VirtualFile for the document
    *     could be found, the found VirtualFile could not be converted to an IFile or the file
    *     represented by the given document is not shared
-   * @see VirtualFileConverter#convertToResource(Project, VirtualFile)
+   * @see VirtualFileConverter#convertToResource(Collection, VirtualFile)
    */
   @Nullable
   final IFile getFile(@NotNull Document document) {
@@ -132,7 +135,9 @@ public abstract class AbstractLocalDocumentModificationHandler implements IProje
       return null;
     }
 
-    file = (IFile) VirtualFileConverter.convertToResource(project, virtualFile);
+    Set<IReferencePoint> sharedReferencePoints = sarosSession.getReferencePoints();
+
+    file = (IFile) VirtualFileConverter.convertToResource(sharedReferencePoints, virtualFile);
 
     if (file == null || !sarosSession.isShared(file)) {
       if (log.isTraceEnabled()) {

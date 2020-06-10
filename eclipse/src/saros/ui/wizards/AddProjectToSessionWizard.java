@@ -44,10 +44,11 @@ import org.eclipse.ui.IFileEditorInput;
 import saros.Saros;
 import saros.SarosPluginContext;
 import saros.editor.internal.EditorAPI;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.ResourceAdapterFactory;
 import saros.filesystem.checksum.IChecksumCache;
 import saros.monitoring.ProgressMonitorAdapterFactory;
-import saros.negotiation.AbstractIncomingProjectNegotiation;
+import saros.negotiation.AbstractIncomingResourceNegotiation;
 import saros.negotiation.CancelListener;
 import saros.negotiation.FileList;
 import saros.negotiation.FileListDiff;
@@ -55,8 +56,8 @@ import saros.negotiation.FileListFactory;
 import saros.negotiation.NegotiationTools;
 import saros.negotiation.NegotiationTools.CancelLocation;
 import saros.negotiation.NegotiationTools.CancelOption;
-import saros.negotiation.ProjectNegotiation;
-import saros.negotiation.ProjectNegotiationData;
+import saros.negotiation.ResourceNegotiation;
+import saros.negotiation.ResourceNegotiationData;
 import saros.net.IConnectionManager;
 import saros.net.xmpp.JID;
 import saros.preferences.Preferences;
@@ -78,7 +79,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
   private EnterProjectNamePage namePage;
   private WizardDialogAccessable wizardDialog;
-  private AbstractIncomingProjectNegotiation negotiation;
+  private AbstractIncomingResourceNegotiation negotiation;
   private JID peer;
 
   private boolean isExceptionCancel;
@@ -128,7 +129,7 @@ public class AddProjectToSessionWizard extends Wizard {
         }
       };
 
-  public AddProjectToSessionWizard(AbstractIncomingProjectNegotiation negotiation) {
+  public AddProjectToSessionWizard(AbstractIncomingResourceNegotiation negotiation) {
 
     SarosPluginContext.initComponent(this);
 
@@ -170,7 +171,7 @@ public class AddProjectToSessionWizard extends Wizard {
             connectionManager,
             preferences,
             peer,
-            negotiation.getProjectNegotiationData(),
+            negotiation.getResourceNegotiationData(),
             lastProjectNameMapping);
 
     addPage(namePage);
@@ -329,15 +330,15 @@ public class AddProjectToSessionWizard extends Wizard {
                 }
               }
 
-              final Map<String, saros.filesystem.IProject> convertedMapping =
-                  new HashMap<String, saros.filesystem.IProject>();
+              final Map<String, IReferencePoint> convertedMapping =
+                  new HashMap<String, IReferencePoint>();
 
               for (final Entry<String, IProject> entry : targetProjectMapping.entrySet()) {
                 convertedMapping.put(
                     entry.getKey(), ResourceAdapterFactory.create(entry.getValue()));
               }
 
-              final ProjectNegotiation.Status status =
+              final ResourceNegotiation.Status status =
                   negotiation.run(convertedMapping, ProgressMonitorAdapterFactory.convert(monitor));
 
               if (isAutoBuilding) {
@@ -349,7 +350,7 @@ public class AddProjectToSessionWizard extends Wizard {
                 }
               }
 
-              if (status != ProjectNegotiation.Status.OK) return Status.CANCEL_STATUS;
+              if (status != ResourceNegotiation.Status.OK) return Status.CANCEL_STATUS;
 
               final List<String> projectNames = new ArrayList<String>();
 
@@ -564,8 +565,7 @@ public class AddProjectToSessionWizard extends Wizard {
       final String projectID = entry.getKey();
       final IProject project = entry.getValue();
 
-      final saros.filesystem.IProject adaptedProject =
-          ResourceAdapterFactory.create(entry.getValue());
+      final IReferencePoint adaptedProject = ResourceAdapterFactory.create(entry.getValue());
 
       if (!session.isShared(adaptedProject)) project.refreshLocal(IResource.DEPTH_INFINITE, null);
 
@@ -588,7 +588,7 @@ public class AddProjectToSessionWizard extends Wizard {
                 IStatus.ERROR, Saros.PLUGIN_ID, "failed to compute local file list", e));
       }
 
-      final ProjectNegotiationData data = negotiation.getProjectNegotiationData(projectID);
+      final ResourceNegotiationData data = negotiation.getResourceNegotiationData(projectID);
 
       final FileListDiff diff = FileListDiff.diff(localFileList, data.getFileList());
 
@@ -627,8 +627,8 @@ public class AddProjectToSessionWizard extends Wizard {
 
     final Map<String, IProject> result = new HashMap<String, IProject>();
 
-    for (final ProjectNegotiationData data : negotiation.getProjectNegotiationData()) {
-      final String projectID = data.getProjectID();
+    for (final ResourceNegotiationData data : negotiation.getResourceNegotiationData()) {
+      final String projectID = data.getReferencePointID();
 
       result.put(
           projectID,
@@ -681,10 +681,10 @@ public class AddProjectToSessionWizard extends Wizard {
   private void storeCurrentProjectNameMapping(final JID jid) {
     Map<String, String> currentProjectNameMapping = new HashMap<>();
 
-    for (final ProjectNegotiationData data : negotiation.getProjectNegotiationData()) {
-      final String projectID = data.getProjectID();
+    for (final ResourceNegotiationData data : negotiation.getResourceNegotiationData()) {
+      final String projectID = data.getReferencePointID();
       currentProjectNameMapping.put(
-          data.getProjectName(), namePage.getTargetProjectName(projectID));
+          data.getReferencePointName(), namePage.getTargetProjectName(projectID));
     }
 
     mappingStorage.updateMapping(jid, currentProjectNameMapping);

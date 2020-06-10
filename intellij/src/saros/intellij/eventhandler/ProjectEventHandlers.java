@@ -77,9 +77,9 @@ public class ProjectEventHandlers {
   }
 
   /**
-   * Returns whether the document change handlers are enabled.
+   * Returns whether the handlers of the given type are enabled.
    *
-   * @return whether the document change handlers are enabled
+   * @return whether the handlers of the given type are enabled
    */
   public boolean areHandlersEnabled(@NotNull ProjectEventHandlerType type) {
     return handlers.get(type).stream().allMatch(IProjectEventHandler::isEnabled);

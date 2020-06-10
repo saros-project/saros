@@ -4,10 +4,7 @@ import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ModuleFileIndex;
-import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.LocalFileSystem;
@@ -34,12 +31,12 @@ import saros.editor.text.LineRange;
 import saros.editor.text.TextPosition;
 import saros.editor.text.TextSelection;
 import saros.filesystem.IFile;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.intellij.context.SharedIDEContext;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.eventhandler.IProjectEventHandler.ProjectEventHandlerType;
 import saros.intellij.eventhandler.editor.editorstate.ViewportAdjustmentExecutor;
-import saros.intellij.filesystem.IntelliJProjectImpl;
+import saros.intellij.filesystem.IntellijReferencePoint;
 import saros.intellij.filesystem.VirtualFileConverter;
 import saros.intellij.runtime.EDTExecutor;
 import saros.intellij.runtime.FilesystemRunner;
@@ -223,7 +220,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
             @NotNull String replacedText,
             @NotNull String newText) {
 
-          Project project = ((IntelliJProjectImpl) file.getProject()).getModule().getProject();
+          Project project = ((IntellijReferencePoint) file.getReferencePoint()).getProject();
 
           if (!replacedText.isEmpty()) {
             String documentReplacedText = document.getText(new TextRange(start, oldEnd));
@@ -386,7 +383,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
         }
 
         @Override
-        public void userFinishedProjectNegotiation(User user) {
+        public void userFinishedResourceNegotiation(User user) {
           sendAwarenessInformation(user);
         }
 
@@ -396,22 +393,22 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
         }
 
         @Override
-        public void resourcesAdded(final IProject project) {
-          executeInUIThreadSynchronous(() -> addProjectResources(project));
+        public void resourcesAdded(final IReferencePoint referencePoint) {
+          executeInUIThreadSynchronous(() -> addReferencePointResources(referencePoint));
         }
 
         /**
          * Sends the awareness information for all open shared editors. This is done to populate the
-         * UserEditorState of the participant that finished the project negotiation.
+         * UserEditorState of the participant that finished the resource negotiation.
          *
          * <p>This is done by first sending the needed state for all locally open editors. After the
          * awareness information for all locally open editors (including the active editor) has been
          * transmitted, a second editor activated activity is send for the locally active editor to
          * correctly set the active editor in the remote user editor state for the local user.
          *
-         * <p>This will not be executed for the user that finished the project negotiation as their
-         * user editor state will be propagated through {@link #resourcesAdded(IProject)} when the
-         * shared resources are initially added.
+         * <p>This will not be executed for the user that finished the resource negotiation as their
+         * user editor state will be propagated through {@link #resourcesAdded(IReferencePoint)}
+         * when the shared resources are initially added.
          */
         private void sendAwarenessInformation(@NotNull User user) {
           User localUser = session.getLocalUser();
@@ -550,23 +547,14 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   }
 
   /**
-   * Adds all currently open text editors belonging to the passed project to the pool of open
-   * editors.
+   * Adds all currently open text editors belonging to the passed reference point to the pool of
+   * open editors.
    *
-   * @param project the added project
+   * @param referencePoint the added reference point
    */
-  private void addProjectResources(IProject project) {
-    Module module = ((IntelliJProjectImpl) project).getModule();
-    ModuleFileIndex moduleFileIndex = ModuleRootManager.getInstance(module).getFileIndex();
-    Project intellijProject = module.getProject();
-
-    Set<VirtualFile> openFiles = new HashSet<>();
-
-    for (VirtualFile openFile : ProjectAPI.getOpenFiles(intellijProject)) {
-      if (FilesystemRunner.runReadAction(() -> moduleFileIndex.isInContent(openFile))) {
-        openFiles.add(openFile);
-      }
-    }
+  private void addReferencePointResources(IReferencePoint referencePoint) {
+    IntellijReferencePoint intellijReferencePoint = (IntellijReferencePoint) referencePoint;
+    Project project = intellijReferencePoint.getProject();
 
     Map<IFile, Editor> openFileMapping = new HashMap<>();
 
@@ -577,12 +565,11 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
       setLocalEditorStatusChangeHandlersEnabled(false);
       setLocalViewPortChangeHandlersEnabled(false);
 
-      for (VirtualFile openFile : openFiles) {
-        IFile file = (IFile) VirtualFileConverter.convertToResource(intellijProject, openFile);
+      for (VirtualFile openFile : ProjectAPI.getOpenFiles(project)) {
+        IFile file = (IFile) VirtualFileConverter.convertToResource(openFile, referencePoint);
 
         if (file == null) {
-          throw new IllegalStateException(
-              "Could not create IFile for resource that is known to be shared: " + openFile);
+          continue;
 
         } else if (file.isIgnored()) {
           log.debug("Skipping editor for ignored open file " + file);
@@ -590,7 +577,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           continue;
         }
 
-        Editor editor = localEditorHandler.openEditor(openFile, project, false);
+        Editor editor = localEditorHandler.openEditor(openFile, referencePoint, false);
 
         if (editor != null) {
           openFileMapping.put(file, editor);
@@ -608,8 +595,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
     Set<String> selectedFiles = new HashSet<>();
 
-    for (VirtualFile selectedFile : ProjectAPI.getSelectedFiles(intellijProject)) {
-      if (moduleFileIndex.isInContent(selectedFile)) {
+    for (VirtualFile selectedFile : ProjectAPI.getSelectedFiles(project)) {
+      if (VirtualFileConverter.convertToResource(selectedFile, referencePoint) != null) {
         selectedFiles.add(selectedFile.getPath());
       }
     }
@@ -623,7 +610,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           sendSelectionInformation(localUser, file, editor);
         });
 
-    sendActiveEditorInformation(localUser, intellijProject);
+    sendActiveEditorInformation(localUser, project);
   }
 
   @SuppressWarnings("FieldCanBeLocal")
@@ -971,7 +958,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
     /*
      * hack to avoid sending activities for changes caused by received
-     * activities during the project negotiation
+     * activities during the resource negotiation
      */
     if (fileReplacementInProgressObservable.isReplacementInProgress()) {
       if (log.isTraceEnabled()) {
@@ -1115,7 +1102,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   }
 
   @Override
-  public void saveEditors(final IProject project) {
+  public void saveEditors(final IReferencePoint referencePoint) {
     DocumentAPI.saveAllDocuments();
   }
 
@@ -1151,7 +1138,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
     Set<String> visibleFilePaths = new HashSet<>();
 
-    Project project = ((IntelliJProjectImpl) file.getProject()).getModule().getProject();
+    Project project = ((IntellijReferencePoint) file.getReferencePoint()).getProject();
 
     for (VirtualFile virtualFile : ProjectAPI.getSelectedFiles(project)) {
       visibleFilePaths.add(virtualFile.getPath());
@@ -1194,7 +1181,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   }
 
   /**
-   * Starts the listeners for the given editor and adds it to the editor pool with the given file.
+   * Adds the given editor to the editor pool with the given file.
    *
    * <p><b>NOTE:</b> This method should only be used when adding editors for files that are not yet
    * part of the session scope. This can be the case when an open file is moved into the session

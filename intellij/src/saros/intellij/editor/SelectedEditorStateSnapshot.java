@@ -99,7 +99,6 @@ public class SelectedEditorStateSnapshot {
    */
   public void replaceSelectedFile(@NotNull IFile oldFile, @NotNull IFile newFile) {
     VirtualFile oldVirtualFile = VirtualFileConverter.convertToVirtualFile(oldFile);
-
     VirtualFile newVirtualFile = VirtualFileConverter.convertToVirtualFile(newFile);
 
     if (oldVirtualFile == null) {

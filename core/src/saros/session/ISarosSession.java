@@ -25,7 +25,7 @@ import java.util.concurrent.CancellationException;
 import saros.activities.IActivity;
 import saros.activities.IResourceActivity;
 import saros.concurrent.management.ConcurrentDocumentClient;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.net.xmpp.JID;
 import saros.session.IActivityConsumer.Priority;
@@ -33,9 +33,9 @@ import saros.session.User.Permission;
 import saros.synchronize.StopManager;
 
 /**
- * A Saros session consists of one or more shared projects, which are the central concept of the
- * Saros plugin. They are associated with projects and make them available for synchronous/real-time
- * collaboration.
+ * A Saros session consists of one or more shared reference point(s), which are the central concept
+ * of the Saros plugin. They are associated with local directory trees and make them available for
+ * synchronous/real-time collaboration.
  *
  * @author rdjemili
  */
@@ -45,21 +45,21 @@ public interface ISarosSession {
    * @JTourBusStop 3, Architecture Overview, Session Management:
    *
    * <p>This Interface is the main entrance Point for the "Session Management"-Component. The
-   * Session Management is responsible for managing a Session and keeping the shared projects in a
-   * consistent state across the local copies of all participants. It functions as the core
-   * component in a running session and directs communication between all other components. In
+   * Session Management is responsible for managing a Session and keeping the shared reference
+   * points in a consistent state across the local copies of all participants. It functions as the
+   * core component in a running session and directs communication between all other components. In
    * general this component takes input from the User Interface, processes it, and afterwards passes
    * the result to the Network Layer.
    */
 
   /** Connection identifier to use for sending data. */
-  public static final String SESSION_CONNECTION_ID = "saros-main-session";
+  String SESSION_CONNECTION_ID = "saros-main-session";
 
   /** @return a list of all users of this session */
-  public List<User> getUsers();
+  List<User> getUsers();
 
   /** @return a list of all remote users of this session */
-  public List<User> getRemoteUsers();
+  List<User> getRemoteUsers();
 
   /**
    * Changes the {@link Permission permission} of a user.
@@ -72,27 +72,27 @@ public interface ISarosSession {
    * @throws CancellationException
    * @throws InterruptedException
    */
-  public void changePermission(User user, Permission permission)
+  void changePermission(User user, Permission permission)
       throws CancellationException, InterruptedException;
 
   /**
    * @return <code>true</code> if the local user has {@link Permission#WRITE_ACCESS write access},
    *     <code>false</code> otherwise
    */
-  public boolean hasWriteAccess();
+  boolean hasWriteAccess();
 
   /**
    * Returns the host of this session.
    *
    * @immutable This method will always return the same value for this session
    */
-  public User getHost();
+  User getHost();
 
   /**
    * @return <code>true</code> if the local user is the host of this session, <code>false</code>
    *     otherwise.
    */
-  public boolean isHost();
+  boolean isHost();
 
   /**
    * Adds the user to this session. If the session currently serves as host all other session users
@@ -100,29 +100,30 @@ public interface ISarosSession {
    *
    * @param user the user that is to be added
    */
-  public void addUser(User user);
+  void addUser(User user);
 
   /**
-   * Informs all listeners that a user now has Projects and can process {@link IResourceActivity}s.
+   * Informs all listeners that a user now has reference points and can process {@link
+   * IResourceActivity}s.
    *
    * @host This method may only called by the host.
    * @param user
    */
-  public void userStartedQueuing(final User user);
+  void userStartedQueuing(final User user);
 
   /**
-   * Informs all participants and listeners that a user now has finished the Project Negotiation.
+   * Informs all participants and listeners that a user now has finished the resource negotiation.
    *
    * @param user
    */
-  public void userFinishedProjectNegotiation(final User user);
+  void userFinishedResourceNegotiation(final User user);
 
   /**
    * Removes a user from this session.
    *
    * @param user the user that is to be removed
    */
-  public void removeUser(User user);
+  void removeUser(User user);
 
   /**
    * Kicks and removes the user out of the session.
@@ -131,7 +132,7 @@ public interface ISarosSession {
    * @throws IllegalStateException if the local user is not the host of the session
    * @throws IllegalArgumentException if the user to kick is the local user
    */
-  public void kickUser(User user);
+  void kickUser(User user);
 
   /**
    * Adds the given session listener. This call is ignored if the listener is already a listener of
@@ -139,7 +140,7 @@ public interface ISarosSession {
    *
    * @param listener the listener to add
    */
-  public void addListener(ISessionListener listener);
+  void addListener(ISessionListener listener);
 
   /**
    * Removes the given session listener. This call is ignored if the listener does not belong to the
@@ -147,28 +148,29 @@ public interface ISarosSession {
    *
    * @param listener the listener to remove
    */
-  public void removeListener(ISessionListener listener);
+  void removeListener(ISessionListener listener);
 
   /**
-   * Enables or disables the execution of received activities for the given project. If the
-   * execution is disabled, activities for resources of the given projects will be dropped without
-   * being applied.
+   * Enables or disables the execution of received activities for the given reference point. If the
+   * execution is disabled, activities for resources of the given reference point will be dropped
+   * without being applied.
    *
-   * <p>This method can be used to disable the execution of received activities for projects that
-   * are no longer available (i.e. are no longer part of the session or are no longer
+   * <p>This method can be used to disable the execution of received activities for reference points
+   * that are no longer available (i.e. are no longer part of the session or are no longer
    * present/accessible locally).
    *
-   * @param project the shared project to enable or disable the activity execution for
+   * @param referencePoint the shared reference point to enable or disable the activity execution
+   *     for
    * @param enabled <code>true</code> to enable or <code>false</code> to disable the activity
    *     execution
    */
-  public void setActivityExecution(IProject project, boolean enabled);
+  void setActivityExecution(IReferencePoint referencePoint, boolean enabled);
 
   /**
-   * @return the shared projects associated with this session, never <code>null</code> but may be
-   *     empty
+   * @return the shared reference points associated with this session, never <code>null</code> but
+   *     may be empty
    */
-  public Set<IProject> getProjects();
+  Set<IReferencePoint> getReferencePoints();
 
   /**
    * FOR INTERNAL USE ONLY !
@@ -176,7 +178,7 @@ public interface ISarosSession {
    * @deprecated only the session manager should be able to call this
    */
   @Deprecated
-  public void start();
+  void start();
 
   /**
    * Given a resource qualified JID, this method will return the user which has the identical ID
@@ -187,7 +189,7 @@ public interface ISarosSession {
    * @return the user with the given fully qualified JID or <code>null</code> if not user with such
    *     a JID exists in the session
    */
-  public User getUser(JID jid);
+  User getUser(JID jid);
 
   /**
    * Given a JID (resource qualified or not), will return the resource qualified JID associated with
@@ -209,31 +211,31 @@ public interface ISarosSession {
    *     and use {@link #getUser(JID)} instead.
    */
   @Deprecated
-  public JID getResourceQualifiedJID(JID jid);
+  JID getResourceQualifiedJID(JID jid);
 
   /**
    * Returns the local user of this session.
    *
    * @immutable This method will always return the same value for this session
    */
-  public User getLocalUser();
+  User getLocalUser();
 
   /**
    * the concurrent document manager is responsible for all jupiter controlled documents
    *
    * @return the concurrent document manager
    */
-  public ConcurrentDocumentClient getConcurrentDocumentClient();
+  ConcurrentDocumentClient getConcurrentDocumentClient();
 
   /**
    * Returns a snapshot of the currently unavailable (in use) color ids.
    *
    * @return
    */
-  public Set<Integer> getUnavailableColors();
+  Set<Integer> getUnavailableColors();
 
   /** FOR INTERNAL USE ONLY ! */
-  public void exec(List<IActivity> activities);
+  void exec(List<IActivity> activities);
 
   /**
    * Adds an {@link IActivityProducer} so the production of its activities will be noticed.
@@ -243,7 +245,7 @@ public interface ISarosSession {
    *     IActivityListener#created(IActivity) created()}.
    * @see #removeActivityProducer(IActivityProducer)
    */
-  public void addActivityProducer(IActivityProducer producer);
+  void addActivityProducer(IActivityProducer producer);
 
   /**
    * Removes an {@link IActivityProducer} from the session.
@@ -253,7 +255,7 @@ public interface ISarosSession {
    *     IActivityListener#created(IActivity) created()}.
    * @see #addActivityProducer(IActivityProducer)
    */
-  public void removeActivityProducer(IActivityProducer producer);
+  void removeActivityProducer(IActivityProducer producer);
 
   /**
    * Adds an {@link IActivityConsumer} so it will be called when an activity is to be executed
@@ -269,7 +271,7 @@ public interface ISarosSession {
    *     is correct. Use individual consumers if you want to get notified multiple times.
    * @see #removeActivityConsumer(IActivityConsumer)
    */
-  public void addActivityConsumer(IActivityConsumer consumer, Priority priority);
+  void addActivityConsumer(IActivityConsumer consumer, Priority priority);
 
   /**
    * Removes an {@link IActivityConsumer} from the session
@@ -278,68 +280,73 @@ public interface ISarosSession {
    *     locally.
    * @see #addActivityConsumer(IActivityConsumer, Priority)
    */
-  public void removeActivityConsumer(IActivityConsumer consumer);
+  void removeActivityConsumer(IActivityConsumer consumer);
 
-  /** Checks if the user is ready to process {@link IResourceActivity}s for a given project */
-  public boolean userHasProject(User user, IProject project);
+  /**
+   * Checks if the user is ready to process {@link IResourceActivity}s for a given reference point
+   */
+  boolean userHasReferencePoint(User user, IReferencePoint referencePoint);
 
   /**
    * @return <code>true</code> if the given {@link IResource resource} is currently shared in this
    *     session, <code>false</code> otherwise
    */
-  public boolean isShared(IResource resource);
+  boolean isShared(IResource resource);
 
   /**
-   * Returns the global ID of the project.
+   * Returns the global ID of the reference point.
    *
-   * @return the global ID of the project or <code>null</code> if this project is not shared
+   * @return the global ID of the reference point or <code>null</code> if this reference point is
+   *     not shared
    */
-  public String getProjectID(IProject project);
+  String getReferencePointId(IReferencePoint referencePoint);
 
   /**
-   * Returns the project with the given ID.
+   * Returns the reference point with the given ID.
    *
-   * @return the project with the given ID or <code>null</code> if no project with this ID is shared
+   * @return the reference point with the given ID or <code>null</code> if no reference point with
+   *     this ID is shared
    */
-  public IProject getProject(String projectID);
+  IReferencePoint getReferencePoint(String referencePointID);
 
   /**
-   * Adds the specified project to this session.
+   * Adds the specified reference point to this session.
    *
-   * @param project The project to share
-   * @param projectID The global project ID
+   * @param referencePoint The reference point to share
+   * @param referencePointId The global reference point ID
    */
-  void addSharedProject(IProject project, String projectID);
+  void addSharedReferencePoint(IReferencePoint referencePoint, String referencePointId);
 
   /**
-   * Stores a bidirectional mapping between <code>project</code> and <code>projectID</code>.
+   * Stores a bidirectional mapping between <code>reference point</code> and <code>
+   * reference point ID</code>.
    *
-   * <p>This information is necessary for receiving (unserializing) resource-related activities.
+   * <p>This information is necessary for receiving (deserializing) resource-related activities.
    *
-   * @param projectID Session-wide ID of the project
-   * @param project the local representation of the project
-   * @see #removeProjectMapping(String, IProject)
+   * @param referencePointId Session-wide ID of the reference point
+   * @param referencePoint the local representation of the reference point
+   * @see #removeReferencePointMapping(String, IReferencePoint)
    */
-  public void addProjectMapping(String projectID, IProject project);
+  void addReferencePointMapping(String referencePointId, IReferencePoint referencePoint);
 
   /**
-   * Removes the bidirectional mapping <code>project</code> and <code>projectId</code> that was
-   * created by {@link #addProjectMapping(String, IProject) addProjectMapping()} .
+   * Removes the bidirectional mapping <code>reference point</code> and <code>reference point ID
+   * </code> that was created by {@link #addReferencePointMapping(String, IReferencePoint)} .
    *
-   * <p>TODO Why is the project parameter needed here? This forces callers to store the mapping
-   * themselves (or retrieve it just before calling this method).
+   * <p>TODO Why is the reference point parameter needed here? This forces callers to store the
+   * mapping themselves (or retrieve it just before calling this method).
    *
-   * @param projectID Session-wide ID of the project
-   * @param project the local representation of the project
+   * @param referencePointId Session-wide ID of the reference point
+   * @param referencePoint the local representation of the reference point
    */
-  public void removeProjectMapping(String projectID, IProject project);
+  void removeReferencePointMapping(String referencePointId, IReferencePoint referencePoint);
 
   /**
    * Return the stop manager of this session.
    *
    * @return
    */
-  public StopManager getStopManager();
+  StopManager getStopManager();
 
   /**
    * Changes the color for the current session. The color change is performed on the session host
@@ -347,36 +354,38 @@ public interface ISarosSession {
    *
    * @param colorID the new color id that should be used during the session
    */
-  public void changeColor(int colorID);
+  void changeColor(int colorID);
 
   /**
    * FOR INTERNAL USE ONLY !
    *
-   * <p>Starts queuing of incoming {@linkplain IResourceActivity project-related activities}, since
-   * they cannot be applied before their corresponding project is received and extracted.
+   * <p>Starts queuing of incoming {@linkplain IResourceActivity reference-point-related
+   * activities}, since they cannot be applied before their corresponding reference point is
+   * received and extracted.
    *
-   * <p>That queuing relies on an existing project-to-projectID mapping (see {@link
-   * #addProjectMapping(String, IProject)}), otherwise incoming activities cannot be queued and will
-   * be lost.
+   * <p>That queuing relies on an existing reference point-to-reference-point-ID mapping (see {@link
+   * #addReferencePointMapping(String, IReferencePoint)}), otherwise incoming activities cannot be
+   * queued and will be lost.
    *
-   * @param project the project for which project-related activities should be queued
+   * @param referencePoint the reference point for which reference-point-related activities should
+   *     be queued
    * @see #disableQueuing
    */
-  public void enableQueuing(IProject project);
+  void enableQueuing(IReferencePoint referencePoint);
 
   /**
    * FOR INTERNAL USE ONLY !
    *
-   * <p>Disables queuing for the given project and flushes all queued activities.
+   * <p>Disables queuing for the given reference point and flushes all queued activities.
    */
-  public void disableQueuing(IProject project);
+  void disableQueuing(IReferencePoint referencePoint);
 
   /**
    * Returns the id of the current session.
    *
    * @return the id of the current session
    */
-  public String getID();
+  String getID();
 
   /**
    * Returns the session runtime component with the given key.
@@ -389,5 +398,5 @@ public interface ISarosSession {
    * @return the runtime component or <code>null</code> if the component is either not available or
    *     does not exist
    */
-  public <T> T getComponent(Class<T> key);
+  <T> T getComponent(Class<T> key);
 }

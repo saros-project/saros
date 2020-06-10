@@ -4,7 +4,9 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.util.Pair;
+import com.intellij.openapi.vfs.VirtualFile;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -21,18 +23,23 @@ import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import saros.core.ui.util.CollaborationUtils;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.intellij.context.SharedIDEContext;
-import saros.intellij.filesystem.IntelliJProjectImpl;
+import saros.intellij.filesystem.IntellijReferencePoint;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.util.IconManager;
 import saros.intellij.ui.util.NotificationPanel;
 import saros.net.xmpp.JID;
 
 /**
- * Contact pop-up menu for selecting a project and module to share. Opened when right-clicking on a
- * contact.
+ * Contact pop-up menu for selecting a project and reference point to share. Opened when
+ * right-clicking on a contact.
+ *
+ * <p>With the current implementation, only reference points representing a module with a single
+ * content root are displayed.
  */
+// TODO add menu point to open dialog to choose directory to share once added
+//  TODO move project module to separate section listed first
 class ContactPopMenu extends JPopupMenu {
 
   private static final Logger log = Logger.getLogger(ContactPopMenu.class);
@@ -124,9 +131,8 @@ class ContactPopMenu extends JPopupMenu {
   }
 
   /**
-   * Creates the menu entries for the modules contained in the project, excluding the project
-   * module. Returns the created entries grouped by whether the described module is shareable or
-   * not.
+   * Creates the menu entries for the modules contained in the project. Returns the created entries
+   * grouped by whether the described module is shareable or not.
    *
    * <p>Shareable module entries trigger the session negotiation when interacted with. Non-shareable
    * module entries are disabled and carry a tooltip explaining why the module can not be shared.
@@ -158,8 +164,17 @@ class ContactPopMenu extends JPopupMenu {
       String moduleName = module.getName();
       String fullModuleName = project.getName() + File.separator + moduleName;
 
+      // TODO adjust once sharing multiple reference points is supported
       try {
-        IProject wrappedModule = new IntelliJProjectImpl(module);
+        VirtualFile[] contentRoots = ModuleRootManager.getInstance(module).getContentRoots();
+
+        if (contentRoots.length != 1) {
+          throw new IllegalArgumentException("Unsupported number of content roots");
+        }
+
+        VirtualFile contentRoot = contentRoots[0];
+
+        IReferencePoint wrappedModule = new IntellijReferencePoint(project, contentRoot);
 
         JMenuItem moduleItem = new JMenuItem(moduleName);
         moduleItem.setToolTipText(Messages.ContactPopMenu_menu_tooltip_share_module);
@@ -171,7 +186,7 @@ class ContactPopMenu extends JPopupMenu {
         log.debug(
             "Ignoring module "
                 + fullModuleName
-                + " as it does not meet the current release restrictions.");
+                + " as it has multiple content roots and can't necessarily be completely shared.");
 
         JMenuItem invalidModuleEntry = new JMenuItem(moduleName);
         invalidModuleEntry.setEnabled(false);
@@ -188,21 +203,23 @@ class ContactPopMenu extends JPopupMenu {
   private class ShareDirectoryAction implements ActionListener {
     private final Project project;
     private final String moduleName;
-    private final IProject module;
+    private final IReferencePoint referencePoint;
 
     private ShareDirectoryAction(
-        @NotNull Project project, @NotNull String moduleName, @Nullable IProject module) {
+        @NotNull Project project,
+        @NotNull String moduleName,
+        @Nullable IReferencePoint referencePoint) {
 
       this.project = project;
       this.moduleName = moduleName;
-      this.module = module;
+      this.referencePoint = referencePoint;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-      if (module == null || !module.exists()) {
+      if (referencePoint == null || !referencePoint.exists()) {
         log.error(
-            "The IProject object for the module "
+            "The reference point object for the content root of the module "
                 + moduleName
                 + " could not be created. This most likely means that the local Intellij instance "
                 + "does not know any module with the given name.");
@@ -217,7 +234,7 @@ class ContactPopMenu extends JPopupMenu {
         return;
       }
 
-      Set<IProject> projects = Collections.singleton(module);
+      Set<IReferencePoint> projects = Collections.singleton(referencePoint);
       List<JID> contacts = Collections.singletonList(contactInfo.getJid());
 
       SharedIDEContext.preregisterProject(project);

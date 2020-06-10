@@ -4,7 +4,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import saros.filesystem.IContainer;
 import saros.filesystem.IPath;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 
 /**
@@ -41,7 +41,7 @@ public abstract class ServerResourceImpl implements IResource {
   }
 
   @Override
-  public IPath getProjectRelativePath() {
+  public IPath getReferencePointRelativePath() {
     return getFullPath().removeFirstSegments(1);
   }
 
@@ -56,13 +56,13 @@ public abstract class ServerResourceImpl implements IResource {
 
   @Override
   public IContainer getParent() {
-    IPath parentPath = getProjectRelativePath().removeLastSegments(1);
-    IProject project = getProject();
+    IPath parentPath = getReferencePointRelativePath().removeLastSegments(1);
+    IReferencePoint project = getReferencePoint();
     return parentPath.segmentCount() == 0 ? project : project.getFolder(parentPath);
   }
 
   @Override
-  public IProject getProject() {
+  public IReferencePoint getReferencePoint() {
     String projectName = getFullPath().segment(0);
     return workspace.getProject(projectName);
   }

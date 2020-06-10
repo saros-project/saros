@@ -6,8 +6,10 @@ import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.messages.MessageBusConnection;
+import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import saros.filesystem.IFile;
+import saros.filesystem.IReferencePoint;
 import saros.intellij.editor.LocalEditorHandler;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.filesystem.VirtualFileConverter;
@@ -65,15 +67,17 @@ public class AnnotationUpdater extends AbstractLocalEditorStatusChangeHandler {
    * @see FileEditorManagerListener#fileOpened(FileEditorManager, VirtualFile)
    */
   private void setUpOpenedEditor(@NotNull VirtualFile virtualFile) {
-    Editor editor = localEditorHandler.openEditor(project, virtualFile, false);
+    Set<IReferencePoint> sharedReferencePoints = sarosSession.getReferencePoints();
 
-    IFile file = (IFile) VirtualFileConverter.convertToResource(project, virtualFile);
+    IFile file = (IFile) VirtualFileConverter.convertToResource(sharedReferencePoints, virtualFile);
 
-    if (file == null || editor == null) {
+    if (file == null || !sarosSession.isShared(file)) {
       return;
     }
 
-    if (sarosSession.isShared(file)) {
+    Editor editor = localEditorHandler.openEditor(file, virtualFile, false);
+
+    if (editor != null) {
       annotationManager.applyStoredAnnotations(file, editor);
     }
   }
@@ -85,7 +89,9 @@ public class AnnotationUpdater extends AbstractLocalEditorStatusChangeHandler {
    * @see FileEditorManagerListener.Before#beforeFileClosed(FileEditorManager, VirtualFile)
    */
   private void cleanUpAnnotations(@NotNull VirtualFile virtualFile) {
-    IFile file = (IFile) VirtualFileConverter.convertToResource(project, virtualFile);
+    Set<IReferencePoint> sharedReferencePoints = sarosSession.getReferencePoints();
+
+    IFile file = (IFile) VirtualFileConverter.convertToResource(sharedReferencePoints, virtualFile);
 
     if (file == null) {
       return;

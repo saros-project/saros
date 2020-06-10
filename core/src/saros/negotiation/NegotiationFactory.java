@@ -15,7 +15,7 @@ import saros.net.xmpp.filetransfer.XMPPFileTransferManager;
 import saros.observables.FileReplacementInProgressObservable;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
-import saros.session.ProjectNegotiationTypeHook;
+import saros.session.ResourceNegotiationTypeHook;
 import saros.session.User;
 import saros.versioning.VersionManager;
 
@@ -35,7 +35,7 @@ public final class NegotiationFactory {
   private final ITransmitter transmitter;
   private final IReceiver receiver;
 
-  private final AdditionalProjectDataFactory additionalProjectDataFactory;
+  private final AdditionalResourceDataFactory additionalResourceDataFactory;
 
   public NegotiationFactory(
       VersionManager versionManager,
@@ -48,7 +48,7 @@ public final class NegotiationFactory {
       IConnectionManager connectionManager,
       ITransmitter transmitter,
       IReceiver receiver,
-      AdditionalProjectDataFactory additionalProjectDataFactory,
+      AdditionalResourceDataFactory additionalResourceDataFactory,
 
       /*
        * FIXME HACK for now to avoid cyclic dependencies between this class,
@@ -68,7 +68,7 @@ public final class NegotiationFactory {
     this.connectionManager = connectionManager;
     this.transmitter = transmitter;
     this.receiver = receiver;
-    this.additionalProjectDataFactory = additionalProjectDataFactory;
+    this.additionalResourceDataFactory = additionalResourceDataFactory;
   }
 
   public OutgoingSessionNegotiation newOutgoingSessionNegotiation(
@@ -110,17 +110,17 @@ public final class NegotiationFactory {
         receiver);
   }
 
-  public AbstractOutgoingProjectNegotiation newOutgoingProjectNegotiation(
+  public AbstractOutgoingResourceNegotiation newOutgoingResourceNegotiation(
       JID remoteAddress,
-      ProjectSharingData projectSharingData,
+      ResourceSharingData resourceSharingData,
       ISarosSessionManager sessionManager,
       ISarosSession session) {
 
     switch (getTransferType(session, remoteAddress)) {
       case ARCHIVE:
-        return new ArchiveOutgoingProjectNegotiation(
+        return new ArchiveOutgoingResourceNegotiation(
             remoteAddress,
-            projectSharingData,
+            resourceSharingData,
             sessionManager,
             session,
             context.getComponent(IEditorManager.class),
@@ -129,11 +129,11 @@ public final class NegotiationFactory {
             fileTransferManager,
             transmitter,
             receiver,
-            additionalProjectDataFactory);
+            additionalResourceDataFactory);
       case INSTANT:
-        return new InstantOutgoingProjectNegotiation(
+        return new InstantOutgoingResourceNegotiation(
             remoteAddress,
-            projectSharingData,
+            resourceSharingData,
             sessionManager,
             session,
             context.getComponent(IEditorManager.class),
@@ -142,25 +142,25 @@ public final class NegotiationFactory {
             fileTransferManager,
             transmitter,
             receiver,
-            additionalProjectDataFactory);
+            additionalResourceDataFactory);
       default:
         throw new UnsupportedOperationException("transferType not implemented");
     }
   }
 
-  public AbstractIncomingProjectNegotiation newIncomingProjectNegotiation(
+  public AbstractIncomingResourceNegotiation newIncomingResourceNegotiation(
       JID remoteAddress,
       String negotiationID,
-      List<ProjectNegotiationData> projectNegotiationData,
+      List<ResourceNegotiationData> resourceNegotiationData,
       ISarosSessionManager sessionManager,
       ISarosSession session) {
 
     switch (getTransferType(session, remoteAddress)) {
       case ARCHIVE:
-        return new ArchiveIncomingProjectNegotiation(
+        return new ArchiveIncomingResourceNegotiation(
             remoteAddress,
             negotiationID,
-            projectNegotiationData,
+            resourceNegotiationData,
             sessionManager,
             session,
             fileReplacementInProgressObservable,
@@ -170,10 +170,10 @@ public final class NegotiationFactory {
             transmitter,
             receiver);
       case INSTANT:
-        return new InstantIncomingProjectNegotiation(
+        return new InstantIncomingResourceNegotiation(
             remoteAddress,
             negotiationID,
-            projectNegotiationData,
+            resourceNegotiationData,
             sessionManager,
             session,
             fileReplacementInProgressObservable,
@@ -193,7 +193,7 @@ public final class NegotiationFactory {
       throw new IllegalStateException("User <" + user + "> is not part of the session.");
     }
 
-    String type = user.getPreferences().getString(ProjectNegotiationTypeHook.KEY_TYPE);
+    String type = user.getPreferences().getString(ResourceNegotiationTypeHook.KEY_TYPE);
     if (type.isEmpty()) {
       throw new IllegalArgumentException("Missing TransferType for User: " + user);
     }

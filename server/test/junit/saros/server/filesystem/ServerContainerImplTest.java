@@ -21,7 +21,7 @@ import org.junit.Test;
 import org.junit.Test.None;
 import saros.filesystem.IContainer;
 import saros.filesystem.IPath;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 
 public class ServerContainerImplTest extends EasyMockSupport {
@@ -42,12 +42,12 @@ public class ServerContainerImplTest extends EasyMockSupport {
 
   private IContainer container;
   private ServerWorkspaceImpl workspace;
-  private IProject project;
+  private IReferencePoint project;
 
   @Before
   public void setUp() throws Exception {
     workspace = createMock(ServerWorkspaceImpl.class);
-    project = createMock(IProject.class);
+    project = createMock(IReferencePoint.class);
 
     expect(workspace.getLocation()).andStubReturn(createWorkspaceFolder());
 

@@ -1,12 +1,12 @@
 package saros.session;
 
-import saros.negotiation.AbstractIncomingProjectNegotiation;
-import saros.negotiation.AbstractOutgoingProjectNegotiation;
+import saros.negotiation.AbstractIncomingResourceNegotiation;
+import saros.negotiation.AbstractOutgoingResourceNegotiation;
 import saros.negotiation.IncomingSessionNegotiation;
 import saros.negotiation.OutgoingSessionNegotiation;
 
 /**
- * Interface for handling incoming and outgoing session and project negotiations. @Note
+ * Interface for handling incoming and outgoing session and resource negotiations. @Note
  * Implementations <b>must not</b> block on all methods that are provided by this interface.
  * Furthermore it is possible that the methods are called concurrently.
  *
@@ -29,17 +29,17 @@ public interface INegotiationHandler {
   public void handleIncomingSessionNegotiation(IncomingSessionNegotiation negotiation);
 
   /**
-   * Called when a local project should be synchronized with a remote session user.
+   * Called when a local reference points should be synchronized with a remote session user.
    *
-   * @param negotiation the negotiation to use for executing the project synchronization
+   * @param negotiation the negotiation to use for executing the resource synchronization
    */
-  public void handleOutgoingProjectNegotiation(AbstractOutgoingProjectNegotiation negotiation);
+  public void handleOutgoingResourceNegotiation(AbstractOutgoingResourceNegotiation negotiation);
 
   /**
-   * Called when a remote project from a remote session user should be synchronized with a local
-   * project.
+   * Called when a remote reference point from a remote session user should be synchronized with a
+   * local reference point.
    *
-   * @param negotiation the negotiation to use for handling the project synchronization
+   * @param negotiation the negotiation to use for handling the resource synchronization
    */
-  public void handleIncomingProjectNegotiation(AbstractIncomingProjectNegotiation negotiation);
+  public void handleIncomingResourceNegotiation(AbstractIncomingResourceNegotiation negotiation);
 }

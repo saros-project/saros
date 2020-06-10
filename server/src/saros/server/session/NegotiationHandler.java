@@ -7,15 +7,15 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.monitoring.NullProgressMonitor;
-import saros.negotiation.AbstractIncomingProjectNegotiation;
-import saros.negotiation.AbstractOutgoingProjectNegotiation;
+import saros.negotiation.AbstractIncomingResourceNegotiation;
+import saros.negotiation.AbstractOutgoingResourceNegotiation;
 import saros.negotiation.IncomingSessionNegotiation;
 import saros.negotiation.NegotiationTools;
 import saros.negotiation.OutgoingSessionNegotiation;
-import saros.negotiation.ProjectNegotiation;
-import saros.negotiation.ProjectNegotiationData;
+import saros.negotiation.ResourceNegotiation;
+import saros.negotiation.ResourceNegotiationData;
 import saros.negotiation.SessionNegotiation;
 import saros.net.xmpp.JID;
 import saros.server.ServerConfig;
@@ -71,7 +71,7 @@ public class NegotiationHandler implements INegotiationHandler {
 
             switch (status) {
               case OK:
-                sessionManager.startSharingProjects(negotiation.getPeer());
+                sessionManager.startSharingReferencePoints(negotiation.getPeer());
                 break;
               case ERROR:
                 log.error("ERROR running session negotiation: " + negotiation.getErrorMessage());
@@ -112,35 +112,35 @@ public class NegotiationHandler implements INegotiationHandler {
   }
 
   @Override
-  public void handleOutgoingProjectNegotiation(
-      final AbstractOutgoingProjectNegotiation negotiation) {
+  public void handleOutgoingResourceNegotiation(
+      final AbstractOutgoingResourceNegotiation negotiation) {
 
     projectExecutor.execute(
         new Runnable() {
           @Override
           public void run() {
-            ProjectNegotiation.Status status;
+            ResourceNegotiation.Status status;
             if (ServerConfig.isInteractive()) {
               status = negotiation.run(new ConsoleProgressIndicator(System.out));
             } else {
               status = negotiation.run(new NullProgressMonitor());
             }
 
-            if (status != ProjectNegotiation.Status.OK)
+            if (status != ResourceNegotiation.Status.OK)
               handleErrorStatus(status, negotiation.getErrorMessage(), negotiation.getPeer());
           }
         });
   }
 
   @Override
-  public void handleIncomingProjectNegotiation(
-      final AbstractIncomingProjectNegotiation negotiation) {
+  public void handleIncomingResourceNegotiation(
+      final AbstractIncomingResourceNegotiation negotiation) {
 
-    Map<String, IProject> projectMapping = new HashMap<>();
+    Map<String, IReferencePoint> projectMapping = new HashMap<>();
 
-    for (ProjectNegotiationData data : negotiation.getProjectNegotiationData()) {
-      String projectName = data.getProjectName();
-      IProject project = workspace.getProject(projectName);
+    for (ResourceNegotiationData data : negotiation.getResourceNegotiationData()) {
+      String projectName = data.getReferencePointName();
+      IReferencePoint project = workspace.getProject(projectName);
 
       // TODO: The file path is currently dictated by the name, potentially resulting in CONFLICTS
       if (!project.exists()) {
@@ -153,27 +153,27 @@ public class NegotiationHandler implements INegotiationHandler {
         }
       }
 
-      projectMapping.put(data.getProjectID(), project);
+      projectMapping.put(data.getReferencePointID(), project);
     }
 
     projectExecutor.execute(
         new Runnable() {
           @Override
           public void run() {
-            ProjectNegotiation.Status status;
+            ResourceNegotiation.Status status;
             if (ServerConfig.isInteractive()) {
               status = negotiation.run(projectMapping, new ConsoleProgressIndicator(System.out));
             } else {
               status = negotiation.run(projectMapping, new NullProgressMonitor());
             }
 
-            if (status != ProjectNegotiation.Status.OK)
+            if (status != ResourceNegotiation.Status.OK)
               handleErrorStatus(status, negotiation.getErrorMessage(), negotiation.getPeer());
           }
         });
   }
 
-  private void handleErrorStatus(ProjectNegotiation.Status status, String errorMessage, JID peer) {
+  private void handleErrorStatus(ResourceNegotiation.Status status, String errorMessage, JID peer) {
     switch (status) {
       case ERROR:
         log.error("ERROR running project negotiation: " + errorMessage);

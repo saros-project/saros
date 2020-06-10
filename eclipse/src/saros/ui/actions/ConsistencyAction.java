@@ -215,9 +215,9 @@ public class ConsistencyAction extends Action implements Disposable {
 
             for (IFile file : files) {
               if (sb.length() > 0) sb.append(", ");
-              sb.append(file.getProject().getName())
+              sb.append(file.getReferencePoint().getName())
                   .append(" - ")
-                  .append(file.getProjectRelativePath());
+                  .append(file.getReferencePointRelativePath());
             }
 
             String files = sb.toString();
@@ -278,9 +278,9 @@ public class ConsistencyAction extends Action implements Disposable {
               IStatus.WARNING,
               pluginID,
               "project: "
-                  + file.getProject().getName()
+                  + file.getReferencePoint().getName()
                   + ", file:"
-                  + file.getProjectRelativePath().toOSString()));
+                  + file.getReferencePointRelativePath().toOSString()));
 
     class OkCancelErrorDialog extends ErrorDialog {
       public OkCancelErrorDialog(

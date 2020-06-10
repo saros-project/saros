@@ -10,11 +10,11 @@ import org.eclipse.swt.SWT;
 import org.eclipse.ui.progress.IProgressConstants;
 import saros.Saros;
 import saros.monitoring.ProgressMonitorAdapterFactory;
-import saros.negotiation.AbstractIncomingProjectNegotiation;
-import saros.negotiation.AbstractOutgoingProjectNegotiation;
+import saros.negotiation.AbstractIncomingResourceNegotiation;
+import saros.negotiation.AbstractOutgoingResourceNegotiation;
 import saros.negotiation.IncomingSessionNegotiation;
 import saros.negotiation.OutgoingSessionNegotiation;
-import saros.negotiation.ProjectNegotiation;
+import saros.negotiation.ResourceNegotiation;
 import saros.negotiation.SessionNegotiation;
 import saros.net.util.XMPPUtils;
 import saros.net.xmpp.JID;
@@ -114,7 +114,7 @@ public class NegotiationHandler implements INegotiationHandler {
         return new Status(IStatus.ERROR, Saros.PLUGIN_ID, e.getMessage(), e);
       }
 
-      sessionManager.startSharingProjects(negotiation.getPeer());
+      sessionManager.startSharingReferencePoints(negotiation.getPeer());
 
       return Status.OK_STATUS;
     }
@@ -122,10 +122,10 @@ public class NegotiationHandler implements INegotiationHandler {
 
   private class OutgoingProjectJob extends Job {
 
-    private AbstractOutgoingProjectNegotiation negotiation;
+    private AbstractOutgoingResourceNegotiation negotiation;
     private String peer;
 
-    public OutgoingProjectJob(AbstractOutgoingProjectNegotiation outgoingProjectNegotiation) {
+    public OutgoingProjectJob(AbstractOutgoingResourceNegotiation outgoingProjectNegotiation) {
       super(Messages.NegotiationHandler_sharing_project);
       negotiation = outgoingProjectNegotiation;
       peer = negotiation.getPeer().getBase();
@@ -139,7 +139,7 @@ public class NegotiationHandler implements INegotiationHandler {
     @Override
     protected IStatus run(IProgressMonitor monitor) {
       try {
-        ProjectNegotiation.Status status =
+        ResourceNegotiation.Status status =
             negotiation.run(ProgressMonitorAdapterFactory.convert(monitor));
 
         String peerName = getNickname(new JID(peer));
@@ -211,7 +211,7 @@ public class NegotiationHandler implements INegotiationHandler {
   }
 
   @Override
-  public void handleOutgoingProjectNegotiation(AbstractOutgoingProjectNegotiation negotiation) {
+  public void handleOutgoingResourceNegotiation(AbstractOutgoingResourceNegotiation negotiation) {
 
     OutgoingProjectJob job = new OutgoingProjectJob(negotiation);
     job.setPriority(Job.SHORT);
@@ -219,7 +219,7 @@ public class NegotiationHandler implements INegotiationHandler {
   }
 
   @Override
-  public void handleIncomingProjectNegotiation(AbstractIncomingProjectNegotiation negotiation) {
+  public void handleIncomingResourceNegotiation(AbstractIncomingResourceNegotiation negotiation) {
     showIncomingProjectUI(negotiation);
   }
 
@@ -265,7 +265,7 @@ public class NegotiationHandler implements INegotiationHandler {
         });
   }
 
-  private void showIncomingProjectUI(final AbstractIncomingProjectNegotiation negotiation) {
+  private void showIncomingProjectUI(final AbstractIncomingResourceNegotiation negotiation) {
 
     SWTUtils.runSafeSWTAsync(
         log,

@@ -14,7 +14,7 @@ import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
 import saros.filesystem.IPath;
 import saros.filesystem.IPathFactory;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.filesystem.IResource.Type;
 import saros.session.ISarosSession;
@@ -40,7 +40,7 @@ public class ResourceTransportWrapperConverterTest {
   private static IFile file;
   private static IFolder folder;
 
-  private static IProject project;
+  private static IReferencePoint referencePoint;
   private static IPathFactory pathFactory;
 
   @BeforeClass
@@ -50,7 +50,7 @@ public class ResourceTransportWrapperConverterTest {
     IPath filePath = EasyMock.createMock(IPath.class);
     IPath folderPath = EasyMock.createMock(IPath.class);
     pathFactory = EasyMock.createMock(IPathFactory.class);
-    project = EasyMock.createNiceMock(IProject.class);
+    referencePoint = EasyMock.createNiceMock(IReferencePoint.class);
     file = EasyMock.createNiceMock(IFile.class);
     folder = EasyMock.createNiceMock(IFolder.class);
 
@@ -70,26 +70,26 @@ public class ResourceTransportWrapperConverterTest {
     expect(pathFactory.fromPath(folderPath)).andStubReturn(actualFolderPath);
     expect(pathFactory.fromString(actualFolderPath)).andStubReturn(folderPath);
 
-    expect(project.getFile(filePath)).andStubReturn(file);
-    expect(project.getFolder(folderPath)).andStubReturn(folder);
+    expect(referencePoint.getFile(filePath)).andStubReturn(file);
+    expect(referencePoint.getFolder(folderPath)).andStubReturn(folder);
 
-    expect(file.getProject()).andStubReturn(project);
-    expect(file.getProjectRelativePath()).andStubReturn(filePath);
+    expect(file.getReferencePoint()).andStubReturn(referencePoint);
+    expect(file.getReferencePointRelativePath()).andStubReturn(filePath);
     expect(file.getType()).andStubReturn(Type.FILE);
 
-    expect(folder.getProject()).andStubReturn(project);
-    expect(folder.getProjectRelativePath()).andStubReturn(folderPath);
+    expect(folder.getReferencePoint()).andStubReturn(referencePoint);
+    expect(folder.getReferencePointRelativePath()).andStubReturn(folderPath);
     expect(folder.getType()).andStubReturn(Type.FOLDER);
 
-    EasyMock.replay(filePath, folderPath, pathFactory, project, file, folder);
+    EasyMock.replay(filePath, folderPath, pathFactory, referencePoint, file, folder);
   }
 
   @Test
   public void conversionRunningSession() {
     /* Mocks */
     ISarosSession session = EasyMock.createMock(ISarosSession.class);
-    expect(session.getProjectID(project)).andStubReturn("ABC");
-    expect(session.getProject("ABC")).andStubReturn(project);
+    expect(session.getReferencePointId(referencePoint)).andStubReturn("ABC");
+    expect(session.getReferencePoint("ABC")).andStubReturn(referencePoint);
 
     EasyMock.replay(session);
 
@@ -126,14 +126,14 @@ public class ResourceTransportWrapperConverterTest {
   public void conversionLeavingReceiver() {
     /* Mocks */
     ISarosSession senderSession = EasyMock.createMock(ISarosSession.class);
-    expect(senderSession.getProjectID(project)).andStubReturn("ABC");
-    expect(senderSession.getProject("ABC")).andStubReturn(project);
+    expect(senderSession.getReferencePointId(referencePoint)).andStubReturn("ABC");
+    expect(senderSession.getReferencePoint("ABC")).andStubReturn(referencePoint);
 
     ISarosSession receiverSession = EasyMock.createMock(ISarosSession.class);
-    expect(receiverSession.getProjectID(project)).andReturn("ABC");
-    expect(receiverSession.getProject("ABC")).andReturn(project);
-    expect(receiverSession.getProjectID(project)).andReturn(null);
-    expect(receiverSession.getProject("ABC")).andReturn(null);
+    expect(receiverSession.getReferencePointId(referencePoint)).andReturn("ABC");
+    expect(receiverSession.getReferencePoint("ABC")).andReturn(referencePoint);
+    expect(receiverSession.getReferencePointId(referencePoint)).andReturn(null);
+    expect(receiverSession.getReferencePoint("ABC")).andReturn(null);
 
     EasyMock.replay(senderSession, receiverSession);
 
@@ -160,15 +160,15 @@ public class ResourceTransportWrapperConverterTest {
   public void conversionLeavingSender() {
     /* Mocks */
     ISarosSession senderSession = EasyMock.createMock(ISarosSession.class);
-    expect(senderSession.getProjectID(project)).andReturn("ABC");
-    expect(senderSession.getProject("ABC")).andReturn(project);
-    expect(senderSession.getProjectID(project)).andReturn(null);
-    expect(senderSession.getProject("ABC")).andReturn(null);
+    expect(senderSession.getReferencePointId(referencePoint)).andReturn("ABC");
+    expect(senderSession.getReferencePoint("ABC")).andReturn(referencePoint);
+    expect(senderSession.getReferencePointId(referencePoint)).andReturn(null);
+    expect(senderSession.getReferencePoint("ABC")).andReturn(null);
 
     ISarosSession receiverSession = EasyMock.createMock(ISarosSession.class);
-    expect(receiverSession.getProjectID(project)).andStubReturn("ABC");
-    expect(receiverSession.getProject("ABC")).andStubReturn(project);
-    expect(receiverSession.getProject(EasyMock.isNull(String.class))).andStubReturn(null);
+    expect(receiverSession.getReferencePointId(referencePoint)).andStubReturn("ABC");
+    expect(receiverSession.getReferencePoint("ABC")).andStubReturn(referencePoint);
+    expect(receiverSession.getReferencePoint(EasyMock.isNull(String.class))).andStubReturn(null);
 
     EasyMock.replay(senderSession, receiverSession);
 

@@ -32,7 +32,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
-import saros.negotiation.ProjectNegotiationData;
+import saros.filesystem.IReferencePoint;
+import saros.negotiation.ResourceNegotiationData;
 import saros.net.IConnectionManager;
 import saros.net.xmpp.JID;
 import saros.preferences.Preferences;
@@ -78,7 +79,7 @@ public class EnterProjectNamePage extends WizardPage {
       IConnectionManager connectionManager,
       Preferences preferences,
       JID peer,
-      List<ProjectNegotiationData> projectNegotiationData,
+      List<ResourceNegotiationData> resourceNegotiationData,
       Map<String, String> desiredRemoteToLocalProjectNameMapping) {
 
     super(Messages.EnterProjectNamePage_title);
@@ -94,9 +95,9 @@ public class EnterProjectNamePage extends WizardPage {
 
     remoteProjectIdToNameMapping = new HashMap<String, String>();
 
-    for (final ProjectNegotiationData data : projectNegotiationData) {
+    for (final ResourceNegotiationData data : resourceNegotiationData) {
 
-      remoteProjectIdToNameMapping.put(data.getProjectID(), data.getProjectName());
+      remoteProjectIdToNameMapping.put(data.getReferencePointID(), data.getReferencePointName());
 
       unsupportedCharsets.addAll(getUnsupportedCharsets(data.getFileList().getEncodings()));
     }
@@ -381,7 +382,7 @@ public class EnterProjectNamePage extends WizardPage {
       String projectID = entry.getKey();
       ProjectOptionComposite projectOptionComposite = entry.getValue();
 
-      saros.filesystem.IProject project = session.getProject(projectID);
+      IReferencePoint project = session.getReferencePoint(projectID);
 
       // not shared yet
       if (project == null) continue;
@@ -397,7 +398,7 @@ public class EnterProjectNamePage extends WizardPage {
       String projectID = entry.getKey();
       ProjectOptionComposite projectOptionComposite = entry.getValue();
 
-      saros.filesystem.IProject project = session.getProject(projectID);
+      IReferencePoint project = session.getReferencePoint(projectID);
 
       // already shared
       if (project != null) continue;

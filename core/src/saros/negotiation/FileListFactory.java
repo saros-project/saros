@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
 import saros.filesystem.FileSystem;
 import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.filesystem.checksum.IChecksumCache;
 import saros.monitoring.IProgressMonitor;
@@ -20,8 +20,8 @@ import saros.negotiation.FileList.MetaData;
  * Offers two ways to create {@link FileList file lists}.
  *
  * <p>
- * <li>Either an inexpensive one that rescans the whole project to gather meta data:<br>
- *     {@link #createFileList(IProject, IChecksumCache, IProgressMonitor)}
+ * <li>Either an expensive one that rescans the whole reference point to gather meta data:<br>
+ *     {@link #createFileList(IReferencePoint, IChecksumCache, IProgressMonitor)}
  * <li>Or a cheap one which requires the caller to take care of the validity of input data:<br>
  *     {@link #createFileList(List)}
  */
@@ -56,27 +56,27 @@ public class FileListFactory {
   }
 
   /**
-   * Creates a file list for the given project.
+   * Creates a file list for the given reference point.
    *
    * <p>Uses the given checksum cache for the checksum calculation. Reports progress to the passed
    * progress monitor if present.
    *
-   * @param project the project for which to create a file list
+   * @param referencePoint the reference point for which to create a file list
    * @param checksumCache the checksum cache to use during the checksum calculation
    * @param suggestedMonitor the progress monitor to report to or <code>null</code>
-   * @return a file list for the given project
-   * @throws IOException if the default charset for the project, the members contained in the
-   *     project or one of its folders, or the charset of a contained file could not be obtained
+   * @return a file list for the given reference point
+   * @throws IOException if the the members contained in the reference point or one of its folders
+   *     or the charset of a contained file could not be obtained
    */
   public static FileList createFileList(
-      final IProject project,
+      final IReferencePoint referencePoint,
       final IChecksumCache checksumCache,
       final IProgressMonitor suggestedMonitor)
       throws IOException {
 
     FileList list = new FileList();
 
-    List<IFile> files = calculateMembers(list, project);
+    List<IFile> files = calculateMembers(list, referencePoint);
 
     IProgressMonitor monitor =
         suggestedMonitor != null ? suggestedMonitor : new NullProgressMonitor();
@@ -87,19 +87,19 @@ public class FileListFactory {
   }
 
   /**
-   * Calculates all files contained in the given project and adds them to the given file list.
-   * Returns a list of all found files.
+   * Calculates all files contained in the given reference point and adds them to the given file
+   * list. Returns a list of all found files.
    *
    * @param list the file list
-   * @param project the project for which to calculate the members
+   * @param referencePoint the reference point for which to calculate the members
    * @return a list of all found files
-   * @throws IOException if the members contained in the project or one of its folders or the
-   *     charset of a contained file could not be obtained
+   * @throws IOException if the members contained in the reference point or one of its folders or
+   *     the charset of a contained file could not be obtained
    */
-  private static List<IFile> calculateMembers(final FileList list, final IProject project)
-      throws IOException {
+  private static List<IFile> calculateMembers(
+      final FileList list, final IReferencePoint referencePoint) throws IOException {
 
-    List<IResource> resources = project.members();
+    List<IResource> resources = referencePoint.members();
 
     if (resources.isEmpty()) return Collections.emptyList();
 
@@ -112,7 +112,7 @@ public class FileListFactory {
 
       if (resource.isIgnored() || !resource.exists()) continue;
 
-      String path = resource.getProjectRelativePath().toPortableString();
+      String path = resource.getReferencePointRelativePath().toPortableString();
 
       if (list.contains(path)) continue;
 
@@ -152,9 +152,10 @@ public class FileListFactory {
 
     for (IFile file : files) {
       try {
-        monitor.subTask(file.getProject().getName() + ": " + file.getProjectRelativePath());
+        monitor.subTask(
+            file.getReferencePoint().getName() + ": " + file.getReferencePointRelativePath());
 
-        MetaData data = list.getMetaData(file.getProjectRelativePath().toPortableString());
+        MetaData data = list.getMetaData(file.getReferencePointRelativePath().toPortableString());
 
         Long checksum = null;
 

@@ -9,7 +9,7 @@ import saros.exceptions.LocalCancellationException;
 import saros.filesystem.IFile;
 import saros.monitoring.IProgressMonitor;
 import saros.negotiation.NegotiationTools.CancelOption;
-import saros.negotiation.ProjectSharingData;
+import saros.negotiation.ResourceSharingData;
 
 /** Implements Stream creation in {@link AbstractStreamProtocol} format. */
 public class OutgoingStreamProtocol extends AbstractStreamProtocol {
@@ -20,13 +20,13 @@ public class OutgoingStreamProtocol extends AbstractStreamProtocol {
   /** used for copy operations between streams * */
   private final byte[] buffer = new byte[BUFFER_SIZE];
 
-  private ProjectSharingData projectSharingData;
+  private ResourceSharingData resourceSharingData;
   private DataOutputStream out;
 
   public OutgoingStreamProtocol(
-      OutputStream out, ProjectSharingData projectSharingData, IProgressMonitor monitor) {
+      OutputStream out, ResourceSharingData resourceSharingData, IProgressMonitor monitor) {
     super(monitor);
-    this.projectSharingData = projectSharingData;
+    this.resourceSharingData = resourceSharingData;
     this.out = new DataOutputStream(out);
   }
 
@@ -62,10 +62,10 @@ public class OutgoingStreamProtocol extends AbstractStreamProtocol {
   }
 
   private void writeHeader(IFile file, long fileSize) throws IOException {
-    String projectID = projectSharingData.getProjectID(file.getProject());
-    String fileName = file.getProjectRelativePath().toPortableString();
+    String referencePointID = resourceSharingData.getReferencePointID(file.getReferencePoint());
+    String fileName = file.getReferencePointRelativePath().toPortableString();
 
-    out.writeUTF(projectID);
+    out.writeUTF(referencePointID);
     out.writeUTF(fileName);
     out.writeLong(fileSize);
   }
