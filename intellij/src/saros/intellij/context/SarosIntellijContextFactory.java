@@ -6,7 +6,6 @@ import saros.core.monitoring.remote.IntelliJRemoteProgressIndicatorFactoryImpl;
 import saros.core.ui.eventhandler.NegotiationHandler;
 import saros.core.ui.eventhandler.UserStatusChangeHandler;
 import saros.core.ui.eventhandler.XMPPAuthorizationHandler;
-import saros.core.util.IntellijCollaborationUtilsImpl;
 import saros.editor.IEditorManager;
 import saros.filesystem.IPathFactory;
 import saros.filesystem.IWorkspace;
@@ -28,7 +27,6 @@ import saros.repackaged.picocontainer.BindKey;
 import saros.repackaged.picocontainer.MutablePicoContainer;
 import saros.session.ISarosSessionContextFactory;
 import saros.synchronize.UISynchronizer;
-import saros.ui.util.ICollaborationUtils;
 
 /** Intellij related context */
 public class SarosIntellijContextFactory extends AbstractContextFactory {
@@ -61,9 +59,6 @@ public class SarosIntellijContextFactory extends AbstractContextFactory {
 
       // UI Utility
       Component.create(UIProjectUtils.class),
-
-      // IDE-specific classes for the HTML GUI
-      Component.create(ICollaborationUtils.class, IntellijCollaborationUtilsImpl.class),
     };
   }
 
