@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jface.action.ContributionItem;
@@ -93,8 +92,7 @@ public class StartSessionWithProjects extends ContributionItem {
         new SelectionAdapter() {
           @Override
           public void widgetSelected(SelectionEvent e) {
-            CollaborationUtils.startSession(
-                Collections.<IResource>singletonList(project), contacts);
+            CollaborationUtils.startSession(Collections.singleton(project), contacts);
           }
         });
 
