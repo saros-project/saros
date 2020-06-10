@@ -58,33 +58,19 @@ public class CollaborationUtils {
   }
 
   /**
-   * Starts a new session and shares the given resources with given contacts.<br>
-   * Does nothing if a {@link ISarosSession session} is already running.
+   * Starts a new session and shares the given reference points with the given contacts.
    *
-   * @param resources
-   * @param contacts
+   * <p>Does nothing if a {@link ISarosSession session} is already running.
+   *
+   * @param referencePointContainers the containers to use for the reference points to share
+   * @param contacts the contacts to share the reference points with
    * @nonBlocking
    */
-  public static void startSession(final List<IResource> resources, final List<JID> contacts) {
-    // TODO remove assertion that only projects are shared (resolved in followup PR)
-    assert resources.stream().allMatch(resource -> resource instanceof IProject)
-        : "Encountered non-project resource to share";
+  public static void startSession(
+      final Set<IContainer> referencePointContainers, final List<JID> contacts) {
 
-    final Set<IProject> projects =
-        resources.stream().map(resource -> (IProject) resource).collect(Collectors.toSet());
+    Set<IReferencePoint> referencePoints = getReferencePoints(referencePointContainers);
 
-    startSession(projects, contacts);
-  }
-
-  /**
-   * Starts a new session and shares the given projects with given contacts.<br>
-   * Does nothing if a {@link ISarosSession session} is already running.
-   *
-   * @param projects the projects share
-   * @param contacts the contacts to share the projects with
-   * @nonBlocking
-   */
-  public static void startSession(final Set<IProject> projects, final List<JID> contacts) {
     Job sessionStartupJob =
         new Job("Session Startup") {
 
@@ -92,10 +78,14 @@ public class CollaborationUtils {
           protected IStatus run(IProgressMonitor monitor) {
             monitor.beginTask("Starting session...", IProgressMonitor.UNKNOWN);
 
+            Set<IProject> projects = getProjects(referencePoints);
+
             try {
               refreshProjects(projects, null);
-              sessionManager.startSession(convert(projects));
-              Set<JID> participantsToAdd = new HashSet<JID>(contacts);
+
+              sessionManager.startSession(referencePoints);
+
+              Set<JID> participantsToAdd = new HashSet<>(contacts);
 
               ISarosSession session = sessionManager.getSession();
 
@@ -274,6 +264,32 @@ public class CollaborationUtils {
             }
           }
         });
+  }
+
+  /**
+   * Returns the reference point objects representing the given container objects.
+   *
+   * @param referencePointContainers the container objects to represent as reference points
+   * @return the reference point objects representing the given container objects
+   */
+  private static Set<IReferencePoint> getReferencePoints(Set<IContainer> referencePointContainers) {
+    return referencePointContainers
+        .stream()
+        .map(EclipseReferencePointImpl::new)
+        .collect(Collectors.toSet());
+  }
+
+  /**
+   * Returns all projects that contain at least one of the given reference points.
+   *
+   * @param referencePoints the currently shared reference points
+   * @return all projects that contain at least one of the given reference points
+   */
+  private static Set<IProject> getProjects(Set<IReferencePoint> referencePoints) {
+    return referencePoints
+        .stream()
+        .map(referencePoint -> ResourceConverter.getDelegate(referencePoint).getProject())
+        .collect(Collectors.toSet());
   }
 
   /**

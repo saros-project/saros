@@ -1,7 +1,7 @@
 package saros.ui.wizards;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
@@ -66,7 +66,6 @@ public class StartSessionWizard extends Wizard {
    *
    * <p>The chosen resources are put into collections to be sent to the chosen contacts.
    */
-  // TODO adjust once CollaborationUtils has been migrated
   @Override
   public boolean performFinish() {
 
@@ -82,7 +81,7 @@ public class StartSessionWizard extends Wizard {
 
     SarosView.clearNotifications();
 
-    CollaborationUtils.startSession(new ArrayList<>(selectedResources), selectedContacts);
+    CollaborationUtils.startSession(new HashSet<>(selectedResources), selectedContacts);
 
     return true;
   }
