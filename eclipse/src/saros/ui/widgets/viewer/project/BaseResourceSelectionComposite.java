@@ -1,16 +1,20 @@
 package saros.ui.widgets.viewer.project;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
@@ -126,7 +130,17 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
         }
       };
 
-  /** Filter for already shared resources. */
+  /**
+   * Filter for resources that are already shared or can't be shared with the current reference
+   * point setup. This includes:
+   *
+   * <ul>
+   *   <li>Already shared resources
+   *   <li>Parents of already shared resources that don't contain any other sharable child
+   *       containers
+   *   <li>Files contained in parents of already shared resources
+   * </ul>
+   */
   @SuppressWarnings("FieldCanBeLocal")
   private final ViewerFilter sharedResourcesFilter =
       new ViewerFilter() {
@@ -134,17 +148,125 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
         public boolean select(Viewer viewer, Object parentElement, Object element) {
           ISarosSession sarosSession = sessionManager.getSession();
 
-          if (sarosSession != null && element instanceof IResource) {
-            Set<IReferencePoint> sharedReferencePoints = sarosSession.getReferencePoints();
-            saros.filesystem.IResource wrappedResource =
-                ResourceConverter.convertToResource(sharedReferencePoints, (IResource) element);
-
-            return !sarosSession.isShared(wrappedResource);
+          if (sarosSession == null || !(element instanceof IResource)) {
+            return true;
           }
 
-          return true;
+          Set<IReferencePoint> referencePoints = sarosSession.getReferencePoints();
+          Set<IContainer> referencePointParents = getReferencePointParents(referencePoints);
+
+          if (element instanceof IContainer) {
+            Set<IContainer> containerWithoutSharableChildren =
+                getIgnoredReferencePointParents(referencePoints, referencePointParents);
+
+            if (containerWithoutSharableChildren.contains(element)) {
+              // TODO inform user about filtered resource
+
+              return false;
+            }
+
+          } else if (element instanceof IFile) {
+            IContainer parent = ((IFile) element).getParent();
+
+            if (referencePointParents.contains(parent)) {
+              return false;
+            }
+          }
+
+          Set<IReferencePoint> sharedReferencePoints = sarosSession.getReferencePoints();
+          saros.filesystem.IResource wrappedResource =
+              ResourceConverter.convertToResource(sharedReferencePoints, (IResource) element);
+
+          return !sarosSession.isShared(wrappedResource);
         }
       };
+
+  /**
+   * Returns all parent resources of the given set of reference points.
+   *
+   * @param referencePoints the reference points
+   * @return all parent resources of the given set of reference points
+   */
+  private Set<IContainer> getReferencePointParents(Set<IReferencePoint> referencePoints) {
+
+    Set<IContainer> referencePointParents = new HashSet<>();
+
+    for (IReferencePoint referencePoint : referencePoints) {
+      IContainer referencePointDelegate = ResourceConverter.getDelegate(referencePoint);
+
+      IContainer parent = referencePointDelegate.getParent();
+
+      while (parent != null && parent.getType() != IResource.ROOT) {
+        referencePointParents.add(parent);
+
+        parent = parent.getParent();
+      }
+    }
+
+    return referencePointParents;
+  }
+
+  /**
+   * Returns a list of all referent point parent resources that don't have any sharable child
+   * resources.
+   *
+   * <p>Sharable resources in this context are containers that are valid candidates for new
+   * reference points that can be added to the session. To be sharable, a container must not have
+   * any child resources that are already shared.
+   *
+   * @param referencePoints the currently shared reference points
+   * @return a list of all referent point parent resources that don't have any sharable child
+   *     resources
+   */
+  private Set<IContainer> getIgnoredReferencePointParents(
+      Set<IReferencePoint> referencePoints, Set<IContainer> referencePointParents) {
+    Set<IContainer> referencePointDelegates =
+        referencePoints.stream().map(ResourceConverter::getDelegate).collect(Collectors.toSet());
+
+    List<IContainer> sortedReferencePointParents = new ArrayList<>(referencePointParents);
+    sortedReferencePointParents.sort(
+        Comparator.comparingInt((IContainer c) -> c.getFullPath().segmentCount()).reversed());
+
+    Set<IContainer> containersWithoutSharableChildren = new HashSet<>();
+    Set<IContainer> containersWithSharableChildren = new HashSet<>();
+
+    for (IContainer referencePointParent : sortedReferencePointParents) {
+      IResource[] children;
+
+      try {
+        children = referencePointParent.members();
+
+      } catch (CoreException e) {
+        log.error("Could not obtain members of container " + referencePointParent, e);
+
+        continue;
+      }
+
+      boolean hasSharableChildren = false;
+
+      for (IResource child : children) {
+        if (!(child instanceof IContainer)) {
+          continue;
+        }
+
+        if (containersWithSharableChildren.contains(child)
+            || (!referencePointParents.contains(child)
+                && !referencePointDelegates.contains(child))) {
+          hasSharableChildren = true;
+
+          break;
+        }
+      }
+
+      if (hasSharableChildren) {
+        containersWithSharableChildren.add(referencePointParent);
+      } else {
+        containersWithoutSharableChildren.add(referencePointParent);
+      }
+    }
+
+    return containersWithoutSharableChildren;
+  }
 
   public BaseResourceSelectionComposite(Composite parent, int style) {
     super(parent, style | SWT.CHECK);
@@ -179,6 +301,7 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
    *
    * <ul>
    *   <li>A resource being deselected while its parent resource is still selected.
+   *   <li>A parent resource of an already shared resource is selected.
    * </ul>
    *
    * @param resource the resource element whose state changed
@@ -186,6 +309,17 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
    * @return whether the change is invalid
    */
   private boolean isInvalidStateChange(IResource resource, boolean selected) {
+    ISarosSession sarosSession = sessionManager.getSession();
+
+    if (sarosSession != null && resource instanceof IContainer) {
+      Set<IContainer> referencePointParents =
+          getReferencePointParents(sarosSession.getReferencePoints());
+
+      if (referencePointParents.contains(resource)) {
+        return true;
+      }
+    }
+
     IResource parentResource = resource.getParent();
 
     boolean parentSelected = checkboxTreeViewer.getChecked(parentResource);
@@ -385,7 +519,7 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
       return false;
     }
 
-    List<IContainer> selectedList = new ArrayList<>();
+    List<IResource> selectedList = new ArrayList<>();
 
     String[] uris;
 
@@ -395,7 +529,7 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
     for (String uri : uris) {
       IResource resource = root.findMember(uri);
       if (resource != null && resource.getType() != IResource.FILE) {
-        selectedList.add((IContainer) resource);
+        selectedList.add(resource);
 
       } else if (resource != null && resource.getType() == IResource.FILE) {
         log.error("Resource for saved uri " + uri + "is not a container: " + resource);
@@ -405,7 +539,11 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
       }
     }
 
-    setSelectedResourcesInternal(selectedList);
+    /*
+     * use "external" selection method to filter out selections that are illegal with the current
+     * session state
+     */
+    setSelectedResources(selectedList);
 
     return true;
   }
@@ -525,6 +663,15 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
       sanitizedResources.add(parentContainer);
     }
 
+    ISarosSession sarosSession = sessionManager.getSession();
+
+    if (sarosSession != null) {
+      Set<IContainer> referencePointParents =
+          getReferencePointParents(sarosSession.getReferencePoints());
+
+      sanitizedResources.removeAll(referencePointParents);
+    }
+
     List<IContainer> sanitizedBaseContainers =
         determineBaseContainers(new ArrayList<>(sanitizedResources));
 
@@ -548,6 +695,7 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
           IPath path1 = r1.getFullPath();
           IPath path2 = r2.getFullPath();
 
+          // sort in ascending order
           return Integer.compare(path1.segmentCount(), path2.segmentCount());
         });
 
