@@ -666,10 +666,15 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
     ISarosSession sarosSession = sessionManager.getSession();
 
     if (sarosSession != null) {
-      Set<IContainer> referencePointParents =
-          getReferencePointParents(sarosSession.getReferencePoints());
+      Set<IReferencePoint> referencePoints = sarosSession.getReferencePoints();
 
-      sanitizedResources.removeAll(referencePointParents);
+      Set<IContainer> referencePointParents = getReferencePointParents(referencePoints);
+
+      sanitizedResources.removeIf(
+          container ->
+              referencePointParents.contains(container)
+                  || sarosSession.isShared(
+                      ResourceConverter.convertToResource(referencePoints, container)));
     }
 
     List<IContainer> sanitizedBaseContainers =
