@@ -73,7 +73,7 @@ public final class SharedProjectDecorator implements ILightweightLabelDecorator 
           session.removeListener(sessionListener);
           SharedProjectDecorator.this.session = null;
           log.debug("clearing project decoration for all shared projects");
-          updateDecoratorsAsync(null); // update all labels
+          updateAllLabelsAsync(); // update all labels
         }
       };
 
@@ -82,7 +82,7 @@ public final class SharedProjectDecorator implements ILightweightLabelDecorator 
         @Override
         public void resourcesAdded(IReferencePoint referencePoint) {
           log.debug("updating project decoration for all shared projects");
-          updateDecoratorsAsync(null); // update all labels
+          updateAllLabelsAsync(); // update all labels
         }
       };
 
@@ -130,14 +130,14 @@ public final class SharedProjectDecorator implements ILightweightLabelDecorator 
     listeners.remove(listener);
   }
 
-  private void updateDecoratorsAsync(final IResource[] resources) {
+  private void updateAllLabelsAsync() {
     SWTUtils.runSafeSWTAsync(
         log,
         new Runnable() {
           @Override
           public void run() {
             LabelProviderChangedEvent event =
-                new LabelProviderChangedEvent(SharedProjectDecorator.this, resources);
+                new LabelProviderChangedEvent(SharedProjectDecorator.this);
 
             for (ILabelProviderListener listener : listeners) {
               listener.labelProviderChanged(event);
