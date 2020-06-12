@@ -1,7 +1,7 @@
 package saros.ui.wizards;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
@@ -43,7 +43,6 @@ public class AddResourcesToSessionWizard extends Wizard {
     addPage(resourceSelectionWizardPage);
   }
 
-  // TODO adjust once CollaborationUtils has been migrated
   @Override
   public boolean performFinish() {
     List<IContainer> selectedResources = resourceSelectionWizardPage.getSelectedResources();
@@ -54,7 +53,7 @@ public class AddResourcesToSessionWizard extends Wizard {
 
     SarosView.clearNotifications();
 
-    CollaborationUtils.addResourcesToSession(new ArrayList<>(selectedResources));
+    CollaborationUtils.addReferencePointsToSession(new HashSet<>(selectedResources));
 
     return true;
   }
