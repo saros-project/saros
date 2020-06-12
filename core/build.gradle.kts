@@ -1,4 +1,9 @@
+plugins {
+  id("saros.gradle.eclipse.plugin")
+}
+
 val versionQualifier = ext.get("versionQualifier") as String
+
 
 configurations {
     // Defined in root build.gradle
@@ -30,7 +35,6 @@ dependencies {
     releaseDep("org.apache.commons:commons-lang3:3.8.1")
 
     releaseDep("javax.jmdns:jmdns:3.4.1")
-    releaseDep(project(path = ":saros.picocontainer", configuration = "shadow"))
     releaseDep("xpp3:xpp3:1.1.4c")
     releaseDep("com.thoughtworks.xstream:xstream:1.4.10")
     releaseDep("org.gnu.inet:libidn:1.15")
@@ -46,6 +50,8 @@ dependencies {
     // Workaround until we updated to a newer smack version
     releaseDep(files("libs/smack-3.4.1.jar"))
     releaseDep(files("libs/smackx-3.4.1.jar"))
+    // Workaround until we can publish and use (without a user token) the repackaged jar in GitHub Packages
+    releaseDep(rootProject.files("libs/picocontainer-2.11.2-patched_relocated.jar"))
 }
 
 sourceSets {

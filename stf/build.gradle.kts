@@ -1,3 +1,7 @@
+plugins {
+  id("saros.gradle.eclipse.plugin")
+}
+
 val versionQualifier = (ext.get("versionQualifier") ?: "") as String
 val junitVersion = ext.get("junitVersion")
 
