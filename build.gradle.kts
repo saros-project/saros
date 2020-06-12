@@ -24,44 +24,25 @@ idea {
     }
 }
 
-/*
- * Apply default plugins and IntelliJ module configuration
- * for all sub-projects
- */
-configure(subprojects) {
-    apply(plugin = "idea")
-    apply(plugin = "java")
 
+subprojects {
+    val projectToConf = this
+
+    apply(plugin = "idea")
+    apply(plugin = "eclipse")
+    apply(plugin = "java")
+    apply(plugin = "pmd")
+
+    /*
+     * Apply default plugins and IntelliJ module configuration
+     * for all sub-projects
+     */
+    
     idea {
         module {
             excludeDirs.addAll(mutableListOf(file("bin"), file("lib"), file("libs")))
         }
     }
-}
-
-/*
- * Workaround: Applying the shadow plugin in picocontainer
- * leads to an error that says that "Project.afterEvaluate" cannot
- * be called in this context.
- */
-configure(mutableListOf(project(":saros.picocontainer"))) {
-    apply(plugin = "com.github.johnrengelman.shadow")
-    apply(plugin = "eclipse")
-}
-
-val projectsToConfigure = subprojects - project(":saros.picocontainer")
-
-configure(projectsToConfigure) {
-    apply(plugin = "pmd")
-    val projectToConf = this
-
-    /*
-     * Applied on all sub-projects, because the plugin adds the
-     * dependency to the picocontainer project to the eclipse config.
-     * If the picocontainer project is separated the gradle "eclipse"
-     * plugin can be applied (and our plugin only for osgi sub-projects)
-     */
-    apply(plugin = "saros.gradle.eclipse.plugin")
 
     repositories {
         mavenCentral()
@@ -206,7 +187,7 @@ tasks {
     // TODO: Verify whether this task is used
     register("aggregatedTestReport", TestReport::class) {
         destinationDir = file("$buildDir/reports/allTests")
-        val testProjects = (projectsToConfigure - project(":saros.stf") - project(":saros.stf.test"))
+        val testProjects = (subprojects - project(":saros.stf") - project(":saros.stf.test"))
         reportOn(testProjects.map { it.tasks.getByName("test") })
 
         group = "Report"
@@ -214,11 +195,10 @@ tasks {
     }
 
     // remove all build dirs. The frontend package has no build directory
-    val projectsToPrepare = projectsToConfigure + project(":saros.picocontainer")
     register("prepareEclipse") {
         dependsOn(
-                projectsToPrepare.map { listOf(":${it.name}:cleanEclipseProject", ":${it.name}:cleanEclipseClasspath") }.flatten() +
-                projectsToPrepare.map { listOf(":${it.name}:eclipseProject", ":${it.name}:eclipseClasspath") }.flatten() +
+                subprojects.map { listOf(":${it.name}:cleanEclipseProject", ":${it.name}:cleanEclipseClasspath") }.flatten() +
+                subprojects.map { listOf(":${it.name}:eclipseProject", ":${it.name}:eclipseClasspath") }.flatten() +
                 listOf("generateLibAll")
         )
 
@@ -228,7 +208,7 @@ tasks {
     }
 
     register("cleanAll") {
-        dependsOn(projectsToConfigure.map { ":${it.name}:clean" })
+        dependsOn(subprojects.map { ":${it.name}:clean" })
 
         group = "Build"
         description = "Utility task that calls 'clean' of all sub-projects"
@@ -236,7 +216,6 @@ tasks {
 
     register("sarosEclipse", Copy::class) {
         dependsOn(
-                ":saros.picocontainer:test",
                 ":saros.core:test",
                 ":saros.eclipse:test",
                 ":saros.eclipse:jar")
@@ -286,7 +265,6 @@ tasks {
 
     register("sarosIntellij", Copy::class) {
         dependsOn(
-                ":saros.picocontainer:test",
                 ":saros.core:test",
                 ":saros.intellij:test",
                 ":saros.intellij:buildPlugin"

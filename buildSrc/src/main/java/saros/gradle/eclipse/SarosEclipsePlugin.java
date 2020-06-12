@@ -64,7 +64,6 @@ public class SarosEclipsePlugin implements Plugin<Project> {
    */
   private void configureEclipseAfterEvaluate(Project p, SarosEclipseExtension e) {
     EclipseConfigurator eclipseConfigurator = new EclipseConfigurator(p);
-    eclipseConfigurator.usePatchedPicocontainer();
     if (e.isAddPdeNature()) {
       eclipseConfigurator.addPdeNature();
     }

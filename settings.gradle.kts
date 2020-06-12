@@ -12,7 +12,3 @@ listOf("core", "eclipse", "intellij", "server", "lsp", "stf", "stf.test").forEac
     include(projectName)
     project(":$projectName").projectDir = file(dir)
 }
-
-val projectName = prefix + "picocontainer"
-include(projectName)
-project(":$projectName").projectDir = file("core/picocontainer")

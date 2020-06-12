@@ -1,5 +1,6 @@
 plugins {
     id("org.gradle.test-retry") version "1.1.5"
+    id("saros.gradle.eclipse.plugin")
 }
 
 sarosEclipse {

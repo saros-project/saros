@@ -20,8 +20,6 @@
       <module name="saros.intellij_test" target="1.8" />
       <module name="saros.lsp_main" target="1.8" />
       <module name="saros.lsp_test" target="1.8" />
-      <module name="saros.picocontainer_main" target="1.8" />
-      <module name="saros.picocontainer_test" target="1.8" />
       <module name="saros.server_main" target="1.8" />
       <module name="saros.server_test" target="1.8" />
       <module name="saros.stf.test_main" target="1.8" />
