@@ -7,7 +7,6 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
   saros.concurrent.undo.TestSuite.class,
   saros.editor.internal.TestSuite.class,
-  saros.feedback.TestSuite.class,
   saros.project.TestSuite.class,
   saros.session.internal.TestSuite.class,
   saros.ui.model.roster.TestSuite.class,

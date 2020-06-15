@@ -7,9 +7,6 @@ import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.osgi.service.prefs.Preferences;
 import saros.Saros;
-import saros.feedback.AbstractFeedbackManager;
-import saros.feedback.FeedbackInterval;
-import saros.feedback.FeedbackManager;
 
 /**
  * Class used to initialize default preference values.
@@ -63,19 +60,6 @@ public class EclipsePreferenceInitializer extends AbstractPreferenceInitializer 
     // TODO Dead preference?
     adapter.setDefault(
         EclipsePreferenceConstants.CONTACT_SELECTION_FILTER_NON_SAROS_CONTACTS, true);
-
-    // Initialize Feedback Preferences
-    adapter.setDefault(
-        EclipsePreferenceConstants.FEEDBACK_SURVEY_DISABLED, FeedbackManager.FEEDBACK_ENABLED);
-    adapter.setDefault(
-        EclipsePreferenceConstants.FEEDBACK_SURVEY_INTERVAL,
-        FeedbackInterval.DEFAULT.getInterval());
-    adapter.setDefault(
-        EclipsePreferenceConstants.STATISTIC_ALLOW_SUBMISSION, AbstractFeedbackManager.UNKNOWN);
-    adapter.setDefault(
-        EclipsePreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION, AbstractFeedbackManager.UNKNOWN);
-    adapter.setDefault(
-        EclipsePreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION_FULL, AbstractFeedbackManager.FORBID);
 
     // Communication default settings
     adapter.setDefault(EclipsePreferenceConstants.USE_IRC_STYLE_CHAT_LAYOUT, false);

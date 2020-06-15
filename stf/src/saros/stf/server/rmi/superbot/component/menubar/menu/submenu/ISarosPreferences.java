@@ -2,7 +2,6 @@ package saros.stf.server.rmi.superbot.component.menubar.menu.submenu;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import saros.feedback.FeedbackManager;
 import saros.net.xmpp.JID;
 
 public interface ISarosPreferences extends Remote {
@@ -96,29 +95,6 @@ public interface ISarosPreferences extends Remote {
   public void removeAllNonActiveAccounts() throws RemoteException;
 
   /**
-   * ********************************************
-   *
-   * <p>setting for Feedback
-   *
-   * <p>********************************************
-   */
-
-  /**
-   * Set feeback disabled using GUI.<br>
-   * To simplify Testing you can disable the automatic reminder, so that you will never get the
-   * feedback popup window.
-   *
-   * <ol>
-   *   <li>open Preferences dialog by clicking main menu Saros -> preferences
-   *   <li>click the treenodes: Saros-> Feedback
-   *   <li>then select the radio button "Disable automatic reminder" in the right page
-   * </ol>
-   *
-   * @throws RemoteException
-   */
-  public void disableAutomaticReminder() throws RemoteException;
-
-  /**
    * @param jid a JID which is used to identify the users of the Jabber network, more about it
    *     please see {@link JID}.
    * @return <tt>true</tt> if the red label with the text "active: jid.getBase()" is visible in the
@@ -144,16 +120,6 @@ public interface ISarosPreferences extends Remote {
    * @throws RemoteException
    */
   public boolean existsAccount(JID jid) throws RemoteException;
-
-  /**
-   * Set feeback disabled without GUI.<br>
-   * To simplify Testing you can disable the automatic reminder, so that you will never get the
-   * feedback popup window.
-   *
-   * @see FeedbackManager#setFeedbackDisabled(boolean)
-   * @throws RemoteException
-   */
-  public void disableAutomaticReminderNoGUI() throws RemoteException;
 
   /**
    * Checks the button Force XMPP transfer over IBB in the Saros advances preferences. You have to

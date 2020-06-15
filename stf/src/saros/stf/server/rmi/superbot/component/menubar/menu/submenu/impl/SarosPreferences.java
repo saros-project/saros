@@ -8,8 +8,6 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCheckBox;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import saros.account.XMPPAccount;
-import saros.feedback.FeedbackManager;
-import saros.feedback.Messages;
 import saros.net.xmpp.JID;
 import saros.stf.server.StfRemoteObject;
 import saros.stf.server.bot.condition.SarosConditions;
@@ -205,35 +203,6 @@ public final class SarosPreferences extends StfRemoteObject implements ISarosPre
     shell.bot().button(APPLY_AND_CLOSE).click();
 
     shell.bot().waitUntil(SarosConditions.isShellClosed(shell));
-  }
-
-  @Override
-  public void disableAutomaticReminder() throws RemoteException {
-    if (FeedbackManager.isFeedbackFeatureRequired() && !FeedbackManager.isFeedbackDisabled()) {
-      clickMenuSarosPreferences();
-
-      SWTBotShell shell = new SWTBot().shell(SHELL_PREFERNCES);
-      shell.activate();
-
-      shell.bot().tree().expandNode(NODE_SAROS, NODE_SAROS_FEEDBACK).select();
-      shell
-          .bot()
-          .radioInGroup(
-              Messages.getString("feedback.page.radio.disable"),
-              Messages.getString("feedback.page.group.interval"))
-          .click();
-      shell.bot().button(APPLY).click();
-      shell.bot().button(APPLY_AND_CLOSE).click();
-      shell.bot().waitUntil(SarosConditions.isShellClosed(shell));
-    }
-  }
-
-  @Override
-  public void disableAutomaticReminderNoGUI() throws RemoteException {
-    if (FeedbackManager.isFeedbackFeatureRequired() && !FeedbackManager.isFeedbackDisabled()) {
-
-      FeedbackManager.setFeedbackDisabled(true);
-    }
   }
 
   @Override
