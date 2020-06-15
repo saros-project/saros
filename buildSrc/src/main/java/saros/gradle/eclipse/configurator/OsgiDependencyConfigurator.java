@@ -13,8 +13,7 @@ import org.gradle.api.Project;
 public class OsgiDependencyConfigurator {
 
   private static final String REQUIRE_BUNDLE_KEY = "Require-Bundle";
-  private static final String GOOMPH_MVN_CENTRAL_PLUGIN_ID =
-      "com.diffplug.gradle.eclipse.mavencentral";
+  private static final String GOOMPH_MVN_CENTRAL_PLUGIN_ID = "com.diffplug.eclipse.mavencentral";
 
   private Project project;
 
