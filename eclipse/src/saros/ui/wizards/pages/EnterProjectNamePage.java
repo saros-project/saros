@@ -177,7 +177,7 @@ public class EnterProjectNamePage extends WizardPage {
           new ProjectOptionListener() {
             @Override
             public void projectNameChanged(ProjectOptionComposite composite) {
-              updatePageComplete(composite.getRemoteProjectID());
+              updatePageComplete(composite.getRemoteReferencePointId());
             }
 
             @Override
@@ -195,7 +195,7 @@ public class EnterProjectNamePage extends WizardPage {
               }
 
               final String remoteProjectName =
-                  remoteProjectIdToNameMapping.get(composite.getRemoteProjectID());
+                  remoteProjectIdToNameMapping.get(composite.getRemoteReferencePointId());
 
               final String proposal =
                   findProjectNameProposal(remoteProjectName, reservedNames.toArray(new String[0]));

@@ -151,27 +151,28 @@ public class Messages extends NLS {
   public static String EditXMPPAccountWizardPage_description;
   public static String EditXMPPAccountWizardPage_title;
 
-  public static String EnterProjectNamePage_browse;
   public static String EnterProjectNamePage_create_new_project;
-  public static String EnterProjectNamePage_description_direct_filetranfser;
+  public static String EnterProjectNamePage_create_new_directory;
   public static String EnterProjectNamePage_description_file_transfer;
   public static String EnterProjectNamePage_description_socks5proxy;
   public static String EnterProjectNamePage_direct_filetransfer_deactivated;
   public static String EnterProjectNamePage_direct_filetransfer_nan;
-  public static String EnterProjectNamePage_error_browser_open;
+  public static String EnterProjectNamePage_directory_name;
+  public static String EnterProjectNamePage_directory_base_path;
   public static String EnterProjectNamePage_error_projectname_exists;
   public static String EnterProjectNamePage_error_projectname_in_use;
   public static String EnterProjectNamePage_error_wrong_name;
+  public static String EnterProjectNamePage_existing_directory_path;
   public static String EnterProjectNamePage_warning_project_artifacts_found;
-  public static String EnterProjectNamePage_faq;
   public static String EnterProjectNamePage_project_name;
   public static String EnterProjectNamePage_saros_url;
-  public static String EnterProjectNamePage_select_project_for_update;
+  public static String EnterProjectNamePage_select_base_directory;
+  public static String EnterProjectNamePage_select_existing_directory;
   public static String EnterProjectNamePage_set_project_name;
   public static String EnterProjectNamePage_title;
   public static String EnterProjectNamePage_title2;
   public static String EnterProjectNamePage_unknown_transport_method;
-  public static String EnterProjectNamePage_use_existing_project;
+  public static String EnterProjectNamePage_use_existing_directory;
 
   public static String EnterXMPPAccountWizardPage_description;
   public static String EnterXMPPAccountWizardPage_title;
