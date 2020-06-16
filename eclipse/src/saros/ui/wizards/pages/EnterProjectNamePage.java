@@ -41,8 +41,8 @@ import saros.session.ISarosSession;
 import saros.ui.ImageManager;
 import saros.ui.Messages;
 import saros.ui.util.SWTUtils;
-import saros.ui.widgets.wizard.ProjectOptionComposite;
-import saros.ui.widgets.wizard.events.ProjectOptionListener;
+import saros.ui.widgets.wizard.ReferencePointOptionComposite;
+import saros.ui.widgets.wizard.events.ReferencePointOptionListener;
 
 /** A wizard page that allows to enter the new project name or to choose to overwrite a project. */
 public class EnterProjectNamePage extends WizardPage {
@@ -57,8 +57,8 @@ public class EnterProjectNamePage extends WizardPage {
   /** Map containing the mapping from the remote project id to the remote project name. */
   private final Map<String, String> remoteProjectIdToNameMapping;
 
-  private final Map<String, ProjectOptionComposite> projectOptionComposites =
-      new HashMap<String, ProjectOptionComposite>();
+  private final Map<String, ReferencePointOptionComposite> projectOptionComposites =
+      new HashMap<String, ReferencePointOptionComposite>();
 
   /** Map containing the current error messages for every project id. */
   private final Map<String, String> currentErrors = new HashMap<>();
@@ -155,7 +155,8 @@ public class EnterProjectNamePage extends WizardPage {
       TabItem tabItem = new TabItem(tabFolder, SWT.NONE);
       tabItem.setText(remoteProjectIdToNameMapping.get(projectID));
 
-      ProjectOptionComposite tabComposite = new ProjectOptionComposite(tabFolder, projectID);
+      ReferencePointOptionComposite tabComposite =
+          new ReferencePointOptionComposite(tabFolder, projectID);
 
       tabItem.setControl(tabComposite);
 
@@ -171,24 +172,24 @@ public class EnterProjectNamePage extends WizardPage {
   }
 
   private void attachListeners() {
-    for (ProjectOptionComposite composite : projectOptionComposites.values()) {
+    for (ReferencePointOptionComposite composite : projectOptionComposites.values()) {
 
-      composite.addProjectOptionListener(
-          new ProjectOptionListener() {
+      composite.addReferencePointOptionListener(
+          new ReferencePointOptionListener() {
             @Override
-            public void projectNameChanged(ProjectOptionComposite composite) {
+            public void valueChanged(ReferencePointOptionComposite composite) {
               updatePageComplete(composite.getRemoteReferencePointId());
             }
 
             @Override
-            public void projectOptionChanged(ProjectOptionComposite composite) {
+            public void selectedOptionChanged(ReferencePointOptionComposite composite) {
               if (composite.useExistingProject()) return;
 
               if (!composite.getProjectName().isEmpty()) return;
 
               final List<String> reservedNames = new ArrayList<>();
 
-              for (ProjectOptionComposite c : projectOptionComposites.values()) {
+              for (ReferencePointOptionComposite c : projectOptionComposites.values()) {
                 if (c.getProjectName().isEmpty()) continue;
 
                 reservedNames.add(c.getProjectName());
@@ -214,9 +215,10 @@ public class EnterProjectNamePage extends WizardPage {
    */
   private String isProjectSelectionValid(String projectID) {
 
-    ProjectOptionComposite projectOptionComposite = projectOptionComposites.get(projectID);
+    ReferencePointOptionComposite referencePointOptionComposite =
+        projectOptionComposites.get(projectID);
 
-    String projectName = projectOptionComposite.getProjectName();
+    String projectName = referencePointOptionComposite.getProjectName();
 
     if (projectName.isEmpty())
       return Messages.EnterProjectNamePage_set_project_name
@@ -238,13 +240,13 @@ public class EnterProjectNamePage extends WizardPage {
 
     IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 
-    if (projectOptionComposite.useExistingProject() && !project.exists())
+    if (referencePointOptionComposite.useExistingProject() && !project.exists())
       // FIXME crap error message
       return Messages.EnterProjectNamePage_error_wrong_name
           + " "
-          + projectOptionComposite.getProjectName();
+          + referencePointOptionComposite.getProjectName();
 
-    if (!projectOptionComposite.useExistingProject() && project.exists())
+    if (!referencePointOptionComposite.useExistingProject() && project.exists())
       // FIXME we are working with tabs ! always display the remote
       // project name
       return MessageFormat.format(
@@ -342,7 +344,7 @@ public class EnterProjectNamePage extends WizardPage {
 
     List<String> dirtyProjectNames = new ArrayList<String>();
 
-    for (ProjectOptionComposite composite : projectOptionComposites.values()) {
+    for (ReferencePointOptionComposite composite : projectOptionComposites.values()) {
 
       if (composite.useExistingProject()) continue;
 
@@ -377,26 +379,26 @@ public class EnterProjectNamePage extends WizardPage {
     final Set<String> reservedProjectNames = new HashSet<String>();
 
     // force pre-selection of already shared projects
-    for (Entry<String, ProjectOptionComposite> entry : projectOptionComposites.entrySet()) {
+    for (Entry<String, ReferencePointOptionComposite> entry : projectOptionComposites.entrySet()) {
 
       String projectID = entry.getKey();
-      ProjectOptionComposite projectOptionComposite = entry.getValue();
+      ReferencePointOptionComposite referencePointOptionComposite = entry.getValue();
 
       IReferencePoint project = session.getReferencePoint(projectID);
 
       // not shared yet
       if (project == null) continue;
 
-      projectOptionComposite.setProjectName(project.getName(), true);
-      projectOptionComposite.setEnabled(false);
+      referencePointOptionComposite.setProjectName(project.getName(), true);
+      referencePointOptionComposite.setEnabled(false);
       reservedProjectNames.add(project.getName());
     }
 
     // try to assign local names for the remaining remote projects
-    for (Entry<String, ProjectOptionComposite> entry : projectOptionComposites.entrySet()) {
+    for (Entry<String, ReferencePointOptionComposite> entry : projectOptionComposites.entrySet()) {
 
       String projectID = entry.getKey();
-      ProjectOptionComposite projectOptionComposite = entry.getValue();
+      ReferencePointOptionComposite referencePointOptionComposite = entry.getValue();
 
       IReferencePoint project = session.getReferencePoint(projectID);
 
@@ -430,7 +432,7 @@ public class EnterProjectNamePage extends WizardPage {
         projectNameProposal =
             findProjectNameProposal(remoteProjectName, reservedProjectNames.toArray(new String[0]));
 
-      projectOptionComposite.setProjectName(projectNameProposal, existingProject);
+      referencePointOptionComposite.setProjectName(projectNameProposal, existingProject);
       reservedProjectNames.add(projectNameProposal);
     }
   }
@@ -440,14 +442,14 @@ public class EnterProjectNamePage extends WizardPage {
 
     final Set<String> excludedProjectIDs = new HashSet<String>(Arrays.asList(projectIDsToExclude));
 
-    for (Entry<String, ProjectOptionComposite> entry : projectOptionComposites.entrySet()) {
+    for (Entry<String, ReferencePointOptionComposite> entry : projectOptionComposites.entrySet()) {
 
       String projectID = entry.getKey();
-      ProjectOptionComposite projectOptionComposite = entry.getValue();
+      ReferencePointOptionComposite referencePointOptionComposite = entry.getValue();
 
       if (excludedProjectIDs.contains(projectID)) continue;
 
-      currentProjectNames.add(projectOptionComposite.getProjectName());
+      currentProjectNames.add(referencePointOptionComposite.getProjectName());
     }
 
     return currentProjectNames;
