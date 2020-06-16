@@ -1,9 +1,9 @@
 package saros.ui.widgets.wizard;
 
 import java.util.Objects;
-import saros.ui.widgets.wizard.ProjectOptionComposite.LocalRepresentationOption;
+import saros.ui.widgets.wizard.ReferencePointOptionComposite.LocalRepresentationOption;
 
-/** Data holder class for the result of a {@link ProjectOptionComposite}. */
+/** Data holder class for the result of a {@link ReferencePointOptionComposite}. */
 public class ReferencePointOptionResult {
   private final LocalRepresentationOption localRepresentationOption;
   private final String newProjectName;

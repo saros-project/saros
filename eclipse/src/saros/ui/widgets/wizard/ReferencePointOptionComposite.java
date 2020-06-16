@@ -18,15 +18,14 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog;
 import saros.ui.ImageManager;
 import saros.ui.Messages;
-import saros.ui.widgets.wizard.events.ProjectOptionListener;
+import saros.ui.widgets.wizard.events.ReferencePointOptionListener;
 
 /**
  * Composite allowing the user to choose how to represent a shared reference point in the local
  * workspace.
  */
-// TODO rename to ReferencePointRepresentationOptionComposite
 // TODO fix scaling; with addition of new row, windows is to short vertically
-public class ProjectOptionComposite extends Composite {
+public class ReferencePointOptionComposite extends Composite {
 
   /** The possible ways to represent the shared reference point that can be chosen by the user. */
   public enum LocalRepresentationOption {
@@ -38,7 +37,7 @@ public class ProjectOptionComposite extends Composite {
   private static final Image BROWSE_BUTTON_ICON =
       ImageManager.getImage("icons/obj16/fldr_obj.png"); // $NON-NLS-1$
 
-  private final List<ProjectOptionListener> listeners = new ArrayList<>();
+  private final List<ReferencePointOptionListener> listeners = new ArrayList<>();
 
   private final String remoteReferencePointId;
 
@@ -71,7 +70,8 @@ public class ProjectOptionComposite extends Composite {
    * @param remoteReferencePointId the ID of the reference point for which this composite chooses a
    *     local representation
    */
-  public ProjectOptionComposite(final Composite parent, final String remoteReferencePointId) {
+  public ReferencePointOptionComposite(
+      final Composite parent, final String remoteReferencePointId) {
     super(parent, SWT.BORDER);
 
     this.remoteReferencePointId = remoteReferencePointId;
@@ -95,11 +95,11 @@ public class ProjectOptionComposite extends Composite {
   }
 
   /**
-   * Adds a {@link ProjectOptionListener} to this composite.
+   * Adds a {@link ReferencePointOptionListener} to this composite.
    *
    * @param listener the listener to add
    */
-  public void addProjectOptionListener(ProjectOptionListener listener) {
+  public void addReferencePointOptionListener(ReferencePointOptionListener listener) {
     listeners.add(listener);
   }
 
@@ -317,8 +317,8 @@ public class ProjectOptionComposite extends Composite {
           public void widgetSelected(SelectionEvent e) {
             updateEnablement(LocalRepresentationOption.NEW_PROJECT);
             newProjectNameText.setFocus();
-            fireProjectNameChanged();
-            fireProjectOptionChanged();
+            fireValueChanged();
+            fireSelectedOptionChanged();
           }
 
           @Override
@@ -339,7 +339,7 @@ public class ProjectOptionComposite extends Composite {
     gridData.horizontalSpan = 2;
 
     newProjectNameText.setLayoutData(gridData);
-    newProjectNameText.addModifyListener(e -> fireProjectNameChanged());
+    newProjectNameText.addModifyListener(e -> fireValueChanged());
   }
 
   /**
@@ -363,8 +363,8 @@ public class ProjectOptionComposite extends Composite {
           public void widgetSelected(SelectionEvent e) {
             updateEnablement(LocalRepresentationOption.NEW_DIRECTORY);
             newDirectoryNameText.setFocus();
-            fireProjectNameChanged();
-            fireProjectOptionChanged();
+            fireValueChanged();
+            fireSelectedOptionChanged();
           }
 
           @Override
@@ -385,7 +385,7 @@ public class ProjectOptionComposite extends Composite {
     gridData.horizontalSpan = 2;
 
     newDirectoryNameText.setLayoutData(gridData);
-    newDirectoryNameText.addModifyListener(e -> fireProjectNameChanged());
+    newDirectoryNameText.addModifyListener(e -> fireValueChanged());
 
     /* Label */
     Label newDirectoryBasePathLabel = new Label(this, SWT.RIGHT);
@@ -400,7 +400,7 @@ public class ProjectOptionComposite extends Composite {
     gridData.horizontalSpan = 1;
 
     newDirectoryBasePathText.setLayoutData(gridData);
-    newDirectoryBasePathText.addModifyListener(e -> fireProjectNameChanged());
+    newDirectoryBasePathText.addModifyListener(e -> fireValueChanged());
 
     /* Button */
     newDirectoryBasePathBrowseButton = new Button(this, SWT.PUSH);
@@ -438,8 +438,8 @@ public class ProjectOptionComposite extends Composite {
           public void widgetSelected(SelectionEvent e) {
             updateEnablement(LocalRepresentationOption.EXISTING_DIRECTORY);
             existingDirectoryPathText.setFocus();
-            fireProjectNameChanged();
-            fireProjectOptionChanged();
+            fireValueChanged();
+            fireSelectedOptionChanged();
           }
 
           @Override
@@ -457,7 +457,7 @@ public class ProjectOptionComposite extends Composite {
     existingDirectoryPathText = new Text(this, SWT.BORDER);
     existingDirectoryPathText.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     existingDirectoryPathText.setEnabled(false);
-    existingDirectoryPathText.addModifyListener(e -> fireProjectNameChanged());
+    existingDirectoryPathText.addModifyListener(e -> fireValueChanged());
 
     /* Button */
     existingDirectoryBrowseButton = new Button(this, SWT.PUSH);
@@ -611,11 +611,11 @@ public class ProjectOptionComposite extends Composite {
     existingDirectoryBrowseButton.setEnabled(enabled);
   }
 
-  private void fireProjectNameChanged() {
-    for (ProjectOptionListener listener : listeners) listener.projectNameChanged(this);
+  private void fireValueChanged() {
+    for (ReferencePointOptionListener listener : listeners) listener.valueChanged(this);
   }
 
-  private void fireProjectOptionChanged() {
-    for (ProjectOptionListener listener : listeners) listener.projectOptionChanged(this);
+  private void fireSelectedOptionChanged() {
+    for (ReferencePointOptionListener listener : listeners) listener.selectedOptionChanged(this);
   }
 }
