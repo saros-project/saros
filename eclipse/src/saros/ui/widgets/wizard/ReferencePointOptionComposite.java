@@ -304,7 +304,7 @@ public class ReferencePointOptionComposite extends Composite {
 
     /* Radio button */
     newProjectRadioButton = new Button(this, SWT.RADIO);
-    newProjectRadioButton.setText(Messages.EnterProjectNamePage_create_new_project);
+    newProjectRadioButton.setText(Messages.ReferencePointOptionComposite_create_new_project);
     newProjectRadioButton.setSelection(false);
 
     gridData = new GridData();
@@ -329,7 +329,7 @@ public class ReferencePointOptionComposite extends Composite {
 
     /* Label */
     Label newProjectNameLabel = new Label(this, SWT.RIGHT);
-    newProjectNameLabel.setText(Messages.EnterProjectNamePage_project_name);
+    newProjectNameLabel.setText(Messages.ReferencePointOptionComposite_project_name);
     newProjectNameLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
 
     /* Text box */
@@ -350,7 +350,7 @@ public class ReferencePointOptionComposite extends Composite {
 
     /* Radio button */
     newDirectoryRadioButton = new Button(this, SWT.RADIO);
-    newDirectoryRadioButton.setText(Messages.EnterProjectNamePage_create_new_directory);
+    newDirectoryRadioButton.setText(Messages.ReferencePointOptionComposite_create_new_directory);
     newDirectoryRadioButton.setSelection(false);
 
     gridData = new GridData();
@@ -375,7 +375,7 @@ public class ReferencePointOptionComposite extends Composite {
 
     /* Label */
     Label newDirectoryNameLabel = new Label(this, SWT.RIGHT);
-    newDirectoryNameLabel.setText(Messages.EnterProjectNamePage_directory_name);
+    newDirectoryNameLabel.setText(Messages.ReferencePointOptionComposite_directory_name);
     newDirectoryNameLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
 
     /* Text box */
@@ -389,7 +389,7 @@ public class ReferencePointOptionComposite extends Composite {
 
     /* Label */
     Label newDirectoryBasePathLabel = new Label(this, SWT.RIGHT);
-    newDirectoryBasePathLabel.setText(Messages.EnterProjectNamePage_directory_base_path);
+    newDirectoryBasePathLabel.setText(Messages.ReferencePointOptionComposite_directory_base_path);
     newDirectoryBasePathLabel.setLayoutData(
         new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
 
@@ -410,7 +410,7 @@ public class ReferencePointOptionComposite extends Composite {
           @Override
           public void widgetSelected(SelectionEvent e) {
             String baseDirectoryPath =
-                showBrowseDialog(Messages.EnterProjectNamePage_select_base_directory);
+                showBrowseDialog(Messages.ReferencePointOptionComposite_select_base_directory);
 
             if (baseDirectoryPath != null) {
               newDirectoryBasePathText.setText(baseDirectoryPath);
@@ -425,7 +425,8 @@ public class ReferencePointOptionComposite extends Composite {
   private void createExistingDirectoryGroup() {
     /* Radio Button */
     existingDirectoryRadioButton = new Button(this, SWT.RADIO);
-    existingDirectoryRadioButton.setText(Messages.EnterProjectNamePage_use_existing_directory);
+    existingDirectoryRadioButton.setText(
+        Messages.ReferencePointOptionComposite_use_existing_directory);
     existingDirectoryRadioButton.setSelection(false);
 
     GridData gridData = new GridData();
@@ -450,7 +451,7 @@ public class ReferencePointOptionComposite extends Composite {
 
     /* Label */
     Label existingDirectoryLabel = new Label(this, SWT.RIGHT);
-    existingDirectoryLabel.setText(Messages.EnterProjectNamePage_existing_directory_path);
+    existingDirectoryLabel.setText(Messages.ReferencePointOptionComposite_existing_directory_path);
     existingDirectoryLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
 
     /* Text box */
@@ -467,7 +468,7 @@ public class ReferencePointOptionComposite extends Composite {
           @Override
           public void widgetSelected(SelectionEvent e) {
             String existingDirectoryPath =
-                showBrowseDialog(Messages.EnterProjectNamePage_select_existing_directory);
+                showBrowseDialog(Messages.ReferencePointOptionComposite_select_existing_directory);
 
             if (existingDirectoryPath != null) {
               existingDirectoryPathText.setText(existingDirectoryPath);
