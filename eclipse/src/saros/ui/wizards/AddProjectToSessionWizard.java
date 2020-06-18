@@ -1,5 +1,7 @@
 package saros.ui.wizards;
 
+import static saros.ui.widgets.wizard.ReferencePointOptionComposite.LocalRepresentationOption.EXISTING_DIRECTORY;
+
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
@@ -14,15 +16,19 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
@@ -44,8 +50,9 @@ import org.eclipse.ui.IFileEditorInput;
 import saros.Saros;
 import saros.SarosPluginContext;
 import saros.editor.internal.EditorAPI;
+import saros.exception.IllegalInputException;
+import saros.filesystem.EclipseReferencePointImpl;
 import saros.filesystem.IReferencePoint;
-import saros.filesystem.ResourceAdapterFactory;
 import saros.filesystem.checksum.IChecksumCache;
 import saros.monitoring.ProgressMonitorAdapterFactory;
 import saros.negotiation.AbstractIncomingResourceNegotiation;
@@ -69,6 +76,7 @@ import saros.ui.Messages;
 import saros.ui.util.DialogUtils;
 import saros.ui.util.SWTUtils;
 import saros.ui.views.SarosView;
+import saros.ui.widgets.wizard.ReferencePointOptionResult;
 import saros.ui.wizards.dialogs.WizardDialogAccessable;
 import saros.ui.wizards.pages.LocalRepresentationSelectionPage;
 import saros.util.ThreadUtils;
@@ -77,7 +85,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
   private static Logger log = Logger.getLogger(AddProjectToSessionWizard.class);
 
-  private LocalRepresentationSelectionPage namePage;
+  private LocalRepresentationSelectionPage localRepresentationSelectionPage;
   private WizardDialogAccessable wizardDialog;
   private AbstractIncomingResourceNegotiation negotiation;
   private JID peer;
@@ -163,29 +171,28 @@ public class AddProjectToSessionWizard extends Wizard {
 
     if (session == null) return;
 
-    final Map<String, String> lastProjectNameMapping = mappingStorage.getMapping(peer);
+    final Map<String, String> lastReferencePointPathMapping = mappingStorage.getMapping(peer);
 
-    namePage =
+    localRepresentationSelectionPage =
         new LocalRepresentationSelectionPage(
             session,
             connectionManager,
             preferences,
             peer,
             negotiation.getResourceNegotiationData(),
-            lastProjectNameMapping);
+            lastReferencePointPathMapping);
 
-    addPage(namePage);
+    addPage(localRepresentationSelectionPage);
   }
 
   @Override
   public boolean performFinish() {
+    if (localRepresentationSelectionPage == null) return true;
 
-    if (namePage == null) return true;
-
-    final Map<String, IProject> targetProjectMapping = getTargetProjectMapping();
+    final Map<String, IContainer> referencePointContainers = getReferencePointContainerMapping();
 
     final Collection<IEditorPart> openEditors =
-        getOpenEditorsForSharedProjects(targetProjectMapping.values());
+        getOpenEditorsForSharedContainers(referencePointContainers.values());
 
     final List<IEditorPart> dirtyEditors = new ArrayList<IEditorPart>();
 
@@ -216,7 +223,7 @@ public class AddProjectToSessionWizard extends Wizard {
     final Map<String, FileListDiff> modifiedResources;
 
     try {
-      modifiedResources = createProjectsAndGetModifiedResources(targetProjectMapping);
+      modifiedResources = createContainersAndGetModifiedResources(referencePointContainers);
     } catch (CoreException e) {
       log.error("could not compute local file list", e);
       MessageDialog.openError(
@@ -234,9 +241,9 @@ public class AddProjectToSessionWizard extends Wizard {
 
     if (!confirmOverwritingResources(modifiedResources)) return false;
 
-    storeCurrentProjectNameMapping(peer);
+    storeCurrentReferencePointPathMapping(peer, referencePointContainers);
 
-    triggerProjectNegotiation(targetProjectMapping, openEditors);
+    triggerResourceNegotiation(referencePointContainers, openEditors);
 
     return true;
   }
@@ -292,8 +299,8 @@ public class AddProjectToSessionWizard extends Wizard {
     return true;
   }
 
-  private void triggerProjectNegotiation(
-      final Map<String, IProject> targetProjectMapping,
+  private void triggerResourceNegotiation(
+      final Map<String, IContainer> referencePointContainers,
       final Collection<IEditorPart> editorsToClose) {
 
     final Job job =
@@ -333,9 +340,9 @@ public class AddProjectToSessionWizard extends Wizard {
               final Map<String, IReferencePoint> convertedMapping =
                   new HashMap<String, IReferencePoint>();
 
-              for (final Entry<String, IProject> entry : targetProjectMapping.entrySet()) {
+              for (final Entry<String, IContainer> entry : referencePointContainers.entrySet()) {
                 convertedMapping.put(
-                    entry.getKey(), ResourceAdapterFactory.create(entry.getValue()));
+                    entry.getKey(), new EclipseReferencePointImpl(entry.getValue()));
               }
 
               final ResourceNegotiation.Status status =
@@ -352,19 +359,20 @@ public class AddProjectToSessionWizard extends Wizard {
 
               if (status != ResourceNegotiation.Status.OK) return Status.CANCEL_STATUS;
 
-              final List<String> projectNames = new ArrayList<String>();
+              final List<String> referencePointNames = new ArrayList<String>();
 
-              for (final IProject project : targetProjectMapping.values())
-                projectNames.add(project.getName());
+              for (final IReferencePoint referencePoint : convertedMapping.values()) {
+                referencePointNames.add(referencePoint.getName());
+              }
 
               SarosView.showNotification(
                   Messages.AddProjectToSessionWizard_synchronize_finished_notification_title,
                   MessageFormat.format(
                       Messages.AddProjectToSessionWizard_synchronize_finished_notification_text,
-                      StringUtils.join(projectNames, ", ")));
+                      StringUtils.join(referencePointNames, ", ")));
 
             } catch (RuntimeException e) {
-              log.error("unknown error during project negotiation: " + e.getMessage(), e);
+              log.error("unknown error during resource negotiation: " + e.getMessage(), e);
               return Status.CANCEL_STATUS;
             } finally {
               SWTUtils.runSafeSWTAsync(
@@ -388,7 +396,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
   private boolean confirmOverwritingResources(final Map<String, FileListDiff> modifiedResources) {
 
-    String message = Messages.AddProjectToSessionWizard_synchronize_projects;
+    String message = Messages.AddProjectToSessionWizard_synchronize_resource_roots;
     String pluginID = Saros.PLUGIN_ID;
 
     MultiStatus info = new MultiStatus(pluginID, 1, message, null);
@@ -471,30 +479,54 @@ public class AddProjectToSessionWizard extends Wizard {
     }
   }
 
-  private Collection<IEditorPart> getOpenEditorsForSharedProjects(Collection<IProject> projects) {
+  /**
+   * Returns all open editors belonging to resources located under one of the given containers.
+   *
+   * @param referencePointContainers the containers used to represent the shared reference points in
+   *     the local workspace
+   * @return all open editors belonging to resources located under one of the given containers
+   */
+  private Collection<IEditorPart> getOpenEditorsForSharedContainers(
+      Collection<IContainer> referencePointContainers) {
+
+    Set<IPath> referencePointPaths =
+        referencePointContainers.stream().map(IContainer::getFullPath).collect(Collectors.toSet());
 
     List<IEditorPart> openEditors = new ArrayList<IEditorPart>();
+
     Set<IEditorPart> editors = EditorAPI.getOpenEditors();
 
-    for (IProject project : projects) {
-      for (IEditorPart editor : editors) {
-        if (editor.getEditorInput() instanceof IFileEditorInput) {
-          IFile file = ((IFileEditorInput) editor.getEditorInput()).getFile();
-          if (project.equals(file.getProject())) openEditors.add(editor);
+    for (IEditorPart editor : editors) {
+      if (editor.getEditorInput() instanceof IFileEditorInput) {
+        IFile file = ((IFileEditorInput) editor.getEditorInput()).getFile();
+
+        for (IPath referencePointPath : referencePointPaths) {
+          if (referencePointPath.isPrefixOf(file.getFullPath())) {
+            openEditors.add(editor);
+
+            break;
+          }
         }
       }
     }
+
     return openEditors;
   }
 
   /**
-   * Returns all modified resources (either changed or deleted) for the current project mapping.
-   * Creates non existing projects if necessary.
+   * Creates all given containers if necessary. Returns all resources that will be modified as part
+   * of the resource negotiation.
+   *
+   * @param referencePointContainers the containers used to represent the shared reference points in
+   *     the local workspace
+   * @return all resources that will be modified as part of the resource negotiation
    */
-  private Map<String, FileListDiff> createProjectsAndGetModifiedResources(
-      final Map<String, IProject> projectMapping) throws CoreException {
+  private Map<String, FileListDiff> createContainersAndGetModifiedResources(
+      final Map<String, IContainer> referencePointContainers) throws CoreException {
 
-    final Map<String, IProject> modifiedProjects = getModifiedProjects(projectMapping);
+    final Map<String, IContainer> existingReferencePointContainers =
+        getExistingReferencePointContainers(referencePointContainers);
+
     final Map<String, FileListDiff> result = new HashMap<String, FileListDiff>();
 
     try {
@@ -508,19 +540,40 @@ public class AddProjectToSessionWizard extends Wizard {
                     throws InvocationTargetException, InterruptedException {
                   try {
 
-                    for (final IProject project : projectMapping.values()) {
-                      if (!modifiedProjects.values().contains(project)) {
+                    for (final IContainer container : referencePointContainers.values()) {
+                      if (!existingReferencePointContainers.containsValue(container)) {
 
-                        if (!project.exists()) project.create(null);
+                        if (!container.exists()) {
+                          if (container instanceof IProject) {
+                            ((IProject) container).create(null);
+
+                          } else if (container instanceof IFolder) {
+                            ((IFolder) container).create(true, true, null);
+
+                          } else {
+                            throw new IllegalStateException(
+                                "Encountered reference point container of unexpected type "
+                                    + container.getType()
+                                    + " - "
+                                    + container);
+                          }
+
+                        } else {
+                          log.error(
+                              "encountered container to create that already existed: " + container);
+                        }
                       }
 
-                      if (!project.isOpen()) project.open(null);
+                      IProject containerProject = container.getProject();
+
+                      if (!containerProject.isOpen()) {
+                        containerProject.open(null);
+                      }
                     }
 
-                    result.putAll(getModifiedResources(modifiedProjects, monitor));
-                  } catch (CoreException e) {
-                    throw new InvocationTargetException(e);
-                  } catch (RuntimeException e) {
+                    result.putAll(getModifiedResources(existingReferencePointContainers, monitor));
+
+                  } catch (CoreException | RuntimeException e) {
                     throw new InvocationTargetException(e);
                   }
                 }
@@ -539,12 +592,19 @@ public class AddProjectToSessionWizard extends Wizard {
   }
 
   /**
-   * Returns all modified resources (either changed or deleted) for the current project mapping.
+   * Returns all modified resources (either changed or deleted) for the given local reference point
+   * mapping.
    *
-   * <p><b>Important:</b> Do not call this inside the SWT Thread. This is a long running operation !
+   * <p><b>Important:</b> Do not call this inside the SWT Thread. This is a long running operation!
+   *
+   * @param referencePointContainers the containers used to represent the shared reference points in
+   *     the local workspace
+   * @param monitor the progress monitor to which to report
+   * @return all modified resources (either changed or deleted) for the given local reference point
+   *     mapping
    */
   private Map<String, FileListDiff> getModifiedResources(
-      final Map<String, IProject> projectMapping, final IProgressMonitor monitor)
+      final Map<String, IContainer> referencePointContainers, final IProgressMonitor monitor)
       throws CoreException {
 
     final Map<String, FileListDiff> modifiedResources = new HashMap<String, FileListDiff>();
@@ -558,23 +618,27 @@ public class AddProjectToSessionWizard extends Wizard {
 
     final SubMonitor subMonitor =
         SubMonitor.convert(
-            monitor, "Searching for files that will be modified...", projectMapping.size());
+            monitor,
+            "Searching for files that will be modified...",
+            referencePointContainers.size());
 
-    for (final Entry<String, IProject> entry : projectMapping.entrySet()) {
+    for (final Entry<String, IContainer> entry : referencePointContainers.entrySet()) {
 
-      final String projectID = entry.getKey();
-      final IProject project = entry.getValue();
+      final String referencePointId = entry.getKey();
+      final IContainer referencePointContainer = entry.getValue();
 
-      final IReferencePoint adaptedProject = ResourceAdapterFactory.create(entry.getValue());
+      final IReferencePoint referencePoint = new EclipseReferencePointImpl(referencePointContainer);
 
-      if (!session.isShared(adaptedProject)) project.refreshLocal(IResource.DEPTH_INFINITE, null);
+      if (!session.isShared(referencePoint)) {
+        referencePointContainer.refreshLocal(IResource.DEPTH_INFINITE, null);
+      }
 
       final FileList localFileList;
 
       try {
         localFileList =
             FileListFactory.createFileList(
-                adaptedProject,
+                referencePoint,
                 checksumCache,
                 ProgressMonitorAdapterFactory.convert(
                     subMonitor.newChild(1, SubMonitor.SUPPRESS_ALL_LABELS)));
@@ -588,14 +652,14 @@ public class AddProjectToSessionWizard extends Wizard {
                 IStatus.ERROR, Saros.PLUGIN_ID, "failed to compute local file list", e));
       }
 
-      final ResourceNegotiationData data = negotiation.getResourceNegotiationData(projectID);
+      final ResourceNegotiationData data = negotiation.getResourceNegotiationData(referencePointId);
 
       final FileListDiff diff = FileListDiff.diff(localFileList, data.getFileList());
 
       if (!diff.getRemovedFolders().isEmpty()
           || !diff.getRemovedFiles().isEmpty()
           || !diff.getAlteredFiles().isEmpty()) {
-        modifiedResources.put(project.getName(), diff);
+        modifiedResources.put(referencePoint.getName(), diff);
       }
     }
 
@@ -603,41 +667,73 @@ public class AddProjectToSessionWizard extends Wizard {
   }
 
   /**
-   * Returns a project mapping that contains all projects that will be modified on synchronization.
+   * Returns all containers used to represent the shared reference points in the local workspace
+   * that already exist. The content of such containers will be overwritten as part of the resource
+   * negotiation.
+   *
+   * @param referencePointContainers the containers used to represent the shared reference points in
+   *     the local workspace
+   * @return all containers used to represent the shared reference points in the local workspace *
+   *     that already exist
    */
-  private Map<String, IProject> getModifiedProjects(Map<String, IProject> projectMapping) {
-    Map<String, IProject> modifiedProjects = new HashMap<String, IProject>();
+  private Map<String, IContainer> getExistingReferencePointContainers(
+      Map<String, IContainer> referencePointContainers) {
 
-    for (Entry<String, IProject> entry : projectMapping.entrySet()) {
-      if (!namePage.overwriteResources(entry.getKey())) continue;
+    Map<String, IContainer> modifiedResources = new HashMap<>();
 
-      modifiedProjects.put(entry.getKey(), entry.getValue());
+    for (Entry<String, IContainer> entry : referencePointContainers.entrySet()) {
+      String referencePointID = entry.getKey();
+      IContainer referencePointContainer = entry.getValue();
+
+      ReferencePointOptionResult result =
+          localRepresentationSelectionPage.getResult(referencePointID);
+
+      if (result.getLocalRepresentationOption() != EXISTING_DIRECTORY) {
+        continue;
+      }
+
+      modifiedResources.put(referencePointID, referencePointContainer);
     }
 
-    return modifiedProjects;
+    return modifiedResources;
   }
 
   /**
-   * Returns the project ids and their target project as selected in the {@link
-   * LocalRepresentationSelectionPage}.
+   * Returns the containers used to represent the shared reference points in the local workspace.
    *
-   * <p>This method must only be called after the page in completed state !
+   * @return the containers used to represent the shared reference points in the local workspace
    */
-  private Map<String, IProject> getTargetProjectMapping() {
-
-    final Map<String, IProject> result = new HashMap<String, IProject>();
+  private Map<String, IContainer> getReferencePointContainerMapping() {
+    final Map<String, IContainer> referencePointContainers = new HashMap<>();
 
     for (final ResourceNegotiationData data : negotiation.getResourceNegotiationData()) {
-      final String projectID = data.getReferencePointID();
+      final String referencePointID = data.getReferencePointID();
+      final String referencePointName = data.getReferencePointName();
 
-      result.put(
-          projectID,
-          ResourcesPlugin.getWorkspace()
-              .getRoot()
-              .getProject(namePage.getTargetProjectName(projectID)));
+      ReferencePointOptionResult result =
+          localRepresentationSelectionPage.getResult(referencePointID);
+
+      IContainer container;
+
+      try {
+        container = result.getSelectedContainerHandle(referencePointName);
+
+      } catch (IllegalInputException e) {
+        log.error(
+            "Failed to obtain container to represent shared reference point "
+                + referencePointName
+                + "(id "
+                + referencePointID
+                + ")",
+            e);
+
+        continue;
+      }
+
+      referencePointContainers.put(referencePointID, container);
     }
 
-    return result;
+    return referencePointContainers;
   }
 
   private void displaySaveDirtyEditorsDialog(final List<IEditorPart> dirtyEditors) {
@@ -678,16 +774,29 @@ public class AddProjectToSessionWizard extends Wizard {
     }
   }
 
-  private void storeCurrentProjectNameMapping(final JID jid) {
-    Map<String, String> currentProjectNameMapping = new HashMap<>();
+  /**
+   * Stores the current reference point path mapping.
+   *
+   * @param jid the peer that started the resource negotiation
+   * @param referencePointContainers the containers used to represent the shared reference points in
+   *     the local workspace
+   */
+  private void storeCurrentReferencePointPathMapping(
+      final JID jid, final Map<String, IContainer> referencePointContainers) {
 
-    for (final ResourceNegotiationData data : negotiation.getResourceNegotiationData()) {
-      final String projectID = data.getReferencePointID();
-      currentProjectNameMapping.put(
-          data.getReferencePointName(), namePage.getTargetProjectName(projectID));
+    Map<String, String> currentReferencePointPaths = new HashMap<>();
+
+    for (Entry<String, IContainer> entry : referencePointContainers.entrySet()) {
+      String referencePointId = entry.getKey();
+
+      String referencePointPath = entry.getValue().getFullPath().toPortableString();
+      String referencePointName =
+          negotiation.getResourceNegotiationData(referencePointId).getReferencePointName();
+
+      currentReferencePointPaths.put(referencePointName, referencePointPath);
     }
 
-    mappingStorage.updateMapping(jid, currentProjectNameMapping);
+    mappingStorage.updateMapping(jid, currentReferencePointPaths);
   }
 
   private static final class ResourceMappingStorage {
