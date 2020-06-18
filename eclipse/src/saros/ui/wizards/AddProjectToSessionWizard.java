@@ -70,14 +70,14 @@ import saros.ui.util.DialogUtils;
 import saros.ui.util.SWTUtils;
 import saros.ui.views.SarosView;
 import saros.ui.wizards.dialogs.WizardDialogAccessable;
-import saros.ui.wizards.pages.EnterProjectNamePage;
+import saros.ui.wizards.pages.LocalRepresentationSelectionPage;
 import saros.util.ThreadUtils;
 
 public class AddProjectToSessionWizard extends Wizard {
 
   private static Logger log = Logger.getLogger(AddProjectToSessionWizard.class);
 
-  private EnterProjectNamePage namePage;
+  private LocalRepresentationSelectionPage namePage;
   private WizardDialogAccessable wizardDialog;
   private AbstractIncomingResourceNegotiation negotiation;
   private JID peer;
@@ -166,7 +166,7 @@ public class AddProjectToSessionWizard extends Wizard {
     final Map<String, String> lastProjectNameMapping = mappingStorage.getMapping(peer);
 
     namePage =
-        new EnterProjectNamePage(
+        new LocalRepresentationSelectionPage(
             session,
             connectionManager,
             preferences,
@@ -619,7 +619,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
   /**
    * Returns the project ids and their target project as selected in the {@link
-   * EnterProjectNamePage}.
+   * LocalRepresentationSelectionPage}.
    *
    * <p>This method must only be called after the page in completed state !
    */

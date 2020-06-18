@@ -151,26 +151,26 @@ public class Messages extends NLS {
   public static String EditXMPPAccountWizardPage_description;
   public static String EditXMPPAccountWizardPage_title;
 
-  public static String EnterProjectNamePage_description_file_transfer;
-  public static String EnterProjectNamePage_description_socks5proxy;
-  public static String EnterProjectNamePage_direct_filetransfer_deactivated;
-  public static String EnterProjectNamePage_direct_filetransfer_nan;
-  public static String EnterProjectNamePage_error_child_of_existing_reference_point;
-  public static String EnterProjectNamePage_error_existing_reference_point_path_clash;
-  public static String EnterProjectNamePage_error_nested_selected_reference_point_paths;
-  public static String EnterProjectNamePage_error_parent_of_existing_reference_point;
-  public static String EnterProjectNamePage_error_reference_point_path_clash;
-  public static String EnterProjectNamePage_page_name;
-  public static String EnterProjectNamePage_saros_url;
-  public static String EnterProjectNamePage_title;
-  public static String EnterProjectNamePage_unknown_transport_method;
-  public static String EnterProjectNamePage_warning_project_artifacts_found;
-  public static String EnterProjectNamePage_warning_unsupported_encoding_found;
-
   public static String EnterXMPPAccountWizardPage_description;
   public static String EnterXMPPAccountWizardPage_title;
   public static String ErrorMessageDialog_error_plugin;
   public static String ErrorMessageDialog_error_unspecified;
+
+  public static String LocalRepresentationSelectionPage_description_file_transfer;
+  public static String LocalRepresentationSelectionPage_description_socks5proxy;
+  public static String LocalRepresentationSelectionPage_direct_filetransfer_deactivated;
+  public static String LocalRepresentationSelectionPage_direct_filetransfer_nan;
+  public static String LocalRepresentationSelectionPage_error_child_of_existing_reference_point;
+  public static String LocalRepresentationSelectionPage_error_existing_reference_point_path_clash;
+  public static String LocalRepresentationSelectionPage_error_nested_selected_reference_point_paths;
+  public static String LocalRepresentationSelectionPage_error_parent_of_existing_reference_point;
+  public static String LocalRepresentationSelectionPage_error_reference_point_path_clash;
+  public static String LocalRepresentationSelectionPage_page_name;
+  public static String LocalRepresentationSelectionPage_saros_url;
+  public static String LocalRepresentationSelectionPage_title;
+  public static String LocalRepresentationSelectionPage_unknown_transport_method;
+  public static String LocalRepresentationSelectionPage_warning_project_artifacts_found;
+  public static String LocalRepresentationSelectionPage_warning_unsupported_encoding_found;
 
   public static String ReferencePointOptionComposite_create_new_project;
   public static String ReferencePointOptionComposite_create_new_directory;

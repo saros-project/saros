@@ -58,7 +58,7 @@ import saros.ui.widgets.wizard.events.ReferencePointOptionListener;
  * @see ReferencePointOptionComposite
  */
 // TODO add logic to help user differentiate multiple reference points with the same name
-public class EnterProjectNamePage extends WizardPage {
+public class LocalRepresentationSelectionPage extends WizardPage {
   private final JID peer;
 
   private final ISarosSession session;
@@ -88,7 +88,7 @@ public class EnterProjectNamePage extends WizardPage {
 
   private final Set<String> unsupportedCharsets;
 
-  public EnterProjectNamePage(
+  public LocalRepresentationSelectionPage(
       ISarosSession session,
       IConnectionManager connectionManager,
       Preferences preferences,
@@ -96,7 +96,7 @@ public class EnterProjectNamePage extends WizardPage {
       List<ResourceNegotiationData> resourceNegotiationData,
       Map<String, String> previousReferencePointPathMapping) {
 
-    super(Messages.EnterProjectNamePage_page_name);
+    super(Messages.LocalRepresentationSelectionPage_page_name);
 
     this.session = session;
     this.connectionManager = connectionManager;
@@ -121,7 +121,7 @@ public class EnterProjectNamePage extends WizardPage {
     }
 
     setPageComplete(false);
-    setTitle(Messages.EnterProjectNamePage_title);
+    setTitle(Messages.LocalRepresentationSelectionPage_title);
   }
 
   /**
@@ -156,7 +156,7 @@ public class EnterProjectNamePage extends WizardPage {
 
   @Override
   public void performHelp() {
-    SWTUtils.openExternalBrowser(Messages.EnterProjectNamePage_saros_url);
+    SWTUtils.openExternalBrowser(Messages.LocalRepresentationSelectionPage_saros_url);
   }
 
   @Override
@@ -294,14 +294,14 @@ public class EnterProjectNamePage extends WizardPage {
 
       if (selectedPath.equals(otherReferencePointPath)) {
         return MessageFormat.format(
-            Messages.EnterProjectNamePage_error_reference_point_path_clash,
+            Messages.LocalRepresentationSelectionPage_error_reference_point_path_clash,
             selectedPath.toPortableString(),
             referencePointName,
             otherReferencePointName);
 
       } else if (otherReferencePointPath.isPrefixOf(selectedPath)) {
         return MessageFormat.format(
-            Messages.EnterProjectNamePage_error_nested_selected_reference_point_paths,
+            Messages.LocalRepresentationSelectionPage_error_nested_selected_reference_point_paths,
             selectedPath.toPortableString(),
             referencePointName,
             otherReferencePointName);
@@ -315,21 +315,21 @@ public class EnterProjectNamePage extends WizardPage {
 
       if (referencePointPath.equals(selectedPath)) {
         return MessageFormat.format(
-            Messages.EnterProjectNamePage_error_existing_reference_point_path_clash,
+            Messages.LocalRepresentationSelectionPage_error_existing_reference_point_path_clash,
             selectedPath.toPortableString(),
             referencePointName,
             sharedReferencePoint.getName());
 
       } else if (referencePointPath.isPrefixOf(selectedPath)) {
         return MessageFormat.format(
-            Messages.EnterProjectNamePage_error_child_of_existing_reference_point,
+            Messages.LocalRepresentationSelectionPage_error_child_of_existing_reference_point,
             selectedPath.toPortableString(),
             referencePointName,
             sharedReferencePoint.getName());
 
       } else if (selectedPath.isPrefixOf(referencePointPath)) {
         return MessageFormat.format(
-            Messages.EnterProjectNamePage_error_parent_of_existing_reference_point,
+            Messages.LocalRepresentationSelectionPage_error_parent_of_existing_reference_point,
             selectedPath.toPortableString(),
             referencePointName,
             sharedReferencePoint.getName());
@@ -376,7 +376,7 @@ public class EnterProjectNamePage extends WizardPage {
 
       warningMessage +=
           MessageFormat.format(
-              Messages.EnterProjectNamePage_warning_unsupported_encoding_found,
+              Messages.LocalRepresentationSelectionPage_warning_unsupported_encoding_found,
               StringUtils.join(unsupportedCharsets, ", "));
     }
 
@@ -484,7 +484,7 @@ public class EnterProjectNamePage extends WizardPage {
     if (!dirtyProjectNames.isEmpty()) {
       warningMessage =
           MessageFormat.format(
-              Messages.EnterProjectNamePage_warning_project_artifacts_found,
+              Messages.LocalRepresentationSelectionPage_warning_project_artifacts_found,
               StringUtils.join(dirtyProjectNames, ", "));
     }
 
@@ -636,8 +636,8 @@ public class EnterProjectNamePage extends WizardPage {
     switch (connectionManager.getTransferMode(ISarosSession.SESSION_CONNECTION_ID, peer)) {
       case SOCKS5_MEDIATED:
         if (preferences.isLocalSOCKS5ProxyEnabled())
-          setDescription(Messages.EnterProjectNamePage_description_socks5proxy);
-        else setDescription(Messages.EnterProjectNamePage_description_file_transfer);
+          setDescription(Messages.LocalRepresentationSelectionPage_description_socks5proxy);
+        else setDescription(Messages.LocalRepresentationSelectionPage_description_file_transfer);
         setImageDescriptor(ImageManager.getImageDescriptor("icons/wizban/socks5m.png"));
         break;
 
@@ -649,9 +649,9 @@ public class EnterProjectNamePage extends WizardPage {
 
       case IBB:
         if (preferences.forceIBBTransport()) {
-          setDescription(Messages.EnterProjectNamePage_direct_filetransfer_deactivated);
+          setDescription(Messages.LocalRepresentationSelectionPage_direct_filetransfer_deactivated);
         } else {
-          setDescription(Messages.EnterProjectNamePage_direct_filetransfer_nan);
+          setDescription(Messages.LocalRepresentationSelectionPage_direct_filetransfer_nan);
         }
 
         new FlashTask(
@@ -663,7 +663,7 @@ public class EnterProjectNamePage extends WizardPage {
 
         break;
       default:
-        setDescription(Messages.EnterProjectNamePage_unknown_transport_method);
+        setDescription(Messages.LocalRepresentationSelectionPage_unknown_transport_method);
         break;
     }
   }
