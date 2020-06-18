@@ -20,9 +20,9 @@ public class Messages extends NLS {
   public static String AddProjectToSessionWizard_invitation_canceled_text3;
   public static String AddProjectToSessionWizard_leave_session;
   public static String AddProjectToSessionWizard_leave_session_text;
-  public static String AddProjectToSessionWizard_synchronize_projects;
   public static String AddProjectToSessionWizard_synchronize_finished_notification_title;
   public static String AddProjectToSessionWizard_synchronize_finished_notification_text;
+  public static String AddProjectToSessionWizard_synchronize_resource_roots;
 
   public static String AddProjectToSessionWizard_title;
   public static String AddProjectToSessionWizard_unsaved_changes_dialog_title;
