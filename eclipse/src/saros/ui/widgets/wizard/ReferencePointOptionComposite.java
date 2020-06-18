@@ -114,17 +114,6 @@ public class ReferencePointOptionComposite extends Composite {
   }
 
   /**
-   * Returns whether the remote project should merged into an already existing one.
-   *
-   * @return <code>true</code> if the remote project should be merged, <code>false</code> otherwise
-   * @deprecated use {@link #getSelectedOption()} instead
-   */
-  @Deprecated
-  public boolean useExistingProject() {
-    return existingDirectoryRadioButton.getSelection();
-  }
-
-  /**
    * Returns the option on how to represent the shared reference point selected by the user. The
    * selected option determines which content requests return valid values.
    *
@@ -145,19 +134,6 @@ public class ReferencePointOptionComposite extends Composite {
     }
 
     throw new IllegalStateException("Encountered unknown selection state");
-  }
-
-  /**
-   * Returns the currently selected local project name for the remote project ID.
-   *
-   * @return the currently selected local project name
-   * @deprecated use {@link #getResult()} instead
-   */
-  @Deprecated
-  public String getProjectName() {
-    if (newProjectRadioButton.getSelection()) return newProjectNameText.getText();
-
-    return existingDirectoryPathText.getText();
   }
 
   /**
@@ -203,40 +179,6 @@ public class ReferencePointOptionComposite extends Composite {
         newDirectoryName,
         newDirectoryBase,
         existingDirectory);
-  }
-
-  /**
-   * Sets the local project name for the remote project ID.
-   *
-   * @param useExistingProject if <code>true</code> the project name references an existing project
-   *     name, otherwise the project name reference a non existing local project
-   * @param name the local name of the project
-   * @see #useExistingProject()
-   * @deprecated use {@link #setNewProjectOptionSelected(String)}, {@link
-   *     #setNewDirectoryOptionSelected(String, String)}, or {@link
-   *     #setExistingDirectoryOptionSelected(String)} instead
-   */
-  @Deprecated
-  public void setProjectName(String name, boolean useExistingProject) {
-    if (useExistingProject) {
-      newProjectRadioButton.setSelection(false);
-      newDirectoryRadioButton.setSelection(false);
-      existingDirectoryRadioButton.setSelection(true);
-      existingDirectoryPathText.setFocus();
-      existingDirectoryPathText.setText(name);
-    } else {
-      newProjectRadioButton.setSelection(true);
-      newDirectoryRadioButton.setSelection(false);
-      existingDirectoryRadioButton.setSelection(false);
-      newProjectNameText.setFocus();
-      newProjectNameText.setText(name);
-    }
-
-    // setting the selection of the button by code does by design not trigger the listener
-    updateEnablement(
-        useExistingProject
-            ? LocalRepresentationOption.EXISTING_DIRECTORY
-            : LocalRepresentationOption.NEW_PROJECT);
   }
 
   /**
