@@ -8,9 +8,8 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.CoreException;
 
 /** Eclipse implementation of the Saros reference point interface. */
-// TODO rename to EclipseReferencePoint
-public class EclipseReferencePointImpl implements IReferencePoint {
-  private static Logger log = Logger.getLogger(EclipseReferencePointImpl.class);
+public class EclipseReferencePoint implements IReferencePoint {
+  private static Logger log = Logger.getLogger(EclipseReferencePoint.class);
 
   /** The delegate represented by the reference point. */
   private final org.eclipse.core.resources.IContainer delegate;
@@ -22,7 +21,7 @@ public class EclipseReferencePointImpl implements IReferencePoint {
    * @throws NullPointerException if the given delegate is <code>null</code>
    * @throws IllegalArgumentException if the given delegate does not exist
    */
-  public EclipseReferencePointImpl(org.eclipse.core.resources.IContainer delegate) {
+  public EclipseReferencePoint(org.eclipse.core.resources.IContainer delegate) {
     Objects.requireNonNull(delegate, "The given delegate must not be null");
 
     if (!delegate.exists()) {
@@ -82,10 +81,10 @@ public class EclipseReferencePointImpl implements IReferencePoint {
       IPath childPath = ResourceConverter.convertToPath(name);
 
       if (containedResource.getType() == org.eclipse.core.resources.IResource.FILE) {
-        result.add(new EclipseFileImplV2(this, childPath));
+        result.add(new EclipseFile(this, childPath));
 
       } else if (containedResource.getType() == org.eclipse.core.resources.IResource.FOLDER) {
-        result.add(new EclipseFolderImplV2(this, childPath));
+        result.add(new EclipseFolder(this, childPath));
 
       } else {
         throw new IllegalStateException(
@@ -109,7 +108,7 @@ public class EclipseReferencePointImpl implements IReferencePoint {
       throw new IllegalArgumentException("Can not create file handle for an empty path");
     }
 
-    return new EclipseFileImplV2(this, path);
+    return new EclipseFile(this, path);
   }
 
   @Override
@@ -125,7 +124,7 @@ public class EclipseReferencePointImpl implements IReferencePoint {
       throw new IllegalArgumentException("Can not create folder handle for an empty path");
     }
 
-    return new EclipseFolderImplV2(this, path);
+    return new EclipseFolder(this, path);
   }
 
   /**
@@ -225,7 +224,7 @@ public class EclipseReferencePointImpl implements IReferencePoint {
       return null;
     }
 
-    return new EclipseFileImplV2(this, relativePath);
+    return new EclipseFile(this, relativePath);
   }
 
   /**
@@ -252,7 +251,7 @@ public class EclipseReferencePointImpl implements IReferencePoint {
       return null;
     }
 
-    return new EclipseFolderImplV2(this, relativePath);
+    return new EclipseFolder(this, relativePath);
   }
 
   /**

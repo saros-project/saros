@@ -22,7 +22,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Shell;
 import saros.Saros;
 import saros.SarosPluginContext;
-import saros.filesystem.EclipseReferencePointImpl;
+import saros.filesystem.EclipseReferencePoint;
 import saros.filesystem.IReferencePoint;
 import saros.filesystem.ResourceConverter;
 import saros.net.xmpp.JID;
@@ -246,7 +246,7 @@ public class CollaborationUtils {
   private static Set<IReferencePoint> getReferencePoints(Set<IContainer> referencePointContainers) {
     return referencePointContainers
         .stream()
-        .map(EclipseReferencePointImpl::new)
+        .map(EclipseReferencePoint::new)
         .collect(Collectors.toSet());
   }
 
