@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -39,7 +38,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.widgets.Button;
@@ -132,7 +130,7 @@ public class AddProjectToSessionWizard extends Wizard {
       new CancelListener() {
 
         @Override
-        public void canceled(final NegotiationTools.CancelLocation location, final String message) {
+        public void canceled(NegotiationTools.CancelLocation location, String message) {
           cancelWizard(peer, message, location);
         }
       };
@@ -169,9 +167,11 @@ public class AddProjectToSessionWizard extends Wizard {
   public void addPages() {
     ISarosSession session = sessionManager.getSession();
 
-    if (session == null) return;
+    if (session == null) {
+      return;
+    }
 
-    final Map<String, String> lastReferencePointPathMapping = mappingStorage.getMapping(peer);
+    Map<String, String> lastReferencePointPathMapping = mappingStorage.getMapping(peer);
 
     localRepresentationSelectionPage =
         new LocalRepresentationSelectionPage(
@@ -187,14 +187,16 @@ public class AddProjectToSessionWizard extends Wizard {
 
   @Override
   public boolean performFinish() {
-    if (localRepresentationSelectionPage == null) return true;
+    if (localRepresentationSelectionPage == null) {
+      return true;
+    }
 
-    final Map<String, IContainer> referencePointContainers = getReferencePointContainerMapping();
+    Map<String, IContainer> referencePointContainers = getReferencePointContainerMapping();
 
-    final Collection<IEditorPart> openEditors =
+    Collection<IEditorPart> openEditors =
         getOpenEditorsForSharedContainers(referencePointContainers.values());
 
-    final List<IEditorPart> dirtyEditors = new ArrayList<IEditorPart>();
+    List<IEditorPart> dirtyEditors = new ArrayList<>();
 
     boolean containsDirtyEditors = false;
 
@@ -208,19 +210,18 @@ public class AddProjectToSessionWizard extends Wizard {
     if (containsDirtyEditors) {
       SWTUtils.runSafeSWTAsync(
           log,
-          new Runnable() {
-            @Override
-            public void run() {
-              if (AddProjectToSessionWizard.this.getShell().isDisposed()) return;
-
-              displaySaveDirtyEditorsDialog(dirtyEditors);
+          () -> {
+            if (AddProjectToSessionWizard.this.getShell().isDisposed()) {
+              return;
             }
+
+            displaySaveDirtyEditorsDialog(dirtyEditors);
           });
 
       return false;
     }
 
-    final Map<String, FileListDiff> modifiedResources;
+    Map<String, FileListDiff> modifiedResources;
 
     try {
       modifiedResources = createContainersAndGetModifiedResources(referencePointContainers);
@@ -239,7 +240,9 @@ public class AddProjectToSessionWizard extends Wizard {
       return false;
     }
 
-    if (!confirmOverwritingResources(modifiedResources)) return false;
+    if (!confirmOverwritingResources(modifiedResources)) {
+      return false;
+    }
 
     storeCurrentReferencePointPathMapping(peer, referencePointContainers);
 
@@ -248,29 +251,20 @@ public class AddProjectToSessionWizard extends Wizard {
     return true;
   }
 
-  public void cancelWizard(
-      final JID jid, final String errorMsg, final CancelLocation cancelLocation) {
+  public void cancelWizard(JID jid, String errorMsg, CancelLocation cancelLocation) {
 
     SWTUtils.runSafeSWTAsync(
         log,
-        new Runnable() {
-          @Override
-          public void run() {
-            Shell shell = wizardDialog.getShell();
-            if (shell == null || shell.isDisposed()) return;
-            isExceptionCancel = true;
-            wizardDialog.close();
+        () -> {
+          Shell shell = wizardDialog.getShell();
+          if (shell == null || shell.isDisposed()) {
+            return;
           }
+          isExceptionCancel = true;
+          wizardDialog.close();
         });
 
-    SWTUtils.runSafeSWTAsync(
-        log,
-        new Runnable() {
-          @Override
-          public void run() {
-            showCancelMessage(jid, errorMsg, cancelLocation);
-          }
-        });
+    SWTUtils.runSafeSWTAsync(log, () -> showCancelMessage(jid, errorMsg, cancelLocation));
   }
 
   @Override
@@ -288,22 +282,16 @@ public class AddProjectToSessionWizard extends Wizard {
       ThreadUtils.runSafeAsync(
           "CancelAddProjectWizard",
           log,
-          new Runnable() {
-            @Override
-            public void run() {
-              negotiation.localCancel(null, CancelOption.NOTIFY_PEER);
-            }
-          });
+          () -> negotiation.localCancel(null, CancelOption.NOTIFY_PEER));
     }
     isExceptionCancel = false;
     return true;
   }
 
   private void triggerResourceNegotiation(
-      final Map<String, IContainer> referencePointContainers,
-      final Collection<IEditorPart> editorsToClose) {
+      Map<String, IContainer> referencePointContainers, Collection<IEditorPart> editorsToClose) {
 
-    final Job job =
+    Job job =
         new Job("Synchronizing") {
           @Override
           protected IStatus run(IProgressMonitor monitor) {
@@ -311,22 +299,20 @@ public class AddProjectToSessionWizard extends Wizard {
 
               SWTUtils.runSafeSWTSync(
                   log,
-                  new Runnable() {
-                    @Override
-                    public void run() {
-                      /*
-                       * close all editors to avoid any conflicts.
-                       */
-                      for (final IEditorPart editor : editorsToClose)
-                        EditorAPI.closeEditor(editor, true);
+                  () -> {
+                    /*
+                     * close all editors to avoid any conflicts.
+                     */
+                    for (IEditorPart editor : editorsToClose) {
+                      EditorAPI.closeEditor(editor, true);
                     }
                   });
 
-              final IWorkspace workspace = ResourcesPlugin.getWorkspace();
+              IWorkspace workspace = ResourcesPlugin.getWorkspace();
 
-              final IWorkspaceDescription description = workspace.getDescription();
+              IWorkspaceDescription description = workspace.getDescription();
 
-              final boolean isAutoBuilding = description.isAutoBuilding();
+              boolean isAutoBuilding = description.isAutoBuilding();
 
               if (isAutoBuilding) {
                 description.setAutoBuilding(false);
@@ -337,15 +323,14 @@ public class AddProjectToSessionWizard extends Wizard {
                 }
               }
 
-              final Map<String, IReferencePoint> convertedMapping =
-                  new HashMap<String, IReferencePoint>();
+              Map<String, IReferencePoint> convertedMapping = new HashMap<>();
 
-              for (final Entry<String, IContainer> entry : referencePointContainers.entrySet()) {
+              for (Entry<String, IContainer> entry : referencePointContainers.entrySet()) {
                 convertedMapping.put(
                     entry.getKey(), new EclipseReferencePointImpl(entry.getValue()));
               }
 
-              final ResourceNegotiation.Status status =
+              ResourceNegotiation.Status status =
                   negotiation.run(convertedMapping, ProgressMonitorAdapterFactory.convert(monitor));
 
               if (isAutoBuilding) {
@@ -357,11 +342,13 @@ public class AddProjectToSessionWizard extends Wizard {
                 }
               }
 
-              if (status != ResourceNegotiation.Status.OK) return Status.CANCEL_STATUS;
+              if (status != ResourceNegotiation.Status.OK) {
+                return Status.CANCEL_STATUS;
+              }
 
-              final List<String> referencePointNames = new ArrayList<String>();
+              List<String> referencePointNames = new ArrayList<>();
 
-              for (final IReferencePoint referencePoint : convertedMapping.values()) {
+              for (IReferencePoint referencePoint : convertedMapping.values()) {
                 referencePointNames.add(referencePoint.getName());
               }
 
@@ -377,12 +364,10 @@ public class AddProjectToSessionWizard extends Wizard {
             } finally {
               SWTUtils.runSafeSWTAsync(
                   log,
-                  new Runnable() {
-                    @Override
-                    public void run() {
-                      for (IEditorPart editor : editorsToClose) {
-                        if (((IFileEditorInput) editor.getEditorInput()).getFile().exists())
-                          EditorAPI.openEditor(editor);
+                  () -> {
+                    for (IEditorPart editor : editorsToClose) {
+                      if (((IFileEditorInput) editor.getEditorInput()).getFile().exists()) {
+                        EditorAPI.openEditor(editor);
                       }
                     }
                   });
@@ -394,8 +379,7 @@ public class AddProjectToSessionWizard extends Wizard {
     job.schedule();
   }
 
-  private boolean confirmOverwritingResources(final Map<String, FileListDiff> modifiedResources) {
-
+  private boolean confirmOverwritingResources(Map<String, FileListDiff> modifiedResources) {
     String message = Messages.AddProjectToSessionWizard_synchronize_resource_roots;
     String pluginID = Saros.PLUGIN_ID;
 
@@ -403,16 +387,16 @@ public class AddProjectToSessionWizard extends Wizard {
 
     // TODO include folder information
 
-    for (String projectName : modifiedResources.keySet()) {
-
-      FileListDiff diff = modifiedResources.get(projectName);
+    for (String referencePointName : modifiedResources.keySet()) {
+      FileListDiff diff = modifiedResources.get(referencePointName);
 
       info.add(
           new Status(
               IStatus.INFO,
               pluginID,
               1,
-              MessageFormat.format(Messages.AddProjectToSessionWizard_files_affected, projectName),
+              MessageFormat.format(
+                  Messages.AddProjectToSessionWizard_files_affected, referencePointName),
               null));
 
       for (String path : diff.getRemovedFiles()) {
@@ -446,8 +430,8 @@ public class AddProjectToSessionWizard extends Wizard {
 
   private void showCancelMessage(JID jid, String errorMsg, CancelLocation cancelLocation) {
 
-    final String peerJid = jid.getBase();
-    final Shell shell = SWTUtils.getShell();
+    String peerJid = jid.getBase();
+    Shell shell = SWTUtils.getShell();
 
     if (errorMsg != null) {
       switch (cancelLocation) {
@@ -492,7 +476,7 @@ public class AddProjectToSessionWizard extends Wizard {
     Set<IPath> referencePointPaths =
         referencePointContainers.stream().map(IContainer::getFullPath).collect(Collectors.toSet());
 
-    List<IEditorPart> openEditors = new ArrayList<IEditorPart>();
+    List<IEditorPart> openEditors = new ArrayList<>();
 
     Set<IEditorPart> editors = EditorAPI.getOpenEditors();
 
@@ -522,68 +506,68 @@ public class AddProjectToSessionWizard extends Wizard {
    * @return all resources that will be modified as part of the resource negotiation
    */
   private Map<String, FileListDiff> createContainersAndGetModifiedResources(
-      final Map<String, IContainer> referencePointContainers) throws CoreException {
+      Map<String, IContainer> referencePointContainers) throws CoreException {
 
-    final Map<String, IContainer> existingReferencePointContainers =
+    Map<String, IContainer> existingReferencePointContainers =
         getExistingReferencePointContainers(referencePointContainers);
 
-    final Map<String, FileListDiff> result = new HashMap<String, FileListDiff>();
+    Map<String, FileListDiff> result = new HashMap<>();
 
     try {
       getContainer()
           .run(
               true,
               false,
-              new IRunnableWithProgress() {
-                @Override
-                public void run(IProgressMonitor monitor)
-                    throws InvocationTargetException, InterruptedException {
-                  try {
+              monitor -> {
+                try {
 
-                    for (final IContainer container : referencePointContainers.values()) {
-                      if (!existingReferencePointContainers.containsValue(container)) {
+                  for (IContainer container : referencePointContainers.values()) {
+                    if (!existingReferencePointContainers.containsValue(container)) {
 
-                        if (!container.exists()) {
-                          if (container instanceof IProject) {
-                            ((IProject) container).create(null);
+                      if (!container.exists()) {
+                        if (container instanceof IProject) {
+                          ((IProject) container).create(null);
 
-                          } else if (container instanceof IFolder) {
-                            ((IFolder) container).create(true, true, null);
-
-                          } else {
-                            throw new IllegalStateException(
-                                "Encountered reference point container of unexpected type "
-                                    + container.getType()
-                                    + " - "
-                                    + container);
-                          }
+                        } else if (container instanceof IFolder) {
+                          ((IFolder) container).create(true, true, null);
 
                         } else {
-                          log.error(
-                              "encountered container to create that already existed: " + container);
+                          throw new IllegalStateException(
+                              "Encountered reference point container of unexpected type "
+                                  + container.getType()
+                                  + " - "
+                                  + container);
                         }
-                      }
 
-                      IProject containerProject = container.getProject();
-
-                      if (!containerProject.isOpen()) {
-                        containerProject.open(null);
+                      } else {
+                        log.error(
+                            "encountered container to create that already existed: " + container);
                       }
                     }
 
-                    result.putAll(getModifiedResources(existingReferencePointContainers, monitor));
+                    IProject containerProject = container.getProject();
 
-                  } catch (CoreException | RuntimeException e) {
-                    throw new InvocationTargetException(e);
+                    if (!containerProject.isOpen()) {
+                      containerProject.open(null);
+                    }
                   }
+
+                  result.putAll(getModifiedResources(existingReferencePointContainers, monitor));
+
+                } catch (CoreException | RuntimeException e) {
+                  throw new InvocationTargetException(e);
                 }
               });
     } catch (InvocationTargetException e) {
       Throwable cause = e.getCause();
 
-      if (cause instanceof CoreException) throw (CoreException) cause;
-      else if (cause instanceof RuntimeException) throw (RuntimeException) cause;
-      else throw new RuntimeException(cause.getMessage(), cause);
+      if (cause instanceof CoreException) {
+        throw (CoreException) cause;
+      } else if (cause instanceof RuntimeException) {
+        throw (RuntimeException) cause;
+      } else {
+        throw new RuntimeException(cause.getMessage(), cause);
+      }
     } catch (InterruptedException e) {
       throw new RuntimeException("unexpected interruption", e);
     }
@@ -604,36 +588,38 @@ public class AddProjectToSessionWizard extends Wizard {
    *     mapping
    */
   private Map<String, FileListDiff> getModifiedResources(
-      final Map<String, IContainer> referencePointContainers, final IProgressMonitor monitor)
+      Map<String, IContainer> referencePointContainers, IProgressMonitor monitor)
       throws CoreException {
 
-    final Map<String, FileListDiff> modifiedResources = new HashMap<String, FileListDiff>();
+    Map<String, FileListDiff> modifiedResources = new HashMap<>();
 
-    final ISarosSession session = sessionManager.getSession();
+    ISarosSession session = sessionManager.getSession();
 
     // FIXME the wizard should handle the case that the session may stop in
     // the meantime !
 
-    if (session == null) throw new IllegalStateException("no session running");
+    if (session == null) {
+      throw new IllegalStateException("no session running");
+    }
 
-    final SubMonitor subMonitor =
+    SubMonitor subMonitor =
         SubMonitor.convert(
             monitor,
             "Searching for files that will be modified...",
             referencePointContainers.size());
 
-    for (final Entry<String, IContainer> entry : referencePointContainers.entrySet()) {
+    for (Entry<String, IContainer> entry : referencePointContainers.entrySet()) {
 
-      final String referencePointId = entry.getKey();
-      final IContainer referencePointContainer = entry.getValue();
+      String referencePointId = entry.getKey();
+      IContainer referencePointContainer = entry.getValue();
 
-      final IReferencePoint referencePoint = new EclipseReferencePointImpl(referencePointContainer);
+      IReferencePoint referencePoint = new EclipseReferencePointImpl(referencePointContainer);
 
       if (!session.isShared(referencePoint)) {
         referencePointContainer.refreshLocal(IResource.DEPTH_INFINITE, null);
       }
 
-      final FileList localFileList;
+      FileList localFileList;
 
       try {
         localFileList =
@@ -645,16 +631,18 @@ public class AddProjectToSessionWizard extends Wizard {
       } catch (IOException e) {
         Throwable cause = e.getCause();
 
-        if (cause instanceof CoreException) throw (CoreException) cause;
+        if (cause instanceof CoreException) {
+          throw (CoreException) cause;
+        }
 
         throw new CoreException(
             new org.eclipse.core.runtime.Status(
                 IStatus.ERROR, Saros.PLUGIN_ID, "failed to compute local file list", e));
       }
 
-      final ResourceNegotiationData data = negotiation.getResourceNegotiationData(referencePointId);
+      ResourceNegotiationData data = negotiation.getResourceNegotiationData(referencePointId);
 
-      final FileListDiff diff = FileListDiff.diff(localFileList, data.getFileList());
+      FileListDiff diff = FileListDiff.diff(localFileList, data.getFileList());
 
       if (!diff.getRemovedFolders().isEmpty()
           || !diff.getRemovedFiles().isEmpty()
@@ -704,11 +692,11 @@ public class AddProjectToSessionWizard extends Wizard {
    * @return the containers used to represent the shared reference points in the local workspace
    */
   private Map<String, IContainer> getReferencePointContainerMapping() {
-    final Map<String, IContainer> referencePointContainers = new HashMap<>();
+    Map<String, IContainer> referencePointContainers = new HashMap<>();
 
-    for (final ResourceNegotiationData data : negotiation.getResourceNegotiationData()) {
-      final String referencePointID = data.getReferencePointID();
-      final String referencePointName = data.getReferencePointName();
+    for (ResourceNegotiationData data : negotiation.getResourceNegotiationData()) {
+      String referencePointID = data.getReferencePointID();
+      String referencePointName = data.getReferencePointName();
 
       ReferencePointOptionResult result =
           localRepresentationSelectionPage.getResult(referencePointID);
@@ -736,20 +724,23 @@ public class AddProjectToSessionWizard extends Wizard {
     return referencePointContainers;
   }
 
-  private void displaySaveDirtyEditorsDialog(final List<IEditorPart> dirtyEditors) {
+  private void displaySaveDirtyEditorsDialog(List<IEditorPart> dirtyEditors) {
     int max = Math.min(20, dirtyEditors.size());
     int more = dirtyEditors.size() - max;
 
-    List<String> dirtyEditorNames = new ArrayList<String>();
+    List<String> dirtyEditorNames = new ArrayList<>();
 
-    for (IEditorPart editor : dirtyEditors.subList(0, max)) dirtyEditorNames.add(editor.getTitle());
+    for (IEditorPart editor : dirtyEditors.subList(0, max)) {
+      dirtyEditorNames.add(editor.getTitle());
+    }
 
     Collections.sort(dirtyEditorNames);
 
-    if (more > 0)
+    if (more > 0) {
       dirtyEditorNames.add(
           MessageFormat.format(
               Messages.AddProjectToSessionWizard_unsaved_changes_dialog_more, more));
+    }
 
     String allDirtyEditorNames = StringUtils.join(dirtyEditorNames, ", ");
 
@@ -767,10 +758,14 @@ public class AddProjectToSessionWizard extends Wizard {
      * The wizard can be closed automatically and so 'proceed' would be true
      * if this happens although the user did not clicked anything.
      */
-    if (getShell().isDisposed()) return;
+    if (getShell().isDisposed()) {
+      return;
+    }
 
     if (proceed) {
-      for (IEditorPart editor : dirtyEditors) editor.doSave(new NullProgressMonitor());
+      for (IEditorPart editor : dirtyEditors) {
+        editor.doSave(new NullProgressMonitor());
+      }
     }
   }
 
@@ -782,7 +777,7 @@ public class AddProjectToSessionWizard extends Wizard {
    *     the local workspace
    */
   private void storeCurrentReferencePointPathMapping(
-      final JID jid, final Map<String, IContainer> referencePointContainers) {
+      JID jid, Map<String, IContainer> referencePointContainers) {
 
     Map<String, String> currentReferencePointPaths = new HashMap<>();
 
@@ -799,7 +794,7 @@ public class AddProjectToSessionWizard extends Wizard {
     mappingStorage.updateMapping(jid, currentReferencePointPaths);
   }
 
-  private static final class ResourceMappingStorage {
+  private static class ResourceMappingStorage {
     private static final String RESOURCE_MAPPING_STORE_PREFIX = "resource.mapping.storage.";
 
     private static final CharSequence DELIMITER = ":";
@@ -818,21 +813,25 @@ public class AddProjectToSessionWizard extends Wizard {
 
     private final IPreferenceStore store;
 
-    public ResourceMappingStorage(final IPreferenceStore store) {
+    public ResourceMappingStorage(IPreferenceStore store) {
       this.store = store;
     }
 
-    public Map<String, String> getMapping(final JID jid) {
-      final Map<String, String> result = new HashMap<>();
+    public Map<String, String> getMapping(JID jid) {
+      Map<String, String> result = new HashMap<>();
 
-      final String mapping = store.getString(RESOURCE_MAPPING_STORE_PREFIX + jid.getBase());
+      String mapping = store.getString(RESOURCE_MAPPING_STORE_PREFIX + jid.getBase());
 
-      if (mapping.isEmpty()) return result;
+      if (mapping.isEmpty()) {
+        return result;
+      }
 
-      final String[] names = SPLIT_PATTERN.split(mapping);
+      String[] names = SPLIT_PATTERN.split(mapping);
 
       for (int i = 0; i < names.length - 1; i += 2) {
-        if (names[i].isEmpty() || names[i + 1].isEmpty()) continue;
+        if (names[i].isEmpty() || names[i + 1].isEmpty()) {
+          continue;
+        }
 
         result.put(unescape(names[i]), unescape(names[i + 1]));
       }
@@ -840,11 +839,11 @@ public class AddProjectToSessionWizard extends Wizard {
       return result;
     }
 
-    public void updateMapping(final JID jid, final Map<String, String> resourceNameMapping) {
+    public void updateMapping(JID jid, Map<String, String> resourceNameMapping) {
 
-      final Map<String, String> lastResourceNameMapping = getMapping(jid);
+      Map<String, String> lastResourceNameMapping = getMapping(jid);
 
-      final Set<String> resourceNameDestinations = new HashSet<>(resourceNameMapping.values());
+      Set<String> resourceNameDestinations = new HashSet<>(resourceNameMapping.values());
 
       /*
        * Remove existing mappings to avoid following problem:
@@ -855,22 +854,19 @@ public class AddProjectToSessionWizard extends Wizard {
        * In other words, ensure that the mapping is injective.
        */
 
-      final Iterator<Entry<String, String>> it = lastResourceNameMapping.entrySet().iterator();
-
-      while (it.hasNext()) {
-
-        final Entry<String, String> entry = it.next();
-
-        if (resourceNameDestinations.contains(entry.getValue())) it.remove();
-      }
+      lastResourceNameMapping
+          .entrySet()
+          .removeIf(entry -> resourceNameDestinations.contains(entry.getValue()));
 
       lastResourceNameMapping.putAll(resourceNameMapping);
 
-      if (lastResourceNameMapping.isEmpty()) return;
+      if (lastResourceNameMapping.isEmpty()) {
+        return;
+      }
 
-      final StringBuilder builder = new StringBuilder();
+      StringBuilder builder = new StringBuilder();
 
-      for (final Entry<String, String> entry : lastResourceNameMapping.entrySet()) {
+      for (Entry<String, String> entry : lastResourceNameMapping.entrySet()) {
         builder.append(escape(entry.getKey()));
         builder.append(DELIMITER);
         builder.append(escape(entry.getValue()));
@@ -882,11 +878,11 @@ public class AddProjectToSessionWizard extends Wizard {
       store.setValue(RESOURCE_MAPPING_STORE_PREFIX + jid.getBase(), builder.toString());
     }
 
-    private static String escape(final String value) {
+    private static String escape(String value) {
       return value.replace(DELIMITER, ESCAPE_SEQUENCE);
     }
 
-    private static String unescape(final String value) {
+    private static String unescape(String value) {
       return value.replace(ESCAPE_SEQUENCE, DELIMITER);
     }
   }
