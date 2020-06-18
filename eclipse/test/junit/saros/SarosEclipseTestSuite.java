@@ -10,7 +10,6 @@ import org.junit.runners.Suite;
   saros.project.TestSuite.class,
   saros.session.internal.TestSuite.class,
   saros.ui.model.roster.TestSuite.class,
-  saros.ui.wizards.pages.TestSuite.class,
   saros.util.UtilTestSuite.class,
   saros.SarosEclipseContextFactoryTest.class,
   saros.SarosEclipseContextTest.class

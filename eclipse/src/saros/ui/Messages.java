@@ -155,15 +155,13 @@ public class Messages extends NLS {
   public static String EnterProjectNamePage_description_socks5proxy;
   public static String EnterProjectNamePage_direct_filetransfer_deactivated;
   public static String EnterProjectNamePage_direct_filetransfer_nan;
-  public static String EnterProjectNamePage_error_projectname_exists;
-  public static String EnterProjectNamePage_error_projectname_in_use;
-  public static String EnterProjectNamePage_error_wrong_name;
-  public static String EnterProjectNamePage_warning_project_artifacts_found;
+  public static String EnterProjectNamePage_error_reference_point_path_clash;
+  public static String EnterProjectNamePage_page_name;
   public static String EnterProjectNamePage_saros_url;
-  public static String EnterProjectNamePage_set_project_name;
   public static String EnterProjectNamePage_title;
-  public static String EnterProjectNamePage_title2;
   public static String EnterProjectNamePage_unknown_transport_method;
+  public static String EnterProjectNamePage_warning_project_artifacts_found;
+  public static String EnterProjectNamePage_warning_unsupported_encoding_found;
 
   public static String EnterXMPPAccountWizardPage_description;
   public static String EnterXMPPAccountWizardPage_title;
