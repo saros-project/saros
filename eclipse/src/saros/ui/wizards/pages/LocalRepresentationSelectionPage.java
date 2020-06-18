@@ -125,26 +125,6 @@ public class LocalRepresentationSelectionPage extends WizardPage {
   }
 
   /**
-   * Returns the name of the project to use during the shared session.
-   *
-   * @deprecated use {@link #getResult(String)} instead
-   */
-  @Deprecated
-  public String getTargetProjectName(String projectID) {
-    return referencePointOptionComposites.get(projectID).getProjectName();
-  }
-
-  /**
-   * @return <code>true</code> if the synchronization option chosen by the user could lead to
-   *     overwriting project resources, <code>false</code> otherwise.
-   * @deprecated use {@link #getResult(String)} instead and check representation option
-   */
-  @Deprecated
-  public boolean overwriteResources(String projectID) {
-    return referencePointOptionComposites.get(projectID).useExistingProject();
-  }
-
-  /**
    * Returns the result of the reference point option page for the given ID.
    *
    * @param referencePointId the ID of the reference point
