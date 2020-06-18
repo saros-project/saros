@@ -12,12 +12,11 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 
 /** Eclipse implementation of the Saros file interface. */
-// TODO rename to EclipseFile
-public class EclipseFileImplV2 extends EclipseResourceImplV2 implements IFile {
-  private static final Logger log = Logger.getLogger(EclipseFileImplV2.class);
+public class EclipseFile extends AbstractEclipseResource implements IFile {
+  private static final Logger log = Logger.getLogger(EclipseFile.class);
 
-  /** @see EclipseResourceImplV2#EclipseResourceImplV2(EclipseReferencePointImpl, IPath) */
-  EclipseFileImplV2(EclipseReferencePointImpl referencePoint, IPath relativePath) {
+  /** @see AbstractEclipseResource#AbstractEclipseResource(EclipseReferencePoint, IPath) */
+  EclipseFile(EclipseReferencePoint referencePoint, IPath relativePath) {
     super(referencePoint, relativePath);
   }
 

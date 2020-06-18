@@ -86,7 +86,7 @@ public class ResourceConverter {
 
     Objects.requireNonNull(referencePoint, "Given reference point must not be null");
 
-    EclipseReferencePointImpl eclipseReferencePoint = (EclipseReferencePointImpl) referencePoint;
+    EclipseReferencePoint eclipseReferencePoint = (EclipseReferencePoint) referencePoint;
 
     if (eclipseReferencePoint.getDelegate().equals(resourceDelegate)) {
       return referencePoint;
@@ -217,7 +217,7 @@ public class ResourceConverter {
   public static org.eclipse.core.resources.IContainer getDelegate(IReferencePoint referencePoint) {
     Objects.requireNonNull(referencePoint, "Given reference point must not be null");
 
-    EclipseReferencePointImpl eclipseReferencePoint = (EclipseReferencePointImpl) referencePoint;
+    EclipseReferencePoint eclipseReferencePoint = (EclipseReferencePoint) referencePoint;
 
     return eclipseReferencePoint.getDelegate();
   }
@@ -232,7 +232,7 @@ public class ResourceConverter {
   public static org.eclipse.core.resources.IFile getDelegate(IFile file) {
     Objects.requireNonNull(file, "Given file must not be null");
 
-    EclipseFileImplV2 eclipseFile = (EclipseFileImplV2) file;
+    EclipseFile eclipseFile = (EclipseFile) file;
 
     return eclipseFile.getDelegate();
   }
@@ -247,7 +247,7 @@ public class ResourceConverter {
   public static org.eclipse.core.resources.IFolder getDelegate(IFolder folder) {
     Objects.requireNonNull(folder, "Given folder must not be null");
 
-    EclipseFolderImplV2 eclipseFile = (EclipseFolderImplV2) folder;
+    EclipseFolder eclipseFile = (EclipseFolder) folder;
 
     return eclipseFile.getDelegate();
   }

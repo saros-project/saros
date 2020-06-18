@@ -8,11 +8,10 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.OperationCanceledException;
 
 /** Eclipse implementation of the Saros folder interface. */
-// TODO rename to EclipseFolder
-public class EclipseFolderImplV2 extends EclipseResourceImplV2 implements IFolder {
+public class EclipseFolder extends AbstractEclipseResource implements IFolder {
 
-  /** @see EclipseResourceImplV2#EclipseResourceImplV2(EclipseReferencePointImpl, IPath) */
-  EclipseFolderImplV2(EclipseReferencePointImpl referencePoint, IPath relativePath) {
+  /** @see AbstractEclipseResource#AbstractEclipseResource(EclipseReferencePoint, IPath) */
+  EclipseFolder(EclipseReferencePoint referencePoint, IPath relativePath) {
     super(referencePoint, relativePath);
   }
 
@@ -42,10 +41,10 @@ public class EclipseFolderImplV2 extends EclipseResourceImplV2 implements IFolde
       IPath childPath = relativePath.append(name);
 
       if (containedResource.getType() == org.eclipse.core.resources.IResource.FILE) {
-        result.add(new EclipseFileImplV2(referencePoint, childPath));
+        result.add(new EclipseFile(referencePoint, childPath));
 
       } else if (containedResource.getType() == org.eclipse.core.resources.IResource.FOLDER) {
-        result.add(new EclipseFolderImplV2(referencePoint, childPath));
+        result.add(new EclipseFolder(referencePoint, childPath));
 
       } else {
         throw new IllegalStateException(
@@ -71,7 +70,7 @@ public class EclipseFolderImplV2 extends EclipseResourceImplV2 implements IFolde
 
     IPath referencePointRelativeChildPath = relativePath.append(path);
 
-    return new EclipseFileImplV2(referencePoint, referencePointRelativeChildPath);
+    return new EclipseFile(referencePoint, referencePointRelativeChildPath);
   }
 
   @Override
@@ -89,7 +88,7 @@ public class EclipseFolderImplV2 extends EclipseResourceImplV2 implements IFolde
 
     IPath referencePointRelativeChildPath = relativePath.append(path);
 
-    return new EclipseFolderImplV2(referencePoint, referencePointRelativeChildPath);
+    return new EclipseFolder(referencePoint, referencePointRelativeChildPath);
   }
 
   @Override

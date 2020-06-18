@@ -49,7 +49,7 @@ import saros.Saros;
 import saros.SarosPluginContext;
 import saros.editor.internal.EditorAPI;
 import saros.exception.IllegalInputException;
-import saros.filesystem.EclipseReferencePointImpl;
+import saros.filesystem.EclipseReferencePoint;
 import saros.filesystem.IReferencePoint;
 import saros.filesystem.checksum.IChecksumCache;
 import saros.monitoring.ProgressMonitorAdapterFactory;
@@ -326,8 +326,7 @@ public class AddReferencePointsToSessionWizard extends Wizard {
               Map<String, IReferencePoint> convertedMapping = new HashMap<>();
 
               for (Entry<String, IContainer> entry : referencePointContainers.entrySet()) {
-                convertedMapping.put(
-                    entry.getKey(), new EclipseReferencePointImpl(entry.getValue()));
+                convertedMapping.put(entry.getKey(), new EclipseReferencePoint(entry.getValue()));
               }
 
               ResourceNegotiation.Status status =
@@ -622,7 +621,7 @@ public class AddReferencePointsToSessionWizard extends Wizard {
       String referencePointId = entry.getKey();
       IContainer referencePointContainer = entry.getValue();
 
-      IReferencePoint referencePoint = new EclipseReferencePointImpl(referencePointContainer);
+      IReferencePoint referencePoint = new EclipseReferencePoint(referencePointContainer);
 
       if (!session.isShared(referencePoint)) {
         referencePointContainer.refreshLocal(IResource.DEPTH_INFINITE, null);

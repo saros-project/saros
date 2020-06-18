@@ -8,11 +8,10 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.OperationCanceledException;
 
 /** Abstract Eclipse implementation of the Saros resource interface. */
-// TODO rename to AbstractEclipseResource
-public abstract class EclipseResourceImplV2 implements IResource {
+public abstract class AbstractEclipseResource implements IResource {
 
   /** The reference point this resource belongs to. */
-  protected final EclipseReferencePointImpl referencePoint;
+  protected final EclipseReferencePoint referencePoint;
 
   /** The reference-point-relative path for this resource. */
   protected final IPath relativePath;
@@ -25,7 +24,7 @@ public abstract class EclipseResourceImplV2 implements IResource {
    * @throws NullPointerException if the given reference point or path is <code>null</code>
    * @throws IllegalArgumentException if the given path is absolute or empty
    */
-  public EclipseResourceImplV2(EclipseReferencePointImpl referencePoint, IPath relativePath) {
+  public AbstractEclipseResource(EclipseReferencePoint referencePoint, IPath relativePath) {
     Objects.requireNonNull(referencePoint, "The given reference point must not be null");
     Objects.requireNonNull(relativePath, "The given relative path must not be null");
 
@@ -66,7 +65,7 @@ public abstract class EclipseResourceImplV2 implements IResource {
       return referencePoint;
     }
 
-    return new EclipseFolderImplV2(referencePoint, relativePath.removeLastSegments(1));
+    return new EclipseFolder(referencePoint, relativePath.removeLastSegments(1));
   }
 
   @Override
@@ -125,7 +124,7 @@ public abstract class EclipseResourceImplV2 implements IResource {
     if (obj == null) return false;
     if (getClass() != obj.getClass()) return false;
 
-    EclipseResourceImplV2 other = (EclipseResourceImplV2) obj;
+    AbstractEclipseResource other = (AbstractEclipseResource) obj;
 
     return this.referencePoint.equals(other.referencePoint)
         && this.relativePath.equals(other.relativePath);
