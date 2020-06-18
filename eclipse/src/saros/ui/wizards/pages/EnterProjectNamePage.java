@@ -285,15 +285,55 @@ public class EnterProjectNamePage extends WizardPage {
       return e.getMessage();
     }
 
-    String selectedPath = selectedContainer.getFullPath().toPortableString();
+    IPath selectedPath = selectedContainer.getFullPath();
 
-    List<String> currentOtherPaths = getReferencePointPaths(referencePointId);
+    // check for clashes in current selection
+    for (Entry<String, IPath> entry : getOtherReferencePointPaths(referencePointId).entrySet()) {
+      String otherReferencePointName = remoteReferencePointIdToNameMapping.get(entry.getKey());
+      IPath otherReferencePointPath = entry.getValue();
 
-    if (currentOtherPaths.contains(selectedPath)) {
-      return MessageFormat.format(
-          Messages.EnterProjectNamePage_error_reference_point_path_clash,
-          selectedPath,
-          referencePointName);
+      if (selectedPath.equals(otherReferencePointPath)) {
+        return MessageFormat.format(
+            Messages.EnterProjectNamePage_error_reference_point_path_clash,
+            selectedPath.toPortableString(),
+            referencePointName,
+            otherReferencePointName);
+
+      } else if (otherReferencePointPath.isPrefixOf(selectedPath)) {
+        return MessageFormat.format(
+            Messages.EnterProjectNamePage_error_nested_selected_reference_point_paths,
+            selectedPath.toPortableString(),
+            referencePointName,
+            otherReferencePointName);
+      }
+    }
+
+    // check for clashes with already shared reference points
+    for (IReferencePoint sharedReferencePoint : session.getReferencePoints()) {
+      IContainer referencePointDelegate = ResourceConverter.getDelegate(sharedReferencePoint);
+      IPath referencePointPath = referencePointDelegate.getFullPath();
+
+      if (referencePointPath.equals(selectedPath)) {
+        return MessageFormat.format(
+            Messages.EnterProjectNamePage_error_existing_reference_point_path_clash,
+            selectedPath.toPortableString(),
+            referencePointName,
+            sharedReferencePoint.getName());
+
+      } else if (referencePointPath.isPrefixOf(selectedPath)) {
+        return MessageFormat.format(
+            Messages.EnterProjectNamePage_error_child_of_existing_reference_point,
+            selectedPath.toPortableString(),
+            referencePointName,
+            sharedReferencePoint.getName());
+
+      } else if (selectedPath.isPrefixOf(referencePointPath)) {
+        return MessageFormat.format(
+            Messages.EnterProjectNamePage_error_parent_of_existing_reference_point,
+            selectedPath.toPortableString(),
+            referencePointName,
+            sharedReferencePoint.getName());
+      }
     }
 
     return null;
@@ -552,25 +592,26 @@ public class EnterProjectNamePage extends WizardPage {
   }
 
   /**
-   * Returns a list of paths currently selected to represent the shared reference points.
+   * Returns the paths currently selected to represent other the shared reference points of the
+   * negotiation.
    *
    * @param excludedReferencePointId the ID of the reference point ot exclude from the list
-   * @return a list of paths currently selected to represent the shared reference points
+   * @return the paths currently selected to represent other the shared reference points of the
+   *     negotiation
    */
-  private List<String> getReferencePointPaths(String excludedReferencePointId) {
-    List<String> currentReferencePointPaths = new ArrayList<>();
+  private Map<String, IPath> getOtherReferencePointPaths(String excludedReferencePointId) {
+    Map<String, IPath> otherReferencePointPaths = new HashMap<>();
 
     for (Entry<String, ReferencePointOptionComposite> entry :
         referencePointOptionComposites.entrySet()) {
 
       String referencePointId = entry.getKey();
-      ReferencePointOptionComposite referencePointOptionComposite = entry.getValue();
 
       if (referencePointId.equals(excludedReferencePointId)) {
         continue;
       }
 
-      ReferencePointOptionResult result = referencePointOptionComposite.getResult();
+      ReferencePointOptionResult result = entry.getValue().getResult();
 
       IContainer chosenContainer;
       try {
@@ -582,10 +623,10 @@ public class EnterProjectNamePage extends WizardPage {
         continue;
       }
 
-      currentReferencePointPaths.add(chosenContainer.getFullPath().toPortableString());
+      otherReferencePointPaths.put(referencePointId, chosenContainer.getFullPath());
     }
 
-    return currentReferencePointPaths;
+    return otherReferencePointPaths;
   }
 
   /** get transfer mode and set header information of the wizard. */
