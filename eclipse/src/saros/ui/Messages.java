@@ -188,6 +188,18 @@ public class Messages extends NLS {
   public static String ReferencePointOptionComposite_tooltip_new_directory_base_path;
   public static String ReferencePointOptionComposite_use_existing_directory;
 
+  public static String ReferencePointOptionResult_error_existing_directory_does_not_exist;
+  public static String ReferencePointOptionResult_error_existing_directory_invalid_path;
+  public static String ReferencePointOptionResult_error_existing_directory_no_path;
+  public static String ReferencePointOptionResult_error_new_directory_already_exists;
+  public static String ReferencePointOptionResult_error_new_directory_already_exists_as_file;
+  public static String ReferencePointOptionResult_error_new_directory_base_does_not_exist;
+  public static String ReferencePointOptionResult_error_new_directory_invalid_name;
+  public static String ReferencePointOptionResult_error_new_directory_no_name_or_path;
+  public static String ReferencePointOptionResult_error_new_project_already_exists;
+  public static String ReferencePointOptionResult_error_new_project_invalid_name;
+  public static String ReferencePointOptionResult_error_new_project_no_name;
+
   public static String GeneralPreferencePage_ACCOUNT_GROUP_TITLE;
   public static String GeneralPreferencePage_ACTIVATE_BTN_TEXT;
   public static String GeneralPreferencePage_active;
