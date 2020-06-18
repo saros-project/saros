@@ -408,7 +408,7 @@ public interface Constants {
   public static final String SHELL_NEED_BASED_SYNC = get("shell_need_based_sync");
 
   public static final String SHELL_CONFIRM_SAVE_UNCHANGED_CHANGES =
-      get("AddProjectToSessionWizard_unsaved_changes_dialog_title");
+      get("AddReferencePointsToSessionWizard_unsaved_changes_dialog_title");
 
   /*
    * second page of the wizard "Session invitation"

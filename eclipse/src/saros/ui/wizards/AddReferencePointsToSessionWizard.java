@@ -79,9 +79,9 @@ import saros.ui.wizards.dialogs.WizardDialogAccessable;
 import saros.ui.wizards.pages.LocalRepresentationSelectionPage;
 import saros.util.ThreadUtils;
 
-public class AddProjectToSessionWizard extends Wizard {
+public class AddReferencePointsToSessionWizard extends Wizard {
 
-  private static Logger log = Logger.getLogger(AddProjectToSessionWizard.class);
+  private static Logger log = Logger.getLogger(AddReferencePointsToSessionWizard.class);
 
   private LocalRepresentationSelectionPage localRepresentationSelectionPage;
   private WizardDialogAccessable wizardDialog;
@@ -135,7 +135,7 @@ public class AddProjectToSessionWizard extends Wizard {
         }
       };
 
-  public AddProjectToSessionWizard(AbstractIncomingResourceNegotiation negotiation) {
+  public AddReferencePointsToSessionWizard(AbstractIncomingResourceNegotiation negotiation) {
 
     SarosPluginContext.initComponent(this);
 
@@ -144,7 +144,7 @@ public class AddProjectToSessionWizard extends Wizard {
     this.negotiation = negotiation;
     this.peer = negotiation.getPeer();
 
-    setWindowTitle(Messages.AddProjectToSessionWizard_title);
+    setWindowTitle(Messages.AddReferencePointsToSessionWizard_title);
     setHelpAvailable(true);
     setNeedsProgressMonitor(true);
     setDefaultPageImageDescriptor(
@@ -211,7 +211,7 @@ public class AddProjectToSessionWizard extends Wizard {
       SWTUtils.runSafeSWTAsync(
           log,
           () -> {
-            if (AddProjectToSessionWizard.this.getShell().isDisposed()) {
+            if (AddReferencePointsToSessionWizard.this.getShell().isDisposed()) {
               return;
             }
 
@@ -274,13 +274,13 @@ public class AddProjectToSessionWizard extends Wizard {
       if (session != null
           && !session.isHost()
           && !DialogUtils.popUpYesNoQuestion(
-              Messages.AddProjectToSessionWizard_leave_session,
-              Messages.AddProjectToSessionWizard_leave_session_text,
+              Messages.AddReferencePointsToSessionWizard_leave_session,
+              Messages.AddReferencePointsToSessionWizard_leave_session_text,
               false)) {
         return false;
       }
       ThreadUtils.runSafeAsync(
-          "CancelAddProjectWizard",
+          "CancelAddReferencePointsToSessionWizard",
           log,
           () -> negotiation.localCancel(null, CancelOption.NOTIFY_PEER));
     }
@@ -353,9 +353,11 @@ public class AddProjectToSessionWizard extends Wizard {
               }
 
               SarosView.showNotification(
-                  Messages.AddProjectToSessionWizard_synchronize_finished_notification_title,
+                  Messages
+                      .AddReferencePointsToSessionWizard_synchronize_finished_notification_title,
                   MessageFormat.format(
-                      Messages.AddProjectToSessionWizard_synchronize_finished_notification_text,
+                      Messages
+                          .AddReferencePointsToSessionWizard_synchronize_finished_notification_text,
                       StringUtils.join(referencePointNames, ", ")));
 
             } catch (RuntimeException e) {
@@ -380,7 +382,7 @@ public class AddProjectToSessionWizard extends Wizard {
   }
 
   private boolean confirmOverwritingResources(Map<String, FileListDiff> modifiedResources) {
-    String message = Messages.AddProjectToSessionWizard_synchronize_resource_roots;
+    String message = Messages.AddReferencePointsToSessionWizard_synchronize_resource_roots;
     String pluginID = Saros.PLUGIN_ID;
 
     MultiStatus info = new MultiStatus(pluginID, 1, message, null);
@@ -396,7 +398,7 @@ public class AddProjectToSessionWizard extends Wizard {
               pluginID,
               1,
               MessageFormat.format(
-                  Messages.AddProjectToSessionWizard_files_affected, referencePointName),
+                  Messages.AddReferencePointsToSessionWizard_files_affected, referencePointName),
               null));
 
       for (String path : diff.getRemovedFiles()) {
@@ -405,7 +407,8 @@ public class AddProjectToSessionWizard extends Wizard {
                 IStatus.WARNING,
                 pluginID,
                 1,
-                MessageFormat.format(Messages.AddProjectToSessionWizard_file_toRemove, path),
+                MessageFormat.format(
+                    Messages.AddReferencePointsToSessionWizard_file_toRemove, path),
                 null));
       }
 
@@ -415,7 +418,8 @@ public class AddProjectToSessionWizard extends Wizard {
                 IStatus.WARNING,
                 pluginID,
                 1,
-                MessageFormat.format(Messages.AddProjectToSessionWizard_file_overwritten, path),
+                MessageFormat.format(
+                    Messages.AddReferencePointsToSessionWizard_file_overwritten, path),
                 null));
       }
 
@@ -423,7 +427,10 @@ public class AddProjectToSessionWizard extends Wizard {
     }
 
     return new OverwriteErrorDialog(
-                getShell(), Messages.AddProjectToSessionWizard_delete_local_changes, null, info)
+                getShell(),
+                Messages.AddReferencePointsToSessionWizard_delete_local_changes,
+                null,
+                info)
             .open()
         == IDialogConstants.OK_ID;
   }
@@ -438,16 +445,18 @@ public class AddProjectToSessionWizard extends Wizard {
         case LOCAL:
           DialogUtils.openErrorMessageDialog(
               shell,
-              Messages.AddProjectToSessionWizard_invitation_canceled,
+              Messages.AddReferencePointsToSessionWizard_invitation_canceled,
               MessageFormat.format(
-                  Messages.AddProjectToSessionWizard_invitation_canceled_text, errorMsg));
+                  Messages.AddReferencePointsToSessionWizard_invitation_canceled_text, errorMsg));
           break;
         case REMOTE:
           DialogUtils.openErrorMessageDialog(
               shell,
-              Messages.AddProjectToSessionWizard_invitation_canceled,
+              Messages.AddReferencePointsToSessionWizard_invitation_canceled,
               MessageFormat.format(
-                  Messages.AddProjectToSessionWizard_invitation_canceled_text2, peerJid, errorMsg));
+                  Messages.AddReferencePointsToSessionWizard_invitation_canceled_text2,
+                  peerJid,
+                  errorMsg));
       }
     } else {
       switch (cancelLocation) {
@@ -456,9 +465,9 @@ public class AddProjectToSessionWizard extends Wizard {
         case REMOTE:
           DialogUtils.openInformationMessageDialog(
               shell,
-              Messages.AddProjectToSessionWizard_invitation_canceled,
+              Messages.AddReferencePointsToSessionWizard_invitation_canceled,
               MessageFormat.format(
-                  Messages.AddProjectToSessionWizard_invitation_canceled_text3, peerJid));
+                  Messages.AddReferencePointsToSessionWizard_invitation_canceled_text3, peerJid));
       }
     }
   }
@@ -739,19 +748,20 @@ public class AddProjectToSessionWizard extends Wizard {
     if (more > 0) {
       dirtyEditorNames.add(
           MessageFormat.format(
-              Messages.AddProjectToSessionWizard_unsaved_changes_dialog_more, more));
+              Messages.AddReferencePointsToSessionWizard_unsaved_changes_dialog_more, more));
     }
 
     String allDirtyEditorNames = StringUtils.join(dirtyEditorNames, ", ");
 
     String dialogText =
         MessageFormat.format(
-            Messages.AddProjectToSessionWizard_unsaved_changes_dialog_text, allDirtyEditorNames);
+            Messages.AddReferencePointsToSessionWizard_unsaved_changes_dialog_text,
+            allDirtyEditorNames);
 
     boolean proceed =
         DialogUtils.openQuestionMessageDialog(
             getShell(),
-            Messages.AddProjectToSessionWizard_unsaved_changes_dialog_title,
+            Messages.AddReferencePointsToSessionWizard_unsaved_changes_dialog_title,
             dialogText);
 
     /*
