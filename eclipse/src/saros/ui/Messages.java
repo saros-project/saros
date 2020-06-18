@@ -9,25 +9,26 @@ public class Messages extends NLS {
   public static String AddContactWizard_title;
   public static String AddContactWizardPage_nickname;
   public static String AddContactWizardPage_optional;
-  public static String AddProjectToSessionWizard_delete_local_changes;
-  public static String AddProjectToSessionWizard_file_added;
-  public static String AddProjectToSessionWizard_file_overwritten;
-  public static String AddProjectToSessionWizard_file_toRemove;
-  public static String AddProjectToSessionWizard_files_affected;
-  public static String AddProjectToSessionWizard_invitation_canceled;
-  public static String AddProjectToSessionWizard_invitation_canceled_text;
-  public static String AddProjectToSessionWizard_invitation_canceled_text2;
-  public static String AddProjectToSessionWizard_invitation_canceled_text3;
-  public static String AddProjectToSessionWizard_leave_session;
-  public static String AddProjectToSessionWizard_leave_session_text;
-  public static String AddProjectToSessionWizard_synchronize_finished_notification_title;
-  public static String AddProjectToSessionWizard_synchronize_finished_notification_text;
-  public static String AddProjectToSessionWizard_synchronize_resource_roots;
 
-  public static String AddProjectToSessionWizard_title;
-  public static String AddProjectToSessionWizard_unsaved_changes_dialog_title;
-  public static String AddProjectToSessionWizard_unsaved_changes_dialog_text;
-  public static String AddProjectToSessionWizard_unsaved_changes_dialog_more;
+  public static String AddReferencePointsToSessionWizard_delete_local_changes;
+  public static String AddReferencePointsToSessionWizard_file_overwritten;
+  public static String AddReferencePointsToSessionWizard_file_toRemove;
+  public static String AddReferencePointsToSessionWizard_files_affected;
+  public static String AddReferencePointsToSessionWizard_invitation_canceled;
+  public static String AddReferencePointsToSessionWizard_invitation_canceled_text;
+  public static String AddReferencePointsToSessionWizard_invitation_canceled_text2;
+  public static String AddReferencePointsToSessionWizard_invitation_canceled_text3;
+  public static String AddReferencePointsToSessionWizard_leave_session;
+  public static String AddReferencePointsToSessionWizard_leave_session_text;
+  public static String AddReferencePointsToSessionWizard_synchronize_finished_notification_title;
+  public static String AddReferencePointsToSessionWizard_synchronize_finished_notification_text;
+  public static String AddReferencePointsToSessionWizard_synchronize_resource_roots;
+
+  public static String AddReferencePointsToSessionWizard_title;
+
+  public static String AddReferencePointsToSessionWizard_unsaved_changes_dialog_title;
+  public static String AddReferencePointsToSessionWizard_unsaved_changes_dialog_text;
+  public static String AddReferencePointsToSessionWizard_unsaved_changes_dialog_more;
 
   public static String ConfigurationWizard_account_created;
   public static String ConfigurationWizard_account_created_text;

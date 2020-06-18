@@ -26,7 +26,7 @@ import saros.ui.util.DialogUtils;
 import saros.ui.util.SWTUtils;
 import saros.ui.util.ViewUtils;
 import saros.ui.views.SarosView;
-import saros.ui.wizards.AddProjectToSessionWizard;
+import saros.ui.wizards.AddReferencePointsToSessionWizard;
 import saros.ui.wizards.JoinSessionWizard;
 import saros.ui.wizards.dialogs.WizardDialogAccessable;
 
@@ -273,12 +273,13 @@ public class NegotiationHandler implements INegotiationHandler {
 
           @Override
           public void run() {
-            AddProjectToSessionWizard projectWizard = new AddProjectToSessionWizard(negotiation);
+            AddReferencePointsToSessionWizard referencePointWizard =
+                new AddReferencePointsToSessionWizard(negotiation);
 
             final WizardDialogAccessable wizardDialog =
                 new WizardDialogAccessable(
                     SWTUtils.getShell(),
-                    projectWizard,
+                    referencePointWizard,
                     SWT.MIN | SWT.MAX,
                     SWT.SYSTEM_MODAL | SWT.APPLICATION_MODAL | SWT.PRIMARY_MODAL);
 
@@ -300,7 +301,7 @@ public class NegotiationHandler implements INegotiationHandler {
             wizardDialog.setBlockOnOpen(false);
 
             wizardDialog.setHelpAvailable(false);
-            projectWizard.setWizardDlg(wizardDialog);
+            referencePointWizard.setWizardDlg(wizardDialog);
 
             DialogUtils.openWindow(wizardDialog);
           }
