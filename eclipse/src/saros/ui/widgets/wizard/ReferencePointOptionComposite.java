@@ -305,6 +305,8 @@ public class ReferencePointOptionComposite extends Composite {
     /* Radio button */
     newProjectRadioButton = new Button(this, SWT.RADIO);
     newProjectRadioButton.setText(Messages.ReferencePointOptionComposite_create_new_project);
+    newProjectRadioButton.setToolTipText(
+        Messages.ReferencePointOptionComposite_tooltip_new_project);
     newProjectRadioButton.setSelection(false);
 
     gridData = new GridData();
@@ -330,10 +332,14 @@ public class ReferencePointOptionComposite extends Composite {
     /* Label */
     Label newProjectNameLabel = new Label(this, SWT.RIGHT);
     newProjectNameLabel.setText(Messages.ReferencePointOptionComposite_project_name);
+    newProjectNameLabel.setToolTipText(
+        Messages.ReferencePointOptionComposite_tooltip_new_project_name);
     newProjectNameLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
 
     /* Text box */
     newProjectNameText = new Text(this, SWT.BORDER);
+    newProjectNameText.setToolTipText(
+        Messages.ReferencePointOptionComposite_tooltip_new_project_name);
 
     gridData = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
     gridData.horizontalSpan = 2;
@@ -351,6 +357,8 @@ public class ReferencePointOptionComposite extends Composite {
     /* Radio button */
     newDirectoryRadioButton = new Button(this, SWT.RADIO);
     newDirectoryRadioButton.setText(Messages.ReferencePointOptionComposite_create_new_directory);
+    newDirectoryRadioButton.setToolTipText(
+        Messages.ReferencePointOptionComposite_tooltip_new_directory);
     newDirectoryRadioButton.setSelection(false);
 
     gridData = new GridData();
@@ -376,10 +384,14 @@ public class ReferencePointOptionComposite extends Composite {
     /* Label */
     Label newDirectoryNameLabel = new Label(this, SWT.RIGHT);
     newDirectoryNameLabel.setText(Messages.ReferencePointOptionComposite_directory_name);
+    newDirectoryNameLabel.setToolTipText(
+        Messages.ReferencePointOptionComposite_tooltip_new_directory_name);
     newDirectoryNameLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
 
     /* Text box */
     newDirectoryNameText = new Text(this, SWT.BORDER);
+    newDirectoryNameText.setToolTipText(
+        Messages.ReferencePointOptionComposite_tooltip_new_directory_name);
 
     gridData = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
     gridData.horizontalSpan = 2;
@@ -390,11 +402,15 @@ public class ReferencePointOptionComposite extends Composite {
     /* Label */
     Label newDirectoryBasePathLabel = new Label(this, SWT.RIGHT);
     newDirectoryBasePathLabel.setText(Messages.ReferencePointOptionComposite_directory_base_path);
+    newDirectoryBasePathLabel.setToolTipText(
+        Messages.ReferencePointOptionComposite_tooltip_new_directory_base_path);
     newDirectoryBasePathLabel.setLayoutData(
         new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
 
     /* Text box */
     newDirectoryBasePathText = new Text(this, SWT.BORDER);
+    newDirectoryBasePathText.setToolTipText(
+        Messages.ReferencePointOptionComposite_tooltip_new_directory_base_path);
 
     gridData = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
     gridData.horizontalSpan = 1;
@@ -404,6 +420,8 @@ public class ReferencePointOptionComposite extends Composite {
 
     /* Button */
     newDirectoryBasePathBrowseButton = new Button(this, SWT.PUSH);
+    newDirectoryBasePathBrowseButton.setToolTipText(
+        Messages.ReferencePointOptionComposite_tooltip_browse_button);
     newDirectoryBasePathBrowseButton.setImage(BROWSE_BUTTON_ICON);
     newDirectoryBasePathBrowseButton.addSelectionListener(
         new SelectionAdapter() {
@@ -427,6 +445,8 @@ public class ReferencePointOptionComposite extends Composite {
     existingDirectoryRadioButton = new Button(this, SWT.RADIO);
     existingDirectoryRadioButton.setText(
         Messages.ReferencePointOptionComposite_use_existing_directory);
+    existingDirectoryRadioButton.setToolTipText(
+        Messages.ReferencePointOptionComposite_tooltip_existing_directory);
     existingDirectoryRadioButton.setSelection(false);
 
     GridData gridData = new GridData();
@@ -452,16 +472,23 @@ public class ReferencePointOptionComposite extends Composite {
     /* Label */
     Label existingDirectoryLabel = new Label(this, SWT.RIGHT);
     existingDirectoryLabel.setText(Messages.ReferencePointOptionComposite_existing_directory_path);
+    existingDirectoryLabel.setToolTipText(
+        Messages.ReferencePointOptionComposite_tooltip_existing_directory_path);
     existingDirectoryLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
 
     /* Text box */
     existingDirectoryPathText = new Text(this, SWT.BORDER);
+    existingDirectoryPathText.setToolTipText(
+        Messages.ReferencePointOptionComposite_tooltip_existing_directory_path);
+
     existingDirectoryPathText.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     existingDirectoryPathText.setEnabled(false);
     existingDirectoryPathText.addModifyListener(e -> fireValueChanged());
 
     /* Button */
     existingDirectoryBrowseButton = new Button(this, SWT.PUSH);
+    existingDirectoryBrowseButton.setToolTipText(
+        Messages.ReferencePointOptionComposite_tooltip_browse_button);
     existingDirectoryBrowseButton.setImage(BROWSE_BUTTON_ICON);
     existingDirectoryBrowseButton.addSelectionListener(
         new SelectionAdapter() {

@@ -178,6 +178,14 @@ public class Messages extends NLS {
   public static String ReferencePointOptionComposite_project_name;
   public static String ReferencePointOptionComposite_select_base_directory;
   public static String ReferencePointOptionComposite_select_existing_directory;
+  public static String ReferencePointOptionComposite_tooltip_browse_button;
+  public static String ReferencePointOptionComposite_tooltip_existing_directory;
+  public static String ReferencePointOptionComposite_tooltip_existing_directory_path;
+  public static String ReferencePointOptionComposite_tooltip_new_project;
+  public static String ReferencePointOptionComposite_tooltip_new_project_name;
+  public static String ReferencePointOptionComposite_tooltip_new_directory;
+  public static String ReferencePointOptionComposite_tooltip_new_directory_name;
+  public static String ReferencePointOptionComposite_tooltip_new_directory_base_path;
   public static String ReferencePointOptionComposite_use_existing_directory;
 
   public static String GeneralPreferencePage_ACCOUNT_GROUP_TITLE;
