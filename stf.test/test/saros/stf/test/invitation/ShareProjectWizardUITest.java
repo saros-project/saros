@@ -5,7 +5,7 @@ import static saros.stf.client.tester.SarosTester.ALICE;
 import static saros.stf.shared.Constants.MENU_SAROS;
 import static saros.stf.shared.Constants.ResourceSelectionComposite_delete_dialog_title;
 import static saros.stf.shared.Constants.ResourceSelectionComposite_overwrite_dialog_title;
-import static saros.stf.shared.Constants.SHARE_PROJECTS;
+import static saros.stf.shared.Constants.SHARE_RESOURCES;
 import static saros.stf.shared.Constants.SHELL_SHARE_PROJECT;
 import static saros.stf.shared.Constants.YES;
 
@@ -105,7 +105,7 @@ public class ShareProjectWizardUITest extends StfTestCase {
   @Test
   public void testShareProjectsUndoRedo() throws Exception {
     ALICE.remoteBot().activateWorkbench();
-    ALICE.remoteBot().menu(MENU_SAROS).menu(SHARE_PROJECTS).click();
+    ALICE.remoteBot().menu(MENU_SAROS).menu(SHARE_RESOURCES).click();
     ALICE.remoteBot().shell(SHELL_SHARE_PROJECT).activate();
 
     assertNoneChecked();
@@ -131,7 +131,7 @@ public class ShareProjectWizardUITest extends StfTestCase {
   @Test
   public void testShareProjectsRestoreSelection() throws Exception {
     ALICE.remoteBot().activateWorkbench();
-    ALICE.remoteBot().menu(MENU_SAROS).menu(SHARE_PROJECTS).click();
+    ALICE.remoteBot().menu(MENU_SAROS).menu(SHARE_RESOURCES).click();
     ALICE.remoteBot().shell(SHELL_SHARE_PROJECT).activate();
 
     // unselect all..
