@@ -65,7 +65,6 @@ public class EclipseFileImplV2 extends EclipseResourceImplV2 implements IFile {
 
     if (!file.exists()) return;
 
-    String projectEncoding = file.getProject().getDefaultCharset();
     String fileEncoding = file.getCharset();
 
     if (encoding.equals(fileEncoding)) {
@@ -74,13 +73,15 @@ public class EclipseFileImplV2 extends EclipseResourceImplV2 implements IFile {
       return;
     }
 
+    String parentContainerEncoding = file.getParent().getDefaultCharset();
+
     // use inherited encoding if possible
-    if (encoding.equals(projectEncoding)) {
+    if (encoding.equals(parentContainerEncoding)) {
       log.debug(
           "changing encoding for file "
               + file
-              + " to use default project encoding: "
-              + projectEncoding);
+              + " to inherit parent container encoding: "
+              + parentContainerEncoding);
 
       file.setCharset(null, new NullProgressMonitor());
 
