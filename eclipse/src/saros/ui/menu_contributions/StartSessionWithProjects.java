@@ -103,7 +103,7 @@ public class StartSessionWithProjects extends ContributionItem {
 
     final MenuItem menuItem = new MenuItem(parentMenu, SWT.NONE, index);
 
-    menuItem.setText("Multiple Projects...");
+    menuItem.setText("Specific resource tree(s)...");
     menuItem.addSelectionListener(
         new SelectionAdapter() {
           @Override

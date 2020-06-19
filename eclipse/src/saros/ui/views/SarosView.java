@@ -469,7 +469,7 @@ public class SarosView extends ViewPart {
             if (sarosSessionManager.getSession() == null && contact.getStatus().isOnline()) {
               MenuManager shareProjectSubMenu =
                   new MenuManager(
-                      "Share Project(s)...",
+                      "Share Resource(s)...",
                       ImageManager.getImageDescriptor(ImageManager.ELCL_SESSION),
                       "Share_Project");
 

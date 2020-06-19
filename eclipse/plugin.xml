@@ -514,7 +514,7 @@
       <command
             categoryId="org.eclipse.ui.category.project"
             id="saros.ui.commands.ShareResource"
-            name="Share Project(s)...">
+            name="Share Resource(s)...">
       </command>
       <command
             categoryId="org.eclipse.ui.category.project"
@@ -524,7 +524,7 @@
       <command
             categoryId="org.eclipse.ui.category.project"
             id="saros.ui.commands.SessionAddResources"
-            name="Add Projects...">
+            name="Add Resource(s)...">
       </command>
       <command
             categoryId="org.eclipse.ui.category.project"
@@ -974,7 +974,7 @@
                commandId="saros.ui.commands.ShareResource"
                disabledIcon="icons/dlcl16/spacer.png"
                icon="icons/elcl16/session_tsk.png"
-               label="Share Project(s)..."
+               label="Share Resource(s)..."
                style="push"
                tooltip="Share the Selected Projects With Your Contacts">
             <visibleWhen
