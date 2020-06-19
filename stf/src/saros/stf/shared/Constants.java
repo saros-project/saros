@@ -186,7 +186,7 @@ public interface Constants {
    * ********************************************
    */
 
-  String ADD_PROJECTS = get("add_projects");
+  String ADD_RESOURCES = get("add_resources");
 
   /* *********************************************
    *
@@ -200,7 +200,7 @@ public interface Constants {
   String MENU_CREATE_ACCOUNT = get("menu_create_account");
   String MENU_ADD_CONTACT = get("menu_add_contact");
   String MENU_ADD_CONTACTS_TO_SESSION = get("menu_add_contacts_to_session");
-  String SHARE_PROJECTS = get("share_projects");
+  String SHARE_RESOURCES = get("share_resources");
   String MENU_PREFERENCES = get("menu_preferences");
   String MENU_STOP_SESSION = get("menu_stop_session");
 
@@ -323,7 +323,7 @@ public interface Constants {
   String CM_SHARE_WITH = get("cm_share_with");
   String CM_WORK_TOGETHER_ON = get("cm_work_together_on");
   String CM_MULTIPLE_CONTACTS = get("cm_multiple_contacts");
-  String CM_MULTIPLE_PROJECTS = get("cm_multiple_projects");
+  String CM_MULTIPLE_RESOURCE_ROOTS = get("cm_multiple_resource_roots");
 
   /* *************************************************************** */
 
@@ -379,7 +379,7 @@ public interface Constants {
    */
   String SHELL_INVITATION_CANCELED = get("shell_invitation_canceled");
   String SHELL_SESSION_INVITATION = get("shell_session_invitation");
-  String SHELL_ADD_PROJECTS = get("shell_add_projects");
+  String SHELL_ADD_RESOURCES = get("shell_add_resources");
   String SHELL_ADD_PROJECTS_TO_SESSION = get("shell_add_projects_to_session");
   String SHELL_PROBLEM_OCCURRED = get("shell_problem_occurred");
   String SHELL_WARNING_LOCAL_CHANGES_DELETED = get("shell_warning_local_changes_deleted");
@@ -394,7 +394,7 @@ public interface Constants {
   /*
    * second page of the wizard "Session invitation"
    */
-  String RADIO_USING_EXISTING_PROJECT = get("radio_use_existing_project");
+  String RADIO_USING_EXISTING_DIRECTORY = get("radio_use_existing_directory");
   String RADIO_CREATE_NEW_PROJECT = get("radio_create_new_project");
 
   /* *********************************************

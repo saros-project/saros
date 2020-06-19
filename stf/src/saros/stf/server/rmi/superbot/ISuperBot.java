@@ -36,7 +36,7 @@ public interface ISuperBot extends Remote {
    */
 
   /**
-   * The shell with the title {@link StfRemoteObject#SHELL_ADD_PROJECTS} should be appeared by the
+   * The shell with the title {@link StfRemoteObject#SHELL_ADD_RESOURCES} should be appeared by the
    * invitees' side during sharing session. This method confirm the shell using a new project.
    *
    * @throws RemoteException
@@ -44,7 +44,7 @@ public interface ISuperBot extends Remote {
   public void confirmShellAddProjectWithNewProject(String projectname) throws RemoteException;
 
   /**
-   * The shell with the title {@link StfRemoteObject#SHELL_ADD_PROJECTS} should be appeared by the
+   * The shell with the title {@link StfRemoteObject#SHELL_ADD_RESOURCES} should be appeared by the
    * invitees' side during sharing session. This method confirm the shell using an existed project.
    *
    * @throws RemoteException
@@ -52,7 +52,7 @@ public interface ISuperBot extends Remote {
   public void confirmShellAddProjectUsingExistProject(String projectName) throws RemoteException;
 
   /**
-   * The shell with the title {@link StfRemoteObject#SHELL_ADD_PROJECTS} should be appeared by the
+   * The shell with the title {@link StfRemoteObject#SHELL_ADD_RESOURCES} should be appeared by the
    * invitees' side during sharing session. This method confirm the shell using an existed project
    * with copy.
    *
@@ -62,7 +62,7 @@ public interface ISuperBot extends Remote {
       throws RemoteException;
 
   /**
-   * The shell with the title {@link StfRemoteObject#SHELL_ADD_PROJECTS} should be appeared by the
+   * The shell with the title {@link StfRemoteObject#SHELL_ADD_RESOURCES} should be appeared by the
    * invitees' side during sharing session. This method confirm the shell. with the passed parameter
    * "usingWhichProject" to decide using which project.
    *
@@ -155,7 +155,7 @@ public interface ISuperBot extends Remote {
 
   /**
    * confirm the shell with title {@link StfRemoteObject#SHELL_SESSION_INVITATION} and also the
-   * following shell with title {@link StfRemoteObject#SHELL_ADD_PROJECTS}
+   * following shell with title {@link StfRemoteObject#SHELL_ADD_RESOURCES}
    *
    * @param projectName the name of shared project
    * @param usingWhichProject if invitee has same project locally, he can decide use new or existed

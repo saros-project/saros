@@ -5,7 +5,7 @@ import static saros.stf.client.tester.SarosTester.BOB;
 import static saros.stf.client.tester.SarosTester.CARL;
 import static saros.stf.client.tester.SarosTester.DAVE;
 import static saros.stf.shared.Constants.ACCEPT;
-import static saros.stf.shared.Constants.SHELL_ADD_PROJECTS;
+import static saros.stf.shared.Constants.SHELL_ADD_RESOURCES;
 import static saros.stf.shared.Constants.SHELL_INVITATION_CANCELED;
 import static saros.stf.shared.Constants.SHELL_SESSION_INVITATION;
 
@@ -106,9 +106,9 @@ public class ParallelInvitationWithTerminationByHostTest extends StfTestCase {
     DAVE.remoteBot().shell(SHELL_SESSION_INVITATION).activate();
     DAVE.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(ACCEPT);
 
-    CARL.remoteBot().waitLongUntilShellIsOpen(SHELL_ADD_PROJECTS);
+    CARL.remoteBot().waitLongUntilShellIsOpen(SHELL_ADD_RESOURCES);
 
-    DAVE.remoteBot().waitLongUntilShellIsOpen(SHELL_ADD_PROJECTS);
+    DAVE.remoteBot().waitLongUntilShellIsOpen(SHELL_ADD_RESOURCES);
 
     // stop the session
 

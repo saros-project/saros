@@ -49,7 +49,7 @@ public final class SarosMenu extends StfRemoteObject implements ISarosMenu {
   @Override
   public void shareProjects(String projectName, JID... jids) throws RemoteException {
     RemoteWorkbenchBot.getInstance().activateWorkbench();
-    menu.menu(SHARE_PROJECTS).click();
+    menu.menu(SHARE_RESOURCES).click();
     SuperBot.getInstance().confirmShellShareProjects(projectName, jids);
   }
 
@@ -57,28 +57,28 @@ public final class SarosMenu extends StfRemoteObject implements ISarosMenu {
   public void shareProjectFiles(String project, String[] files, JID... jids)
       throws RemoteException {
     RemoteWorkbenchBot.getInstance().activateWorkbench();
-    menu.menu(SHARE_PROJECTS).click();
+    menu.menu(SHARE_RESOURCES).click();
     SuperBot.getInstance().confirmShellShareProjectFiles(project, files, jids);
   }
 
   @Override
   public void shareProjects(String[] projectNames, JID... jids) throws RemoteException {
     RemoteWorkbenchBot.getInstance().activateWorkbench();
-    menu.menu(SHARE_PROJECTS).click();
+    menu.menu(SHARE_RESOURCES).click();
     SuperBot.getInstance().confirmShellShareProjects(projectNames, jids);
   }
 
   @Override
   public void addProject(String project, String[] files) throws RemoteException {
     RemoteWorkbenchBot.getInstance().activateWorkbench();
-    menu.menu(ADD_PROJECTS).click();
+    menu.menu(ADD_RESOURCES).click();
     SuperBot.getInstance().confirmShellAddProjectToSession(project, files);
   }
 
   @Override
   public void addProjects(String... projectNames) throws RemoteException {
     RemoteWorkbenchBot.getInstance().activateWorkbench();
-    menu.menu(ADD_PROJECTS).click();
+    menu.menu(ADD_RESOURCES).click();
     SuperBot.getInstance().confirmShellAddProjectsToSession(projectNames);
   }
 

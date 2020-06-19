@@ -150,11 +150,11 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
 
     SWTBotTreeItem treeItem = getTreeItem();
 
-    log.trace("clicking on context menu item: " + ADD_PROJECTS);
+    log.trace("clicking on context menu item: " + ADD_RESOURCES);
 
     try {
       treeItem.select();
-      ContextMenuHelper.clickContextMenu(tree, ADD_PROJECTS);
+      ContextMenuHelper.clickContextMenu(tree, ADD_RESOURCES);
     } catch (RuntimeException e) {
       logError(log, e, tree, treeItem);
       throw e;
@@ -185,11 +185,11 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
 
     SWTBotTreeItem treeItem = getTreeItem();
 
-    log.trace("clicking on context menu item: " + SHARE_PROJECTS);
+    log.trace("clicking on context menu item: " + SHARE_RESOURCES);
 
     try {
       treeItem.select();
-      ContextMenuHelper.clickContextMenu(tree, SHARE_PROJECTS);
+      ContextMenuHelper.clickContextMenu(tree, SHARE_RESOURCES);
     } catch (RuntimeException e) {
       logError(log, e, tree, treeItem);
       throw e;

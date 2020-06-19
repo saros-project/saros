@@ -7,7 +7,7 @@ import static saros.stf.shared.Constants.FINISH;
 import static saros.stf.shared.Constants.MENU_ADD_CONTACT;
 import static saros.stf.shared.Constants.MENU_SAROS;
 import static saros.stf.shared.Constants.NEXT;
-import static saros.stf.shared.Constants.SHARE_PROJECTS;
+import static saros.stf.shared.Constants.SHARE_RESOURCES;
 import static saros.stf.shared.Constants.SHELL_SESSION_INVITATION;
 import static saros.stf.shared.Constants.SHELL_SHARE_PROJECT;
 
@@ -61,7 +61,7 @@ public class MenuSarosByAliceBobTest extends StfTestCase {
         .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
 
     ALICE.remoteBot().activateWorkbench();
-    ALICE.remoteBot().menu(MENU_SAROS).menu(SHARE_PROJECTS).click();
+    ALICE.remoteBot().menu(MENU_SAROS).menu(SHARE_RESOURCES).click();
 
     IRemoteBotShell shell = ALICE.remoteBot().shell(SHELL_SHARE_PROJECT);
     shell.activate();

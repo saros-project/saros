@@ -5,7 +5,7 @@ import static saros.stf.client.tester.SarosTester.ALICE;
 import static saros.stf.client.tester.SarosTester.BOB;
 import static saros.stf.client.tester.SarosTester.CARL;
 import static saros.stf.shared.Constants.ACCEPT;
-import static saros.stf.shared.Constants.SHELL_ADD_PROJECTS;
+import static saros.stf.shared.Constants.SHELL_ADD_RESOURCES;
 import static saros.stf.shared.Constants.SHELL_SESSION_INVITATION;
 
 import org.junit.BeforeClass;
@@ -36,7 +36,7 @@ public class ModifyDocumentBeforeProjectNegotiationTest extends StfTestCase {
 
     CARL.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(ACCEPT);
 
-    CARL.remoteBot().waitLongUntilShellIsOpen(SHELL_ADD_PROJECTS);
+    CARL.remoteBot().waitLongUntilShellIsOpen(SHELL_ADD_RESOURCES);
 
     // this test will fail if a jupiter proxy is added when bob is typing
     // text now

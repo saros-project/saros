@@ -63,9 +63,9 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
 
     SWTBot bot = new SWTBot();
     bot.waitUntil(
-        Conditions.shellIsActive(SHELL_ADD_PROJECTS), SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
+        Conditions.shellIsActive(SHELL_ADD_RESOURCES), SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
 
-    SWTBotShell shell = bot.shell(SHELL_ADD_PROJECTS);
+    SWTBotShell shell = bot.shell(SHELL_ADD_RESOURCES);
     shell.activate();
 
     shell.bot().radio(RADIO_CREATE_NEW_PROJECT).click();
@@ -78,9 +78,9 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
   public void confirmShellAddProjectUsingExistProject(String projectName) throws RemoteException {
     SWTBot bot = new SWTBot();
     bot.waitUntil(
-        Conditions.shellIsActive(SHELL_ADD_PROJECTS), SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
+        Conditions.shellIsActive(SHELL_ADD_RESOURCES), SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
 
-    SWTBotShell shell = bot.shell(SHELL_ADD_PROJECTS);
+    SWTBotShell shell = bot.shell(SHELL_ADD_RESOURCES);
     shell.activate();
 
     // see https://bugs.eclipse.org/bugs/show_bug.cgi?id=344484
@@ -96,7 +96,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
           }
         });
 
-    shell.bot().radio(RADIO_USING_EXISTING_PROJECT).click();
+    shell.bot().radio(RADIO_USING_EXISTING_DIRECTORY).click();
     shell.bot().textWithLabel("Project name", 1).setText(projectName);
     shell.bot().button(FINISH).click();
 
@@ -136,9 +136,9 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
 
     SWTBot bot = new SWTBot();
     bot.waitUntil(
-        Conditions.shellIsActive(SHELL_ADD_PROJECTS), SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
+        Conditions.shellIsActive(SHELL_ADD_RESOURCES), SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
 
-    SWTBotShell shell = bot.shell(SHELL_ADD_PROJECTS);
+    SWTBotShell shell = bot.shell(SHELL_ADD_RESOURCES);
     shell.activate();
 
     shell.bot().radio("Use existing project").click();
@@ -152,9 +152,9 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
       String projectName, TypeOfCreateProject usingWhichProject) throws RemoteException {
     SWTBot bot = new SWTBot();
     bot.waitUntil(
-        Conditions.shellIsActive(SHELL_ADD_PROJECTS), SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
+        Conditions.shellIsActive(SHELL_ADD_RESOURCES), SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
 
-    SWTBotShell shell = bot.shell(SHELL_ADD_PROJECTS);
+    SWTBotShell shell = bot.shell(SHELL_ADD_RESOURCES);
     shell.activate();
 
     switch (usingWhichProject) {

@@ -4,7 +4,7 @@ import static org.junit.Assert.assertFalse;
 import static saros.stf.client.tester.SarosTester.ALICE;
 import static saros.stf.client.tester.SarosTester.BOB;
 import static saros.stf.client.tester.SarosTester.CARL;
-import static saros.stf.shared.Constants.ADD_PROJECTS;
+import static saros.stf.shared.Constants.ADD_RESOURCES;
 import static saros.stf.shared.Constants.CANCEL;
 import static saros.stf.shared.Constants.MENU_SAROS;
 import static saros.stf.shared.Constants.SHELL_ADD_PROJECTS_TO_SESSION;
@@ -88,7 +88,7 @@ public class ShareMultipleProjectsTest extends StfTestCase {
     Util.buildSessionConcurrently("foo", TypeOfCreateProject.NEW_PROJECT, ALICE, BOB, CARL);
 
     ALICE.remoteBot().activateWorkbench();
-    ALICE.remoteBot().menu(MENU_SAROS).menu(ADD_PROJECTS).click();
+    ALICE.remoteBot().menu(MENU_SAROS).menu(ADD_RESOURCES).click();
 
     IRemoteBotShell shell = ALICE.remoteBot().shell(SHELL_ADD_PROJECTS_TO_SESSION);
     shell.activate();
