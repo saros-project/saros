@@ -986,7 +986,7 @@
                      </reference>
                   </not>
                   <reference
-                        definitionId="saros.ui.definitions.projectsSelected">
+                        definitionId="saros.ui.definitions.resourcesSelected">
                   </reference>
                </and>
             </visibleWhen>
@@ -1006,7 +1006,7 @@
                            definitionId="saros.ui.definitions.isSarosSessionRunning">
                      </reference>
                      <reference
-                           definitionId="saros.ui.definitions.projectsSelected">
+                           definitionId="saros.ui.definitions.resourcesSelected">
                      </reference>
                   </and>
                </visibleWhen>
