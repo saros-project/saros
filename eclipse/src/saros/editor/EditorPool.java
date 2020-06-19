@@ -301,6 +301,9 @@ final class EditorPool {
     dirtyStateListener.unregisterAll();
 
     assert getAllEditors().size() == 0;
+    assert editorInputMap.isEmpty();
+
+    editorParts.clear();
   }
 
   /** Changes the editable state of all editors currently managed by this pool. */
