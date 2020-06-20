@@ -396,6 +396,8 @@ public interface Constants {
    */
   String RADIO_USING_EXISTING_DIRECTORY = get("radio_use_existing_directory");
   String RADIO_CREATE_NEW_PROJECT = get("radio_create_new_project");
+  String LABEL_NEW_PROJECT_NAME = get("label_new_project_name");
+  String LABEL_EXISTING_DIRECTORY_PATH = get("label_existing_directory_path");
 
   /* *********************************************
    *
