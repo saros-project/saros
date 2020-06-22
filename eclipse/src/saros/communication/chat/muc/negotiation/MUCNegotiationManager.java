@@ -16,7 +16,7 @@ import saros.session.ISarosSessionManager;
 
 /**
  * The MUCNegotiationManager is responsible for transmitting the Communication config of the host to
- * all other participants of the shared project during the Invitation process
+ * all other participants of the session during the Invitation process.
  *
  * @author ologa
  * @author bkahlert
@@ -128,7 +128,7 @@ public class MUCNegotiationManager {
   }
 
   /**
-   * Set temporarily communication shared project settings
+   * Set temporarily communication session settings.
    *
    * @param remotePreferences received communication settings
    */
