@@ -217,6 +217,34 @@ task sarosLsp(type: Copy, dependsOn: [
   into 'build/distribution/lsp'
 }
 
+task sarosVSCode(type: Copy, dependsOn: [
+  'sarosLsp',
+  ':saros.vscode:packageExtension'
+  ]) {
+  group 'Delivery'
+  description 'Builds and tests all modules required by the Saros VS Code Extension'
+
+  from project(':saros.lsp').jar
+  from 'vscode/vsix'
+  into 'build/distribution/vscode'
+}
+
+task buildVSCode(dependsOn: [
+  'sarosLsp',
+  'saros.vscode:buildExtension'
+]) {
+  group 'VS Code'
+  description 'Builds the Saros VS Code plugin'
+}
+
+task runVSCode(dependsOn: [
+  'sarosLsp',
+  'saros.vscode:runExtension'
+]) {
+  group 'VS Code'
+  description 'Builds and runs the Saros VS Code plugin'
+}
+
 task sarosIntellij(type: Copy, dependsOn: [
   ':saros.picocontainer:test',
   ':saros.core:test',
