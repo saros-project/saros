@@ -17,6 +17,8 @@ function start_container_master()
 
 function setup_container_master()
 {
+  # Workaround: Package installation has to be moved into a Dockerfile
+  docker exec -t "$stf_master_name" /bin/sh -c "apk --update add --no-cache gtk+3.0"
   echo "Build testees"
   docker exec -t "$stf_master_name" "$SCRIPT_DIR_CONTAINER/stf/master/build_testee.sh"
   echo "Executing setup_stf_ws.sh on $stf_master_name"
