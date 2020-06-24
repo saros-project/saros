@@ -374,7 +374,7 @@ public class EditorManager implements IEditorManager {
 
     this.preferenceStore = preferenceStore;
 
-    editorPool = new EditorPool(this, sessionManager);
+    editorPool = new EditorPool(this);
     partListener = new SafePartListener2(log, new EditorPartListener(this));
 
     registerCustomAnnotations();
@@ -860,11 +860,13 @@ public class EditorManager implements IEditorManager {
       return;
     }
 
+    saros.filesystem.IFile wrappedFile = convertToFile(resource.getAdapter(IFile.class));
+
     /*
      * side effect: this method call also locks the editor part if the user
      * has no write access or if the session is currently locked
      */
-    editorPool.add(editorPart);
+    editorPool.add(editorPart, wrappedFile);
 
     final ITextViewer viewer = EditorAPI.getViewer(editorPart);
 

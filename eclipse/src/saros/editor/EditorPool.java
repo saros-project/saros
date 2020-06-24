@@ -20,10 +20,6 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.IElementStateListener;
 import org.eclipse.ui.texteditor.ITextEditor;
 import saros.editor.internal.EditorAPI;
-import saros.filesystem.IReferencePoint;
-import saros.filesystem.ResourceConverter;
-import saros.session.ISarosSession;
-import saros.session.ISarosSessionManager;
 import saros.session.User.Permission;
 
 /**
@@ -53,7 +49,6 @@ final class EditorPool {
   }
 
   private final EditorManager editorManager;
-  private final ISarosSessionManager sarosSessionManager;
 
   private final DirtyStateListener dirtyStateListener;
 
@@ -79,9 +74,8 @@ final class EditorPool {
   /** Editors where the user isn't allowed to write */
   private final List<IEditorPart> lockedEditors = new ArrayList<IEditorPart>();
 
-  EditorPool(EditorManager editorManager, ISarosSessionManager sarosSessionManager) {
+  EditorPool(EditorManager editorManager) {
     this.editorManager = editorManager;
-    this.sarosSessionManager = sarosSessionManager;
 
     this.dirtyStateListener = new DirtyStateListener(editorManager);
     this.documentListener = new StoppableDocumentListener(editorManager);
@@ -104,9 +98,18 @@ final class EditorPool {
    * This method will return without any effect if the given IEditorPart does not a.) represent an
    * IFile, b.) which can be referred to using an IPath and c.) the IEditorPart can be mapped to an
    * ITextViewer.
+   *
+   * @param editorPart editorPart to be add
+   * @param wrappedFile the file represented by the editor part
    */
-  public void add(final IEditorPart editorPart) {
-    log.trace("adding editor part " + editorPart + " [" + editorPart.getTitle() + "]");
+  public void add(final IEditorPart editorPart, final saros.filesystem.IFile wrappedFile) {
+    log.trace(
+        "adding editor part "
+            + editorPart
+            + " ["
+            + editorPart.getTitle()
+            + "] with file representation "
+            + wrappedFile);
 
     if (isManaged(editorPart)) {
       log.error("editor part " + editorPart + " is already managed");
@@ -129,14 +132,6 @@ final class EditorPool {
     }
 
     findAndLogDocumentProviderIssues(editorPart);
-
-    final saros.filesystem.IFile wrappedFile = convert(file);
-
-    if (wrappedFile == null) {
-      log.error("editor part does not represent a shared file: " + editorPart + ", file: " + file);
-
-      return;
-    }
 
     /*
      * Connecting causes Conversion of Delimiters which trigger Selection
@@ -321,7 +316,7 @@ final class EditorPool {
    *
    * @param enabled if <code>true</code> element state changes will be reported, otherwise no
    *     element state changes will be reported
-   * @see #add(IEditorPart)
+   * @see #add(IEditorPart, saros.filesystem.IFile)
    */
   public void setElementStateListenerEnabled(final boolean enabled) {
     dirtyStateListener.setEnabled(enabled);
@@ -332,7 +327,7 @@ final class EditorPool {
    *
    * @param enabled if <code>true</code> document changes will be reported, otherwise no document
    *     changes will be reported
-   * @see #add(IEditorPart)
+   * @see #add(IEditorPart, saros.filesystem.IFile)
    */
   public void setDocumentListenerEnabled(final boolean enabled) {
     documentListener.setEnabled(enabled);
@@ -368,24 +363,5 @@ final class EditorPool {
               + editorPart.getTitle()
               + "' might not support shared access. It is likely that the editor content is not properly synchronized!");
     }
-  }
-
-  /**
-   * Returns a Saros file object representing the given Eclipse file.
-   *
-   * @param file the file to convert to a Saros file
-   * @return a Saros file object representing the given Eclipse file or <code>null</code> if there
-   *     is currently nu running session or the file does not belong to a shared reference point
-   */
-  private saros.filesystem.IFile convert(final IFile file) {
-    final ISarosSession session = sarosSessionManager.getSession();
-
-    if (session == null) {
-      return null;
-    }
-
-    final Set<IReferencePoint> referencePoints = session.getReferencePoints();
-
-    return ResourceConverter.convertToFile(referencePoints, file);
   }
 }
