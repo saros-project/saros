@@ -108,7 +108,7 @@ public class Messages extends NLS {
   public static String ConfigurationSummaryWizardPage_description;
   public static String ConfigurationSummaryWizardPage_label_success;
   public static String ConfigurationSummaryWizardPage_right_column_your_configuration;
-  public static String ConfigurationSummaryWizardPage_share_project;
+  public static String ConfigurationSummaryWizardPage_share_resources;
   public static String ConfigurationSummaryWizardPage_skype_show_username;
   public static String ConfigurationSummaryWizardPage_skype_show_username_not;
   public static String ConfigurationSummaryWizardPage_title;

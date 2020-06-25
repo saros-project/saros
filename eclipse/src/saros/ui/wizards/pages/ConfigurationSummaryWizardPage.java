@@ -105,14 +105,14 @@ public class ConfigurationSummaryWizardPage extends WizardPage {
     addContacts.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
     addContacts.setSpacing(5);
 
-    SimpleNoteComposite shareProjects =
+    SimpleNoteComposite shareResources =
         new SimpleNoteComposite(
             autoConnectComposite,
             SWT.BORDER,
             ImageManager.ELCL_SESSION,
-            saros.ui.Messages.ConfigurationSummaryWizardPage_share_project);
-    shareProjects.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-    shareProjects.setSpacing(5);
+            saros.ui.Messages.ConfigurationSummaryWizardPage_share_resources);
+    shareResources.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+    shareResources.setSpacing(5);
 
     return leftColumn;
   }
