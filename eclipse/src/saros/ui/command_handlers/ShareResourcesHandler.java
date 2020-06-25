@@ -12,7 +12,7 @@ import saros.ui.util.selection.retriever.SelectionRetrieverFactory;
  * @JTourBusStop 1, Invitation Process:
  *
  * <p>Clicking on "Share Resource(s)..." brings execution here. This class is connected to the GUI
- * via Eclipse handlers. Right-click on the word ShareProjectHandler below and click
+ * via Eclipse handlers. Right-click on the word ShareResourcesHandler below and click
  * References->Project. This will show all the other resources in the project which reference this
  * class.
  *
@@ -35,7 +35,7 @@ import saros.ui.util.selection.retriever.SelectionRetrieverFactory;
  *
  * <p>Notice that this is done via the {@link saros.ui.wizards.StartSessionWizard}.
  */
-public class ShareProjectHandler extends AbstractHandler {
+public class ShareResourcesHandler extends AbstractHandler {
 
   @Override
   public Object execute(ExecutionEvent event) throws ExecutionException {
