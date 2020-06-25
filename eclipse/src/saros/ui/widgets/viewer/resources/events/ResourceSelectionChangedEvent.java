@@ -1,4 +1,4 @@
-package saros.ui.widgets.viewer.project.events;
+package saros.ui.widgets.viewer.resources.events;
 
 import org.eclipse.core.resources.IResource;
 

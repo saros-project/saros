@@ -1,6 +1,6 @@
-package saros.ui.widgets.viewer.project.events;
+package saros.ui.widgets.viewer.resources.events;
 
-import saros.ui.widgets.viewer.project.ResourceSelectionComposite;
+import saros.ui.widgets.viewer.resources.ResourceSelectionComposite;
 
 /** Listener for {@link ResourceSelectionComposite} events. */
 public interface ResourceSelectionListener extends BaseResourceSelectionListener {

@@ -18,10 +18,10 @@ import saros.preferences.EclipsePreferenceConstants;
 import saros.ui.Messages;
 import saros.ui.util.SWTUtils;
 import saros.ui.views.SarosView;
-import saros.ui.widgets.viewer.project.ResourceSelectionComposite;
-import saros.ui.widgets.viewer.project.events.FilterClosedProjectsChangedEvent;
-import saros.ui.widgets.viewer.project.events.ResourceSelectionChangedEvent;
-import saros.ui.widgets.viewer.project.events.ResourceSelectionListener;
+import saros.ui.widgets.viewer.resources.ResourceSelectionComposite;
+import saros.ui.widgets.viewer.resources.events.FilterClosedProjectsChangedEvent;
+import saros.ui.widgets.viewer.resources.events.ResourceSelectionChangedEvent;
+import saros.ui.widgets.viewer.resources.events.ResourceSelectionListener;
 
 public class ResourceSelectionWizardPage extends WizardPage {
   private static final Logger log = Logger.getLogger(ResourceSelectionWizardPage.class);
