@@ -493,7 +493,9 @@ public interface Constants {
    *
    * ********************************************
    */
-  String SHELL_SHARE_PROJECT = "Share Project";
+  // FIXME this constant is currently only used to identify the StartSessionWizard
+  //  introduce a separate entry for this usage and change this constant to "Share Resource(s)..."
+  String SHELL_SHARE_PROJECT = "Share Resource(s)";
 
   /*
    * Invit. / Synch. Monitor Names
