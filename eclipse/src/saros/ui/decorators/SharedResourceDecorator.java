@@ -46,9 +46,9 @@ import saros.ui.util.SWTUtils;
  * UI-thread safe.
  */
 @Component(module = "eclipse")
-public final class SharedProjectDecorator implements ILightweightLabelDecorator {
+public final class SharedResourceDecorator implements ILightweightLabelDecorator {
 
-  private static final Logger log = Logger.getLogger(SharedProjectDecorator.class);
+  private static final Logger log = Logger.getLogger(SharedResourceDecorator.class);
 
   private static final ImageDescriptor SHARED_RESOURCE_DESCRIPTOR =
       ImageManager.getImageDescriptor("icons/ovr16/shared.png"); // NON-NLS-1
@@ -68,13 +68,13 @@ public final class SharedProjectDecorator implements ILightweightLabelDecorator 
         @Override
         public void sessionStarted(ISarosSession session) {
           session.addListener(sessionListener);
-          SharedProjectDecorator.this.session = session;
+          SharedResourceDecorator.this.session = session;
         }
 
         @Override
         public void sessionEnded(ISarosSession session, SessionEndReason reason) {
           session.removeListener(sessionListener);
-          SharedProjectDecorator.this.session = null;
+          SharedResourceDecorator.this.session = null;
           log.debug("clearing decoration for all shared resources");
           updateDecoratorsAsync(null); // update all labels
 
@@ -91,7 +91,7 @@ public final class SharedProjectDecorator implements ILightweightLabelDecorator 
         }
       };
 
-  public SharedProjectDecorator() {
+  public SharedResourceDecorator() {
     SarosPluginContext.initComponent(this);
     session = sessionManager.getSession();
     sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
@@ -115,7 +115,7 @@ public final class SharedProjectDecorator implements ILightweightLabelDecorator 
 
     if (resourceWrapper == null || !currentSession.isShared(resourceWrapper)) return;
 
-    decoration.addOverlay(SharedProjectDecorator.SHARED_RESOURCE_DESCRIPTOR, IDecoration.TOP_LEFT);
+    decoration.addOverlay(SharedResourceDecorator.SHARED_RESOURCE_DESCRIPTOR, IDecoration.TOP_LEFT);
 
     if (resourceWrapper.getType() == Type.REFERENCE_POINT) {
       decoration.addSuffix(Messages.SharedBaseResourceDecorator_shared);
@@ -144,7 +144,7 @@ public final class SharedProjectDecorator implements ILightweightLabelDecorator 
           @Override
           public void run() {
             LabelProviderChangedEvent event =
-                new LabelProviderChangedEvent(SharedProjectDecorator.this, resources);
+                new LabelProviderChangedEvent(SharedResourceDecorator.this, resources);
 
             for (ILabelProviderListener listener : listeners) {
               listener.labelProviderChanged(event);
