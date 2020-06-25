@@ -49,38 +49,18 @@ public class ConnectionStateComposite extends Composite {
   private final CLabel stateLabel;
 
   private ConnectionState lastConnectionState;
-
   private Exception lastError;
 
   private final IAccountStoreListener accountStoreListener =
       new IAccountStoreListener() {
         @Override
         public void accountsChanged(List<XMPPAccount> currentAccounts) {
-          SWTUtils.runSafeSWTAsync(
-              log,
-              () -> {
-                if (!ConnectionStateComposite.this.isDisposed()) updateLabel(null, null);
-              });
+          SWTUtils.runSafeSWTAsync(log, () -> updateLabel(null, null));
         }
       };
 
   private final IConnectionStateListener connectionListener =
-      new IConnectionStateListener() {
-        @Override
-        public void connectionStateChanged(final ConnectionState state, final Exception error) {
-
-          SWTUtils.runSafeSWTAsync(
-              log,
-              new Runnable() {
-                @Override
-                public void run() {
-                  if (ConnectionStateComposite.this.isDisposed()) return;
-
-                  updateLabel(state, error);
-                }
-              });
-        }
-      };
+      (state, error) -> SWTUtils.runSafeSWTAsync(log, () -> updateLabel(state, error));
 
   public ConnectionStateComposite(Composite parent, int style) {
     super(parent, style);
@@ -123,6 +103,7 @@ public class ConnectionStateComposite extends Composite {
    * @param error additional error information or <code>null</code>
    */
   private void updateLabel(ConnectionState state, Exception error) {
+    if (ConnectionStateComposite.this.isDisposed()) return;
 
     // do not hide the latest error
     if (lastConnectionState == ConnectionState.ERROR && state == ConnectionState.NOT_CONNECTED)

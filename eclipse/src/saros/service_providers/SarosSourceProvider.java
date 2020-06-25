@@ -10,7 +10,6 @@ import saros.Saros;
 import saros.SarosPluginContext;
 import saros.communication.connection.ConnectionHandler;
 import saros.communication.connection.IConnectionStateListener;
-import saros.net.ConnectionState;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
@@ -36,13 +35,7 @@ public class SarosSourceProvider extends AbstractSourceProvider {
 
   @Inject private ConnectionHandler connectionHandler;
 
-  private IConnectionStateListener connectionStateListener =
-      new IConnectionStateListener() {
-        @Override
-        public void connectionStateChanged(final ConnectionState state, final Exception error) {
-          connectionChanged();
-        }
-      };
+  private IConnectionStateListener connectionStateListener = (state, error) -> connectionChanged();
 
   private ISessionLifecycleListener sessionLifecycleListener =
       new ISessionLifecycleListener() {
