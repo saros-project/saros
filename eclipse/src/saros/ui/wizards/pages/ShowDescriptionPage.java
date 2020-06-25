@@ -51,7 +51,7 @@ public class ShowDescriptionPage extends WizardPage {
 
     String completeDescription =
         nickname
-            + " has invited you to a Saros session with the currently shared project(s):\n"
+            + " has invited you to a Saros session with the currently shared root resource(s):\n"
             + sessionNegotiation.getDescription();
 
     Label inviterText = new Label(composite, SWT.WRAP);
