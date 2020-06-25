@@ -396,7 +396,7 @@ public interface Constants {
   String SHELL_INVITATION_CANCELED = get("shell_invitation_canceled");
   String SHELL_SESSION_INVITATION = get("shell_session_invitation");
   String SHELL_ADD_RESOURCES = get("shell_add_resources");
-  String SHELL_ADD_PROJECTS_TO_SESSION = get("shell_add_projects_to_session");
+  String SHELL_ADD_RESOURCES_TO_SESSION = get("shell_add_resources_to_session");
   String SHELL_PROBLEM_OCCURRED = get("shell_problem_occurred");
   String SHELL_WARNING_LOCAL_CHANGES_DELETED = get("shell_warning_local_changes_deleted");
   String SHELL_FOLDER_SELECTION = get("shell_folder_selection");

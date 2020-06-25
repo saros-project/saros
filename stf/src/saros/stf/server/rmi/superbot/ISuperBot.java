@@ -156,7 +156,7 @@ public interface ISuperBot extends Remote {
   public void confirmShellAddProjectsToSession(String... projectNames) throws RemoteException;
 
   /**
-   * Confirms the shell with title {@link Constants#SHELL_ADD_PROJECTS_TO_SESSION}
+   * Confirms the shell with title {@link Constants#SHELL_ADD_RESOURCES_TO_SESSION}
    *
    * @param project the name of the project that should be added to the current session
    * @param files the files of the project that should be added

@@ -318,7 +318,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
   public void confirmShellAddProjectsToSession(String... projectNames) throws RemoteException {
 
     SWTBot bot = new SWTBot();
-    SWTBotShell shell = bot.shell(SHELL_ADD_PROJECTS_TO_SESSION);
+    SWTBotShell shell = bot.shell(SHELL_ADD_RESOURCES_TO_SESSION);
     shell.activate();
 
     // wait for tree update
@@ -336,7 +336,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
   public void confirmShellAddProjectToSession(String project, String[] files)
       throws RemoteException {
     SWTBot bot = new SWTBot();
-    SWTBotShell shell = bot.shell(SHELL_ADD_PROJECTS_TO_SESSION);
+    SWTBotShell shell = bot.shell(SHELL_ADD_RESOURCES_TO_SESSION);
     shell.activate();
 
     // wait for tree update

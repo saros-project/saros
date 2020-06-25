@@ -30,6 +30,8 @@ public class Messages extends NLS {
   public static String AddReferencePointsToSessionWizard_unsaved_changes_dialog_text;
   public static String AddReferencePointsToSessionWizard_unsaved_changes_dialog_more;
 
+  public static String AddResourcesToSessionWizard_title;
+
   public static String ConfigurationWizard_account_created;
   public static String ConfigurationWizard_account_created_text;
   public static String ConfigurationWizard_button_create_account;
@@ -260,7 +262,6 @@ public class Messages extends NLS {
   public static String SessionStop_host_removed_you_message;
 
   public static String SessionAddContactsWizard_title;
-  public static String SessionAddProjectsWizard_title;
   public static String SessionStartWizard_title;
 
   public static String ShowDescriptionPage_description;
