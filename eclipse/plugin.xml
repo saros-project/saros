@@ -34,9 +34,9 @@
          point="org.eclipse.ui.decorators">
       <decorator
             adaptable="true"
-            class="saros.ui.decorators.SharedProjectDecorator"
-            id="saros.ui.decorators.SharedProjectDecorator"
-            label="Shared Project Decorator"
+            class="saros.ui.decorators.SharedResourceDecorator"
+            id="saros.ui.decorators.SharedResourceDecorator"
+            label="Shared Resource Decorator"
             lightweight="true"
             state="true">
          <enablement>
