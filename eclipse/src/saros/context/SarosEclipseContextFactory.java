@@ -1,15 +1,14 @@
-package saros;
+package saros.context;
 
 import java.util.Arrays;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Platform;
 import org.osgi.framework.Bundle;
 import org.osgi.service.prefs.Preferences;
+import saros.Saros;
 import saros.awareness.AwarenessInformationCollector;
 import saros.communication.SkypeManager;
 import saros.communication.chat.muc.negotiation.MUCNegotiationManager;
-import saros.context.AbstractContextFactory;
-import saros.context.IContextKeyBindings;
 import saros.editor.EditorManager;
 import saros.editor.IEditorManager;
 import saros.filesystem.EclipsePathFactory;
@@ -25,7 +24,6 @@ import saros.monitoring.remote.IRemoteProgressIndicatorFactory;
 import saros.preferences.EclipsePreferenceStoreAdapter;
 import saros.preferences.EclipsePreferences;
 import saros.preferences.IPreferenceStore;
-import saros.project.internal.SarosEclipseSessionContextFactory;
 import saros.repackaged.picocontainer.BindKey;
 import saros.repackaged.picocontainer.MutablePicoContainer;
 import saros.session.ISarosSessionContextFactory;

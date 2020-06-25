@@ -13,6 +13,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import saros.context.CoreContextFactory;
 import saros.context.IContainerContext;
 import saros.context.IContextFactory;
+import saros.context.SarosEclipseContextFactory;
 import saros.repackaged.picocontainer.MutablePicoContainer;
 import saros.test.mocks.ContextMocker;
 import saros.test.mocks.EclipseMocker;
