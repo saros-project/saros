@@ -39,7 +39,7 @@ public class HostLeftAloneInSessionHandler {
            * we need to clear any open notifications because there might be
            * stuff left, like follow mode notifications, or "user joined"
            * notification in case a user joined the session but aborted the
-           * incoming project negotiation...
+           * incoming resource negotiation...
            */
           SarosView.clearNotifications();
         }
@@ -63,7 +63,7 @@ public class HostLeftAloneInSessionHandler {
           /*
            * only ask to close session if there are no running negotiations
            * because if there are, and the last user "left", it was because he
-           * canceled an IncomingProjectNegotiation, and the session will be
+           * canceled an IncomingResourceNegotiation, and the session will be
            * closed anyway.
            */
 
@@ -71,7 +71,7 @@ public class HostLeftAloneInSessionHandler {
            * Stefan Rossbach: Welcome to global state programming, threading
            * and network latency.
            *
-           * This currently does NOT work. It is possible the the project
+           * This currently does NOT work. It is possible that the resource
            * negotiation is about to finish (last cancellation check passed).
            * As we do not have a final synchronization packet in this
            * negotiation it is possible that the user left packet arrives but
