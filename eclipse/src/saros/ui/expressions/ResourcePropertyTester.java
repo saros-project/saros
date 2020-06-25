@@ -14,11 +14,11 @@ import saros.session.ISarosSessionManager;
  * Adds tests to the {@link IResource}. Currently tests whether given {@link IResource} is part of
  * the {@link ISarosSession}.
  */
-public class ProjectPropertyTester extends PropertyTester {
+public class ResourcePropertyTester extends PropertyTester {
 
   @Inject private ISarosSessionManager sessionManager;
 
-  public ProjectPropertyTester() {
+  public ResourcePropertyTester() {
     SarosPluginContext.initComponent(this);
   }
 
