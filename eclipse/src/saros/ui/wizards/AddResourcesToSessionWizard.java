@@ -27,7 +27,7 @@ public class AddResourcesToSessionWizard extends Wizard {
   public AddResourcesToSessionWizard(final Collection<IResource> preselectedResources) {
     setWindowTitle(TITLE);
     setDefaultPageImageDescriptor(
-        ImageManager.getImageDescriptor(ImageManager.WIZBAN_SESSION_ADD_PROJECTS));
+        ImageManager.getImageDescriptor(ImageManager.WIZBAN_SESSION_ADD_REFERENCE_POINTS));
     setHelpAvailable(false);
     resourceSelectionWizardPage = new ResourceSelectionWizardPage(preselectedResources);
   }

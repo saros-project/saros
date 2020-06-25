@@ -148,7 +148,7 @@ public class AddReferencePointsToSessionWizard extends Wizard {
     setHelpAvailable(true);
     setNeedsProgressMonitor(true);
     setDefaultPageImageDescriptor(
-        ImageManager.getImageDescriptor(ImageManager.WIZBAN_SESSION_ADD_PROJECTS));
+        ImageManager.getImageDescriptor(ImageManager.WIZBAN_SESSION_ADD_REFERENCE_POINTS));
     /* holds if the wizard close is because of an exception or not */
     isExceptionCancel = false;
   }
