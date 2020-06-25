@@ -342,9 +342,9 @@ public class Messages extends NLS {
   public static String PersonalizationPreferencePage_visible_appearance_set_color_label_text;
   public static String PersonalizationPreferencePage_visible_information_group_text;
 
-  public static String ProjectSelectionWizardPage_description;
-  public static String ProjectSelectionWizardPage_selected_no_project;
-  public static String ProjectSelectionWizardPage_title;
+  public static String ResourceSelectionWizardPage_description;
+  public static String ResourceSelectionWizardPage_selected_no_selection;
+  public static String ResourceSelectionWizardPage_title;
 
   public static String SessionWithContacts_menuItem_no_contacts_available_text;
   public static String SessionWithProjects_no_projects_in_workspace;
