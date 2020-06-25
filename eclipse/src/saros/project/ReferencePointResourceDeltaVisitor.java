@@ -23,10 +23,10 @@ import saros.session.ISarosSession;
 import saros.session.User;
 import saros.util.FileUtils;
 
-/** Visits the resource changes in a shared project. */
-final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
+/** Visits the resource changes in a shared reference point. */
+final class ReferencePointResourceDeltaVisitor implements IResourceDeltaVisitor {
 
-  private static final Logger log = Logger.getLogger(ProjectDeltaVisitor.class);
+  private static final Logger log = Logger.getLogger(ReferencePointResourceDeltaVisitor.class);
 
   private static final int CAPACITY_THRESHOLD = 128;
 
@@ -43,7 +43,7 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
 
   private final List<IResourceActivity<? extends saros.filesystem.IResource>> resourceActivities;
 
-  public ProjectDeltaVisitor(
+  public ReferencePointResourceDeltaVisitor(
       ISarosSession session, EditorManager editorManager, IReferencePoint referencePoint) {
     this.session = session;
     this.editorManager = editorManager;
@@ -104,9 +104,8 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
     boolean contentChange = isContentChange(delta);
 
     /*
-     * TODO Generate better move deltas, e.g we share multiple projects and
-     * a file is moved between those projects. Currently we generate a
-     * delete and create activity.
+     * TODO Generate better move deltas, e.g we share multiple reference points and
+     *  a file is moved between them. Currently we generate a delete and create activity.
      */
 
     switch (kind) {
