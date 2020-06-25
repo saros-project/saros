@@ -467,15 +467,15 @@ public class SarosView extends ViewPart {
             // but could check already for saros support via contact.hasSarosSupport(). In this case
             // we should probably add a Information about missing saros support.
             if (sarosSessionManager.getSession() == null && contact.getStatus().isOnline()) {
-              MenuManager shareProjectSubMenu =
+              MenuManager shareResourcesSubMenu =
                   new MenuManager(
                       "Share Resource(s)...",
                       ImageManager.getImageDescriptor(ImageManager.ELCL_SESSION),
-                      "Share_Project");
+                      "Share_Resources");
 
-              shareProjectSubMenu.add(new StartSessionWithProjects());
+              shareResourcesSubMenu.add(new StartSessionWithProjects());
               // TODO it seems it not that trivial to add tooltips to these entries
-              manager.add(shareProjectSubMenu);
+              manager.add(shareResourcesSubMenu);
               manager.add(new Separator());
             }
 
