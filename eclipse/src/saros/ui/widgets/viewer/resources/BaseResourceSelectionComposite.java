@@ -1,4 +1,4 @@
-package saros.ui.widgets.viewer.project;
+package saros.ui.widgets.viewer.resources;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -37,8 +37,8 @@ import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
 import saros.ui.util.LayoutUtils;
 import saros.ui.widgets.viewer.ViewerComposite;
-import saros.ui.widgets.viewer.project.events.BaseResourceSelectionListener;
-import saros.ui.widgets.viewer.project.events.ResourceSelectionChangedEvent;
+import saros.ui.widgets.viewer.resources.events.BaseResourceSelectionListener;
+import saros.ui.widgets.viewer.resources.events.ResourceSelectionChangedEvent;
 
 /**
  * Base UI allowing the user to select (complete) resource trees in the current workspace.

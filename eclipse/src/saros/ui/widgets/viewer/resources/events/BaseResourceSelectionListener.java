@@ -1,7 +1,7 @@
-package saros.ui.widgets.viewer.project.events;
+package saros.ui.widgets.viewer.resources.events;
 
 import org.eclipse.core.resources.IFile;
-import saros.ui.widgets.viewer.project.BaseResourceSelectionComposite;
+import saros.ui.widgets.viewer.resources.BaseResourceSelectionComposite;
 
 /** Listener for {@link BaseResourceSelectionComposite} events. */
 public interface BaseResourceSelectionListener {

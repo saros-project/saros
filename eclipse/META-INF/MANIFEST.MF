@@ -113,7 +113,7 @@ Export-Package: saros;
  saros.ui.widgets.chat.parts,
  saros.ui.widgets.decoration,
  saros.ui.widgets.viewer,
- saros.ui.widgets.viewer.project,
+ saros.ui.widgets.viewer.resources,
  saros.ui.widgets.viewer.roster,
  saros.ui.widgets.viewer.session,
  saros.ui.widgets.wizard,

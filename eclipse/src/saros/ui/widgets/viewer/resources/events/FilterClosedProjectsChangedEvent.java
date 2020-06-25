@@ -1,4 +1,4 @@
-package saros.ui.widgets.viewer.project.events;
+package saros.ui.widgets.viewer.resources.events;
 
 public class FilterClosedProjectsChangedEvent {
   private boolean filterClosedProjects;

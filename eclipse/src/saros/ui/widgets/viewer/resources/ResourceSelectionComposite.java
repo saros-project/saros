@@ -1,4 +1,4 @@
-package saros.ui.widgets.viewer.project;
+package saros.ui.widgets.viewer.resources;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -32,9 +32,9 @@ import saros.ui.util.DialogUtils;
 import saros.ui.util.LayoutUtils;
 import saros.ui.util.WizardUtils;
 import saros.ui.views.SarosView;
-import saros.ui.widgets.viewer.project.events.BaseResourceSelectionListener;
-import saros.ui.widgets.viewer.project.events.FilterClosedProjectsChangedEvent;
-import saros.ui.widgets.viewer.project.events.ResourceSelectionListener;
+import saros.ui.widgets.viewer.resources.events.BaseResourceSelectionListener;
+import saros.ui.widgets.viewer.resources.events.FilterClosedProjectsChangedEvent;
+import saros.ui.widgets.viewer.resources.events.ResourceSelectionListener;
 
 public class ResourceSelectionComposite extends BaseResourceSelectionComposite {
   protected boolean filterClosedProjects;

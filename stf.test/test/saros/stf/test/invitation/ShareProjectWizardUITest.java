@@ -99,7 +99,7 @@ public class ShareProjectWizardUITest extends StfTestCase {
 
   /**
    * Ignored while project selection window is restricted by hack. See <code>nonProjectFiler</code>
-   * in {@link saros.ui.widgets.viewer.project.BaseResourceSelectionComposite}.
+   * in {@link saros.ui.widgets.viewer.resources.BaseResourceSelectionComposite}.
    */
   @Ignore("Ignored while project selection window is restricted by hack.")
   @Test
@@ -125,7 +125,7 @@ public class ShareProjectWizardUITest extends StfTestCase {
 
   /**
    * Ignored while project selection window is restricted by hack. See <code>nonProjectFiler</code>
-   * in {@link saros.ui.widgets.viewer.project.BaseResourceSelectionComposite}.
+   * in {@link saros.ui.widgets.viewer.resources.BaseResourceSelectionComposite}.
    */
   @Ignore("Ignored while project selection window is restricted by hack.")
   @Test

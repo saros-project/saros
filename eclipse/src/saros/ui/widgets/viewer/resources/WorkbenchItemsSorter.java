@@ -1,4 +1,4 @@
-package saros.ui.widgets.viewer.project;
+package saros.ui.widgets.viewer.resources;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.viewers.ViewerSorter;
