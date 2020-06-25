@@ -572,7 +572,7 @@
             commandId="saros.ui.commands.OpenSarosPreferences">
       </handler>
       <handler
-      class="saros.ui.command_handlers.ShareProjectHandler"
+      class="saros.ui.command_handlers.ShareResourcesHandler"
             commandId="saros.ui.commands.ShareResource">
          <enabledWhen>
             <and>
