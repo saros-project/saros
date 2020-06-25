@@ -53,7 +53,7 @@ public class ResourceSelectionWizardPage extends WizardPage {
         public void filterClosedProjectsChanged(FilterClosedProjectsChangedEvent event) {
           PlatformUI.getPreferenceStore()
               .setValue(
-                  EclipsePreferenceConstants.PROJECTSELECTION_FILTERCLOSEDPROJECTS,
+                  EclipsePreferenceConstants.RESOURCESELECTION_FILTERCLOSEDPROJECTS,
                   event.isFilterClosedProjects());
         }
       };
@@ -91,7 +91,7 @@ public class ResourceSelectionWizardPage extends WizardPage {
             parent,
             SWT.BORDER | SWT.V_SCROLL,
             PlatformUI.getPreferenceStore()
-                .getBoolean(EclipsePreferenceConstants.PROJECTSELECTION_FILTERCLOSEDPROJECTS));
+                .getBoolean(EclipsePreferenceConstants.RESOURCESELECTION_FILTERCLOSEDPROJECTS));
 
     /*
      * Initialize the selection asynchronously, so the wizard opens
