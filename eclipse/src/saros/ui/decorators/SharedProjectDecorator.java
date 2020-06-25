@@ -26,10 +26,9 @@ import saros.ui.Messages;
 import saros.ui.util.SWTUtils;
 
 /**
- * Decorates shared projects and their files.
+ * Decorates shared base resources and their files.
  *
  * @see ILightweightLabelDecorator
- * @author oezbek
  */
 /*
  * http://help.eclipse.org/helios/index.jsp?topic=/org.eclipse.platform.doc.isv/
@@ -51,7 +50,7 @@ public final class SharedProjectDecorator implements ILightweightLabelDecorator 
 
   private static final Logger log = Logger.getLogger(SharedProjectDecorator.class);
 
-  private static final ImageDescriptor PROJECT_DESCRIPTOR =
+  private static final ImageDescriptor SHARED_RESOURCE_DESCRIPTOR =
       ImageManager.getImageDescriptor("icons/ovr16/shared.png"); // NON-NLS-1
 
   private final List<ILabelProviderListener> listeners =
@@ -76,7 +75,7 @@ public final class SharedProjectDecorator implements ILightweightLabelDecorator 
         public void sessionEnded(ISarosSession session, SessionEndReason reason) {
           session.removeListener(sessionListener);
           SharedProjectDecorator.this.session = null;
-          log.debug("clearing project decoration for all shared projects");
+          log.debug("clearing decoration for all shared resources");
           updateDecoratorsAsync(null); // update all labels
 
           lastDecoratedReferencePoint = null;
@@ -87,7 +86,7 @@ public final class SharedProjectDecorator implements ILightweightLabelDecorator 
       new ISessionListener() {
         @Override
         public void resourcesAdded(IReferencePoint referencePoint) {
-          log.debug("updating project decoration for all shared projects");
+          log.debug("updating decoration for all shared resources");
           updateDecoratorsAsync(null); // update all labels
         }
       };
@@ -116,10 +115,10 @@ public final class SharedProjectDecorator implements ILightweightLabelDecorator 
 
     if (resourceWrapper == null || !currentSession.isShared(resourceWrapper)) return;
 
-    decoration.addOverlay(SharedProjectDecorator.PROJECT_DESCRIPTOR, IDecoration.TOP_LEFT);
+    decoration.addOverlay(SharedProjectDecorator.SHARED_RESOURCE_DESCRIPTOR, IDecoration.TOP_LEFT);
 
     if (resourceWrapper.getType() == Type.REFERENCE_POINT) {
-      decoration.addSuffix(Messages.SharedProjectDecorator_shared);
+      decoration.addSuffix(Messages.SharedBaseResourceDecorator_shared);
     }
   }
 

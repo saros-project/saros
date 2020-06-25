@@ -394,7 +394,7 @@ public class Messages extends NLS {
   public static String FollowThisPersonAction_stop_follow_title;
   public static String FollowThisPersonAction_stop_follow_tooltip;
 
-  public static String SharedProjectDecorator_shared;
+  public static String SharedBaseResourceDecorator_shared;
 
   public static String SubscriptionManager_incoming_subscription_request_title;
   public static String SubscriptionManager_incoming_subscription_request_message;
