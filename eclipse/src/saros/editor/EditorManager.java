@@ -381,7 +381,7 @@ public class EditorManager implements IEditorManager {
     sessionManager.addSessionLifecycleListener(this.sessionLifecycleListener);
   }
 
-  // FIXME thread access (used by ProjectDeltaVisitor which might NOT run from
+  // FIXME thread access (used by ReferencePointResourceDeltaVisitor which might NOT run from
   // the SWT Thread
   public boolean isManaged(IFile file) {
     return connectedFiles.contains(file);
@@ -1033,7 +1033,7 @@ public class EditorManager implements IEditorManager {
    * @param file the file to check
    * @return <code>true</code> if the given file is opened according to the editor pool.
    */
-  // FIXME thread access (used by ProjectDeltaVisitor which might NOT run from
+  // FIXME thread access (used by ReferencePointResourceDeltaVisitor which might NOT run from
   // the SWT Thread
   public boolean isOpened(saros.filesystem.IFile file) {
     return editorPool.getEditors(file).size() > 0;
@@ -1237,7 +1237,7 @@ public class EditorManager implements IEditorManager {
 
     /*
      * connect to the file so the SharedResourceManager /
-     * ProjectDeltaVisitor will ignore the file change because it is
+     * ReferencePointResourceDeltaVisitor will ignore the file change because it is
      * possible that no editor is open for this file
      */
     if (!isConnected) connect(file);

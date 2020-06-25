@@ -222,8 +222,8 @@ public class SharedResourcesManager extends AbstractActivityProducer
       }
 
       for (IReferencePoint referencePoint : projectReferencePoints) {
-        ProjectDeltaVisitor projectDeltaVisitor =
-            new ProjectDeltaVisitor(sarosSession, editorManager, referencePoint);
+        ReferencePointResourceDeltaVisitor referencePointResourceDeltaVisitor =
+            new ReferencePointResourceDeltaVisitor(sarosSession, editorManager, referencePoint);
 
         IContainer referencePointDelegate = ResourceConverter.getDelegate(referencePoint);
 
@@ -236,21 +236,22 @@ public class SharedResourcesManager extends AbstractActivityProducer
 
         try {
           /*
-           * There is some magic involved here. The ProjectDeltaVisitor
+           * There is some magic involved here. The ReferencePointResourceDeltaVisitor
            * will ignore changed files that are currently opened in an
            * editor to prevent transmitting the whole file content of the
            * modified file.
            *
-           * FIXME document this behavior in the ProjectDeltaVisitor !
+           * FIXME document this behavior in the ReferencePointResourceDeltaVisitor !
            */
-          referencePointDelta.accept(projectDeltaVisitor, IContainer.INCLUDE_HIDDEN);
+          referencePointDelta.accept(referencePointResourceDeltaVisitor, IContainer.INCLUDE_HIDDEN);
 
         } catch (CoreException e) {
           // cannot be thrown by our custom visitor
-          log.warn("ProjectDeltaVisitor class is not supposed to throw a CoreException", e);
+          log.warn(
+              this.getClass().getSimpleName() + " is not supposed to throw a CoreException", e);
         }
 
-        resourceActivities.addAll(projectDeltaVisitor.getActivities());
+        resourceActivities.addAll(referencePointResourceDeltaVisitor.getActivities());
       }
     }
 
