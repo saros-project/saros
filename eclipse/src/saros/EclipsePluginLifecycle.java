@@ -7,6 +7,7 @@ import saros.communication.connection.ConnectionHandler;
 import saros.context.AbstractContextLifecycle;
 import saros.context.ContainerContext;
 import saros.context.IContextFactory;
+import saros.context.SarosEclipseContextFactory;
 import saros.session.SarosSessionManager;
 import saros.session.SessionEndReason;
 

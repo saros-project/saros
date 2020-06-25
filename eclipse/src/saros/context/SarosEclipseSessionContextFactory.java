@@ -1,4 +1,4 @@
-package saros.project.internal;
+package saros.context;
 
 import saros.project.FileActivityConsumer;
 import saros.project.FolderActivityConsumer;
