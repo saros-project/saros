@@ -63,8 +63,8 @@ public class ReferencePointOptionComposite extends Composite {
   private Button existingDirectoryBrowseButton;
 
   /**
-   * Instantiates a new project option composite. Selects the option to create a new project by
-   * default.
+   * Instantiates a new reference point option composite. Selects the option to create a new project
+   * by default.
    *
    * @param parent the parent composite
    * @param remoteReferencePointId the ID of the reference point for which this composite chooses a
