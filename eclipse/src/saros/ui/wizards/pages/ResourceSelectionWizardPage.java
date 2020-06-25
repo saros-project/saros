@@ -41,7 +41,7 @@ public class ResourceSelectionWizardPage extends WizardPage {
           if (resourceSelectionComposite == null || resourceSelectionComposite.isDisposed()) return;
 
           if (!resourceSelectionComposite.hasSelectedResources()) {
-            setErrorMessage(Messages.ProjectSelectionWizardPage_selected_no_project);
+            setErrorMessage(Messages.ResourceSelectionWizardPage_selected_no_selection);
             setPageComplete(false);
           } else {
             setErrorMessage(null);
@@ -61,8 +61,8 @@ public class ResourceSelectionWizardPage extends WizardPage {
   /** @param preselectedResources resources that should be preselected or <code>null</code> */
   public ResourceSelectionWizardPage(final Collection<IResource> preselectedResources) {
     super(ResourceSelectionWizardPage.class.getName());
-    setTitle(Messages.ProjectSelectionWizardPage_title);
-    setDescription(Messages.ProjectSelectionWizardPage_description);
+    setTitle(Messages.ResourceSelectionWizardPage_title);
+    setDescription(Messages.ResourceSelectionWizardPage_description);
     this.preselectedResources = preselectedResources;
   }
 
