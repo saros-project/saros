@@ -47,20 +47,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator, Dis
   private boolean defaultAccountChanged;
 
   private final IConnectionStateListener connectionStateListener =
-      new IConnectionStateListener() {
-        @Override
-        public void connectionStateChanged(final ConnectionState state, final Exception error) {
-          SWTUtils.runSafeSWTAsync(
-              log,
-              new Runnable() {
-
-                @Override
-                public void run() {
-                  updateStatus(state);
-                }
-              });
-        }
-      };
+      (state, error) -> SWTUtils.runSafeSWTAsync(log, () -> updateStatus(state));
 
   private final IAccountStoreListener accountStoreListener =
       new IAccountStoreListener() {
