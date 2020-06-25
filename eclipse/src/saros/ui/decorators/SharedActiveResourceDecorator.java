@@ -46,15 +46,15 @@ import saros.ui.util.SWTUtils;
 // TODO rename this class, requires change in the plugin.xml too
 
 /**
- * Decorates project files and their parent folders belonging to the active editors of the remote
+ * Decorates shared files and their parent folders belonging to the active editors of the remote
  * users.
  *
  * @see ILightweightLabelDecorator
  */
 @Component(module = "eclipse")
-public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
+public class SharedActiveResourceDecorator implements ILightweightLabelDecorator {
 
-  private static final Logger log = Logger.getLogger(SharedProjectFileDecorator.class.getName());
+  private static final Logger log = Logger.getLogger(SharedActiveResourceDecorator.class.getName());
 
   private static final String IMAGE_PATH = "icons/ovr16/dot.png"; // $NON-NLS-1$
 
@@ -159,7 +159,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
         }
       };
 
-  public SharedProjectFileDecorator() {
+  public SharedActiveResourceDecorator() {
 
     SarosPluginContext.initComponent(this);
 
@@ -229,7 +229,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
           @Override
           public void run() {
             LabelProviderChangedEvent event =
-                new LabelProviderChangedEvent(SharedProjectFileDecorator.this, updateElements);
+                new LabelProviderChangedEvent(SharedActiveResourceDecorator.this, updateElements);
 
             for (ILabelProviderListener listener : listeners) {
               listener.labelProviderChanged(event);
