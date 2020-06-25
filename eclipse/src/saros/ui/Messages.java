@@ -410,10 +410,10 @@ public class Messages extends NLS {
   public static String NegotiationHandler_error_during_invitation;
   public static String NegotiationHandler_error_during_invitation_text;
   public static String NegotiationHandler_inviting_user;
-  public static String NegotiationHandler_project_sharing_canceled_text;
-  public static String NegotiationHandler_sharing_project;
-  public static String NegotiationHandler_sharing_project_canceled_remotely;
-  public static String NegotiationHandler_sharing_project_canceled_remotely_text;
+  public static String NegotiationHandler_resource_sharing_canceled_text;
+  public static String NegotiationHandler_sharing_resources;
+  public static String NegotiationHandler_sharing_resources_canceled_remotely;
+  public static String NegotiationHandler_sharing_resources_canceled_remotely_text;
 
   public static String UserStatusChangeHandler_user_joined;
   public static String UserStatusChangeHandler_user_joined_text;
