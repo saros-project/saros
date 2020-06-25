@@ -17,7 +17,8 @@ import saros.session.User.Permission;
 
 /**
  * This model provider is responsible for warning a session participant when trying to modify the
- * resources of a shared project or the project itself in an unsupported way.
+ * resources of a shared reference point or the reference point resource itself in an unsupported
+ * way.
  *
  * <p>Ignoring the warnings will lead to inconsistencies. Note that we can't prevent these actions,
  * just detect them and report them.
@@ -26,8 +27,8 @@ import saros.session.User.Permission;
  *
  * <ul>
  *   <li>File and folder modifications as a user with {@link Permission#READONLY_ACCESS}.
- *   <li>Deletion of a shared project.
- *   <li>Renaming and moving of a shared project.
+ *   <li>Deletion of a shared reference point resource.
+ *   <li>Renaming and moving of a shared reference point resource.
  * </ul>
  */
 /*
@@ -44,11 +45,11 @@ public class ResourceChangeValidator extends ModelProvider {
   private static final IStatus MODIFYING_RESOURCES_ERROR_STATUS =
       createErrorStatus(Messages.ResourceChangeValidator_ModifyingResourcesErrorMessage);
 
-  private static final IStatus DELETE_PROJECT_ERROR_STATUS =
-      createErrorStatus(Messages.ResourceChangeValidator_DeleteProjectErrorMessage);
+  private static final IStatus DELETE_REFERENCE_POINT_ERROR_STATUS =
+      createErrorStatus(Messages.ResourceChangeValidator_DeleteReferencePointErrorMessage);
 
-  private static final IStatus MOVE_OR_RENAME_PROJECT_ERROR_STATUS =
-      createErrorStatus(Messages.ResourceChangeValidator_MoveOrRenameProjectErrorMessage);
+  private static final IStatus MOVE_OR_RENAME_REFERENCE_POINT_ERROR_STATUS =
+      createErrorStatus(Messages.ResourceChangeValidator_MoveOrRenameReferencePointErrorMessage);
 
   private static volatile ISarosSession session;
 
@@ -87,9 +88,9 @@ public class ResourceChangeValidator extends ModelProvider {
       if (!currentSession.hasWriteAccess() && visitor.isModifyingResources())
         return MODIFYING_RESOURCES_ERROR_STATUS;
 
-      if (visitor.isDeletingProject()) return DELETE_PROJECT_ERROR_STATUS;
+      if (visitor.isDeletingProject()) return DELETE_REFERENCE_POINT_ERROR_STATUS;
 
-      if (visitor.isMovingProject()) return MOVE_OR_RENAME_PROJECT_ERROR_STATUS;
+      if (visitor.isMovingProject()) return MOVE_OR_RENAME_REFERENCE_POINT_ERROR_STATUS;
     }
 
     return Status.OK_STATUS;
