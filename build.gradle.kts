@@ -32,13 +32,16 @@ idea {
 configure(subprojects) {
     apply(plugin = "idea")
     apply(plugin = "java")
-    apply(plugin = "pmd")
 
     idea {
         module {
             excludeDirs.addAll(mutableListOf(file("bin"), file("lib"), file("libs")))
         }
     }
+}
+
+configure(subprojects - project(":saros.picocontainer")) {
+    apply(plugin = "pmd")
 }
 
 /*
@@ -69,10 +72,11 @@ configure(projectsToConfigure) {
     }
 
     configurations {
-        val testing by creating // used to reference the testJar
-        val testConfig by creating // contains test dependencies that are used by all java subprojects
-        val releaseDep by creating // contains all dependencies which has to be included into the release jar/zip
-        releaseDep.isTransitive = true // avoid that the whole dependency tree is released
+        create("testing") // used to reference the testJar
+        create("testConfig") // contains test dependencies that are used by all java subprojects
+        create("releaseDep") { // contains all dependencies which has to be included into the release jar/zip
+            isTransitive = false // avoid that the whole dependency tree is released
+        }
     }
 
     configure<PmdExtension> {
