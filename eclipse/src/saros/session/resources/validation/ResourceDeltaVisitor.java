@@ -17,9 +17,9 @@ final class ResourceDeltaVisitor implements IResourceDeltaVisitor {
 
   private boolean isModifyingResources = false;
 
-  private boolean isDeletingProject = false;
+  private boolean isDeletingReferencePointResource = false;
 
-  private boolean isMovingProject = false;
+  private boolean isMovingReferencePointResource = false;
 
   /** The reference point whose resources the delta visitor is iterating. */
   private final IReferencePoint referencePoint;
@@ -50,9 +50,9 @@ final class ResourceDeltaVisitor implements IResourceDeltaVisitor {
 
     if (delta.getKind() == IResourceDelta.REMOVED) {
       if ((delta.getFlags() & IResourceDelta.MOVED_TO) != 0) {
-        isMovingProject = true;
+        isMovingReferencePointResource = true;
       } else {
-        isDeletingProject = true;
+        isDeletingReferencePointResource = true;
       }
 
       return false;
@@ -65,11 +65,11 @@ final class ResourceDeltaVisitor implements IResourceDeltaVisitor {
     return isModifyingResources;
   }
 
-  boolean isDeletingProject() {
-    return isDeletingProject;
+  boolean isDeletingReferencePointResource() {
+    return isDeletingReferencePointResource;
   }
 
-  boolean isMovingProject() {
-    return isMovingProject;
+  boolean isMovingReferencePointResource() {
+    return isMovingReferencePointResource;
   }
 }

@@ -88,9 +88,10 @@ public class ResourceChangeValidator extends ModelProvider {
       if (!currentSession.hasWriteAccess() && visitor.isModifyingResources())
         return MODIFYING_RESOURCES_ERROR_STATUS;
 
-      if (visitor.isDeletingProject()) return DELETE_REFERENCE_POINT_ERROR_STATUS;
+      if (visitor.isDeletingReferencePointResource()) return DELETE_REFERENCE_POINT_ERROR_STATUS;
 
-      if (visitor.isMovingProject()) return MOVE_OR_RENAME_REFERENCE_POINT_ERROR_STATUS;
+      if (visitor.isMovingReferencePointResource())
+        return MOVE_OR_RENAME_REFERENCE_POINT_ERROR_STATUS;
     }
 
     return Status.OK_STATUS;
