@@ -31,10 +31,8 @@ import saros.ui.wizards.JoinSessionWizard;
 import saros.ui.wizards.dialogs.WizardDialogAccessable;
 
 /**
- * This handler is responsible for presenting and running the session and project negotiations that
+ * This handler is responsible for presenting and running the session and resource negotiations that
  * are received by the Saros Session Manager component.
- *
- * @author srossbach
  */
 public class NegotiationHandler implements INegotiationHandler {
 
@@ -120,14 +118,14 @@ public class NegotiationHandler implements INegotiationHandler {
     }
   }
 
-  private class OutgoingProjectJob extends Job {
+  private class OutgoingResourceJob extends Job {
 
     private AbstractOutgoingResourceNegotiation negotiation;
     private String peer;
 
-    public OutgoingProjectJob(AbstractOutgoingResourceNegotiation outgoingProjectNegotiation) {
-      super(Messages.NegotiationHandler_sharing_project);
-      negotiation = outgoingProjectNegotiation;
+    public OutgoingResourceJob(AbstractOutgoingResourceNegotiation outgoingResourceNegotiation) {
+      super(Messages.NegotiationHandler_sharing_resources);
+      negotiation = outgoingResourceNegotiation;
       peer = negotiation.getPeer().getBase();
 
       setUser(true);
@@ -156,7 +154,7 @@ public class NegotiationHandler implements INegotiationHandler {
           case REMOTE_CANCEL:
             message =
                 MessageFormat.format(
-                    Messages.NegotiationHandler_project_sharing_canceled_text, peerName);
+                    Messages.NegotiationHandler_resource_sharing_canceled_text, peerName);
 
             SWTUtils.runSafeSWTAsync(
                 log,
@@ -172,11 +170,11 @@ public class NegotiationHandler implements INegotiationHandler {
           case REMOTE_ERROR:
             message =
                 MessageFormat.format(
-                    Messages.NegotiationHandler_sharing_project_canceled_remotely,
+                    Messages.NegotiationHandler_sharing_resources_canceled_remotely,
                     peerName,
                     negotiation.getErrorMessage());
             SarosView.showNotification(
-                Messages.NegotiationHandler_sharing_project_canceled_remotely_text, message);
+                Messages.NegotiationHandler_sharing_resources_canceled_remotely_text, message);
 
             return new Status(IStatus.ERROR, Saros.PLUGIN_ID, message);
         }
@@ -213,14 +211,14 @@ public class NegotiationHandler implements INegotiationHandler {
   @Override
   public void handleOutgoingResourceNegotiation(AbstractOutgoingResourceNegotiation negotiation) {
 
-    OutgoingProjectJob job = new OutgoingProjectJob(negotiation);
+    OutgoingResourceJob job = new OutgoingResourceJob(negotiation);
     job.setPriority(Job.SHORT);
     job.schedule();
   }
 
   @Override
   public void handleIncomingResourceNegotiation(AbstractIncomingResourceNegotiation negotiation) {
-    showIncomingProjectUI(negotiation);
+    showIncomingResourceNegotiationUI(negotiation);
   }
 
   private void showIncomingInvitationUI(final IncomingSessionNegotiation negotiation) {
@@ -265,7 +263,8 @@ public class NegotiationHandler implements INegotiationHandler {
         });
   }
 
-  private void showIncomingProjectUI(final AbstractIncomingResourceNegotiation negotiation) {
+  private void showIncomingResourceNegotiationUI(
+      final AbstractIncomingResourceNegotiation negotiation) {
 
     SWTUtils.runSafeSWTAsync(
         log,
