@@ -61,7 +61,7 @@ public class SharedResourcesManager extends AbstractActivityProducer
    * We also don't need PRE_CLOSE, since we'll also get a POST_CHANGE and
    * still have to test project.isOpen().
    *
-   * We might want to add PRE_DELETE if the user deletes our shared project
+   * We might want to add PRE_DELETE if the user deletes a shared reference point base resource
    * though.
    */
   private static final int INTERESTING_EVENTS = IResourceChangeEvent.POST_CHANGE;
@@ -69,7 +69,7 @@ public class SharedResourcesManager extends AbstractActivityProducer
   private static final Logger log = Logger.getLogger(SharedResourcesManager.class);
 
   /**
-   * If the StopManager has paused the project, the SharedResourcesManager doesn't react to resource
+   * If the StopManager has paused the session, the SharedResourcesManager doesn't react to resource
    * changes.
    */
   private boolean pause = false;
@@ -126,8 +126,8 @@ public class SharedResourcesManager extends AbstractActivityProducer
 
     /*
      * FIXME this is REAL GARBAGE ! This is sometimes set by the
-     * IncomingProjectNegotiation. So when it is set every change in an
-     * already shared project is just SILENTLY IGNORED !!!
+     * IncomingResourceNegotiation. So when it is set every change in an
+     * already shared reference point is just SILENTLY IGNORED !!!
      */
     if (fileReplacementInProgressObservable.isReplacementInProgress()) return;
 
