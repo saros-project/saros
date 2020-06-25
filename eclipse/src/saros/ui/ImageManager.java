@@ -47,8 +47,8 @@ public class ImageManager {
   public static final Image WIZBAN_SESSION_OUTGOING =
       getImage("icons/wizban/session_outgoing_wiz.gif"); // $NON-NLS-1$
 
-  public static final Image WIZBAN_SESSION_ADD_PROJECTS =
-      getImage("icons/wizban/session_add_projects_wiz.gif"); // $NON-NLS-1$
+  public static final Image WIZBAN_SESSION_ADD_REFERENCE_POINTS =
+      getImage("icons/wizban/session_add_reference_points_wiz.gif"); // $NON-NLS-1$
 
   public static final Image WIZBAN_SESSION_ADD_CONTACTS =
       getImage("icons/wizban/session_add_contacts_wiz.gif"); // $NON-NLS-1$
@@ -118,11 +118,11 @@ public class ImageManager {
   public static final Image DLCL_SESSION_TERMINATE =
       getImage("icons/dlcl16/session_terminate_tsk.png"); // $NON-NLS-1$
 
-  public static final Image ELCL_SESSION_ADD_PROJECTS =
-      getImage("icons/elcl16/session_add_projects_tsk.png"); // $NON-NLS-1$
+  public static final Image ELCL_SESSION_ADD_REFERENCE_POINTS =
+      getImage("icons/elcl16/session_add_reference_points_tsk.png"); // $NON-NLS-1$
 
-  public static final Image DLCL_SESSION_ADD_PROJECTS =
-      getImage("icons/dlcl16/session_add_projects_tsk.png"); // $NON-NLS-1$
+  public static final Image DLCL_SESSION_ADD_REFERENCE_POINTS =
+      getImage("icons/dlcl16/session_add_reference_points_tsk.png"); // $NON-NLS-1$
 
   public static final Image ELCL_SESSION_ADD_CONTACTS =
       getImage("icons/elcl16/session_add_contacts_tsk.png"); // $NON-NLS-1$

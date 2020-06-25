@@ -763,8 +763,8 @@
             </command>
            <command
                   commandId="saros.ui.commands.SessionAddResources"
-                  disabledIcon="icons/dlcl16/session_add_projects_tsk.png"
-                  icon="icons/elcl16/session_add_projects_tsk.png"
+                  disabledIcon="icons/dlcl16/session_add_reference_points_tsk.png"
+                  icon="icons/elcl16/session_add_reference_points_tsk.png"
                   style="push">
                <visibleWhen
                      checkEnabled="false">
@@ -891,8 +891,8 @@
          </command>
          <command
                commandId="saros.ui.commands.SessionAddResources"
-               disabledIcon="icons/dlcl16/session_add_projects_tsk.png"
-               icon="icons/elcl16/session_add_projects_tsk.png"
+               disabledIcon="icons/dlcl16/session_add_reference_points_tsk.png"
+               icon="icons/elcl16/session_add_reference_points_tsk.png"
                style="push">
             <visibleWhen
                   checkEnabled="false">
@@ -993,8 +993,8 @@
          </command>
             <command
                   commandId="saros.ui.commands.SessionAddSelectedResources"
-                  disabledIcon="icons/dlcl16/session_add_projects_tsk.png"
-                  icon="icons/elcl16/session_add_projects_tsk.png"
+                  disabledIcon="icons/dlcl16/session_add_reference_points_tsk.png"
+                  icon="icons/elcl16/session_add_reference_points_tsk.png"
                   style="push">
                <visibleWhen
                      checkEnabled="false">
