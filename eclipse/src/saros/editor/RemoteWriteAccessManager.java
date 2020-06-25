@@ -48,7 +48,6 @@ public class RemoteWriteAccessManager extends AbstractActivityConsumer {
     this.sarosSession.addListener(sessionListener);
   }
 
-  /** This method is called from the shared project when a new Activity arrives */
   @Override
   public void receive(final EditorActivity editorActivity) {
     User sender = editorActivity.getSource();
