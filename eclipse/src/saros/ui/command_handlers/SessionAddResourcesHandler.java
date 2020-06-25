@@ -15,7 +15,7 @@ import saros.ui.wizards.AddResourcesToSessionWizard;
  * <p>This class is used to define the behavior of the saros menu entry to add reference points to a
  * running session.
  */
-public class SessionAddProjectsHandler extends AbstractHandler {
+public class SessionAddResourcesHandler extends AbstractHandler {
 
   @Override
   public Object execute(ExecutionEvent event) throws ExecutionException {

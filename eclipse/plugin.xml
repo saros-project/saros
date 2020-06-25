@@ -602,7 +602,7 @@
          </activeWhen>
       </handler>
       <handler
-            class="saros.ui.command_handlers.SessionAddProjectsHandler"
+            class="saros.ui.command_handlers.SessionAddResourcesHandler"
             commandId="saros.ui.commands.SessionAddResources">
          <activeWhen>
             <and>
