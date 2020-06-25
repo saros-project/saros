@@ -16,10 +16,10 @@ import saros.ui.util.selection.retriever.SelectionRetrieverFactory;
  * <p>An {@link saros.ui.wizards.AddResourcesToSessionWizard} is opened for this purpose with the
  * currently selected resources preselected.
  *
- * <p>This class is used to define the behavior of the project view context menu entry to add
+ * <p>This class is used to define the behavior of the package explorer context menu entry to add
  * reference points to a running session.
  */
-public class SessionAddSelectedProjectsHandler extends AbstractHandler {
+public class SessionAddSelectedResourcesHandler extends AbstractHandler {
 
   @Override
   public Object execute(ExecutionEvent event) throws ExecutionException {
