@@ -74,13 +74,13 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
   public static final Image composingImage = ImageManager.getImage("icons/view16/cmpsg_misc.png");
 
   private ListExplanation connectFirst =
-      new ListExplanation(SWT.ICON_INFORMATION, "To share projects you must connect first.");
+      new ListExplanation(SWT.ICON_INFORMATION, "To share resources you must connect first.");
 
-  private ListExplanation howToShareProjects =
+  private ListExplanation howToShareResources =
       new ListExplanation(
           SWT.ICON_INFORMATION,
-          "To share projects you can either:",
-          "Right-click on a project",
+          "To share resources you can either:",
+          "Right-click on a resource",
           "Right-click on a contact",
           "Use the Saros menu in the Eclipse menu bar");
 
@@ -570,7 +570,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
     if (chatRooms.getItemCount() != 0) return;
 
     if (!connectionHandler.isConnected()) showExplanation(connectFirst);
-    else showExplanation(howToShareProjects);
+    else showExplanation(howToShareResources);
   }
 
   public ChatControl getSelectedChatControl() {
