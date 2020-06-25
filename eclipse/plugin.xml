@@ -45,9 +45,9 @@
       </decorator>
       <decorator
             adaptable="true"
-            class="saros.ui.decorators.SharedProjectFileDecorator"
-            id="saros.ui.decorators.SharedProjectFileDecorator"
-            label="Shared Project File Decorator"
+            class="saros.ui.decorators.SharedActiveResourceDecorator"
+            id="saros.ui.decorators.SharedActiveResourceDecorator"
+            label="Shared Active Resource Decorator"
             lightweight="true"
             state="true">
          <enablement>
