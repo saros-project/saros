@@ -635,7 +635,7 @@
          </activeWhen>
       </handler>
       <handler
-            class="saros.ui.command_handlers.SessionAddSelectedProjectsHandler"
+            class="saros.ui.command_handlers.SessionAddSelectedResourcesHandler"
             commandId="saros.ui.commands.SessionAddSelectedResources">
          <activeWhen>
             <and>
