@@ -1,4 +1,4 @@
-package saros.project;
+package saros.resource_change_handlers;
 
 import static org.easymock.EasyMock.anyBoolean;
 import static org.easymock.EasyMock.anyObject;
