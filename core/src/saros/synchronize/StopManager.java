@@ -103,14 +103,13 @@ public final class StopManager extends AbstractActivityProducer implements Start
         }
       };
 
-  // TODO update this entry
   /**
    * @JTourBusStop 2, StopManager:
    *
    * <p>This is where lock/unlock requests and acknowledgments will be handled. When there are
    * outgoing lock requests the expected answers will be put into the expectedAcknowledgements set
    * and when the acknowledgment arrives it will be removed from the set. For incoming lock requests
-   * lockProject(true) will be called.
+   * {@link #lockSession(boolean) lockSession(true)} will be called.
    */
   private void handleStopActivity(final StopActivity stopActivity) {
     assert sarosSession != null;
