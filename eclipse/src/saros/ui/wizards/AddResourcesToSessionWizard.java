@@ -19,7 +19,7 @@ import saros.ui.wizards.pages.ResourceSelectionWizardPage;
  * @author bkahlert
  */
 public class AddResourcesToSessionWizard extends Wizard {
-  public static final String TITLE = Messages.SessionAddProjectsWizard_title;
+  public static final String TITLE = Messages.AddResourcesToSessionWizard_title;
 
   private final ResourceSelectionWizardPage resourceSelectionWizardPage;
 

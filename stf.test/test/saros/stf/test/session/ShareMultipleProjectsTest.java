@@ -7,7 +7,7 @@ import static saros.stf.client.tester.SarosTester.CARL;
 import static saros.stf.shared.Constants.ADD_RESOURCES;
 import static saros.stf.shared.Constants.CANCEL;
 import static saros.stf.shared.Constants.MENU_SAROS;
-import static saros.stf.shared.Constants.SHELL_ADD_PROJECTS_TO_SESSION;
+import static saros.stf.shared.Constants.SHELL_ADD_RESOURCES_TO_SESSION;
 
 import java.util.List;
 import org.junit.After;
@@ -92,7 +92,7 @@ public class ShareMultipleProjectsTest extends StfTestCase {
     ALICE.remoteBot().activateWorkbench();
     ALICE.remoteBot().menu(MENU_SAROS).menu(ADD_RESOURCES).click();
 
-    IRemoteBotShell shell = ALICE.remoteBot().shell(SHELL_ADD_PROJECTS_TO_SESSION);
+    IRemoteBotShell shell = ALICE.remoteBot().shell(SHELL_ADD_RESOURCES_TO_SESSION);
     shell.activate();
     Thread.sleep(1000);
 
