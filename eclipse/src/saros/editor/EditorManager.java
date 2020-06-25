@@ -91,8 +91,8 @@ public class EditorManager implements IEditorManager {
   /**
    * @JTourBusStop 6, Some Basics:
    *
-   * <p>When you work on a project using Saros, you still use the standard Eclipse Editor, however
-   * Saros adds a little extra needed functionality to them.
+   * <p>When you work on a shared resource using Saros, you still use the standard Eclipse Editor,
+   * however Saros adds a little extra needed functionality to them.
    *
    * <p>EditorManager is one of the most important classes in this respect. Remember that every
    * change done in an Editor needs to be intercepted, translated into an Activity and sent to all
@@ -327,8 +327,8 @@ public class EditorManager implements IEditorManager {
               log,
               new Runnable() {
                 /*
-                 * When Alice invites Bob to a session with a project and Alice
-                 * has some Files of the shared project already open, Bob will
+                 * When Alice invites Bob to a session with some resources and Alice
+                 * has some Files of the shared resources already open, Bob will
                  * not receive any Actions (Selection, Contribution etc.) for
                  * the open editors. When Alice closes and reopens this Files
                  * again everything is going back to normal. To prevent that
@@ -1017,8 +1017,8 @@ public class EditorManager implements IEditorManager {
     activityDelayer.fireActivity(new EditorActivity(session.getLocalUser(), Type.CLOSED, file));
 
     /**
-     * TODO We need a reliable way to communicate editors which are outside the shared project scope
-     * and a way to deal with closing the active editor
+     * TODO We need a reliable way to communicate editors which are outside the session scope and a
+     * way to deal with closing the active editor
      */
     // Check if the currently active editor is closed
     boolean newActiveEditor = file.equals(this.locallyActiveEditor);
@@ -1058,7 +1058,7 @@ public class EditorManager implements IEditorManager {
    * <ol>
    *   <li>Has an underlying <code>IResource</code> as storage.
    *   <li>Can be adapted to an <code>ITextViewer</code>.
-   *   <li>The underlying <code>IResource</code> is part of the current project sharing (see {@link
+   *   <li>The underlying <code>IResource</code> is part of the current session (see {@link
    *       ISarosSession#isShared}).
    * </ol>
    */
