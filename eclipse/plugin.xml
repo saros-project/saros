@@ -1409,7 +1409,7 @@
             type="saros.session.ISarosSession">
       </propertyTester>
       <propertyTester
-            class="saros.ui.expressions.ProjectPropertyTester"
+            class="saros.ui.expressions.ResourcePropertyTester"
             id="saros.propertyTesters.ProjectPropertyTester"
             namespace="saros"
             properties="isInSarosSession"
