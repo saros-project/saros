@@ -9,9 +9,9 @@ public class Messages extends NLS {
 
   public static String ResourceChangeValidator_ModifyingResourcesErrorMessage;
 
-  public static String ResourceChangeValidator_DeleteProjectErrorMessage;
+  public static String ResourceChangeValidator_DeleteReferencePointErrorMessage;
 
-  public static String ResourceChangeValidator_MoveOrRenameProjectErrorMessage;
+  public static String ResourceChangeValidator_MoveOrRenameReferencePointErrorMessage;
 
   static {
     // initialize resource bundle
