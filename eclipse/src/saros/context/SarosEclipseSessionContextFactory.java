@@ -1,9 +1,9 @@
 package saros.context;
 
-import saros.project.FileActivityConsumer;
-import saros.project.FolderActivityConsumer;
-import saros.project.SharedResourcesManager;
 import saros.repackaged.picocontainer.MutablePicoContainer;
+import saros.resource_change_handlers.FileActivityConsumer;
+import saros.resource_change_handlers.FolderActivityConsumer;
+import saros.resource_change_handlers.SharedResourcesManager;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionContextFactory;
 import saros.session.SarosCoreSessionContextFactory;

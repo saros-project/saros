@@ -1,4 +1,4 @@
-package saros.project;
+package saros.resource_change_handlers;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFolder;

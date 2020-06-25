@@ -1,4 +1,4 @@
-package saros.project;
+package saros.resource_change_handlers;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package saros.project;
+package saros.resource_change_handlers;
 
 import java.util.HashMap;
 import java.util.Map;
