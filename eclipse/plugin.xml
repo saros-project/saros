@@ -650,7 +650,7 @@
                </reference>
                <not>
                   <reference
-                        definitionId="saros.ui.definitions.projectsSelectedInSarosSession">
+                        definitionId="saros.ui.definitions.resourcesSelectedInSarosSession">
                   </reference>
                </not>
             </and>
@@ -976,7 +976,7 @@
                icon="icons/elcl16/session_tsk.png"
                label="Share Resource(s)..."
                style="push"
-               tooltip="Share the Selected Projects With Your Contacts">
+               tooltip="Share the Selected Resources With Your Contacts">
             <visibleWhen
                   checkEnabled="false">
                <and>
@@ -1171,7 +1171,7 @@
          </and>
       </definition>
       <definition
-            id="saros.ui.definitions.projectsSelectedInSarosSession">
+            id="saros.ui.definitions.resourcesSelectedInSarosSession">
          <with
                variable="selection">
             <iterate
@@ -1410,7 +1410,7 @@
       </propertyTester>
       <propertyTester
             class="saros.ui.expressions.ResourcePropertyTester"
-            id="saros.propertyTesters.ProjectPropertyTester"
+            id="saros.propertyTesters.ResourcePropertyTester"
             namespace="saros"
             properties="isInSarosSession"
             type="org.eclipse.core.resources.IResource">
