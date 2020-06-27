@@ -2,14 +2,17 @@ package saros.intellij.ui.wizards.pages.referencepointselection;
 
 import com.intellij.ui.components.JBTabbedPane;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import javax.swing.JTabbedPane;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import saros.intellij.ui.wizards.Wizard;
 import saros.intellij.ui.wizards.pages.AbstractWizardPage;
 import saros.intellij.ui.wizards.pages.PageActionListener;
+import saros.negotiation.ResourceNegotiationData;
+import saros.negotiation.additional_resource_data.AbstractPossibleRepresentationProvider;
 
 /**
  * Wizard page to choose how the shared reference points are represented locally. For each shared
@@ -22,7 +25,9 @@ public class SelectLocalReferencePointRepresentationPage extends AbstractWizardP
   private final ReferencePointTabStateListener referencePointTabStateListener;
 
   public SelectLocalReferencePointRepresentationPage(
-      String id, PageActionListener pageActionListener, Set<String> referencePointNames) {
+      String id,
+      PageActionListener pageActionListener,
+      List<ResourceNegotiationData> resourceNegotiationData) {
 
     super(id, pageActionListener);
 
@@ -30,21 +35,25 @@ public class SelectLocalReferencePointRepresentationPage extends AbstractWizardP
     referencePointTabs = new HashMap<>();
     referencePointTabStateListener = new ReferencePointTabStateListener();
 
-    referencePointNames.forEach(this::addReferencePointTab);
+    resourceNegotiationData.forEach(this::addReferencePointTab);
 
     add(tabbedBasePane);
   }
 
   /**
-   * Creates a reference point tab for the given reference point name and adds it to the tabbed
+   * Creates a reference point tab for the given resource negotiation data and adds it to the tabbed
    * reference point view.
    *
-   * @param referencePointName the name of a shared reference point contained in the resource
-   *     negotiation data
+   * @param resourceNegotiationData the resource negotiation data of the shared reference point
    */
-  private void addReferencePointTab(@NotNull String referencePointName) {
+  private void addReferencePointTab(@NotNull ResourceNegotiationData resourceNegotiationData) {
+    String referencePointName = resourceNegotiationData.getReferencePointName();
+    List<Pair<String, String>> possibleRepresentations =
+        AbstractPossibleRepresentationProvider.getPossibleRepresentations(resourceNegotiationData);
+
     ReferencePointTab referencePointTab =
-        new ReferencePointTab(referencePointName, referencePointTabStateListener);
+        new ReferencePointTab(
+            referencePointName, possibleRepresentations, referencePointTabStateListener);
 
     referencePointTabs.put(referencePointTab.getReferencePointName(), referencePointTab);
 
