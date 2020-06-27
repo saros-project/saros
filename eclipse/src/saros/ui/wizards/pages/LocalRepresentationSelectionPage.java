@@ -6,7 +6,6 @@ import java.io.File;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,14 +13,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.IDialogPage;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.WizardPage;
@@ -40,6 +38,7 @@ import saros.exception.IllegalInputException;
 import saros.filesystem.IReferencePoint;
 import saros.filesystem.ResourceConverter;
 import saros.negotiation.ResourceNegotiationData;
+import saros.negotiation.additional_resource_data.AbstractPossibleRepresentationProvider;
 import saros.net.IConnectionManager;
 import saros.net.xmpp.JID;
 import saros.preferences.Preferences;
@@ -68,6 +67,9 @@ public class LocalRepresentationSelectionPage extends WizardPage {
    * name.
    */
   private final Map<String, String> remoteReferencePointIdToNameMapping;
+
+  private final Map<String, List<Pair<String, String>>>
+      referencePointIdPossibleRepresentationMapping;
 
   private final Map<String, ReferencePointOptionComposite> referencePointOptionComposites;
 
@@ -109,13 +111,19 @@ public class LocalRepresentationSelectionPage extends WizardPage {
             : Collections.emptyMap();
 
     this.remoteReferencePointIdToNameMapping = new HashMap<>();
+    this.referencePointIdPossibleRepresentationMapping = new HashMap<>();
     this.referencePointOptionComposites = new HashMap<>();
     this.currentErrors = new HashMap<>();
     this.unsupportedCharsets = new HashSet<>();
 
     for (ResourceNegotiationData data : resourceNegotiationData) {
-      remoteReferencePointIdToNameMapping.put(
-          data.getReferencePointID(), data.getReferencePointName());
+      String referencePointId = data.getReferencePointID();
+
+      remoteReferencePointIdToNameMapping.put(referencePointId, data.getReferencePointName());
+
+      List<Pair<String, String>> possibleRepresentations =
+          AbstractPossibleRepresentationProvider.getPossibleRepresentations(data);
+      referencePointIdPossibleRepresentationMapping.put(referencePointId, possibleRepresentations);
 
       unsupportedCharsets.addAll(getUnsupportedCharsets(data.getFileList().getEncodings()));
     }
@@ -479,9 +487,9 @@ public class LocalRepresentationSelectionPage extends WizardPage {
    * name.
    *
    * <p>If there is a previous path mapping for the reference point name, the option to use an
-   * existing directory using that path is selected. Otherwise, if the reference point has the same
-   * name as a project in the local workspace, the option to use an existing directory using the
-   * project path is selected.
+   * existing directory using that path is selected. Otherwise, if a proposed resource
+   * representations applies to the local workspace, the option to use an existing directory using
+   * the proposed resource is selected.
    */
   private void preselectValues() {
     // try to assign local names for the remaining remote reference points
@@ -498,10 +506,6 @@ public class LocalRepresentationSelectionPage extends WizardPage {
       String previousReferencePointPath =
           previousReferencePointPathMapping.get(remoteReferencePointName);
 
-      Map<String, IProject> localProjects =
-          Arrays.stream(ResourcesPlugin.getWorkspace().getRoot().getProjects())
-              .collect(Collectors.toMap(IResource::getName, Function.identity()));
-
       /*
        * only use previous mapping if it does not clash with the current mapping
        */
@@ -515,13 +519,36 @@ public class LocalRepresentationSelectionPage extends WizardPage {
           referencePointOptionComposite.setExistingDirectoryOptionSelected(existingDirectoryPath);
         }
 
-      } else if (localProjects.containsKey(remoteReferencePointName)) {
-        // if there is a project with the same name as the reference point, suggest it
+      } else {
 
-        String projectPath =
-            localProjects.get(remoteReferencePointName).getFullPath().toPortableString();
+        for (Pair<String, String> possibleRepresentation :
+            referencePointIdPossibleRepresentationMapping.get(referencePointId)) {
 
-        referencePointOptionComposite.setExistingDirectoryOptionSelected(projectPath);
+          String projectName = possibleRepresentation.getLeft();
+          String projectRelativePath = possibleRepresentation.getRight();
+
+          IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+
+          if (!project.exists()) {
+            continue;
+          }
+
+          if (projectRelativePath.isEmpty()) {
+            referencePointOptionComposite.setExistingDirectoryOptionSelected(
+                project.getFullPath().toPortableString());
+
+            break;
+          }
+
+          IContainer container = project.getFolder(Path.fromPortableString(projectRelativePath));
+
+          if (container.exists()) {
+            referencePointOptionComposite.setExistingDirectoryOptionSelected(
+                container.getFullPath().toPortableString());
+
+            break;
+          }
+        }
       }
     }
 
