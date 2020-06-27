@@ -14,6 +14,7 @@ import saros.filesystem.EclipsePathFactory;
 import saros.filesystem.IPathFactory;
 import saros.monitoring.remote.EclipseRemoteProgressIndicatorFactoryImpl;
 import saros.monitoring.remote.IRemoteProgressIndicatorFactory;
+import saros.negotiation.additional_resource_data.EclipsePossibleRepresentationProvider;
 import saros.preferences.EclipsePreferenceStoreAdapter;
 import saros.preferences.EclipsePreferences;
 import saros.preferences.IPreferenceStore;
@@ -54,6 +55,9 @@ public class SarosEclipseContextFactory extends AbstractContextFactory {
       // do not forget to enable the option in the GeneralPreferencePage once it is fixed
       // Component.create(UndoManager.class),
       Component.create(ISarosSessionContextFactory.class, SarosEclipseSessionContextFactory.class),
+
+      // Additional resource negotiation data providers
+      Component.create(EclipsePossibleRepresentationProvider.class),
 
       // UI handlers
       Component.create(HostLeftAloneInSessionHandler.class),
