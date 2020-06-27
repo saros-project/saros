@@ -59,7 +59,7 @@ public class IntellijReferencePoint implements IReferencePoint {
    * @return the virtual file represented by this reference point
    */
   @NotNull
-  VirtualFile getVirtualFile() {
+  public VirtualFile getVirtualFile() {
     return virtualFile;
   }
 

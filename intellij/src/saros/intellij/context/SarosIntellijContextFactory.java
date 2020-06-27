@@ -17,6 +17,7 @@ import saros.intellij.ui.eventhandler.ConnectingFailureHandler;
 import saros.intellij.ui.eventhandler.SessionStatusChangeHandler;
 import saros.intellij.ui.util.UIProjectUtils;
 import saros.monitoring.remote.IRemoteProgressIndicatorFactory;
+import saros.negotiation.additional_resource_data.IntellijPossibleRepresentationProvider;
 import saros.preferences.IPreferenceStore;
 import saros.preferences.Preferences;
 import saros.repackaged.picocontainer.BindKey;
@@ -37,6 +38,9 @@ public class SarosIntellijContextFactory extends AbstractContextFactory {
       // Core Managers
       Component.create(IEditorManager.class, EditorManager.class),
       Component.create(ISarosSessionContextFactory.class, SarosIntellijSessionContextFactory.class),
+
+      // Additional resource negotiation data providers
+      Component.create(IntellijPossibleRepresentationProvider.class),
 
       // UI handlers
       Component.create(NegotiationHandler.class),
