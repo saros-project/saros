@@ -11,7 +11,6 @@ import java.awt.Dimension;
 import java.awt.Window;
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -471,9 +470,7 @@ public class AddReferencePointToSessionWizard extends Wizard {
 
     selectLocalReferencePointRepresentationPage =
         new SelectLocalReferencePointRepresentationPage(
-            SELECT_REFERENCE_POINT_REPRESENTATION_PAGE_ID,
-            selectReferencePointsPageListener,
-            Collections.singleton(remoteReferencePointName));
+            SELECT_REFERENCE_POINT_REPRESENTATION_PAGE_ID, selectReferencePointsPageListener, data);
 
     registerPage(selectLocalReferencePointRepresentationPage);
 
