@@ -61,6 +61,8 @@ public final class SharedProjectDecorator implements ILightweightLabelDecorator 
 
   private volatile ISarosSession session;
 
+  private volatile IReferencePoint lastDecoratedReferencePoint;
+
   private final ISessionLifecycleListener sessionLifecycleListener =
       new ISessionLifecycleListener() {
 
@@ -76,6 +78,8 @@ public final class SharedProjectDecorator implements ILightweightLabelDecorator 
           SharedProjectDecorator.this.session = null;
           log.debug("clearing project decoration for all shared projects");
           updateDecoratorsAsync(null); // update all labels
+
+          lastDecoratedReferencePoint = null;
         }
       };
 
@@ -108,9 +112,7 @@ public final class SharedProjectDecorator implements ILightweightLabelDecorator 
 
     IResource resource = (IResource) element;
 
-    Set<IReferencePoint> referencePoints = session.getReferencePoints();
-    saros.filesystem.IResource resourceWrapper =
-        ResourceConverter.convertToResource(referencePoints, resource);
+    saros.filesystem.IResource resourceWrapper = getSarosResource(resource);
 
     if (resourceWrapper == null || !currentSession.isShared(resourceWrapper)) return;
 
@@ -150,5 +152,39 @@ public final class SharedProjectDecorator implements ILightweightLabelDecorator 
             }
           }
         });
+  }
+
+  /**
+   * Returns the Saros resource object for the given Eclipse resource object.
+   *
+   * <p>Tries to use the last used reference point as the first guess of which reference point to
+   * use. Updates the last used reference point if the resource belongs to a different reference
+   * point.
+   *
+   * @param resource the Eclipse resource object
+   * @return the Saros resource object for the given Eclipse resource object or <code>null</code> if
+   *     the resource is not part of a shared reference point
+   */
+  private saros.filesystem.IResource getSarosResource(IResource resource) {
+    IReferencePoint currentLastUsedReferencePoint = lastDecoratedReferencePoint;
+
+    if (currentLastUsedReferencePoint != null) {
+      saros.filesystem.IResource resourceWrapper =
+          ResourceConverter.convertToResource(currentLastUsedReferencePoint, resource);
+
+      if (resourceWrapper != null) {
+        return resourceWrapper;
+      }
+    }
+
+    Set<IReferencePoint> referencePoints = session.getReferencePoints();
+    saros.filesystem.IResource resourceWrapper =
+        ResourceConverter.convertToResource(referencePoints, resource);
+
+    if (resourceWrapper != null) {
+      lastDecoratedReferencePoint = resourceWrapper.getReferencePoint();
+    }
+
+    return resourceWrapper;
   }
 }
