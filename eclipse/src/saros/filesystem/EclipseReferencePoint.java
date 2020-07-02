@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import org.apache.log4j.Logger;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.runtime.CoreException;
 
 /** Eclipse implementation of the Saros reference point interface. */
@@ -43,6 +44,16 @@ public class EclipseReferencePoint implements IReferencePoint {
   @Override
   public EclipsePathImpl getReferencePointRelativePath() {
     return new EclipsePathImpl(org.eclipse.core.runtime.Path.EMPTY);
+  }
+
+  @Override
+  public boolean isNested(IReferencePoint otherReferencePoint) {
+    org.eclipse.core.runtime.IPath p1 = delegate.getFullPath();
+
+    IContainer d2 = ResourceConverter.getDelegate(otherReferencePoint);
+    org.eclipse.core.runtime.IPath p2 = d2.getFullPath();
+
+    return p1.equals(p2) || p1.isPrefixOf(p2) || p2.isPrefixOf(p1);
   }
 
   @Override
