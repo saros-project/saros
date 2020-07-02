@@ -175,6 +175,11 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
               + referencePoint);
 
       return;
+
+    } else if (!session.isShared(wrappedResource)) {
+      log.debug("Ignoring resource creation of ignored resource " + wrappedResource);
+
+      return;
     }
 
     if (isFile(resource)) {
@@ -255,8 +260,28 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
     saros.filesystem.IFile oldFile =
         referencePoint.getFile(ResourceConverter.convertToPath(referencePointRelativePath));
 
-    addActivity(
-        new FileActivity(user, Type.MOVED, Purpose.ACTIVITY, newFile, oldFile, content, charset));
+    boolean newFileIsShared = session.isShared(newFile);
+    boolean oldFileWasShared = session.isShared(oldFile);
+
+    if (newFileIsShared && oldFileWasShared) {
+      addActivity(
+          new FileActivity(user, Type.MOVED, Purpose.ACTIVITY, newFile, oldFile, content, charset));
+
+    } else if (newFileIsShared) {
+      addActivity(
+          new FileActivity(user, Type.CREATED, Purpose.ACTIVITY, newFile, null, content, charset));
+
+    } else if (oldFileWasShared) {
+      addActivity(
+          new FileActivity(user, Type.REMOVED, Purpose.ACTIVITY, null, oldFile, null, null));
+
+    } else {
+      log.debug(
+          "Ignoring file move with both ignored source and target file - old file: "
+              + oldFile
+              + ", new file: "
+              + newFile);
+    }
   }
 
   private void generateRemoved(IResource resource) {
@@ -270,6 +295,11 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
               + resource
               + " as no Saros resource object could be obtained - used reference point: "
               + referencePoint);
+
+      return;
+
+    } else if (!session.isShared(removedResource)) {
+      log.debug("Ignoring resource deletion of ignored resource " + removedResource);
 
       return;
     }
@@ -312,6 +342,11 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
               + file
               + " as no Saros file object could be obtained - used reference point: "
               + referencePoint);
+
+      return;
+
+    } else if (!session.isShared(wrappedFile)) {
+      log.debug("Ignoring content change of ignored file " + wrappedFile);
 
       return;
     }
