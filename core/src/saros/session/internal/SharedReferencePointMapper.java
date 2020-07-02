@@ -83,10 +83,32 @@ class SharedReferencePointMapper {
               + currentReferencePoin);
     }
 
+    checkForNestedReferencePoints(referencePoint);
+
     idToReferencePointMapping.put(id, referencePoint);
     referencePointToIDMapping.put(referencePoint, id);
 
     log.debug("added reference point " + referencePoint + " with ID " + id);
+  }
+
+  /**
+   * Checks whether adding the given reference point to the mapping would create shared nested
+   * reference points.
+   *
+   * @param addedReferencePoint the reference point to add to the mapping
+   * @throws IllegalStateException if nested reference points are detected
+   */
+  private void checkForNestedReferencePoints(IReferencePoint addedReferencePoint) {
+    for (IReferencePoint sharedReferencePoint : idToReferencePointMapping.values()) {
+      if (addedReferencePoint.isNested(sharedReferencePoint)) {
+        throw new IllegalStateException(
+            "Reference point "
+                + addedReferencePoint
+                + " can not be added to the mapping as this would create nested reference points "
+                + "in combination with the already shared reference point "
+                + sharedReferencePoint);
+      }
+    }
   }
 
   /**
