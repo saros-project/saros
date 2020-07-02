@@ -110,6 +110,16 @@ public class IntellijReferencePoint implements IReferencePoint {
     return IntellijPath.EMPTY;
   }
 
+  @Override
+  public boolean isNested(IReferencePoint otherReferencePoint) {
+    Path p1 = Paths.get(virtualFile.getPath());
+
+    IntellijReferencePoint i2 = (IntellijReferencePoint) otherReferencePoint;
+    Path p2 = Paths.get(i2.getVirtualFile().getPath());
+
+    return p1.equals(p2) || p1.startsWith(p2) || p2.startsWith(p1);
+  }
+
   /**
    * Returns the path to the given file relative to the virtual file represented by this reference
    * point.

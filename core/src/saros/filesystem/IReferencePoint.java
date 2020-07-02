@@ -20,6 +20,17 @@ public interface IReferencePoint extends IContainer {
   IPath getReferencePointRelativePath();
 
   /**
+   * Returns whether this reference point in combination with the other reference point represents a
+   * nested configuration, either because this reference point is contained in the other reference
+   * point or the other reference point is contained in this reference point.
+   *
+   * @param otherReferencePoint the other reference point with which to check
+   * @return whether this reference point in combination with the other reference point represents a
+   *     nested configuration
+   */
+  boolean isNested(IReferencePoint otherReferencePoint);
+
+  /**
    * Always throws an IO exception.
    *
    * <p>Deleting a reference point resource is not supported.
