@@ -58,7 +58,6 @@ import saros.repackaged.picocontainer.PicoContainer;
 import saros.repackaged.picocontainer.injectors.AnnotatedFieldInjection;
 import saros.repackaged.picocontainer.injectors.CompositeInjection;
 import saros.repackaged.picocontainer.injectors.ConstructorInjection;
-import saros.repackaged.picocontainer.injectors.Reinjector;
 import saros.session.ISarosSessionContextFactory;
 import saros.session.ISarosSessionManager;
 import saros.session.SessionEndReason;
@@ -123,25 +122,6 @@ public class SarosSessionTest {
   private static IContainerContext createContextMock(final MutablePicoContainer container) {
 
     final IContainerContext context = createMock(IContainerContext.class);
-
-    context.initComponent(isA(Object.class));
-
-    expectLastCall()
-        .andAnswer(
-            new IAnswer<Object>() {
-
-              @Override
-              public Object answer() throws Throwable {
-                Object session = getCurrentArguments()[0];
-                MutablePicoContainer dummyContainer = container.makeChildContainer();
-                dummyContainer.addComponent(session.getClass(), session);
-                new Reinjector(dummyContainer)
-                    .reinject(session.getClass(), new AnnotatedFieldInjection());
-                container.removeChildContainer(dummyContainer);
-                return null;
-              }
-            })
-        .times(2);
 
     expect(context.getComponent(isA(Class.class)))
         .andStubAnswer(

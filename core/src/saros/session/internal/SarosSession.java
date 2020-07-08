@@ -45,7 +45,7 @@ import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
 import saros.preferences.IPreferenceStore;
 import saros.repackaged.picocontainer.MutablePicoContainer;
-import saros.repackaged.picocontainer.annotations.Inject;
+import saros.repackaged.picocontainer.PicoContainer;
 import saros.session.IActivityConsumer;
 import saros.session.IActivityConsumer.Priority;
 import saros.session.IActivityHandlerCallback;
@@ -70,15 +70,17 @@ public final class SarosSession implements ISarosSession {
 
   private static final Logger log = Logger.getLogger(SarosSession.class);
 
-  @Inject private UISynchronizer synchronizer;
+  /* Application Context Dependencies Start*/
 
-  /* Dependencies */
+  private final UISynchronizer synchronizer;
 
-  @Inject private ITransmitter transmitter;
+  private final ITransmitter transmitter;
 
-  @Inject private XMPPConnectionService connectionService;
+  private final XMPPConnectionService connectionService;
 
-  @Inject private IConnectionManager connectionManager;
+  private final IConnectionManager connectionManager;
+
+  /* Application Context Dependencies End*/
 
   private final IContainerContext containerContext;
 
@@ -93,6 +95,7 @@ public final class SarosSession implements ISarosSession {
 
   private final List<IActivityConsumer> activeActivityConsumers =
       new CopyOnWriteArrayList<IActivityConsumer>();
+
   private final List<IActivityConsumer> passiveActivityConsumers =
       new CopyOnWriteArrayList<IActivityConsumer>();
 
@@ -787,7 +790,7 @@ public final class SarosSession implements ISarosSession {
       JID host,
       IPreferenceStore hostProperties) {
 
-    context.initComponent(this);
+    connectionService = getComponent(context, XMPPConnectionService.class);
 
     this.sessionID = id;
     this.referencePointMapper = new SharedReferencePointMapper();
@@ -816,25 +819,29 @@ public final class SarosSession implements ISarosSession {
     sessionContainer.addComponent(ISarosSession.class, this);
     sessionContainer.addComponent(IActivityHandlerCallback.class, activityCallback);
 
-    ISarosSessionContextFactory factory = context.getComponent(ISarosSessionContextFactory.class);
+    ISarosSessionContextFactory factory =
+        getComponent(sessionContainer, ISarosSessionContextFactory.class);
+
     factory.createComponents(this, sessionContainer);
 
     // Force the creation of the components added to the session container.
     sessionContainer.getComponents();
 
-    concurrentDocumentClient = sessionContainer.getComponent(ConcurrentDocumentClient.class);
+    // Obtained from Application context START
+    synchronizer = getComponent(sessionContainer, UISynchronizer.class);
+    transmitter = getComponent(sessionContainer, ITransmitter.class);
+    connectionManager = getComponent(sessionContainer, IConnectionManager.class);
+    // Obtained from Application context END
 
-    activityHandler = sessionContainer.getComponent(ActivityHandler.class);
-
-    stopManager = sessionContainer.getComponent(StopManager.class);
-
-    changeColorManager = sessionContainer.getComponent(ChangeColorManager.class);
-
-    permissionManager = sessionContainer.getComponent(PermissionManager.class);
-
-    activitySequencer = sessionContainer.getComponent(ActivitySequencer.class);
-
-    userListHandler = sessionContainer.getComponent(UserInformationHandler.class);
+    // Obtained from Session context START
+    concurrentDocumentClient = getComponent(sessionContainer, ConcurrentDocumentClient.class);
+    activityHandler = getComponent(sessionContainer, ActivityHandler.class);
+    stopManager = getComponent(sessionContainer, StopManager.class);
+    changeColorManager = getComponent(sessionContainer, ChangeColorManager.class);
+    permissionManager = getComponent(sessionContainer, PermissionManager.class);
+    activitySequencer = getComponent(sessionContainer, ActivitySequencer.class);
+    userListHandler = getComponent(sessionContainer, UserInformationHandler.class);
+    // Obtained from Session context END
 
     // ensure that the container uses caching
     assert sessionContainer.getComponent(ActivityHandler.class)
@@ -860,5 +867,31 @@ public final class SarosSession implements ISarosSession {
    */
   boolean hasActivityConsumers() {
     return !activeActivityConsumers.isEmpty() || !passiveActivityConsumers.isEmpty();
+  }
+
+  // remove this method
+  @Deprecated
+  private static <T> T getComponent(final IContainerContext context, final Class<T> componentType) {
+    final T result = context.getComponent(componentType);
+
+    if (result == null)
+      throw new IllegalStateException(
+          "component of class type "
+              + componentType.getName()
+              + " could not be found in the current global application context but is required for operation");
+
+    return result;
+  }
+
+  private static <T> T getComponent(final PicoContainer container, final Class<T> componentType) {
+    final T result = container.getComponent(componentType);
+
+    if (result == null)
+      throw new IllegalStateException(
+          "component of class type "
+              + componentType.getName()
+              + " could not be found in the current session context or application context but is required for operation");
+
+    return result;
   }
 }
