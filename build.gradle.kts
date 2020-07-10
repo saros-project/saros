@@ -1,6 +1,5 @@
 plugins {
     idea
-    java
     id("com.github.johnrengelman.shadow") version "5.2.0" apply false
 }
 
@@ -40,10 +39,6 @@ configure(subprojects) {
     }
 }
 
-configure(subprojects - project(":saros.picocontainer")) {
-    apply(plugin = "pmd")
-}
-
 /*
  * Workaround: Applying the shadow plugin in picocontainer
  * leads to an error that says that "Project.afterEvaluate" cannot
@@ -57,6 +52,7 @@ configure(mutableListOf(project(":saros.picocontainer"))) {
 val projectsToConfigure = subprojects - project(":saros.picocontainer")
 
 configure(projectsToConfigure) {
+    apply(plugin = "pmd")
     val projectToConf = this
 
     /*
@@ -88,12 +84,13 @@ configure(projectsToConfigure) {
 
     tasks {
 
+        // Otherwise our custom tags (as "@JTourBus") let the javadoc generation fail
+        withType<Javadoc> {
+            isFailOnError = false
+        }
+
         withType<Test> {
 
-            // Otherwise our custom tags (as "@JTourBus") let the javadoc generation fail
-            javadoc {
-                isFailOnError = false
-            }
             /* Exclude test suites if property is set. Otherwise tests are executed multiple times
              * in the ci server (via test class and suite).
              * see gradle.properties for default values
@@ -297,7 +294,7 @@ tasks {
         group = "Build"
         description = "Builds and tests all modules required by Saros for Intellij"
 
-        from(project(":saros.intellij").configurations.archives.get().artifacts.files)
+        from(project(":saros.intellij").configurations.getByName("archives").artifacts.files)
         include("*.zip")
         into("build/distribution/intellij")
     }
