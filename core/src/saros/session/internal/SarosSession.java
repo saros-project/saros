@@ -42,7 +42,6 @@ import saros.filesystem.IResource;
 import saros.net.IConnectionManager;
 import saros.net.ITransmitter;
 import saros.net.xmpp.JID;
-import saros.net.xmpp.XMPPConnectionService;
 import saros.preferences.IPreferenceStore;
 import saros.repackaged.picocontainer.MutablePicoContainer;
 import saros.repackaged.picocontainer.PicoContainer;
@@ -75,8 +74,6 @@ public final class SarosSession implements ISarosSession {
   private final UISynchronizer synchronizer;
 
   private final ITransmitter transmitter;
-
-  private final XMPPConnectionService connectionService;
 
   private final IConnectionManager connectionManager;
 
@@ -210,18 +207,22 @@ public final class SarosSession implements ISarosSession {
   // FIXME those parameter passing feels strange, find a better way
   /** Constructor for host. */
   public SarosSession(
-      final String id, IPreferenceStore properties, IContainerContext containerContext) {
-    this(id, containerContext, properties, /* unused */ null, /* unused */ null);
+      final String id,
+      JID localUserJID,
+      IPreferenceStore properties,
+      IContainerContext containerContext) {
+    this(id, containerContext, properties, localUserJID, /* unused */ null, /* unused */ null);
   }
 
   /** Constructor for client. */
   public SarosSession(
       final String id,
+      JID localUserJID,
       JID hostJID,
       IPreferenceStore localProperties,
       IPreferenceStore hostProperties,
       IContainerContext containerContext) {
-    this(id, containerContext, localProperties, hostJID, hostProperties);
+    this(id, containerContext, localProperties, localUserJID, hostJID, hostProperties);
   }
 
   @Override
@@ -787,18 +788,14 @@ public final class SarosSession implements ISarosSession {
       final String id,
       IContainerContext context,
       IPreferenceStore localProperties,
+      JID localUserJID,
       JID host,
       IPreferenceStore hostProperties) {
-
-    connectionService = getComponent(context, XMPPConnectionService.class);
 
     this.sessionID = id;
     this.referencePointMapper = new SharedReferencePointMapper();
     this.activityQueuer = new ActivityQueuer();
     this.containerContext = context;
-
-    // FIXME that should be passed in !
-    JID localUserJID = connectionService.getJID();
 
     assert localUserJID != null;
 
@@ -819,8 +816,14 @@ public final class SarosSession implements ISarosSession {
     sessionContainer.addComponent(ISarosSession.class, this);
     sessionContainer.addComponent(IActivityHandlerCallback.class, activityCallback);
 
-    ISarosSessionContextFactory factory =
-        getComponent(sessionContainer, ISarosSessionContextFactory.class);
+    ISarosSessionContextFactory factory = context.getComponent(ISarosSessionContextFactory.class);
+
+    if (factory == null) {
+      throw new IllegalStateException(
+          "component of class type "
+              + ISarosSessionContextFactory.class.getName()
+              + " could not be found in the current global application context but is required for operation");
+    }
 
     factory.createComponents(this, sessionContainer);
 
@@ -867,20 +870,6 @@ public final class SarosSession implements ISarosSession {
    */
   boolean hasActivityConsumers() {
     return !activeActivityConsumers.isEmpty() || !passiveActivityConsumers.isEmpty();
-  }
-
-  // remove this method
-  @Deprecated
-  private static <T> T getComponent(final IContainerContext context, final Class<T> componentType) {
-    final T result = context.getComponent(componentType);
-
-    if (result == null)
-      throw new IllegalStateException(
-          "component of class type "
-              + componentType.getName()
-              + " could not be found in the current global application context but is required for operation");
-
-    return result;
   }
 
   private static <T> T getComponent(final PicoContainer container, final Class<T> componentType) {

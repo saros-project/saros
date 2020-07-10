@@ -251,6 +251,8 @@ public class SarosSessionManager implements ISarosSessionManager {
 
       negotiationPacketLister.setRejectSessionNegotiationRequests(true);
 
+      JID localUserJID = connectionHandler.getLocalJID();
+
       IPreferenceStore hostProperties = new PreferenceStore();
       if (hookManager != null) {
         for (ISessionNegotiationHook hook : hookManager.getHooks()) {
@@ -258,7 +260,7 @@ public class SarosSessionManager implements ISarosSessionManager {
         }
       }
 
-      session = new SarosSession(sessionID, hostProperties, context);
+      session = new SarosSession(sessionID, localUserJID, hostProperties, context);
 
       sessionStarting(session);
       session.start();
@@ -284,7 +286,9 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     assert session == null;
 
-    session = new SarosSession(id, host, localProperties, hostProperties, context);
+    JID localUserJID = connectionHandler.getLocalJID();
+
+    session = new SarosSession(id, localUserJID, host, localProperties, hostProperties, context);
 
     log.info("joined uninitialized Saros session");
 
