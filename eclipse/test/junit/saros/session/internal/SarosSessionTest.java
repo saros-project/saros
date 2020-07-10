@@ -73,6 +73,8 @@ public class SarosSessionTest {
 
   private static final String SAROS_SESSION_ID = "SAROS_SESSION_TEST";
 
+  private static final JID LOCAL_USER_JID = new JID("alice");
+
   private static class CountingReceiver implements IReceiver {
 
     private int currentListeners;
@@ -100,23 +102,6 @@ public class SarosSessionTest {
     public synchronized int getCurrentPacketListenersCount() {
       return currentListeners;
     }
-  }
-
-  private static XMPPConnectionService createConnectionServiceMock() {
-    XMPPConnectionService srv = createNiceMock(XMPPConnectionService.class);
-
-    expect(srv.getJID())
-        .andStubAnswer(
-            new IAnswer<JID>() {
-
-              @Override
-              public JID answer() throws Throwable {
-                return new JID("alice");
-              }
-            });
-
-    replay(srv);
-    return srv;
   }
 
   private static IContainerContext createContextMock(final MutablePicoContainer container) {
@@ -262,7 +247,7 @@ public class SarosSessionTest {
      * Replacements
      */
     container.removeComponent(XMPPConnectionService.class);
-    container.addComponent(XMPPConnectionService.class, createConnectionServiceMock());
+    container.addComponent(XMPPConnectionService.class);
 
     container.removeComponent(IConnectionManager.class);
     addMockedComponent(IConnectionManager.class);
@@ -301,7 +286,8 @@ public class SarosSessionTest {
     final IContainerContext context = createContextMock(container);
 
     // Test creating, starting and stopping the session.
-    SarosSession session = new SarosSession(SAROS_SESSION_ID, new PreferenceStore(), context);
+    SarosSession session =
+        new SarosSession(SAROS_SESSION_ID, LOCAL_USER_JID, new PreferenceStore(), context);
 
     assertFalse(session.hasActivityConsumers());
     assertFalse(session.hasActivityProducers());
