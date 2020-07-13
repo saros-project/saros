@@ -22,7 +22,7 @@ import saros.test.mocks.PrepareEclipseComponents;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({Saros.class})
 @MockPolicy({PrepareEclipseComponents.class})
-@PowerMockIgnore({"javax.xml.*"})
+@PowerMockIgnore({"javax.xml.*", "org.apache.log4j.*"})
 public class SarosEclipseContextTest {
 
   private MutablePicoContainer container;

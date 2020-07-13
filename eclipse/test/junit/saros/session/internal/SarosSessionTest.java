@@ -68,7 +68,7 @@ import saros.test.mocks.EditorManagerMock;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ResourcesPlugin.class})
-@PowerMockIgnore({"javax.xml.*"})
+@PowerMockIgnore({"javax.xml.*", "org.apache.log4j.*"})
 public class SarosSessionTest {
 
   private static final String SAROS_SESSION_ID = "SAROS_SESSION_TEST";
