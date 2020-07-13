@@ -23,6 +23,8 @@ buildSrc/.gradle
 /eclipse/update/content.jar
 /stf/src/saros/stf/client/configuration.properties
 /eclipse/lib
+/eclipse/log4j2.xml
+/eclipse/saros_log4j2.xml
 /core/lib
 /stf/lib
 /stf.test/lib
