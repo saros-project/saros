@@ -125,17 +125,24 @@ subprojects {
      * Make common dependency definitions accessible by all sub-projects
      */
     val junitVersion = "junit:junit:4.12"
-    val log4JVersion = "log4j:log4j:1.2.15"
+    val log4j2VersionNr = "2.13.3"
+    val log4j2Api = "org.apache.logging.log4j:log4j-api:$log4j2VersionNr"
+    val log4j2Core = "org.apache.logging.log4j:log4j-core:$log4j2VersionNr"
+    // Bridge that routes log4j calls to log4j2
+    val log4j2Bridge = "org.apache.logging.log4j:log4j-1.2-api:$log4j2VersionNr"
+
     projectToConf.extra["junitVersion"] = junitVersion
-    projectToConf.extra["log4jVersion"] = log4JVersion
+    projectToConf.extra["log4j2ApiVersion"] = log4j2Api
+    projectToConf.extra["log4j2CoreVersion"] = log4j2Core
+    projectToConf.extra["log4j2BridgeVersion"] = log4j2Bridge
 
     dependencies {
         val testConfig by configurations
-        testConfig(log4JVersion) {
-            exclude(group = "com.sun.jmx", module = "jmxri")
-            exclude(group = "com.sun.jdmk", module = "jmxtools")
-            exclude(group = "javax.jms", module = "jms")
-        }
+
+        testConfig(log4j2Api)
+        testConfig(log4j2Core)
+        testConfig(log4j2Bridge)
+
         testConfig(junitVersion)
         testConfig("org.easymock:easymock:4.0.1")
         testConfig("org.powermock:powermock-core:2.0.5")
