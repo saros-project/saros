@@ -102,7 +102,7 @@ The only differences and additional conventions are:
 
 #### Class Member Visibility
 
-By default all fields and methods should be **`private`**. For any field
+By default, all fields and methods should be **`private`**. For any field
 or method with a visibility higher than **`private `**(visible from the
 outside) there MUST be a detailed JavaDoc explanation. Thus, especially
 making something `public `should be a deliberate and conscious act.
