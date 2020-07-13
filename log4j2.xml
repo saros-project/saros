@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+This configuration is used by default when log4j2 is initialized
+and the file can be found in the classpath.
+In most cases log4j2 will be reinitialized with the configuration file
+saros_log4j2.xml.
+-->
+<Configuration status="error">
+
+  <Appenders>
+    <Console name="SarosConsoleAppender" target="SYSTEM_OUT">
+      <PatternLayout pattern="%-5p %d{HH:mm:ss,SSS} [%t] (%F:%L) %m%n"/>
+    </Console>
+  </Appenders>
+
+  <Loggers>
+    <Root level="all">
+      <AppenderRef ref="SarosConsoleAppender"/>
+    </Root>
+  </Loggers>
+
+</Configuration>
