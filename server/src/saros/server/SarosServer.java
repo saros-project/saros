@@ -1,15 +1,12 @@
 package saros.server;
 
-import java.net.URL;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 import saros.server.console.ServerConsole;
 
 /** The entry point for the Saros server. */
 public class SarosServer {
 
   private static final Logger log = Logger.getLogger(SarosServer.class);
-  private static final String LOGGING_CONFIG_FILE = "/log4j.properties";
 
   private ServerLifecycle lifecycle;
 
@@ -25,9 +22,8 @@ public class SarosServer {
 
   public void start() {
 
-    // Logging
-    URL log4jProperties = SarosServer.class.getResource(LOGGING_CONFIG_FILE);
-    PropertyConfigurator.configure(log4jProperties);
+    // Logger uses default config log4j2.xml
+
     log.info("Starting server...");
 
     lifecycle.start();
