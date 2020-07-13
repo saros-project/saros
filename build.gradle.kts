@@ -206,7 +206,7 @@ tasks {
         dependsOn(
                 subprojects.map { listOf(":${it.name}:cleanEclipseProject", ":${it.name}:cleanEclipseClasspath") }.flatten() +
                 subprojects.map { listOf(":${it.name}:eclipseProject", ":${it.name}:eclipseClasspath") }.flatten() +
-                listOf("generateLibAll")
+                listOf("generateLibAll", ":saros.eclipse:copyLogFiles")
         )
 
         group = "IDE"
