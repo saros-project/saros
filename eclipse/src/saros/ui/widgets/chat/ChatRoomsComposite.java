@@ -34,7 +34,6 @@ import saros.communication.chat.single.SingleUserChatService;
 import saros.communication.connection.ConnectionHandler;
 import saros.communication.connection.IConnectionStateListener;
 import saros.editor.EditorManager;
-import saros.net.ConnectionState;
 import saros.net.util.XMPPUtils;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.contact.IContactsUpdate;
@@ -162,23 +161,14 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
       };
 
   private final IConnectionStateListener connectionStateListener =
-      new IConnectionStateListener() {
-
-        @Override
-        public void connectionStateChanged(ConnectionState state, Exception error) {
+      (state, error) ->
           SWTUtils.runSafeSWTAsync(
               log,
-              new Runnable() {
+              () -> {
+                if (ChatRoomsComposite.this.isDisposed()) return;
 
-                @Override
-                public void run() {
-                  if (ChatRoomsComposite.this.isDisposed()) return;
-
-                  updateExplanation();
-                }
+                updateExplanation();
               });
-        }
-      };
 
   protected ISessionLifecycleListener sessionLifecycleListener =
       new ISessionLifecycleListener() {

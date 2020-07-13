@@ -7,9 +7,11 @@ import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.StreamError;
 import org.jivesoftware.smack.packet.XMPPError;
 import saros.SarosConstants;
 import saros.account.XMPPAccount;
+import saros.communication.connection.IConnectionStateListener.ErrorType;
 import saros.net.ConnectionState;
 import saros.net.IConnectionManager;
 import saros.net.xmpp.IConnectionListener;
@@ -43,7 +45,8 @@ public class ConnectionHandler {
   private boolean isDisconnecting;
 
   private ConnectionState currentConnectionState = ConnectionState.NOT_CONNECTED;
-  private Exception currentConnectionError = null;
+  private ConnectionState lastConnectionState = ConnectionState.NOT_CONNECTED;
+  private ErrorType currentConnectionError = null;
 
   private final Object notifyLock = new Object();
 
@@ -83,7 +86,7 @@ public class ConnectionHandler {
    *
    * @return the connection error or <code>null</code>
    */
-  public Exception getConnectionError() {
+  public ErrorType getConnectionError() {
     synchronized (notifyLock) {
       return currentConnectionError;
     }
@@ -305,16 +308,44 @@ public class ConnectionHandler {
 
   private void setConnectionState(final ConnectionState state, final Exception error) {
     synchronized (notifyLock) {
-      this.currentConnectionState = state;
-      this.currentConnectionError = error;
+      lastConnectionState = currentConnectionState;
+      currentConnectionState = state;
+      currentConnectionError = getExceptionType(error);
     }
 
     for (IConnectionStateListener listener : stateListeners) {
       try {
-        listener.connectionStateChanged(state, error);
+        listener.connectionStateChanged(state, currentConnectionError);
       } catch (Exception e) {
         log.error("internal error in listener: " + listener, e);
       }
     }
+  }
+
+  private ErrorType getExceptionType(Exception error) {
+    // TODO logic copied from eclipse, change after smack 4 update
+
+    if (!(error instanceof XMPPException)
+        || !(lastConnectionState == ConnectionState.CONNECTED
+            || lastConnectionState == ConnectionState.CONNECTING)) {
+      return ErrorType.CONNECTION_LOST;
+    }
+
+    XMPPError xmppError = ((XMPPException) error).getXMPPError();
+    StreamError streamError = ((XMPPException) error).getStreamError();
+
+    // see http://xmpp.org/rfcs/rfc3921.html chapter 3
+
+    if (lastConnectionState == ConnectionState.CONNECTED
+        && (streamError == null || !"conflict".equalsIgnoreCase(streamError.getCode()))) {
+      return ErrorType.CONNECTION_LOST;
+    }
+
+    if (lastConnectionState == ConnectionState.CONNECTING
+        && (xmppError == null || xmppError.getCode() != 409)) {
+      return ErrorType.CONNECTION_LOST;
+    }
+
+    return ErrorType.RESOURCE_CONFLICT;
   }
 }

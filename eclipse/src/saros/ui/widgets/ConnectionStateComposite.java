@@ -7,15 +7,13 @@ import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
-import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.packet.StreamError;
-import org.jivesoftware.smack.packet.XMPPError;
 import saros.SarosPluginContext;
 import saros.account.IAccountStoreListener;
 import saros.account.XMPPAccount;
 import saros.account.XMPPAccountStore;
 import saros.communication.connection.ConnectionHandler;
 import saros.communication.connection.IConnectionStateListener;
+import saros.communication.connection.IConnectionStateListener.ErrorType;
 import saros.context.IContextKeyBindings.SarosVersion;
 import saros.net.ConnectionState;
 import saros.repackaged.picocontainer.annotations.Inject;
@@ -49,38 +47,18 @@ public class ConnectionStateComposite extends Composite {
   private final CLabel stateLabel;
 
   private ConnectionState lastConnectionState;
-
-  private Exception lastError;
+  private ErrorType lastError;
 
   private final IAccountStoreListener accountStoreListener =
       new IAccountStoreListener() {
         @Override
         public void accountsChanged(List<XMPPAccount> currentAccounts) {
-          SWTUtils.runSafeSWTAsync(
-              log,
-              () -> {
-                if (!ConnectionStateComposite.this.isDisposed()) updateLabel(null, null);
-              });
+          SWTUtils.runSafeSWTAsync(log, () -> updateLabel(null, null));
         }
       };
 
   private final IConnectionStateListener connectionListener =
-      new IConnectionStateListener() {
-        @Override
-        public void connectionStateChanged(final ConnectionState state, final Exception error) {
-
-          SWTUtils.runSafeSWTAsync(
-              log,
-              new Runnable() {
-                @Override
-                public void run() {
-                  if (ConnectionStateComposite.this.isDisposed()) return;
-
-                  updateLabel(state, error);
-                }
-              });
-        }
-      };
+      (state, error) -> SWTUtils.runSafeSWTAsync(log, () -> updateLabel(state, error));
 
   public ConnectionStateComposite(Composite parent, int style) {
     super(parent, style);
@@ -122,7 +100,8 @@ public class ConnectionStateComposite extends Composite {
    * @param state the current connection state or <code>null</code>
    * @param error additional error information or <code>null</code>
    */
-  private void updateLabel(ConnectionState state, Exception error) {
+  private void updateLabel(ConnectionState state, ErrorType error) {
+    if (isDisposed()) return;
 
     // do not hide the latest error
     if (lastConnectionState == ConnectionState.ERROR && state == ConnectionState.NOT_CONNECTED)
@@ -156,7 +135,7 @@ public class ConnectionStateComposite extends Composite {
    * Returns a nice string description of the given state, which can be used to be shown in labels
    * (e.g. CONNECTING becomes "Connecting...").
    */
-  private String getDescription(ConnectionState state, Exception error) {
+  private String getDescription(ConnectionState state, ErrorType error) {
 
     switch (state) {
       case NOT_CONNECTED:
@@ -173,38 +152,25 @@ public class ConnectionStateComposite extends Composite {
          */
         if (id == null) return Messages.ConnectionStateComposite_error_unknown;
 
-        String displayText = id + Messages.ConnectionStateComposite_connected;
-        return displayText;
+        return id + Messages.ConnectionStateComposite_connected;
       case DISCONNECTING:
         return Messages.ConnectionStateComposite_disconnecting;
       case ERROR:
-        if (!(error instanceof XMPPException)
-            || !(lastConnectionState == ConnectionState.CONNECTED
-                || lastConnectionState == ConnectionState.CONNECTING))
-          return Messages.ConnectionStateComposite_error_connection_lost;
+        switch (error) {
+          case CONNECTION_LOST:
+            return Messages.ConnectionStateComposite_error_connection_lost;
+          case RESOURCE_CONFLICT:
+            if (lastConnectionState == ConnectionState.CONNECTING) {
+              SarosView.showNotification("XMPP Connection lost", "You are already logged in.");
+            } else {
+              SarosView.showNotification(
+                  "XMPP Connection lost", Messages.ConnectionStateComposite_remote_login_warning);
+            }
 
-        XMPPError xmppError = ((XMPPException) error).getXMPPError();
-
-        StreamError streamError = ((XMPPException) error).getStreamError();
-
-        // see http://xmpp.org/rfcs/rfc3921.html chapter 3
-
-        if (lastConnectionState == ConnectionState.CONNECTED
-            && (streamError == null || !"conflict".equalsIgnoreCase(streamError.getCode())))
-          return Messages.ConnectionStateComposite_error_connection_lost;
-
-        if (lastConnectionState == ConnectionState.CONNECTING
-            && (xmppError == null || xmppError.getCode() != 409))
-          return Messages.ConnectionStateComposite_error_connection_lost;
-
-        if (lastConnectionState == ConnectionState.CONNECTING) {
-          SarosView.showNotification("XMPP Connection lost", "You are already logged in.");
-        } else {
-          SarosView.showNotification(
-              "XMPP Connection lost", Messages.ConnectionStateComposite_remote_login_warning);
+            return Messages.ConnectionStateComposite_error_resource_conflict;
+          default:
         }
-
-        return Messages.ConnectionStateComposite_error_resource_conflict;
+        // $FALL-THROUGH$
       default:
         return Messages.ConnectionStateComposite_error_unknown;
     }
