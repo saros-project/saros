@@ -1,13 +1,18 @@
 package saros.intellij;
 
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
+import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.keymap.Keymap;
 import com.intellij.openapi.keymap.KeymapManager;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.io.InputStream;
 import javax.swing.KeyStroke;
-import org.apache.log4j.PropertyConfigurator;
-import org.apache.log4j.helpers.LogLog;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.config.ConfigurationSource;
+import org.apache.logging.log4j.core.config.Configurator;
+import org.apache.logging.log4j.core.lookup.MainMapLookup;
+import org.apache.logging.log4j.status.StatusLogger;
 
 /**
  * Component that is initialized when a application is loaded. It initializes the logging, shortcuts
@@ -21,8 +26,10 @@ public class SarosComponent {
    */
   public static final String PLUGIN_ID = "saros";
 
+  private static final String LOG4J2_CONFIG_FILENAME = "saros_log4j2.xml";
+
   public SarosComponent() {
-    loadLoggers();
+    setupLoggers();
 
     Keymap keymap = KeymapManager.getInstance().getActiveKeymap();
     keymap.addShortcut(
@@ -36,35 +43,39 @@ public class SarosComponent {
           SarosComponent.class.getClassLoader().getResourceAsStream("saros.properties");
 
       if (sarosProperties == null) {
-        LogLog.warn(
-            "could not initialize Saros properties because "
-                + "the 'saros.properties' file could not be found on the "
-                + "current JAVA class path");
+        StatusLogger.getLogger()
+            .warn(
+                "could not initialize Saros properties because "
+                    + "the 'saros.properties' file could not be found on the "
+                    + "current JAVA class path");
       } else {
         System.getProperties().load(sarosProperties);
         sarosProperties.close();
       }
     } catch (Exception e) {
-      LogLog.error("could not load saros property file 'saros.properties'", e);
+      StatusLogger.getLogger().error("could not load saros property file 'saros.properties'", e);
     }
 
     IntellijApplicationLifecycle.getInstance().start();
   }
 
-  private void loadLoggers() {
-    final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-
+  private void setupLoggers() {
     try {
-      // change the context class loader so Log4J will find
-      // the SarosLogFileAppender
-      Thread.currentThread().setContextClassLoader(SarosComponent.class.getClassLoader());
+      final String logDir = PathManager.getLogPath() + File.separator + "SarosLogs";
+      final boolean isDebugMode = Boolean.getBoolean("saros.debug");
+      final Level logLevel = isDebugMode ? Level.ALL : Level.INFO;
 
-      PropertyConfigurator.configure(
-          SarosComponent.class.getClassLoader().getResource("saros.log4j.properties"));
+      // make arguments accessible in the log configuration file
+      MainMapLookup.setMainArguments("logDir", logDir, "logLevel", logLevel.name());
+
+      // trigger reconfiguration with new properties and config file
+      Configurator.initialize(
+          null,
+          ConfigurationSource.fromResource(
+              LOG4J2_CONFIG_FILENAME, SarosComponent.class.getClassLoader()));
     } catch (RuntimeException e) {
-      LogLog.error("initializing loggers failed", e);
-    } finally {
-      Thread.currentThread().setContextClassLoader(contextClassLoader);
+      StatusLogger.getLogger().error("initializing loggers failed", e);
+      e.printStackTrace();
     }
   }
 }
