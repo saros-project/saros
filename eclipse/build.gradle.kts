@@ -52,6 +52,8 @@ tasks {
             include("LICENSE")
             include("CHANGELOG")
         }
+	    from(rootProject.file("saros_log4j2.xml"))
+	    from(rootProject.file("log4j2.xml"))
     }
 
     val testJar by registering(Jar::class) {

@@ -4,6 +4,9 @@ plugins {
 
 val versionQualifier = ext.get("versionQualifier") as String
 
+val log4j2ApiVersion = ext.get("log4j2ApiVersion") as String
+val log4j2CoreVersion = ext.get("log4j2CoreVersion") as String
+val log4j2BridgeVersion = ext.get("log4j2BridgeVersion") as String
 
 configurations {
     // Defined in root build.gradle
@@ -39,11 +42,9 @@ dependencies {
     releaseDep("com.thoughtworks.xstream:xstream:1.4.10")
     releaseDep("org.gnu.inet:libidn:1.15")
 
-    releaseDep("log4j:log4j:1.2.15") {
-        exclude(group = "com.sun.jmx", module = "jmxri")
-        exclude(group = "com.sun.jdmk", module = "jmxtools")
-        exclude(group = "javax.jms", module = "jms")
-    }
+    releaseDep(log4j2ApiVersion)
+    releaseDep(log4j2CoreVersion)
+    releaseDep(log4j2BridgeVersion)
 
     // TODO: use real release. This version is a customized SNAPSHOT
     releaseDep(files("libs/weupnp.jar"))
