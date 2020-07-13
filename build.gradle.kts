@@ -72,6 +72,8 @@ subprojects {
 
         withType<Test> {
 
+            // Disable jmx in the test environment to avoid issues with easymock
+            systemProperty("log4j2.disableJmx", "true")
             /* Exclude test suites if property is set. Otherwise tests are executed multiple times
              * in the ci server (via test class and suite).
              * see gradle.properties for default values
