@@ -6,6 +6,8 @@ on:
       - 'pr/stf/**'
       - 'master'
 
+  workflow_dispatch:
+
 jobs:
   stf:
     runs-on: ubuntu-latest
