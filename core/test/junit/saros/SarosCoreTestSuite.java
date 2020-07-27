@@ -19,6 +19,7 @@ import org.junit.runners.Suite;
   saros.negotiation.TestSuite.class,
   saros.net.TestSuite.class,
   saros.net.internal.TestSuite.class,
+  saros.net.stream.TestSuite.class,
   saros.preferences.TestSuite.class,
   saros.session.TestSuite.class,
   saros.session.internal.TestSuite.class,
