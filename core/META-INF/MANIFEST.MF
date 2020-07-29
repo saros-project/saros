@@ -102,7 +102,8 @@ Export-Package: com.thoughtworks.xstream,
  org.apache.logging.log4j.core,
  org.apache.logging.log4j.core.appender,
  org.apache.logging.log4j.core.config,
- org.apache.logging.log4j.status
+ org.apache.logging.log4j.status,
+ org.apache.logging.log4j.core.lookup,
  org.bitlet.weupnp,
  org.jivesoftware.smack,
  org.jivesoftware.smack.debugger,
@@ -150,5 +151,6 @@ Bundle-ClassPath: .,
  lib/xpp3-1.1.4c.jar,
  lib/picocontainer-2.11.2-patched_relocated.jar,
  lib/weupnp.jar,
- lib/libidn-1.15.jar
+ lib/libidn-1.15.jar,
+ log4j2.component.properties
 Bundle-Vendor: Saros Project
