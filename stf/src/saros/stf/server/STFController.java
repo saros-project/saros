@@ -16,7 +16,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -98,22 +97,6 @@ public class STFController {
             log.error("uncaught exception in thread: " + thread, error);
           }
         });
-
-    /*
-     * HACK this is not the way OSGi works but it currently fulfill its
-     * purpose
-     */
-    final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-
-    try {
-      // change the context class loader so Log4J will find the appenders
-      Thread.currentThread().setContextClassLoader(STFController.class.getClassLoader());
-
-      PropertyConfigurator.configure(
-          STFController.class.getClassLoader().getResource("saros_stf.log4j.properties"));
-    } finally {
-      Thread.currentThread().setContextClassLoader(contextClassLoader);
-    }
 
     performConfigurationCheck();
 
