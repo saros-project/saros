@@ -66,6 +66,7 @@ tasks {
         // set heap size for the test JVM(s)
         minHeapSize = "128m"
         maxHeapSize = "2048m"
+        jvmArgs("-Dsaros.debug=true")
     }
 
     intellij {
