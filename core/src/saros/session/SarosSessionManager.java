@@ -37,7 +37,6 @@ import saros.filesystem.IReferencePoint;
 import saros.negotiation.AbstractIncomingResourceNegotiation;
 import saros.negotiation.AbstractOutgoingResourceNegotiation;
 import saros.negotiation.IncomingSessionNegotiation;
-import saros.negotiation.NegotiationFactory;
 import saros.negotiation.NegotiationListener;
 import saros.negotiation.NegotiationTools.CancelOption;
 import saros.negotiation.OutgoingSessionNegotiation;
@@ -47,6 +46,7 @@ import saros.negotiation.ResourceNegotiationData;
 import saros.negotiation.ResourceNegotiationFactory;
 import saros.negotiation.ResourceSharingData;
 import saros.negotiation.SessionNegotiation;
+import saros.negotiation.SessionNegotiationFactory;
 import saros.negotiation.hooks.ISessionNegotiationHook;
 import saros.negotiation.hooks.SessionNegotiationHookManager;
 import saros.net.ConnectionState;
@@ -94,7 +94,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
   private final IContainerContext context;
 
-  private final NegotiationFactory negotiationFactory;
+  private final SessionNegotiationFactory sessionNegotiationFactory;
 
   private final NegotiationPacketListener negotiationPacketLister;
 
@@ -169,7 +169,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
   public SarosSessionManager(
       IContainerContext context,
-      NegotiationFactory negotiationFactory,
+      SessionNegotiationFactory sessionNegotiationFactory,
       SessionNegotiationHookManager hookManager,
       ConnectionHandler connectionHandler,
       ITransmitter transmitter,
@@ -181,7 +181,7 @@ public class SarosSessionManager implements ISarosSessionManager {
     this.currentResourceNegotiations = new ResourceNegotiationObservable();
     this.connectionHandler.addConnectionStateListener(connectionListener);
 
-    this.negotiationFactory = negotiationFactory;
+    this.sessionNegotiationFactory = sessionNegotiationFactory;
     this.hookManager = hookManager;
 
     this.negotiationPacketLister =
@@ -411,7 +411,7 @@ public class SarosSessionManager implements ISarosSessionManager {
         negotiationPacketLister.setRejectSessionNegotiationRequests(true);
 
         negotiation =
-            negotiationFactory.newIncomingSessionNegotiation(
+            sessionNegotiationFactory.newIncomingSessionNegotiation(
                 remoteAddress, negotiationID, sessionID, version, this, description);
 
         negotiation.setNegotiationListener(negotiationListener);
@@ -499,7 +499,8 @@ public class SarosSessionManager implements ISarosSessionManager {
         if (currentSessionNegotiations.exists(toInvite)) return;
 
         negotiation =
-            negotiationFactory.newOutgoingSessionNegotiation(toInvite, this, session, description);
+            sessionNegotiationFactory.newOutgoingSessionNegotiation(
+                toInvite, this, session, description);
 
         negotiation.setNegotiationListener(negotiationListener);
         currentSessionNegotiations.add(negotiation);

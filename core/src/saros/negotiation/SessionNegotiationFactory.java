@@ -10,7 +10,8 @@ import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
 import saros.versioning.VersionManager;
 
-public final class NegotiationFactory {
+/** Factory to create session negotiation objects. */
+public final class SessionNegotiationFactory {
   private final VersionManager versionManager;
   private final SessionNegotiationHookManager hookManager;
 
@@ -21,7 +22,7 @@ public final class NegotiationFactory {
   private final ITransmitter transmitter;
   private final IReceiver receiver;
 
-  public NegotiationFactory(
+  public SessionNegotiationFactory(
       VersionManager versionManager,
       SessionNegotiationHookManager hookManager,
       XMPPContactsService contactsService,

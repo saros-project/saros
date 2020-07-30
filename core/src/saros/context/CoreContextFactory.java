@@ -10,7 +10,7 @@ import saros.concurrent.watchdog.IsInconsistentObservable;
 import saros.editor.colorstorage.ColorIDSetStorage;
 import saros.monitoring.remote.RemoteProgressManager;
 import saros.negotiation.AdditionalResourceDataFactory;
-import saros.negotiation.NegotiationFactory;
+import saros.negotiation.SessionNegotiationFactory;
 import saros.negotiation.hooks.SessionNegotiationHookManager;
 import saros.net.DispatchThreadContext;
 import saros.net.IConnectionManager;
@@ -69,7 +69,7 @@ public class CoreContextFactory extends AbstractContextFactory {
       Component.create(ColorIDSetStorage.class),
 
       // Negotiation
-      Component.create(NegotiationFactory.class),
+      Component.create(SessionNegotiationFactory.class),
       Component.create(AdditionalResourceDataFactory.class),
 
       // Negotiation hooks
