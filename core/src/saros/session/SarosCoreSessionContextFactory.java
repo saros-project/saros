@@ -11,6 +11,7 @@ import saros.editor.FollowModeManager;
 import saros.editor.remote.UserEditorStateManager;
 import saros.misc.xstream.ResourceTransportWrapperConverter;
 import saros.misc.xstream.UserConverter;
+import saros.negotiation.ResourceNegotiationFactory;
 import saros.repackaged.picocontainer.MutablePicoContainer;
 import saros.session.internal.ActivityHandler;
 import saros.session.internal.ActivitySequencer;
@@ -34,6 +35,9 @@ public class SarosCoreSessionContextFactory implements ISarosSessionContextFacto
 
   @Override
   public final void createComponents(ISarosSession session, MutablePicoContainer container) {
+
+    // Negotiation
+    container.addComponent(ResourceNegotiationFactory.class);
 
     // Concurrent Editing
     if (session.isHost()) container.addComponent(ConcurrentDocumentServer.class);
