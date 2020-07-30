@@ -32,7 +32,7 @@ This can be done by either ensuring that the git repository is located on the sa
 
 ## Develop with Eclipse
 
-If you develop on Eclipse you should have already installed the Eclipse version for "Eclipse Committers".
+If you develop on Eclipse you should have already installed the Eclipse version (if you plan to run the STF tests, please install the version specified in the [STF documentation](saros-testing-framework.md#prerequisites)) for "Eclipse Committers".
 
 ### Configure
 
