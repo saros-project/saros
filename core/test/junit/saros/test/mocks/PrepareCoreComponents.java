@@ -5,7 +5,7 @@ import org.powermock.mockpolicies.MockPolicyClassLoadingSettings;
 import org.powermock.mockpolicies.MockPolicyInterceptionSettings;
 import saros.account.XMPPAccountStore;
 import saros.editor.colorstorage.ColorIDSetStorage;
-import saros.negotiation.NegotiationFactory;
+import saros.negotiation.SessionNegotiationFactory;
 
 /**
  * This policy can be used to avoid reiterating which core components need to be prepared by
@@ -25,7 +25,7 @@ public class PrepareCoreComponents implements PowerMockPolicy {
 
   private static final Class<?>[] finalClasses =
   // Add more final classes here, if need be
-  {NegotiationFactory.class, XMPPAccountStore.class, ColorIDSetStorage.class};
+  {SessionNegotiationFactory.class, XMPPAccountStore.class, ColorIDSetStorage.class};
 
   @Override
   public void applyClassLoadingPolicy(MockPolicyClassLoadingSettings settings) {
