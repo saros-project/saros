@@ -86,8 +86,6 @@ public class AddReferencePointToSessionWizard extends Wizard {
   /** reference point ID => reference point */
   private final Map<String, IReferencePoint> localReferencePoints;
 
-  @Inject private IChecksumCache checksumCache;
-
   @Inject private ISarosSessionManager sessionManager;
 
   private final SelectLocalReferencePointRepresentationPage
@@ -658,6 +656,12 @@ public class AddReferencePointToSessionWizard extends Wizard {
 
     if (session == null) {
       throw new IllegalStateException("no session running");
+    }
+
+    IChecksumCache checksumCache = session.getComponent(IChecksumCache.class);
+
+    if (checksumCache == null) {
+      throw new IllegalStateException("failed to obtain checksum cache from session context");
     }
 
     SubProgressMonitor subMonitor = new SubProgressMonitor(monitor, referencePointMapping.size());

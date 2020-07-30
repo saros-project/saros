@@ -92,8 +92,6 @@ public class AddReferencePointsToSessionWizard extends Wizard {
 
   private final ResourceMappingStorage mappingStorage;
 
-  @Inject private IChecksumCache checksumCache;
-
   @Inject private IConnectionManager connectionManager;
 
   @Inject private Preferences preferences;
@@ -608,6 +606,12 @@ public class AddReferencePointsToSessionWizard extends Wizard {
 
     if (session == null) {
       throw new IllegalStateException("no session running");
+    }
+
+    IChecksumCache checksumCache = session.getComponent(IChecksumCache.class);
+
+    if (checksumCache == null) {
+      throw new IllegalStateException("failed to obtain checksum cache from session context");
     }
 
     SubMonitor subMonitor =
