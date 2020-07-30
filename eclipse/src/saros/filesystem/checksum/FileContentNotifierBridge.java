@@ -12,10 +12,9 @@ import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ResourcesPlugin;
-import saros.SarosPluginContext;
 import saros.filesystem.IReferencePoint;
 import saros.filesystem.ResourceConverter;
-import saros.repackaged.picocontainer.annotations.Inject;
+import saros.repackaged.picocontainer.Startable;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
 
@@ -26,35 +25,33 @@ import saros.session.ISarosSessionManager;
  * @author Stefan Rossbach
  */
 public class FileContentNotifierBridge
-    implements IFileContentChangedNotifier, IResourceChangeListener {
+    implements IFileContentChangedNotifier, IResourceChangeListener, Startable {
 
   private static final Logger log = Logger.getLogger(FileContentNotifierBridge.class);
 
-  @Inject private ISarosSessionManager sarosSessionManager;
+  private final ISarosSessionManager sarosSessionManager;
 
   private CopyOnWriteArrayList<IFileContentChangedListener> fileContentChangedListeners =
       new CopyOnWriteArrayList<IFileContentChangedListener>();
 
-  public FileContentNotifierBridge() {
+  public FileContentNotifierBridge(ISarosSessionManager sarosSessionManager) {
+    this.sarosSessionManager = sarosSessionManager;
+  }
+
+  @Override
+  public void start() {
     ResourcesPlugin.getWorkspace()
         .addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE);
   }
 
-  private void initialize() {
-    SarosPluginContext.initComponent(this);
+  @Override
+  public void stop() {
+    ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
   }
 
   @Override
   public void resourceChanged(IResourceChangeEvent event) {
     if (event.getDelta() == null) return;
-
-    if (sarosSessionManager == null) {
-      initialize();
-
-      if (sarosSessionManager == null) {
-        throw new IllegalStateException("Failed to inject saros session manager instance");
-      }
-    }
 
     Deque<IResourceDelta> stack = new LinkedList<IResourceDelta>();
 

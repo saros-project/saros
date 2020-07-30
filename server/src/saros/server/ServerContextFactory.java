@@ -10,8 +10,6 @@ import saros.context.IContextKeyBindings;
 import saros.filesystem.IPath;
 import saros.filesystem.IPathFactory;
 import saros.filesystem.IWorkspace;
-import saros.filesystem.checksum.IChecksumCache;
-import saros.filesystem.checksum.NullChecksumCache;
 import saros.monitoring.remote.IRemoteProgressIndicatorFactory;
 import saros.preferences.IPreferenceStore;
 import saros.preferences.Preferences;
@@ -48,7 +46,6 @@ public class ServerContextFactory extends AbstractContextFactory {
   public void createComponents(MutablePicoContainer c) {
     addVersionString(c);
     addCoreInterfaceImplementations(c);
-    addOptionalCoreInterfaceImplementations(c);
     addAdditionalComponents(c);
   }
 
@@ -61,6 +58,7 @@ public class ServerContextFactory extends AbstractContextFactory {
   private void addCoreInterfaceImplementations(MutablePicoContainer c) {
     // File System
     c.addComponent(IPathFactory.class, ServerPathFactoryImpl.class);
+    // TODO move to session context once #980 has been resolved
     c.addComponent(IWorkspace.class, createWorkspace());
 
     // Preferences
@@ -74,14 +72,6 @@ public class ServerContextFactory extends AbstractContextFactory {
     c.addComponent(IRemoteProgressIndicatorFactory.class, NullRemoteProgressIndicatorFactory.class);
 
     c.addComponent(UISynchronizer.class, ServerUISynchronizerImpl.class);
-  }
-
-  /*
-   * Components that are not necessarily needed but must be present, i.e. use
-   * dummies
-   */
-  private void addOptionalCoreInterfaceImplementations(MutablePicoContainer c) {
-    c.addComponent(IChecksumCache.class, NullChecksumCache.class);
   }
 
   private void addAdditionalComponents(MutablePicoContainer c) {

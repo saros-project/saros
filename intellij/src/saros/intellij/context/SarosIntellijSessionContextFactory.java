@@ -1,5 +1,8 @@
 package saros.intellij.context;
 
+import saros.filesystem.IWorkspace;
+import saros.filesystem.checksum.IChecksumCache;
+import saros.filesystem.checksum.NullChecksumCache;
 import saros.intellij.editor.LocalEditorHandler;
 import saros.intellij.editor.LocalEditorManipulator;
 import saros.intellij.editor.SelectedEditorStateSnapshotFactory;
@@ -7,6 +10,7 @@ import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.eventhandler.ApplicationEventHandlersFactory;
 import saros.intellij.eventhandler.ProjectEventHandlersFactory;
 import saros.intellij.eventhandler.project.ProjectClosedHandler;
+import saros.intellij.filesystem.IntellijWorkspace;
 import saros.intellij.filesystem.SharedResourcesManager;
 import saros.intellij.followmode.FollowModeNotificationDispatcher;
 import saros.repackaged.picocontainer.MutablePicoContainer;
@@ -34,6 +38,10 @@ public class SarosIntellijSessionContextFactory extends SarosCoreSessionContextF
 
     // Annotation utility to create, remove, and manage annotations
     container.addComponent(AnnotationManager.class);
+
+    // Checksum cache support
+    container.addComponent(IChecksumCache.class, NullChecksumCache.class);
+    container.addComponent(IWorkspace.class, IntellijWorkspace.class);
 
     // Other
     container.addComponent(SharedResourcesManager.class);

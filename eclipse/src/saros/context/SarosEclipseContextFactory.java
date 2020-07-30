@@ -1,7 +1,6 @@
 package saros.context;
 
 import java.util.Arrays;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Platform;
 import org.osgi.framework.Bundle;
 import org.osgi.service.prefs.Preferences;
@@ -12,13 +11,7 @@ import saros.communication.chat.muc.negotiation.MUCNegotiationManager;
 import saros.editor.EditorManager;
 import saros.editor.IEditorManager;
 import saros.filesystem.EclipsePathFactory;
-import saros.filesystem.EclipseWorkspaceImpl;
 import saros.filesystem.IPathFactory;
-import saros.filesystem.IWorkspace;
-import saros.filesystem.checksum.EclipseAbsolutePathResolver;
-import saros.filesystem.checksum.FileContentNotifierBridge;
-import saros.filesystem.checksum.FileSystemChecksumCache;
-import saros.filesystem.checksum.IChecksumCache;
 import saros.monitoring.remote.EclipseRemoteProgressIndicatorFactoryImpl;
 import saros.monitoring.remote.IRemoteProgressIndicatorFactory;
 import saros.preferences.EclipsePreferenceStoreAdapter;
@@ -69,18 +62,6 @@ public class SarosEclipseContextFactory extends AbstractContextFactory {
       Component.create(XMPPAuthorizationHandler.class),
       Component.create(ConnectingFailureHandler.class),
       Component.create(IncomingFileTransferHandler.class),
-
-      // Cache support
-      /*
-       * TODO avoid direct creation as this will become tricky especially
-       * if we are the delegate and depends on components that are only
-       * available after we added all our context stuff or vice versa
-       */
-      Component.create(
-          IChecksumCache.class,
-          new FileSystemChecksumCache(
-              new FileContentNotifierBridge(), new EclipseAbsolutePathResolver())),
-      Component.create(IWorkspace.class, new EclipseWorkspaceImpl(ResourcesPlugin.getWorkspace())),
 
       // Saros Core Path Support
       Component.create(IPathFactory.class, EclipsePathFactory.class),

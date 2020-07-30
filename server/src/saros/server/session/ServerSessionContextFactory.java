@@ -1,5 +1,7 @@
 package saros.server.session;
 
+import saros.filesystem.checksum.IChecksumCache;
+import saros.filesystem.checksum.NullChecksumCache;
 import saros.repackaged.picocontainer.MutablePicoContainer;
 import saros.server.editor.ServerEditorManager;
 import saros.session.ISarosSession;
@@ -15,5 +17,8 @@ public class ServerSessionContextFactory extends SarosCoreSessionContextFactory 
     container.addComponent(FileActivityExecutor.class);
     container.addComponent(FolderActivityExecutor.class);
     container.addComponent(TextEditActivityExecutor.class);
+
+    // Checksum cache support
+    container.addComponent(IChecksumCache.class, NullChecksumCache.class);
   }
 }
