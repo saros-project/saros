@@ -6,10 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swtbot.swt.finder.SWTBot;
-import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
-import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
@@ -82,19 +79,6 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
 
     SWTBotShell shell = bot.shell(SHELL_ADD_PROJECTS);
     shell.activate();
-
-    // see https://bugs.eclipse.org/bugs/show_bug.cgi?id=344484
-    // FIXME fix the bug in the SWTBot Framework, do not use a workaround
-    final Button radioButton = shell.bot().radio(RADIO_CREATE_NEW_PROJECT).widget;
-
-    UIThreadRunnable.syncExec(
-        new VoidResult() {
-
-          @Override
-          public void run() {
-            radioButton.setSelection(false);
-          }
-        });
 
     shell.bot().radio(RADIO_USING_EXISTING_PROJECT).click();
     shell.bot().textWithLabel("Project name", 1).setText(projectName);

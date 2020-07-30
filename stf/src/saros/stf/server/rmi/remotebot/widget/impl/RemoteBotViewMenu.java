@@ -1,7 +1,7 @@
 package saros.stf.server.rmi.remotebot.widget.impl;
 
 import java.rmi.RemoteException;
-import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotViewMenu;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import saros.stf.server.StfRemoteObject;
 import saros.stf.server.rmi.remotebot.widget.IRemoteBotViewMenu;
 
@@ -9,13 +9,13 @@ public final class RemoteBotViewMenu extends StfRemoteObject implements IRemoteB
 
   private static final RemoteBotViewMenu INSTANCE = new RemoteBotViewMenu();
 
-  private SWTBotViewMenu widget;
+  private SWTBotMenu widget;
 
   public static RemoteBotViewMenu getInstance() {
     return INSTANCE;
   }
 
-  public IRemoteBotViewMenu setWidget(SWTBotViewMenu viewMenu) {
+  public IRemoteBotViewMenu setWidget(SWTBotMenu viewMenu) {
     this.widget = viewMenu;
     return this;
   }

@@ -255,8 +255,7 @@ public class RemoteBotEditor extends StfRemoteObject implements IRemoteBotEditor
 
   @Override
   public List<Integer> getViewport() throws RemoteException {
-    @SuppressWarnings("deprecation")
-    final IEditorPart editorPart = widget.getEditorReference().getEditor(false);
+    final IEditorPart editorPart = widget.getReference().getEditor(false);
 
     if (editorPart == null)
       throw new WidgetNotFoundException(
@@ -290,8 +289,7 @@ public class RemoteBotEditor extends StfRemoteObject implements IRemoteBotEditor
   @Override
   public String getSelectionByAnnotation() throws RemoteException {
 
-    @SuppressWarnings("deprecation")
-    final IEditorPart editorPart = widget.getEditorReference().getEditor(false);
+    final IEditorPart editorPart = widget.getReference().getEditor(false);
 
     if (editorPart == null)
       throw new WidgetNotFoundException(

@@ -46,12 +46,7 @@ public final class RemoteBotView extends StfRemoteObject implements IRemoteBotVi
   // menu
   @Override
   public IRemoteBotViewMenu menu(String label) throws RemoteException {
-    return RemoteBotViewMenu.getInstance().setWidget(widget.menu(label));
-  }
-
-  @Override
-  public IRemoteBotViewMenu menu(String label, int index) throws RemoteException {
-    return RemoteBotViewMenu.getInstance().setWidget(widget.menu(label, index));
+    return RemoteBotViewMenu.getInstance().setWidget(widget.viewMenu(label));
   }
 
   // toolbarButton

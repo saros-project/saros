@@ -1021,13 +1021,6 @@ public interface IRemoteBot extends Remote {
   public IRemoteBotMenu menu(String text) throws RemoteException;
 
   /**
-   * @param text the text on the menu.
-   * @param index the index of the menu, in case there are multiple menus with the same text.
-   * @return a menu item that matches the specified text.
-   */
-  public IRemoteBotMenu menu(String text, int index) throws RemoteException;
-
-  /**
    * @param value the value of the id.
    * @return a wrapper around a @{link Menu} with the specified key/value pair for its id.
    */

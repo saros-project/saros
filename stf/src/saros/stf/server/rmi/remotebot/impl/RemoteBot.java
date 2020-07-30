@@ -1155,11 +1155,6 @@ public abstract class RemoteBot extends StfRemoteObject implements IRemoteBot {
   }
 
   @Override
-  public IRemoteBotMenu menu(String text, int index) throws RemoteException {
-    return menu.setWidget(swtBot.menu(text, index));
-  }
-
-  @Override
   public IRemoteBotMenu menuWithId(String value) throws RemoteException {
     return menu.setWidget(swtBot.menuWithId(value));
   }

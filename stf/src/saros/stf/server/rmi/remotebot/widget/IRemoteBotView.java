@@ -21,8 +21,6 @@ public interface IRemoteBotView extends Remote {
 
   public IRemoteBotViewMenu menu(String label) throws RemoteException;
 
-  public IRemoteBotViewMenu menu(String label, int index) throws RemoteException;
-
   public IRemoteBotToolbarButton toolbarButton(String tooltip) throws RemoteException;
 
   public boolean existsToolbarButton(String tooltip) throws RemoteException;
