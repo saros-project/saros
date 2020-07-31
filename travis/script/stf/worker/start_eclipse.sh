@@ -1,5 +1,5 @@
 #!/bin/bash -e
-# Has to be called within a stf_slave container
+# Has to be called within a stf_worker container
 # params DISPLAY, user(e.g: Alice, Bob), PORT
 
 [ ! -z "$DEBUG_BASH" ] && set -x

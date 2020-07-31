@@ -1,5 +1,5 @@
 #!/bin/sh -e
-# Has to be execute in a stf_master container
+# Has to be execute in a stf_coordinator container
 
 # TODO: Script is currently unused and would fail in execution,
 # because of deprecated environment vars.

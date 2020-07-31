@@ -14,7 +14,7 @@ function restore_workspaces_permissions {
     local user="$1"
 
     # variables provided by shared_vars.sh
-    docker exec -t "$stf_master_name" bash -c "chown -R $user $CONTAINER_SRC $STF_CONTAINER_WS"
+    docker exec -t "$stf_coordinator_name" bash -c "chown -R $user $CONTAINER_SRC $STF_CONTAINER_WS"
 }
 
 function stop_and_remove_container {
@@ -25,12 +25,12 @@ function stop_and_remove_container {
     [ "$container_exists" != "" ] && docker rm -f "$container"
 }
 
-function stop_and_remove_slave_containers {
+function stop_and_remove_worker_containers {
   # Method get_distinct_hosts provided by config_utils.sh
   get_distinct_hosts
-  stf_slave_names="$retval"
-  for slave_name in $stf_slave_names; do
-    stop_and_remove_container "$slave_name"
+  stf_worker_names="$retval"
+  for worker_name in $stf_worker_names; do
+    stop_and_remove_container "$worker_name"
   done
 }
 
@@ -42,8 +42,8 @@ function remove_network {
 
 function teardown_containers {
     # variables provided by shared_vars.sh
-    stop_and_remove_container "$stf_master_name"
-    stop_and_remove_slave_containers
+    stop_and_remove_container "$stf_coordinator_name"
+    stop_and_remove_worker_containers
     stop_and_remove_container "$stf_xmpp_server_name"
     remove_network
 }
@@ -95,8 +95,8 @@ function finalize {
 
 # variables stf_*_image provided by shared_vars.sh
 function pull_images {
-    docker pull "$stf_master_image"
-    docker pull "$stf_slave_image"
+    docker pull "$stf_coordinator_image"
+    docker pull "$stf_worker_image"
     docker pull "$stf_xmpp_image"
 }
 
@@ -113,8 +113,8 @@ if [ "$?" != "0" ]; then
 fi
 
 echo "::Start stf tests"
-# variables stf_master_name, SCRIPT_DIR_CONTAINER provided by shared_vars.sh
-docker exec -t "$stf_master_name" "$SCRIPT_DIR_CONTAINER/stf/master/start_stf_tests.sh" 
+# variables stf_coordinator_name, SCRIPT_DIR_CONTAINER provided by shared_vars.sh
+docker exec -t "$stf_coordinator_name" "$SCRIPT_DIR_CONTAINER/stf/coordinator/start_stf_tests.sh" 
 rc="$?"
 if [ "$rc" != "0" ]; then
     echo "::Failed during the stf test execution"

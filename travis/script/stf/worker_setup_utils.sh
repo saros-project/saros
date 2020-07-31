@@ -32,21 +32,21 @@ function create_vnc_port_mapping()
   retval=$mapping
 }
 
-# Function that either waits until the vncserver on slave host 'slave'
+# Function that either waits until the vncserver on worker host 'worker'
 # binded the corresponding port or the timeout of poll*delay seconds is exceeded.
 function wait_for_xfwm()
 {
   local poll=$1
   local delay=$2
   local display=$3
-  local slave=$4
+  local worker=$4
 
   while [ $poll -gt 0 ]; do
     sleep $delay
     ((poll--))
-    local res=$(docker exec -t $slave bash -c "ps -eF | grep \"[x]fwm\" | wc -l | tr -d '\n'")
+    local res=$(docker exec -t $worker bash -c "ps -eF | grep \"[x]fwm\" | wc -l | tr -d '\n'")
     if [[ "$display" -eq "$res" ]]; then
-      echo "Vnc and Xfwm of display $display on $slave alive"
+      echo "Vnc and Xfwm of display $display on $worker alive"
       return 0
     fi
   done
@@ -54,7 +54,7 @@ function wait_for_xfwm()
   exit 1
 }
 
-# Function that either waits until the rmi server on slave host 'slave'
+# Function that either waits until the rmi server on worker host 'worker'
 # binded the corresponding port or the timeout of poll*delay seconds is exceeded.
 # In fact the function is used to wait for a stable state of the started eclipse
 function wait_for_rmi_server()
@@ -62,17 +62,17 @@ function wait_for_rmi_server()
   local poll=$1
   local delay=$2
   local port=$3
-  local slave=$4
+  local worker=$4
 
   while [ $poll -gt 0 ]; do
     sleep "$delay"
     ((poll--))
-    local res=$(docker exec -t "$slave" bash -c "netstat -tulpn | grep java | grep $port")
+    local res=$(docker exec -t "$worker" bash -c "netstat -tulpn | grep java | grep $port")
     if [ ! -z "$res" ]; then
-      echo "Rmi server of port $port on $slave alive"
+      echo "Rmi server of port $port on $worker alive"
       return 0
     fi
-    echo "Still waiting for rmi server of port $port on $slave"
+    echo "Still waiting for rmi server of port $port on $worker"
   done
   echo "Timout waiting for rmi server"
   exit 1
@@ -89,8 +89,8 @@ function create_rmi_port_mapping()
 # create_rmi_port_mapping and create_vnc_port_mapping
 function create_port_mapping()
 {
-  local slave_name=$1
-  get_host_ports "$slave_name"
+  local worker_name=$1
+  get_host_ports "$worker_name"
   local ports="$retval"
 
   # the number of required ports is equal to the number required displays
@@ -101,49 +101,49 @@ function create_port_mapping()
   retval=$mapping
 }
 
-function start_container_slave()
+function start_container_worker()
 {
   get_distinct_hosts
-  stf_slave_names="$retval"
-  for slave_name in $stf_slave_names; do
+  stf_worker_names="$retval"
+  for worker_name in $stf_worker_names; do
 
-    create_port_mapping "$slave_name"
+    create_port_mapping "$worker_name"
     local port_mapping_args="$retval"
 
-    echo "Starting stf slave container: $slave_name"
-    docker run -dt --name $slave_name \
+    echo "Starting stf worker container: $worker_name"
+    docker run -dt --name $worker_name \
       -v $STF_HOST_WS:$STF_CONTAINER_WS \
       -v $CONFIG_DIR_HOST:$CONFIG_DIR_CONTAINER \
       -v $SCRIPT_DIR_HOST:$SCRIPT_DIR_CONTAINER \
       $port_mapping_args \
       --net=$stf_network_name \
-      --net-alias=$slave_name \
-      $stf_slave_image /bin/bash
+      --net-alias=$worker_name \
+      $stf_worker_image /bin/bash
   done
 }
 
-function setup_container_slave()
+function setup_container_worker()
 {
   get_distinct_hosts
-  local stf_slave_names="$retval"
-  for slave_name in $stf_slave_names; do
+  local stf_worker_names="$retval"
+  for worker_name in $stf_worker_names; do
     # Cast whitespace separed string to array
-    get_host_users $slave_name
+    get_host_users $worker_name
     IFS=' ' read -r -a users <<< "$retval"
 
-    get_host_ports $slave_name
+    get_host_ports $worker_name
     IFS=' ' read -r -a ports <<< "$retval"
 
     display=1
 
     for i in "${!users[@]}"; do
-      echo "Starting vnc server on $slave_name with display $display"
-      docker exec -d "$slave_name" vncserver -geometry 1280x960
-      wait_for_xfwm 100 10 $display $slave_name
+      echo "Starting vnc server on $worker_name with display $display"
+      docker exec -d "$worker_name" vncserver -geometry 1280x960
+      wait_for_xfwm 100 10 $display $worker_name
 
-      echo "Starting eclipse on $slave_name with display $display, user ${users[$i]} and port ${ports[$i]}"
-      docker exec -dt "$slave_name" bash -c "$SCRIPT_DIR_CONTAINER/stf/slave/start_eclipse.sh $display ${users[$i]} ${ports[$i]} > $STF_CONTAINER_WS/ws/${users[$i]}.log 2>&1"
-      wait_for_rmi_server 100 10 "${ports[$i]}" "$slave_name"
+      echo "Starting eclipse on $worker_name with display $display, user ${users[$i]} and port ${ports[$i]}"
+      docker exec -dt "$worker_name" bash -c "$SCRIPT_DIR_CONTAINER/stf/worker/start_eclipse.sh $display ${users[$i]} ${ports[$i]} > $STF_CONTAINER_WS/ws/${users[$i]}.log 2>&1"
+      wait_for_rmi_server 100 10 "${ports[$i]}" "$worker_name"
       (( display++ ))
     done
   done

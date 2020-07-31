@@ -103,14 +103,14 @@ In order to use the corresponding script you need a current **docker installatio
 * Create the required docker contains by executing  
   `./travis/script/stf/setup_stf_container.sh $PWD`
 * Start the STF tests by executing
-  `docker exec -t stf_master /home/ci/saros_src/travis/script/stf/master/start_stf_tests.sh`
+  `docker exec -t stf_coordinator /home/ci/saros_src/travis/script/stf/coordinator/start_stf_tests.sh`
 
 ### Clean Test Environment
 
 In order to clean the environment you have to stop and remove all created containers and
 remove the network.
 
-* Stop and remove containers `docker rm -f stf_slave_1 stf_prosody_test.org stf_master`
+* Stop and remove containers `docker rm -f stf_worker_1 stf_prosody_test.org stf_coordinator`
 * Remove network `docker network rm stf_test_network`
 * Remove the `stf_ws` directory
 
