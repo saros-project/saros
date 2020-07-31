@@ -1,5 +1,5 @@
 #!/bin/sh -e
-# Has to be execute in a stf_master container
+# Has to be execute in a stf_coordinator container
 
 [ ! -z "$DEBUG_BASH" ] && set -x
 
