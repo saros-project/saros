@@ -44,6 +44,11 @@ sourceSets {
 }
 
 tasks {
+
+    test {
+        systemProperty("saros.stf.client.configuration.files", System.getProperty("stf.client.configuration.files", ""))
+    }
+
     jar {
         from("plugin.xml")
         into("test/resources") {
