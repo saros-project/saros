@@ -2,28 +2,58 @@
 title: Continuous Integration Process
 ---
 
-## Push-Triggered Jobs
+We are using GitHub Actions as CI server solution (see [here](https://docs.github.com/en/actions/configuring-and-managing-workflows) for more information).
 
-Whenever commits are pushed to a branch of the main repository, GitHub Actions triggers a new job that builds and tests the state of the updated branch.
+## Build and Tests
+
+Whenever commits are pushed to a branch of the main repository or Pull Requests are created or changed, GitHub Actions triggers a new job that builds and tests the state of the updated branch.
 During the test phase, only the JUnit tests (excluding STF tests) are executed.
 
-Furthermore, the static code analysis tool Codacy is run to scan the code and binaries.
+See configuration [`build.yml`](https://github.com/saros-project/saros/blob/master/.github/workflows/build.yml).
+
+## Static Code Analysis
+
+### Codacy
+
+The static code analysis is executed for each commit and Pull Request to scan the code and binaries.
 This scan only looks at the changes made by the pushed commits, meaning it will not analyze existing/unchanged code.
 The results of the analysis are available through the GitHub interface or can be viewed using the [Codacy web interface](https://app.codacy.com/project/Saros/saros/dashboard).
 
-### To branches starting with 'pr/stf/'
+Configured in the admin interface of our [codacy project](https://app.codacy.com/manual/Saros/saros/dashboard).
 
-As an interim solution only branches with the prefix `pr/stf/'
-trigger a GitHub Action that executes the stf tests.
+### PMD
 
-## Pull-Request-Triggered Jobs
+We use the checker tool PMD for analyzing our Java code. PMD is executed by Codacy, but the [configuration](https://github.com/saros-project/saros/blob/master/ruleset.xml)
+is located in our repository and Codacy only uses the version on the master branch. Therefore, we execute PMD in a workflow if a commit is pushed or a Pull Request is
+opened (or updated) that changes the configurations.
 
-GitHub Actions also runs when a new pull request is created or an existing pull request is updated.
-See the [GitHub Actions](https://help.github.com/en/actions) for more information.
-These jobs are identical to the jobs triggered by a push. The only difference is that issues of the static code analysis are also reported in the pull request.
+See configuration [`build_pmd.yml`](https://github.com/saros-project/saros/blob/master/.github/workflows/build_pmd.yml).
 
-## Daily Jobs
+## STF
 
-GitHub Actions executes a daily cron job that triggers the following builds:
-* Builds and tests the current master branch
-  * If this job fails the failure is reported in GitHub
+The STF test execution is triggered for each push to the master branch and each branch with the prefix `pr/stf/`.
+Furthermore, it is possible to [manually trigger](https://github.blog/changelog/2020-07-06-github-actions-manual-triggers-with-workflow_dispatch/) the STF
+workflow with:
+- Open the project's [`Actions` tab](https://github.com/saros-project/saros/actions?query=workflow%3A%22STF+Tests%22) (with the selected workflow `STF Tests`).
+- Click the drop-down button `Run workflow`.
+- Select a branch.
+- If needed, add arguments that are handed to [`run_stf.sh`](https://github.com/saros-project/saros/blob/master/run_stf.sh).
+  If you want to run the **STF self tests** (located in `stf/test`) that test the framework (and are not intended to test Saros) add the argument `--self`.
+- Click the button `Run workflow`
+
+See configuration [`stf.yml`](https://github.com/saros-project/saros/blob/master/.github/workflows/stf.yml).
+
+
+## Java 11 Compatibility
+
+We build Saros every week with JDK 11 to verify that the project is still compatible
+with JDK 11.
+
+See configuration [`build_jdk11.yml`](https://github.com/saros-project/saros/blob/master/.github/workflows/build_jdk11.yml)
+
+## Documentation
+
+All documentation changes (via pushing a commit or opening a Pull Request) trigger a build of the Jekyll documentation.
+If these changes are pushed to the master branch, the result is published as new website.
+
+See configuration [`build_doc.yml`](https://github.com/saros-project/saros/blob/master/.github/workflows/build_doc.yml)
