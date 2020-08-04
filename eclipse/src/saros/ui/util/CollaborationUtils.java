@@ -274,6 +274,8 @@ public class CollaborationUtils {
 
     for (IReferencePoint referencePoint : referencePoints) {
 
+      final IContainer referencePointDelegate = ResourceConverter.getDelegate(referencePoint);
+
       final Pair<Long, Long> fileCountAndSize;
 
       final List<IResource> resources =
@@ -284,7 +286,7 @@ public class CollaborationUtils {
       result.append(
           String.format(
               "\nReference Point: %s, Files: %d, Size: %s",
-              referencePoint.getName(),
+              referencePointDelegate.getFullPath(),
               fileCountAndSize.getRight(),
               format(fileCountAndSize.getLeft())));
     }
