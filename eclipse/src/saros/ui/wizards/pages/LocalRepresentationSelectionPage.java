@@ -484,38 +484,12 @@ public class LocalRepresentationSelectionPage extends WizardPage {
    * project path is selected.
    */
   private void preselectValues() {
-    // force pre-selection of already shared projects
-    for (Entry<String, ReferencePointOptionComposite> entry :
-        referencePointOptionComposites.entrySet()) {
-
-      String referencePointId = entry.getKey();
-      ReferencePointOptionComposite referencePointOptionComposite = entry.getValue();
-
-      IReferencePoint referencePoint = session.getReferencePoint(referencePointId);
-
-      // not shared yet
-      if (referencePoint == null) continue;
-
-      IContainer referencePointDelegate = ResourceConverter.getDelegate(referencePoint);
-      String delegatePath = referencePointDelegate.getFullPath().toPortableString();
-
-      referencePointOptionComposite.setExistingDirectoryOptionSelected(delegatePath);
-      referencePointOptionComposite.setEnabled(false);
-    }
-
     // try to assign local names for the remaining remote reference points
     for (Entry<String, ReferencePointOptionComposite> entry :
         referencePointOptionComposites.entrySet()) {
 
       String referencePointId = entry.getKey();
       ReferencePointOptionComposite referencePointOptionComposite = entry.getValue();
-
-      IReferencePoint referencePoint = session.getReferencePoint(referencePointId);
-
-      // already shared
-      if (referencePoint != null) {
-        continue;
-      }
 
       String remoteReferencePointName = remoteReferencePointIdToNameMapping.get(referencePointId);
 
