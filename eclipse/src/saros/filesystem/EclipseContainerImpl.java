@@ -7,6 +7,11 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 
+/**
+ * @deprecated no longer necessary, use {@link EclipseFolderImplV2} or {@link
+ *     EclipseReferencePointImpl}
+ */
+@Deprecated
 public class EclipseContainerImpl extends EclipseResourceImpl implements IContainer {
 
   EclipseContainerImpl(org.eclipse.core.resources.IContainer delegate) {
