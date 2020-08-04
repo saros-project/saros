@@ -10,8 +10,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import saros.SarosPluginContext;
-import saros.feedback.FeedbackManager;
-import saros.feedback.Messages;
 import saros.net.xmpp.JID;
 import saros.ui.ImageManager;
 import saros.ui.util.FontUtils;
@@ -41,8 +39,6 @@ public class ConfigurationSummaryWizardPage extends WizardPage {
   private SimpleIllustratedComposite autoConnection;
   private SimpleIllustratedComposite uPnPOption;
   private SimpleIllustratedComposite skypeUsername;
-  private SimpleIllustratedComposite statisticSubmission;
-  private SimpleIllustratedComposite errorLogSubmission;
 
   private final EnterXMPPAccountWizardPage accountPage;
   private final ConfigurationSettingsWizardPage configurationPage;
@@ -159,25 +155,6 @@ public class ConfigurationSummaryWizardPage extends WizardPage {
     skypeUsername = new SummaryItemComposite(networkSettingsComposite, SWT.NONE);
     skypeUsername.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
-    if (FeedbackManager.isFeedbackFeatureRequired()) {
-      /*
-       * separator
-       */
-      new Label(rightColumn, SWT.SEPARATOR | SWT.HORIZONTAL)
-          .setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-
-      /*
-       * statistic settings
-       */
-      Composite statisticSettingsComposite = new Composite(rightColumn, SWT.NONE);
-      statisticSettingsComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
-      statisticSettingsComposite.setLayout(LayoutUtils.createGridLayout(0, 5));
-
-      statisticSubmission = new SummaryItemComposite(statisticSettingsComposite, SWT.NONE);
-      statisticSubmission.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-      errorLogSubmission = new SummaryItemComposite(statisticSettingsComposite, SWT.NONE);
-      errorLogSubmission.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-    }
     return rightColumn;
   }
 
@@ -201,10 +178,6 @@ public class ConfigurationSummaryWizardPage extends WizardPage {
 
     String currentSkypeUsername =
         configurationPage.isSkypeUsage() ? configurationPage.getSkypeUsername() : ""; // $NON-NLS-1$
-
-    boolean statisticSubmissionAllowed = configurationPage.isStatisticSubmissionAllowed();
-
-    boolean errorLogSubmissionAllowed = configurationPage.isErrorLogSubmissionAllowed();
 
     if (jid != null) {
       jid.setContent(new IllustratedText(ImageManager.ELCL_SPACER, accountJID.getBase()));
@@ -252,33 +225,6 @@ public class ConfigurationSummaryWizardPage extends WizardPage {
           new IllustratedText(
               ImageManager.DLCL_CONTACT_SKYPE_CALL,
               saros.ui.Messages.ConfigurationSummaryWizardPage_skype_show_username_not));
-    }
-
-    if (FeedbackManager.isFeedbackFeatureRequired()) {
-      if (statisticSubmissionAllowed) {
-        statisticSubmission.setContent(
-            new IllustratedText(
-                ImageManager.ETOOL_STATISTIC,
-                Messages.getString("feedback.statistic.page.statistic.submission"))); // $NON-NLS-1$
-      } else {
-        statisticSubmission.setContent(
-            new IllustratedText(
-                ImageManager.DTOOL_STATISTIC,
-                Messages.getString(
-                    "feedback.statistic.page.statistic.noSubmission"))); // $NON-NLS-1$
-      }
-
-      if (errorLogSubmissionAllowed) {
-        errorLogSubmission.setContent(
-            new IllustratedText(
-                ImageManager.ETOOL_CRASH_REPORT,
-                Messages.getString("feedback.statistic.page.error.log"))); // $NON-NLS-1$
-      } else {
-        errorLogSubmission.setContent(
-            new IllustratedText(
-                ImageManager.DTOOL_CRASH_REPORT,
-                Messages.getString("feedback.statistic.page.error.noLog"))); // $NON-NLS-1$
-      }
     }
 
     composite.layout(false, true);

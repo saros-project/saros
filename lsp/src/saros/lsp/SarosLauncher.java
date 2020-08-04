@@ -2,10 +2,7 @@ package saros.lsp;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.net.URL;
-import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import saros.lsp.extensions.client.ISarosLanguageClient;
 import saros.lsp.log.LanguageClientAppender;
@@ -14,7 +11,6 @@ import saros.lsp.log.LanguageClientAppender;
 public class SarosLauncher {
 
   private static final Logger log = Logger.getLogger(SarosLauncher.class);
-  private static final String LOGGING_CONFIG_FILE = "/log4j.properties";
 
   /**
    * Starts the server.
@@ -32,10 +28,7 @@ public class SarosLauncher {
       throw new IllegalArgumentException("port is not a number");
     }
 
-    URL log4jProperties = SarosLauncher.class.getResource(LOGGING_CONFIG_FILE);
-    PropertyConfigurator.configure(log4jProperties);
-
-    log.addAppender(new ConsoleAppender());
+    // Logger uses default config log4j2.xml
 
     int port = Integer.parseInt(args[0]);
     Socket socket = new Socket("localhost", port);

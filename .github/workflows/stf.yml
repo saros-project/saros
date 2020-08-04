@@ -6,6 +6,11 @@ on:
       - 'pr/stf/**'
       - 'master'
 
+  workflow_dispatch:
+    inputs:
+      arguments:
+        description: "run_stf.sh arguments"
+
 jobs:
   stf:
     runs-on: ubuntu-latest
@@ -15,7 +20,7 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Run STF Tests
-      run: ./run_stf.sh CI
+      run: ./run_stf.sh --ci --aggregate ${{ github.event.inputs.arguments }}
 
     - name: Upload STF results
       uses: actions/upload-artifact@v1

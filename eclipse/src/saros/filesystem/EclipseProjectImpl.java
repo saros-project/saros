@@ -1,5 +1,7 @@
 package saros.filesystem;
 
+/** @deprecated use {@link EclipseReferencePointImpl} instead */
+@Deprecated
 public class EclipseProjectImpl extends EclipseContainerImpl implements IReferencePoint {
 
   EclipseProjectImpl(org.eclipse.core.resources.IProject delegate) {

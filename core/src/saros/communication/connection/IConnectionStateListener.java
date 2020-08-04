@@ -6,12 +6,21 @@ import saros.net.ConnectionState;
 @FunctionalInterface
 public interface IConnectionStateListener {
 
+  /** List of possible error types. TODO add cases for connect failures */
+  enum ErrorType {
+    /** A previously available connection was unexpectedly disconnected */
+    CONNECTION_LOST,
+    /** Another client logged on with the same resource */
+    RESOURCE_CONFLICT
+  }
+
   /**
    * Is fired when the state of the connection changes.
    *
    * @param state the current state of the connection
-   * @param error the error that occurred when the state is {@link ConnectionState#ERROR} or <code>
+   * @param errorType the error that occurred when the state is {@link ConnectionState#ERROR} or
+   *     <code>
    *     null</code> when the error is not available
    */
-  public void connectionStateChanged(ConnectionState state, Exception error);
+  public void connectionStateChanged(ConnectionState state, ErrorType errorType);
 }

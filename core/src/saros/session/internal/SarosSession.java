@@ -42,10 +42,9 @@ import saros.filesystem.IResource;
 import saros.net.IConnectionManager;
 import saros.net.ITransmitter;
 import saros.net.xmpp.JID;
-import saros.net.xmpp.XMPPConnectionService;
 import saros.preferences.IPreferenceStore;
 import saros.repackaged.picocontainer.MutablePicoContainer;
-import saros.repackaged.picocontainer.annotations.Inject;
+import saros.repackaged.picocontainer.PicoContainer;
 import saros.session.IActivityConsumer;
 import saros.session.IActivityConsumer.Priority;
 import saros.session.IActivityHandlerCallback;
@@ -70,15 +69,15 @@ public final class SarosSession implements ISarosSession {
 
   private static final Logger log = Logger.getLogger(SarosSession.class);
 
-  @Inject private UISynchronizer synchronizer;
+  /* Application Context Dependencies Start*/
 
-  /* Dependencies */
+  private final UISynchronizer synchronizer;
 
-  @Inject private ITransmitter transmitter;
+  private final ITransmitter transmitter;
 
-  @Inject private XMPPConnectionService connectionService;
+  private final IConnectionManager connectionManager;
 
-  @Inject private IConnectionManager connectionManager;
+  /* Application Context Dependencies End*/
 
   private final IContainerContext containerContext;
 
@@ -93,6 +92,7 @@ public final class SarosSession implements ISarosSession {
 
   private final List<IActivityConsumer> activeActivityConsumers =
       new CopyOnWriteArrayList<IActivityConsumer>();
+
   private final List<IActivityConsumer> passiveActivityConsumers =
       new CopyOnWriteArrayList<IActivityConsumer>();
 
@@ -207,18 +207,22 @@ public final class SarosSession implements ISarosSession {
   // FIXME those parameter passing feels strange, find a better way
   /** Constructor for host. */
   public SarosSession(
-      final String id, IPreferenceStore properties, IContainerContext containerContext) {
-    this(id, containerContext, properties, /* unused */ null, /* unused */ null);
+      final String id,
+      JID localUserJID,
+      IPreferenceStore properties,
+      IContainerContext containerContext) {
+    this(id, containerContext, properties, localUserJID, /* unused */ null, /* unused */ null);
   }
 
   /** Constructor for client. */
   public SarosSession(
       final String id,
+      JID localUserJID,
       JID hostJID,
       IPreferenceStore localProperties,
       IPreferenceStore hostProperties,
       IContainerContext containerContext) {
-    this(id, containerContext, localProperties, hostJID, hostProperties);
+    this(id, containerContext, localProperties, localUserJID, hostJID, hostProperties);
   }
 
   @Override
@@ -784,18 +788,14 @@ public final class SarosSession implements ISarosSession {
       final String id,
       IContainerContext context,
       IPreferenceStore localProperties,
+      JID localUserJID,
       JID host,
       IPreferenceStore hostProperties) {
-
-    context.initComponent(this);
 
     this.sessionID = id;
     this.referencePointMapper = new SharedReferencePointMapper();
     this.activityQueuer = new ActivityQueuer();
     this.containerContext = context;
-
-    // FIXME that should be passed in !
-    JID localUserJID = connectionService.getJID();
 
     assert localUserJID != null;
 
@@ -817,24 +817,34 @@ public final class SarosSession implements ISarosSession {
     sessionContainer.addComponent(IActivityHandlerCallback.class, activityCallback);
 
     ISarosSessionContextFactory factory = context.getComponent(ISarosSessionContextFactory.class);
+
+    if (factory == null) {
+      throw new IllegalStateException(
+          "component of class type "
+              + ISarosSessionContextFactory.class.getName()
+              + " could not be found in the current global application context but is required for operation");
+    }
+
     factory.createComponents(this, sessionContainer);
 
     // Force the creation of the components added to the session container.
     sessionContainer.getComponents();
 
-    concurrentDocumentClient = sessionContainer.getComponent(ConcurrentDocumentClient.class);
+    // Obtained from Application context START
+    synchronizer = getComponent(sessionContainer, UISynchronizer.class);
+    transmitter = getComponent(sessionContainer, ITransmitter.class);
+    connectionManager = getComponent(sessionContainer, IConnectionManager.class);
+    // Obtained from Application context END
 
-    activityHandler = sessionContainer.getComponent(ActivityHandler.class);
-
-    stopManager = sessionContainer.getComponent(StopManager.class);
-
-    changeColorManager = sessionContainer.getComponent(ChangeColorManager.class);
-
-    permissionManager = sessionContainer.getComponent(PermissionManager.class);
-
-    activitySequencer = sessionContainer.getComponent(ActivitySequencer.class);
-
-    userListHandler = sessionContainer.getComponent(UserInformationHandler.class);
+    // Obtained from Session context START
+    concurrentDocumentClient = getComponent(sessionContainer, ConcurrentDocumentClient.class);
+    activityHandler = getComponent(sessionContainer, ActivityHandler.class);
+    stopManager = getComponent(sessionContainer, StopManager.class);
+    changeColorManager = getComponent(sessionContainer, ChangeColorManager.class);
+    permissionManager = getComponent(sessionContainer, PermissionManager.class);
+    activitySequencer = getComponent(sessionContainer, ActivitySequencer.class);
+    userListHandler = getComponent(sessionContainer, UserInformationHandler.class);
+    // Obtained from Session context END
 
     // ensure that the container uses caching
     assert sessionContainer.getComponent(ActivityHandler.class)
@@ -860,5 +870,17 @@ public final class SarosSession implements ISarosSession {
    */
   boolean hasActivityConsumers() {
     return !activeActivityConsumers.isEmpty() || !passiveActivityConsumers.isEmpty();
+  }
+
+  private static <T> T getComponent(final PicoContainer container, final Class<T> componentType) {
+    final T result = container.getComponent(componentType);
+
+    if (result == null)
+      throw new IllegalStateException(
+          "component of class type "
+              + componentType.getName()
+              + " could not be found in the current session context or application context but is required for operation");
+
+    return result;
   }
 }

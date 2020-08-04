@@ -41,9 +41,6 @@ import saros.context.CoreContextFactory;
 import saros.context.IContainerContext;
 import saros.context.IContextKeyBindings;
 import saros.editor.EditorManager;
-import saros.feedback.FeedbackManager;
-import saros.feedback.FeedbackPreferences;
-import saros.feedback.StatisticManager;
 import saros.filesystem.IPathFactory;
 import saros.net.IConnectionManager;
 import saros.net.IReceiver;
@@ -51,7 +48,6 @@ import saros.net.ITransmitter;
 import saros.net.PacketCollector;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
-import saros.preferences.EclipsePreferenceConstants;
 import saros.preferences.EclipsePreferences;
 import saros.preferences.PreferenceStore;
 import saros.project.internal.SarosEclipseSessionContextFactory;
@@ -62,7 +58,6 @@ import saros.repackaged.picocontainer.PicoContainer;
 import saros.repackaged.picocontainer.injectors.AnnotatedFieldInjection;
 import saros.repackaged.picocontainer.injectors.CompositeInjection;
 import saros.repackaged.picocontainer.injectors.ConstructorInjection;
-import saros.repackaged.picocontainer.injectors.Reinjector;
 import saros.session.ISarosSessionContextFactory;
 import saros.session.ISarosSessionManager;
 import saros.session.SessionEndReason;
@@ -72,11 +67,13 @@ import saros.test.mocks.EclipseMocker;
 import saros.test.mocks.EditorManagerMock;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({StatisticManager.class, ResourcesPlugin.class})
-@PowerMockIgnore({"javax.xml.*"})
+@PrepareForTest({ResourcesPlugin.class})
+@PowerMockIgnore({"javax.xml.*", "org.apache.log4j.*"})
 public class SarosSessionTest {
 
   private static final String SAROS_SESSION_ID = "SAROS_SESSION_TEST";
+
+  private static final JID LOCAL_USER_JID = new JID("alice");
 
   private static class CountingReceiver implements IReceiver {
 
@@ -107,45 +104,9 @@ public class SarosSessionTest {
     }
   }
 
-  private static XMPPConnectionService createConnectionServiceMock() {
-    XMPPConnectionService srv = createNiceMock(XMPPConnectionService.class);
-
-    expect(srv.getJID())
-        .andStubAnswer(
-            new IAnswer<JID>() {
-
-              @Override
-              public JID answer() throws Throwable {
-                return new JID("alice");
-              }
-            });
-
-    replay(srv);
-    return srv;
-  }
-
   private static IContainerContext createContextMock(final MutablePicoContainer container) {
 
     final IContainerContext context = createMock(IContainerContext.class);
-
-    context.initComponent(isA(Object.class));
-
-    expectLastCall()
-        .andAnswer(
-            new IAnswer<Object>() {
-
-              @Override
-              public Object answer() throws Throwable {
-                Object session = getCurrentArguments()[0];
-                MutablePicoContainer dummyContainer = container.makeChildContainer();
-                dummyContainer.addComponent(session.getClass(), session);
-                new Reinjector(dummyContainer)
-                    .reinject(session.getClass(), new AnnotatedFieldInjection());
-                container.removeChildContainer(dummyContainer);
-                return null;
-              }
-            })
-        .times(2);
 
     expect(context.getComponent(isA(Class.class)))
         .andStubAnswer(
@@ -276,25 +237,17 @@ public class SarosSessionTest {
 
     final Preferences preferences = EclipseMocker.initPreferences();
 
-    // triggers SWTUtils if not disabled and causes issues
-    preferences.putInt(
-        EclipsePreferenceConstants.FEEDBACK_SURVEY_DISABLED, FeedbackManager.FEEDBACK_DISABLED);
-
-    // Init Feedback
-    FeedbackPreferences.setPreferences(preferences);
-
     EclipseMocker.mockSarosWithPreferences(container, store, preferences);
 
     container.addComponent(AwarenessInformationCollector.class);
     container.addComponent(EclipsePreferences.class);
-    container.addComponent(FeedbackManager.class);
     container.addComponent(NonUISynchronizer.class);
 
     /*
      * Replacements
      */
     container.removeComponent(XMPPConnectionService.class);
-    container.addComponent(XMPPConnectionService.class, createConnectionServiceMock());
+    container.addComponent(XMPPConnectionService.class);
 
     container.removeComponent(IConnectionManager.class);
     addMockedComponent(IConnectionManager.class);
@@ -333,7 +286,8 @@ public class SarosSessionTest {
     final IContainerContext context = createContextMock(container);
 
     // Test creating, starting and stopping the session.
-    SarosSession session = new SarosSession(SAROS_SESSION_ID, new PreferenceStore(), context);
+    SarosSession session =
+        new SarosSession(SAROS_SESSION_ID, LOCAL_USER_JID, new PreferenceStore(), context);
 
     assertFalse(session.hasActivityConsumers());
     assertFalse(session.hasActivityProducers());

@@ -4,11 +4,11 @@ The stf test process is much more complex than the build process and also requir
 ## Directory structure
 * `stf/build`
   * Contains only scripts that are build related and are called within the build and test container of saros (`saros/saros_test`).
-* `stf/master`
-  * Contains only scripts which are called within the master docker container of the stf infrastructure (`saros/stf_master`).
+* `stf/coordinator`
+  * Contains only scripts which are called within the coordinator docker container of the stf infrastructure (`saros/stf_coordinator`).
   * The purpose of the scripts is to prepare the mounted workspace `/stf_ws` for testing and execute the tests
-* `stf/slave`
-  * Contains only scripts which are called within the slave docker container of the stf infrastructure (`saros/stf_slave`).
+* `stf/worker`
+  * Contains only scripts which are called within the worker docker container of the stf infrastructure (`saros/stf_worker`).
   * The purpose of the scripts is to start eclipse
 * `stf`
   * Contains scripts which are directly executed from GitHub Actions.
@@ -23,7 +23,7 @@ Setting:
 
 Process
 1. Step: Build testees (all jars which have to be tested)
-  * Script triggered by: `master_setup_utils.sh`
+  * Script triggered by: `coordinator_setup_utils.sh`
   * Executed in: container of `saros/build_test`
   * Implemented in: `build/provide_testee.sh`
   * Tasks:
@@ -42,36 +42,36 @@ Process
   * Executed in: Travis VM
   * Implemented in: `setup_stf_container.sh`
   * Tasks:
-    * Start master container
+    * Start coordinator container
     * Start xmpp server container
     * Start determined set of containers
 4. Step: Prepare stf workspace
   * Script triggered by: `setup_stf_container.sh`
-  * Executed in: container of `saros/stf_test_master`
-  * Implemented in: `master/setup_stf_ws.sh`
+  * Executed in: container of `saros/stf_test_coordinator`
+  * Implemented in: `coordinator/setup_stf_ws.sh`
   * Tasks:
     * extract sources from jars in stf workspace which are created by the build step
     * instrument jars
     * provide instrumented jars in plugin directory for provisioning into eclipse
 5. Step: Setup XMPP Server
   * Script triggered by: `setup_stf_container.sh`
-  * Executed in: container of `saros/stf_test_master`
+  * Executed in: container of `saros/stf_test_coordinator`
   * Implemented in: `xmpp_setup_utils.sh`
   * Tasks:
     * Start prosody xmpp server in container
     * Create test user in database
-6. Step: Start services in all slaves
+6. Step: Start services in all workers
   * Script triggered by: Travis
   * Executed in: Travis VM
   * Implemented in: `setup_stf_container.sh`
-  * Tasks executed for each slave:
+  * Tasks executed for each worker:
     * start vncserver in container
     * wait until xfwm (window manager) is available
-    * start eclipse in container (via script `slave/start_eclipse.sh`)
+    * start eclipse in container (via script `worker/start_eclipse.sh`)
     * wait until rmi server binded corresponding port
 6. Step: Execute stf tests
   * Script triggered by: Travis
-  * Executed in: container of `saros/stf_master`
-  * Implemented in: `master/start_stf_tests.sh`
+  * Executed in: container of `saros/stf_coordinator`
+  * Implemented in: `coordinator/start_stf_tests.sh`
   * Tasks:
     * Execute tests via ant

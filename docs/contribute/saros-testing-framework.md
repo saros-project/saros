@@ -72,6 +72,18 @@ Each simultaneously execution of `runIde` creates a sandbox directory in the `bu
 If you want to configure the parent directory of the sandbox directories you have to set the environment variable `SAROS_INTELLIJ_SANDBOX`
 to the corresponding directory.
 
+### Debugging Saros/E using IntelliJ
+
+Even though it is currently not possible to run the STF (or start a new Eclipse instance with the built plugin) from within IntelliJ IDEA,
+it is possible to use IntelliJ as the debugging client.
+
+To do so, you will first have to start the needed Eclipse tasks.
+The tasks are named `Remore Debugging - Saros_STF_[USER]` (e.g. `Remore Debugging - Saros_STF_Alice`).
+The tasks will hold until a debugger is attached.
+
+To attach the IntelliJ debugger, call the matching run configuration `Saros/E Debugging - STF [USER]` (e.g. `Saros/E Debugging - STF Alice`).
+
+
 ## Without an IDE
 
 ### Test IntelliJ by Hand
@@ -91,14 +103,14 @@ In order to use the corresponding script you need a current **docker installatio
 * Create the required docker contains by executing  
   `./travis/script/stf/setup_stf_container.sh $PWD`
 * Start the STF tests by executing
-  `docker exec -t stf_master /home/ci/saros_src/travis/script/stf/master/start_stf_tests.sh`
+  `docker exec -t stf_coordinator /home/ci/saros_src/travis/script/stf/coordinator/start_stf_tests.sh`
 
 ### Clean Test Environment
 
 In order to clean the environment you have to stop and remove all created containers and
 remove the network.
 
-* Stop and remove containers `docker rm -f stf_slave_1 stf_prosody_test.org stf_master`
+* Stop and remove containers `docker rm -f stf_worker_1 stf_prosody_test.org stf_coordinator`
 * Remove network `docker network rm stf_test_network`
 * Remove the `stf_ws` directory
 

@@ -73,10 +73,11 @@ public class SortContactsOnlineOverOfflineTest extends StfTestCase {
     checkContactsOrder(contacts, 0);
   }
 
+  /** Checks that the contacts list is sorted as defined in {@link RosterComparator}. */
   private void checkContactsOrder(List<String> contacts, int s) {
     for (int i = s; i < contacts.size() - 1; i++)
       assertTrue(
           "roster is not sorted asc. : " + contacts.get(i) + " > " + contacts.get(i + 1),
-          contacts.get(i).compareTo(contacts.get(i + 1)) <= 0);
+          contacts.get(i).compareToIgnoreCase(contacts.get(i + 1)) <= 0);
   }
 }

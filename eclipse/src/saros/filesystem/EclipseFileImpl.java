@@ -11,6 +11,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 
+/** @deprecated use {@link EclipseFileImplV2} instead */
+@Deprecated
 public class EclipseFileImpl extends EclipseResourceImpl implements IFile {
 
   private static final Logger log = Logger.getLogger(EclipseFileImpl.class);

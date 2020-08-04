@@ -9,6 +9,8 @@ import java.io.IOException;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.OperationCanceledException;
 
+/** @deprecated use {@link EclipseResourceImplV2} instead */
+@Deprecated
 public class EclipseResourceImpl implements IResource {
 
   protected final org.eclipse.core.resources.IResource delegate;

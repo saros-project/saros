@@ -16,6 +16,9 @@
 - title: Saros Server Development
   url: /contribute/saros-server.html
 
+- title: Logging
+  url: /contribute/logging.html
+
 - title: Processes
   sublinks:
   - title: Development Process

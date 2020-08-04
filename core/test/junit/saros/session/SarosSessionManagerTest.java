@@ -17,6 +17,7 @@ import saros.communication.connection.ConnectionHandler;
 import saros.context.IContainerContext;
 import saros.net.IReceiver;
 import saros.net.ITransmitter;
+import saros.net.xmpp.JID;
 import saros.preferences.IPreferenceStore;
 import saros.session.internal.SarosSession;
 
@@ -97,6 +98,7 @@ public class SarosSessionManagerTest {
     PowerMock.expectNew(
             SarosSession.class,
             EasyMock.anyObject(String.class),
+            EasyMock.anyObject(JID.class),
             EasyMock.anyObject(IPreferenceStore.class),
             EasyMock.anyObject(IContainerContext.class))
         .andStubReturn(session);

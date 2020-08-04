@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Using this configuration file requires to set the main arguments:
+- logLevel the log level that has to be logged (e.g. set it to "warn"
+  to avoid logging messages with a lower level than "warn" (e.g. "debug"))
+- logDir the target directory for all log files
+-->
+<Configuration status="error">
+
+  <Appenders>
+    <Console name="SarosConsoleAppender" target="SYSTEM_OUT">
+      <PatternLayout pattern="%-5p %d{HH:mm:ss,SSS} [%t] (%F:%L) %m%n"/>
+      <ThresholdFilter level="${main:logLevel}" onMatch="ACCEPT" onMismatch="DENY"/>
+    </Console>
+
+    <RollingFile name="FileLogAppender" fileName="${main:logDir}/saros.log"
+                   filePattern="${main:logDir}/archive/saros-%d{MM-dd-yyyy_HH-mm-ss}-%i.log.zip">
+      <PatternLayout pattern="%-5p %d{HH:mm:ss,SSS} [%t] (%F:%L) %m%n" />
+      <Policies>
+        <OnStartupTriggeringPolicy />
+      </Policies>
+      <DefaultRolloverStrategy max="5"/>
+      <ThresholdFilter level="${main:logLevel}" onMatch="ACCEPT" onMismatch="DENY"/>
+    </RollingFile>
+
+    <RollingFile name="ErrorFileAppender" fileName="${main:logDir}/saros-errors.log"
+                   filePattern="${main:logDir}/archive/saros-errors-%d{MM-dd-yyyy_HH-mm-ss}-%i.log.zip">
+      <PatternLayout pattern="%-5p %d{HH:mm:ss,SSS} [%t] (%F:%L) %m%n" />
+      <Policies>
+        <OnStartupTriggeringPolicy />
+      </Policies>
+      <DefaultRolloverStrategy max="5"/>
+      <ThresholdFilter level="warn" onMatch="ACCEPT" onMismatch="DENY"/>
+    </RollingFile>
+  </Appenders>
+
+  <Loggers>
+
+    <Root level="all">
+      <AppenderRef ref="SarosConsoleAppender"/>
+      <AppenderRef ref="FileLogAppender"/>
+      <AppenderRef ref="ErrorFileAppender"/>
+    </Root>
+
+    <!-- Logger only used by stf to avoid flooding the log with swtbot's trace messages -->
+    <Logger name="org.eclipse.swtbot" level="warn">
+      <AppenderRef ref="SarosConsoleAppender"/>
+      <AppenderRef ref="FileLogAppender"/>
+      <AppenderRef ref="ErrorFileAppender"/>
+    </Logger>
+  </Loggers>
+
+</Configuration>
