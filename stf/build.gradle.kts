@@ -1,4 +1,5 @@
 plugins {
+  id("org.gradle.test-retry") version "1.1.5"
   id("saros.gradle.eclipse.plugin")
 }
 
@@ -47,6 +48,12 @@ tasks {
 
     test {
         systemProperty("saros.stf.client.configuration.files", System.getProperty("stf.client.configuration.files", ""))
+      
+        retry {
+            failOnPassedAfterRetry.set(false)
+            maxFailures.set(10)
+            maxRetries.set(3)
+        }
     }
 
     jar {
