@@ -54,6 +54,8 @@ tasks {
             maxFailures.set(10)
             maxRetries.set(3)
         }
+      
+        include("**/stf/test/**/*Test.*") // Match only test cases and ignore the test suites
     }
 
     jar {
