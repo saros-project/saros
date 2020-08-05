@@ -93,7 +93,7 @@ function aggregate_test_results {
     ws_dir="$STF_HOST_WS/ws"
 
     echo "::Copy test report"
-    [ "$run_self_tests" == "true" ] && project="stf.test" || "stf"
+    [ "$run_self_tests" == "true" ] && project="stf.test" || project="stf"
     cp -r "$project/build/reports/tests" "$result_dir/reports"
     cp "$ws_dir"/*.log "$result_dir/"
 
