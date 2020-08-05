@@ -200,7 +200,7 @@ tasks {
     register("dropin", Zip::class) {
         dependsOn(updateSite)
 
-        archiveFileName.set("saros-dropin.zip")
+        archiveFileName.set("saros-eclipse-dropin.zip")
         destinationDirectory.set(project.file("build/dropin"))
 
         from(updateSiteDirPath) {
