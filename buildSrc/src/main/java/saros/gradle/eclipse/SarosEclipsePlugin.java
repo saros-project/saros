@@ -75,9 +75,13 @@ public class SarosEclipsePlugin implements Plugin<Project> {
 
     if (e.isAddDependencies()) {
       methodRequiresManifest("add dependencies", e);
+      String eclipseVersion = e.getEclipseVersion();
+      if (eclipseVersion == null)
+        throw new GradleException(
+            "Unable to add osgi dependencies without an eclipse version specification.");
+
       new OsgiDependencyConfigurator(p)
-          .addDependencies(
-              e.getManifest(), e.getExcludeManifestDependencies(), e.getEclipseVersion());
+          .addDependencies(e.getManifest(), e.getExcludeManifestDependencies(), eclipseVersion);
     }
   }
 

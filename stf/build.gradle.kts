@@ -3,6 +3,7 @@ plugins {
 }
 
 val versionQualifier = (ext.get("versionQualifier") ?: "") as String
+val eclipseVersionNr = ext.get("eclipseVersion") as String
 val junitVersion = ext.get("junitVersion")
 
 sarosEclipse {
@@ -11,6 +12,7 @@ sarosEclipse {
     isCreateBundleJar = true
     isAddDependencies = true
     pluginVersionQualifier = versionQualifier
+    eclipseVersion = eclipseVersionNr
 }
 
 configurations {

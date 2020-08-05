@@ -8,6 +8,7 @@ import com.diffplug.gradle.p2.CategoryPublisher
 import com.diffplug.gradle.pde.EclipseRelease
 
 val versionQualifier = ext.get("versionQualifier") as String
+val eclipseVersionNr = ext.get("eclipseVersion") as String
 
 configurations {
     val testConfig by getting {}
@@ -23,6 +24,7 @@ sarosEclipse {
     isCreateBundleJar = true
     isAddDependencies = true
     pluginVersionQualifier = versionQualifier
+    eclipseVersion = eclipseVersionNr
 }
 
 sourceSets {
@@ -164,8 +166,7 @@ tasks {
     val updateSiteCategoryPublishing by registering {
         dependsOn(updateSiteFeaturesAndBundlesPublishing)
         doLast {
-            val eclipseVersion = "4.8.0"
-            with(CategoryPublisher(EclipseRelease.official(eclipseVersion))) {
+            with(CategoryPublisher(EclipseRelease.official(eclipseVersionNr))) {
                 metadataRepository(project.file(updateSiteDirPath))
                 categoryDefinition(project.file("$updateSiteDirPath/site.xml"))
                 runUsingPdeInstallation()

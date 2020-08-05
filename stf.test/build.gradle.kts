@@ -3,10 +3,13 @@ plugins {
     id("saros.gradle.eclipse.plugin")
 }
 
+val eclipseVersionNr = ext.get("eclipseVersion") as String
+
 sarosEclipse {
     manifest = file("META-INF/MANIFEST.MF")
     excludeManifestDependencies = listOf("org.junit", "saros.eclipse", "saros.core")
     isAddDependencies = true
+    eclipseVersion = eclipseVersionNr
 }
 
 configurations {
