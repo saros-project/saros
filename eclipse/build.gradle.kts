@@ -105,20 +105,20 @@ tasks {
      *  |- plugins/
      *    |- saros.core.jar
      *    |- saros.eclipse.jar
-     *  |- category.xml
+     *  |- site.xml
      */
     val updateSitePreparation by registering(Copy::class) {
         dependsOn(":saros.core:jar", ":saros.eclipse:jar")
 
-        from("feature/feature.xml") {
-            into("features")
+        into(updateSiteDirPath)
+        into("features") {
+            from("feature/feature.xml")
         }
         into("plugins") {
             from(project.tasks.findByName("jar"))
             from(project(":saros.core").tasks.findByName("jar"))
         }
         from("update/site.xml")
-        into(updateSiteDirPath)
     }
 
     /* Step 1 of update-site creation
