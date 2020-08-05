@@ -3,6 +3,10 @@ plugins {
     id("com.diffplug.p2.asmaven") // Provides the class FeaturesAndBundlesPublisher
 }
 
+import com.diffplug.gradle.p2.FeaturesAndBundlesPublisher
+import com.diffplug.gradle.p2.CategoryPublisher
+import com.diffplug.gradle.pde.EclipseRelease
+
 val versionQualifier = ext.get("versionQualifier") as String
 
 configurations {
@@ -134,7 +138,7 @@ tasks {
     val updateSiteFeaturesAndBundlesPublishing by registering {
         dependsOn(updateSitePreparation)
         doLast {
-            with(com.diffplug.gradle.p2.FeaturesAndBundlesPublisher()) {
+            with(FeaturesAndBundlesPublisher()) {
                 source(project.file(updateSiteDirPath))
                 compress()
                 inplace()
@@ -160,7 +164,8 @@ tasks {
     val updateSiteCategoryPublishing by registering {
         dependsOn(updateSiteFeaturesAndBundlesPublishing)
         doLast {
-            with(saros.gradle.eclipse.CategoryPublisher("4.8.0")) {
+            val eclipseVersion = "4.8.0"
+            with(CategoryPublisher(EclipseRelease.official(eclipseVersion))) {
                 metadataRepository(project.file(updateSiteDirPath))
                 categoryDefinition(project.file("$updateSiteDirPath/site.xml"))
                 runUsingPdeInstallation()
