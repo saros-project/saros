@@ -1,8 +1,8 @@
 #!/bin/bash -e
 
-stf_coordinator_image="openjdk:8-jdk-alpine3.8"
-stf_worker_image="saros/stf_test_slave:0.6"
-stf_xmpp_image="saros/stf_xmpp_server:0.6"
+stf_coordinator_image="saros/stf_test_coordinator:0.8"
+stf_worker_image="saros/stf_test_worker:0.8"
+stf_xmpp_image="saros/stf_xmpp_server:0.8"
 
 stf_coordinator_name="stf_coordinator"
 stf_network_name="stf_test_network"

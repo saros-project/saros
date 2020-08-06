@@ -17,8 +17,6 @@ function start_container_coordinator()
 
 function setup_container_coordinator()
 {
-  # Workaround: Package installation has to be moved into a Dockerfile
-  docker exec -t "$stf_coordinator_name" /bin/sh -c "apk --update add --no-cache gtk+3.0"
   echo "Build testees"
   docker exec -t "$stf_coordinator_name" "$SCRIPT_DIR_CONTAINER/stf/coordinator/build_testee.sh"
   echo "Executing setup_stf_ws.sh on $stf_coordinator_name"
