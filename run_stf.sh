@@ -1,7 +1,7 @@
 #!/bin/bash
 
-export CONFIG_DIR=travis/config \
-       SCRIPT_DIR=travis/script/stf \
+export CONFIG_DIR=ci_scripts/config \
+       SCRIPT_DIR=ci_scripts/script/stf \
        ws_dir=$PWD
 
 user="$(id -u):$(id -g)"

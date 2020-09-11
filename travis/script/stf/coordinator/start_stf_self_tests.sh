@@ -9,7 +9,7 @@ cd /home/ci/saros_src
 timeout -t 3600 ./gradlew \
   --stacktrace \
   --no-daemon \
-  -Dstf.client.configuration.files=/home/ci/saros_src/travis/config/stf_config \
+  -Dstf.client.configuration.files=/home/ci/saros_src/ci_scripts/config/stf_config \
   -Dsaros.debug=true \
   -PskipSTFTests=false \
   -PuseBuildScan=true \
