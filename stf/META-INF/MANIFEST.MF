@@ -16,7 +16,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.jdt.launching;resolution:=optional,
  saros.core,
  saros.eclipse,
- org.junit
+ org.junit,
+ org.eclipse.ui.ide
 Bundle-ClassPath: .,
  lib/org.eclipse.swtbot.ant.junit_2.7.0.201806111355.jar,
  lib/org.eclipse.swtbot.e4.finder_2.7.0.201806111355.jar,

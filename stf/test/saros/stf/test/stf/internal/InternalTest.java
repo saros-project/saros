@@ -21,6 +21,7 @@ public class InternalTest extends StfTestCase {
 
   @After
   public void deleteWorkspace() throws Exception {
+    ALICE.remoteBot().closeAllEditors();
     ALICE.superBot().internal().clearWorkspace();
   }
 
@@ -112,6 +113,14 @@ public class InternalTest extends StfTestCase {
     ALICE.superBot().internal().createJavaProject("Hello");
     ALICE.superBot().internal().createFile("Hello", "test.bar", "bla");
     assertEquals(3L, ALICE.superBot().internal().getFileSize("Hello", "test.bar"));
+  }
+
+  @Test
+  public void testOpenFile() throws Exception {
+    ALICE.superBot().internal().createProject("foo");
+    ALICE.superBot().internal().createFile("foo", "hello.txt", "Hello World");
+    ALICE.superBot().internal().openFile("foo/hello.txt");
+    assertEquals("Hello World", ALICE.remoteBot().editor("hello.txt").getText());
   }
 
   @AfterClass

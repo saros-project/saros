@@ -17,6 +17,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -27,6 +28,9 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.launching.IVMInstall;
 import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.jdt.launching.LibraryLocation;
+import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.ide.IDE;
 import saros.stf.server.StfRemoteObject;
 import saros.stf.server.rmi.superbot.internal.IInternal;
 import saros.versioning.Version;
@@ -404,6 +408,36 @@ public final class InternalImpl extends StfRemoteObject implements IInternal {
     } catch (CoreException e) {
       log.error(e.getMessage(), e);
       throw new RemoteException(e.getMessage(), e.getCause());
+    }
+  }
+
+  @Override
+  public void openFile(final String path) throws RemoteException {
+
+    final IResource resource = ResourcesPlugin.getWorkspace().getRoot().findMember(path);
+
+    if (resource == null) throw new RemoteException(path + " does not exist");
+
+    if ((resource.getType() & IResource.FILE) != IResource.FILE)
+      throw new RemoteException(path + " is not a file");
+
+    final Exception exception =
+        UIThreadRunnable.syncExec(
+            () -> {
+              try {
+                IDE.openEditor(
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(),
+                    resource.getAdapter(IFile.class));
+                return null;
+              } catch (Exception e) {
+                return e;
+              }
+            });
+
+    // TODO check if PartInitException can be serialized
+    if (exception != null) {
+      log.error("failed to open file: " + path, exception);
+      throw new RemoteException("failed to open file " + path + " : " + exception.getMessage());
     }
   }
 }

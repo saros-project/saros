@@ -144,6 +144,13 @@ public interface IInternal extends Remote {
   public void append(String projectName, String path, String content) throws RemoteException;
 
   /**
+   * Opens a file in an editor. The editor used to display the file is determined by Eclipse.
+   *
+   * @param path full path to the file relative to the workspace root, e.g <i>Foo/bar/hello.txt</i>
+   * @throws RemoteException
+   */
+  public void openFile(String path) throws RemoteException;
+  /**
    * Gets the content from the given file
    *
    * @param projectName the name project where the java class should be created
