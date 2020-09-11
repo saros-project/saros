@@ -98,17 +98,13 @@ In order to use the corresponding script you need a current **docker installatio
 
 * Open a bash terminal
 * Change the current working directory to the Saros repository root directory
-* Create the directory `stf_ws` which is used by the containers to store test artifacts
-* Execute `export CONFIG_DIR=travis/config SCRIPT_DIR=travis/script/stf`
-* Create the required docker contains by executing  
-  `./travis/script/stf/setup_stf_container.sh $PWD`
-* Start the STF tests by executing
-  `docker exec -t stf_coordinator /home/ci/saros_src/travis/script/stf/coordinator/start_stf_tests.sh`
+* Call the script `./run_stf.sh` (check `--help` for options)
 
 ### Clean Test Environment
 
-In order to clean the environment you have to stop and remove all created containers and
-remove the network.
+If your environment is not clean after the stf test execution
+(e.g. because you used `run_stf.sh --ci`) you can perform the following
+clean-up steps:
 
 * Stop and remove containers `docker rm -f stf_worker_1 stf_prosody_test.org stf_coordinator`
 * Remove network `docker network rm stf_test_network`
@@ -117,4 +113,5 @@ remove the network.
 ### View Eclipse Test Instances
 
 If you want to see how the tests are performed you have install a vncviewer.
-Start the vncviewer and connect to the vncservers running on the test container. You have to connect to host `localhost` and the ports `5901`, `5902`, `5903` and `5904`.
+Start the vncviewer and connect to the vncservers running on the test container.
+You have to connect to host `localhost` and the ports `5901`, `5902`, `5903` and `5904`.
