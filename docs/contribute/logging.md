@@ -45,8 +45,17 @@ log.trace("id: {}, namespace: {}", namespaceId, namespace)
 ```
 or also a format string using a closure:
 ```java
+log.trace("id: {}, namespace: {}", () -> calculateId(), () -> namespace())
+```
+
+{% alert warning %}
+The [Log4j2 API](https://logging.apache.org/log4j/2.x/log4j-api/apidocs/index.html) does not support to mix both variants.<br/>
+Therefore, **the following is invalid**:
+
+```java
 log.trace("id: {}, namespace: {}", () -> calculateId(), namespace)
 ```
+{% endalert %}
 
 ### Log4j-1.2-api
 
