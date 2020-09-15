@@ -1,51 +1,63 @@
-import * as vscode from 'vscode';
-import {sarosExtensionInstance} from './core';
-import {activateAccounts} from './account';
+import {
+  activateAccounts,
+  activateContacts,
+} from './commands';
+import {SarosContactView, SarosAccountView} from './views';
+import {sarosInstance} from './lsp';
+import {ExtensionContext, workspace, window} from 'vscode';
+import {variables} from './utils/variables';
+import {activateConnections} from './commands/connections/activator';
 
 /**
- * Activation function of the extension.
+ * Activates the extension.
  *
  * @export
- * @param {vscode.ExtensionContext} context - The extension context
+ * @param {ExtensionContext} context - The extension context
  */
-export function activate(context: vscode.ExtensionContext) {
-  sarosExtensionInstance.setContext(context)
+export function activate(context: ExtensionContext) {
+  const activationConditionError = getActivationConditionError();
+  if (activationConditionError) {
+    window.showErrorMessage(activationConditionError);
+    deactivate();
+    return;
+  }
+  sarosInstance.setContext(context)
       .init()
       .then(() => {
-        activateAccounts(sarosExtensionInstance);
+        activateAccounts(sarosInstance);
+        activateContacts(sarosInstance);
+        activateConnections(sarosInstance);
 
-        console.log('Extension "Saros" is now active!');
-      })
-      .catch((reason) => {
-        console.log(reason);
-        vscode.window.showErrorMessage(
-            'Saros extension did not start propertly.' +
-            'Reason: ' + reason);
+        context.subscriptions
+            .push(new SarosAccountView(sarosInstance));
+        context.subscriptions
+            .push(new SarosContactView(sarosInstance));
+
+        variables.setInitialized(true);
       });
-
-  context.subscriptions.push(createStatusBar());
 }
 
 /**
- * Creates the status bar.
+ * Checks if extension is supported within the opened workspace.
  *
- * @return {Disposable} The status bar item as [disposable](#Disposable)
+ * @return {(string|undefined)} undefined if extension can be activated
+ *  and a reason if extension doesn't support the opened workspace.
  */
-function createStatusBar(): vscode.Disposable {
-  const statusBarItem =
-    vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left,
-        Number.MAX_VALUE);
-  statusBarItem.text = 'Saros';
-  statusBarItem.show();
-
-  return statusBarItem;
+function getActivationConditionError(): string|undefined {
+  if (workspace.workspaceFolders === undefined) {
+    return 'Workspace is empty - Saros deactivated';
+  } else if (workspace.workspaceFolders.length > 1) {
+    return 'Multiple workspaces aren\'t currently supported' +
+           ' - Saros deactivated';
+  }
 }
 
 /**
- * Deactivation function of the extension.
+ * Deactivates the extension.
  *
  * @export
  */
 export function deactivate() {
-  console.log('deactivated');
+  sarosInstance.deactivate();
+  variables.setInitialized(false);
 }
