@@ -40,6 +40,8 @@ sourceSets {
 
 dependencies {
     implementation(project(":saros.core"))
+    // This is a workaround for https://github.com/saros-project/saros/issues/1086
+    implementation("org.eclipse.platform:org.eclipse.urischeme:1.1.0")
     testImplementation(project(path = ":saros.core", configuration = "testing"))
 }
 
