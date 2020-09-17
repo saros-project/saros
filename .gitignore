@@ -49,6 +49,8 @@ buildSrc/.gradle
 .DS_Store
 /.gradle/
 /build/
+**/.settings/org.eclipse.buildship.core.prefs
+.classpath
 
 # Common
 .project
