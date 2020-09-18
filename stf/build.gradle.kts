@@ -28,6 +28,8 @@ dependencies {
     }
     compile(project(":saros.core"))
     compile(project(":saros.eclipse"))
+      // This is a workaround for https://github.com/saros-project/saros/issues/1086
+    implementation("org.eclipse.platform:org.eclipse.urischeme:1.1.0")
 
     compile(project(path = ":saros.eclipse", configuration = "testing"))
 
