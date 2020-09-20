@@ -1,31 +1,51 @@
 package saros.lsp;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import org.apache.log4j.Logger;
+import java.util.function.Consumer;
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.ServerCapabilities;
-import org.eclipse.lsp4j.services.TextDocumentService;
+import org.eclipse.lsp4j.TextDocumentSyncKind;
 import org.eclipse.lsp4j.services.WorkspaceService;
-import saros.lsp.extensions.ISarosLanguageServer;
-import saros.lsp.extensions.client.ISarosLanguageClient;
-import saros.lsp.extensions.client.ISarosLanguageClientAware;
-import saros.lsp.extensions.server.account.AccountService;
+import saros.lsp.extensions.server.ISarosLanguageServer;
 import saros.lsp.extensions.server.account.IAccountService;
-import saros.lsp.service.DocumentServiceStub;
-import saros.lsp.service.WorkspaceServiceStub;
+import saros.lsp.extensions.server.connection.IConnectionService;
+import saros.lsp.extensions.server.contact.IContactService;
+import saros.lsp.extensions.server.document.IDocumentService;
 
-/** Implementation of the Saros language server. */
-// TODO: Remove SuppressWarning after Server and Client interaction is on master branch
-@SuppressWarnings({"PMD.UnusedPrivateField"})
-public class SarosLanguageServer implements ISarosLanguageServer, ISarosLanguageClientAware {
+/** Implmenentation of {@link ISarosLanguageServer}. */
+public class SarosLanguageServer implements ISarosLanguageServer {
 
-  private static final Logger log = Logger.getLogger(SarosLanguageServer.class);
+  private IAccountService accountService;
 
-  private ISarosLanguageClient languageClient;
+  private IContactService contactService;
+
+  private IDocumentService documentService;
+
+  private WorkspaceService workspaceService;
+
+  private IConnectionService connectionService;
+
+  public SarosLanguageServer(
+      IAccountService accountService,
+      IContactService contactService,
+      IDocumentService documentService,
+      IConnectionService connectionService,
+      WorkspaceService workspaceService) {
+    this.accountService = accountService;
+    this.contactService = contactService;
+    this.documentService = documentService;
+    this.connectionService = connectionService;
+    this.workspaceService = workspaceService;
+  }
 
   @Override
   public CompletableFuture<InitializeResult> initialize(InitializeParams params) {
+
+    this.initializeListeners.forEach(listener -> listener.accept(params));
+
     return CompletableFuture.completedFuture(new InitializeResult(this.createCapabilities()));
   }
 
@@ -46,37 +66,57 @@ public class SarosLanguageServer implements ISarosLanguageServer, ISarosLanguage
   private ServerCapabilities createCapabilities() {
     ServerCapabilities capabilities = new ServerCapabilities();
 
+    capabilities.setExperimental(true);
+    capabilities.setTextDocumentSync(TextDocumentSyncKind.Incremental);
+
     return capabilities;
   }
 
   @Override
   public CompletableFuture<Object> shutdown() {
-    log.info("shutdown");
     return CompletableFuture.completedFuture(null);
   }
 
   @Override
   public void exit() {
-    log.info("exit");
+    this.exitListeners.forEach(listener -> listener.run());
+  }
+
+  private List<Runnable> exitListeners = new ArrayList<>();
+  private List<Consumer<InitializeParams>> initializeListeners = new ArrayList<>();
+
+  @Override
+  public void onInitialize(Consumer<InitializeParams> consumer) {
+    this.initializeListeners.add(consumer);
   }
 
   @Override
-  public TextDocumentService getTextDocumentService() {
-    return new DocumentServiceStub();
+  public void onExit(Runnable runnable) {
+    this.exitListeners.add(runnable);
+  }
+
+  @Override
+  public IDocumentService getTextDocumentService() {
+    return this.documentService;
   }
 
   @Override
   public WorkspaceService getWorkspaceService() {
-    return new WorkspaceServiceStub();
-  }
-
-  @Override
-  public void connect(ISarosLanguageClient client) {
-    this.languageClient = client;
+    return this.workspaceService;
   }
 
   @Override
   public IAccountService getSarosAccountService() {
-    return new AccountService();
+    return this.accountService;
+  }
+
+  @Override
+  public IContactService getSarosContactService() {
+    return this.contactService;
+  }
+
+  @Override
+  public IConnectionService getSarosConnectionService() {
+    return this.connectionService;
   }
 }
