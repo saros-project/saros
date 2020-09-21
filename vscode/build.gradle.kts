@@ -55,14 +55,13 @@ tasks.register<Exec>("runExtension") {
   group = "VS Code"
   description = "Builds and runs the extension"
 
-  var cwd = System.getProperty("cwd", "") // argument is -Pcwd=
-  var execArgs = "code --extensionDevelopmentPath=${projectDir.absolutePath} ${cwd} --inspect-extensions 1234"
-  
+  var cwd = System.getProperty("cwd", "") // gradle argument is -Pcwd=
+  var execArgs = "--extensionDevelopmentPath=${projectDir.absolutePath} ${cwd}".trim()
   if (Os.isFamily(Os.FAMILY_WINDOWS)) {
     executable = "cmd"
-    setArgs(listOf("/c ${execArgs}"))
+    setArgs(listOf("/c code ${execArgs}"))
   } else {
-    executable = "sh"
+    executable = "code"
     setArgs(listOf(execArgs))
   }
 
