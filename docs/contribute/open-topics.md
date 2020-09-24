@@ -9,11 +9,6 @@ Here you can find:
 Therefore this page can be used for finding open and interesting topics which can be continued.
 Please, let us know (e.g. via our [Gitter](https://gitter.im/saros-project/saros) or [mailing list](https://groups.google.com/forum/#!forum/saros-devel)) before you continue a topic so we can share our thoughts and experiences.
 
-## Refactoring Saros filesystem
-**Status:** [@tobous](https://github.com/tobous) is currently preparing a refactoring of the filesystem.
-
-You can find all information about the idea of the refactoring of the Saros filesystem [here](refactoring-filesystem.md).
-
 ## Instant Session Start
 **Status:** Currently the author ([@stefaus](https://github.com/stefaus)) of the feature wants to finish the rest of this work and some patches are already available.
 Nevertheless the topic is on hold mainly because it is mandatory to change the way resources are shared first (from project based to per resource tracking).
