@@ -124,6 +124,12 @@ subprojects {
     }
 
     /*
+     * Define default eclipse version that is used for resolving
+     * dependencies and building the update site.
+     */
+    projectToConf.extra["eclipseVersion"] = "4.8.0"
+
+    /*
      * Make common dependency definitions accessible by all sub-projects
      */
     val junitVersion = "junit:junit:4.12"

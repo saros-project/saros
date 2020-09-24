@@ -3,6 +3,7 @@ plugins {
 }
 
 val versionQualifier = (ext.get("versionQualifier") ?: "") as String
+val eclipseVersionNr = ext.get("eclipseVersion") as String
 val junitVersion = ext.get("junitVersion")
 
 sarosEclipse {
@@ -11,6 +12,7 @@ sarosEclipse {
     isCreateBundleJar = true
     isAddDependencies = true
     pluginVersionQualifier = versionQualifier
+    eclipseVersion = eclipseVersionNr
 }
 
 configurations {
@@ -26,6 +28,8 @@ dependencies {
     }
     compile(project(":saros.core"))
     compile(project(":saros.eclipse"))
+      // This is a workaround for https://github.com/saros-project/saros/issues/1086
+    implementation("org.eclipse.platform:org.eclipse.urischeme:1.1.0")
 
     compile(project(path = ":saros.eclipse", configuration = "testing"))
 
