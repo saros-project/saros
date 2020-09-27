@@ -13,10 +13,10 @@ configurations {
 
 dependencies {
     compile(project(":saros.core"))
-    compile(project(":saros.server"))
     compile("org.apache.commons:commons-collections4:4.2")
-    compile("org.eclipse.lsp4j:org.eclipse.lsp4j:0.8.1")
-    compile("org.eclipse.lsp4j:org.eclipse.lsp4j.jsonrpc:0.8.1")
+    compile("org.eclipse.lsp4j:org.eclipse.lsp4j:0.9.0")
+    compile("org.eclipse.lsp4j:org.eclipse.lsp4j.jsonrpc:0.9.0")
+    compile("info.picocli:picocli:4.2.0")
 }
 
 sourceSets {
@@ -37,12 +37,17 @@ tasks.jar {
         ))
     }
     from(
-            configurations.compile.get().map { if (it.isDirectory) it else zipTree(it) }
+            configurations.compile.get().map {if (it.isDirectory) it else zipTree(it) }
     )
 
-    from("src/log4j.properties")
+    from(rootProject.file("saros_log4j2.xml"))
+    from(rootProject.file("log4j2.xml"))
     exclude("**/*.jar")
-
+    
     // Exclude files that prevent the jar from starting
     exclude("META-INF/*.RSA", "META-INF/*.SF", "META-INF/*.DSA")
+
+    // Exclude ambigious Log4j2Plugins.dat resulting from bug LOG4J2-954
+    // see https://issues.apache.org/jira/browse/LOG4J2-954
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
