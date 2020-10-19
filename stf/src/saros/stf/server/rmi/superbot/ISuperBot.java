@@ -39,9 +39,15 @@ public interface ISuperBot extends Remote {
    * The shell with the title {@link StfRemoteObject#SHELL_ADD_RESOURCES} should be appeared by the
    * invitees' side during sharing session. This method confirm the shell using a new project.
    *
+   * <p><b>Note:</b> This method does not enforce that the project nature on the inviter's side is
+   * correctly applied on the invitee's side. As a result, it is only supported for cases where the
+   * project nature is not of interest. In cases where the same project nature is required on all
+   * sides (e.g. if Java language support is needed), please use {@link
+   * #confirmShellAddProjectUsingExistProject(String)} instead.
+   *
    * @throws RemoteException
    */
-  public void confirmShellAddProjectWithNewProject(String projectname) throws RemoteException;
+  public void confirmShellAddProjectWithNewProject(String projectName) throws RemoteException;
 
   /**
    * The shell with the title {@link StfRemoteObject#SHELL_ADD_RESOURCES} should be appeared by the
@@ -65,6 +71,12 @@ public interface ISuperBot extends Remote {
    * The shell with the title {@link StfRemoteObject#SHELL_ADD_RESOURCES} should be appeared by the
    * invitees' side during sharing session. This method confirm the shell. with the passed parameter
    * "usingWhichProject" to decide using which project.
+   *
+   * <p><b>Note:</b> The type {@link TypeOfCreateProject#NEW_PROJECT} does not enforce that the
+   * project nature on the inviter's side is correctly applied on the invitee's side. As a result,
+   * it is only supported for cases where the project nature is not of interest. In cases where the
+   * same project nature is necessary on all sides (e.g. if Java language support is needed), please
+   * use {@link TypeOfCreateProject#EXIST_PROJECT}.
    *
    * @throws RemoteException
    */
@@ -156,6 +168,12 @@ public interface ISuperBot extends Remote {
   /**
    * confirm the shell with title {@link StfRemoteObject#SHELL_SESSION_INVITATION} and also the
    * following shell with title {@link StfRemoteObject#SHELL_ADD_RESOURCES}
+   *
+   * <p><b>Note:</b> The type {@link TypeOfCreateProject#NEW_PROJECT} does not enforce that the
+   * project nature on the inviter's side is correctly applied on the invitee's side. As a result,
+   * it is only supported for cases where the project nature is not of interest. In cases where the
+   * same project nature is necessary on all sides (e.g. if Java language support is needed), please
+   * use {@link TypeOfCreateProject#EXIST_PROJECT}.
    *
    * @param projectName the name of shared project
    * @param usingWhichProject if invitee has same project locally, he can decide use new or existed

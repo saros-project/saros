@@ -3,6 +3,22 @@ package saros.stf.shared;
 import static saros.stf.shared.Configuration.get;
 
 public interface Constants {
+
+  /** Defines how invitees are added to the session. */
+  enum SessionInvitationModality {
+    SEQUENTIALLY,
+    CONCURRENTLY
+  }
+
+  /**
+   * Defines how the shared project is represented on the invitee's side.
+   *
+   * <p><b>Note:</b> Using creation type {@link TypeOfCreateProject#NEW_PROJECT} does not enforce
+   * that the project nature on the inviter's side is correctly applied on the invitee's side. As a
+   * result, it is only supported for cases where the project nature is not of interest. In cases
+   * where the same project nature is necessary on all sides (e.g. if Java language support is
+   * needed), please use {@link TypeOfCreateProject#EXIST_PROJECT} instead.
+   */
   enum TypeOfCreateProject {
     NEW_PROJECT,
     EXIST_PROJECT,
