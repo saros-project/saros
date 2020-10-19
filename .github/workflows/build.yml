@@ -40,7 +40,7 @@ jobs:
       run: |
         short_sha=$(git rev-parse --short=10 $GITHUB_SHA)
         echo "::set-output name=short_sha::$short_sha"
-        echo "::set-env name=SHORT_SHA::$short_sha"
+        echo "SHORT_SHA=$short_sha" >> $GITHUB_ENV
       shell: 'bash'
 
     # Build
