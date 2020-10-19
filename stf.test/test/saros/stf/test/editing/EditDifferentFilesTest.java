@@ -9,7 +9,7 @@ import org.junit.Test;
 import saros.stf.client.StfTestCase;
 import saros.stf.client.util.EclipseTestThread;
 import saros.stf.client.util.Util;
-import saros.stf.shared.Constants.TypeOfCreateProject;
+import saros.stf.shared.Constants.SessionInvitationModality;
 
 public class EditDifferentFilesTest extends StfTestCase {
 
@@ -33,7 +33,7 @@ public class EditDifferentFilesTest extends StfTestCase {
         .newC()
         .javaProjectWithClasses("foo", "bar", "HelloWorld");
 
-    Util.buildSessionSequentially("foo", TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
+    Util.setUpSessionWithJavaProject("foo", SessionInvitationModality.SEQUENTIALLY, ALICE, BOB);
 
     BOB.superBot()
         .views()

@@ -11,7 +11,7 @@ import org.junit.Test;
 import saros.session.User.Permission;
 import saros.stf.client.StfTestCase;
 import saros.stf.client.util.Util;
-import saros.stf.shared.Constants.TypeOfCreateProject;
+import saros.stf.shared.Constants.SessionInvitationModality;
 import saros.stf.test.stf.Constants;
 
 public class Share3UsersConcurrentlyTest extends StfTestCase {
@@ -57,8 +57,8 @@ public class Share3UsersConcurrentlyTest extends StfTestCase {
         .tree()
         .newC()
         .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
-    Util.buildSessionConcurrently(
-        Constants.PROJECT1, TypeOfCreateProject.NEW_PROJECT, ALICE, BOB, CARL);
+    Util.setUpSessionWithJavaProject(
+        Constants.PROJECT1, SessionInvitationModality.CONCURRENTLY, ALICE, BOB, CARL);
 
     BOB.superBot()
         .views()

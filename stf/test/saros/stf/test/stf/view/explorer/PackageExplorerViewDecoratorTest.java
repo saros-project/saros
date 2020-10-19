@@ -10,7 +10,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import saros.stf.client.StfTestCase;
 import saros.stf.client.util.Util;
-import saros.stf.shared.Constants.TypeOfCreateProject;
 
 public class PackageExplorerViewDecoratorTest extends StfTestCase {
 
@@ -111,7 +110,7 @@ public class PackageExplorerViewDecoratorTest extends StfTestCase {
     ALICE.superBot().internal().createJavaProject(JAVA_PROJECT);
     ALICE.superBot().internal().createJavaClass(JAVA_PROJECT, JAVA_PACKAGE, JAVA_CLASS);
 
-    Util.addProjectToSessionSequentially(JAVA_PROJECT, TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
+    Util.addJavaProjectToSessionSequentially(JAVA_PROJECT, ALICE, BOB);
 
     BOB.superBot().views().packageExplorerView().waitUntilResourceIsShared(JAVA_PROJECT);
 

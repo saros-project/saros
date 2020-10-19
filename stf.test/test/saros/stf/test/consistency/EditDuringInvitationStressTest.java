@@ -15,7 +15,7 @@ import saros.stf.client.StfTestCase;
 import saros.stf.client.tester.SarosTester;
 import saros.stf.client.util.EclipseTestThread;
 import saros.stf.client.util.Util;
-import saros.stf.shared.Constants.TypeOfCreateProject;
+import saros.stf.shared.Constants.SessionInvitationModality;
 import saros.stf.test.stf.Constants;
 
 public class EditDuringInvitationStressTest extends StfTestCase {
@@ -39,7 +39,8 @@ public class EditDuringInvitationStressTest extends StfTestCase {
         .newC()
         .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1, CLASS_NAMES);
 
-    Util.buildSessionSequentially(Constants.PROJECT1, TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
+    Util.setUpSessionWithJavaProject(
+        Constants.PROJECT1, SessionInvitationModality.SEQUENTIALLY, ALICE, BOB);
 
     BOB.superBot()
         .views()
@@ -49,6 +50,8 @@ public class EditDuringInvitationStressTest extends StfTestCase {
     openTestClasses(BOB);
 
     ALICE.superBot().views().sarosView().selectContact(CARL.getJID()).addToSarosSession();
+
+    CARL.superBot().internal().createJavaProject(Constants.PROJECT1);
 
     CARL.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(ACCEPT);
 
@@ -75,7 +78,7 @@ public class EditDuringInvitationStressTest extends StfTestCase {
 
     bobIsWriting.start();
 
-    CARL.superBot().confirmShellAddProjectWithNewProject(Constants.PROJECT1);
+    CARL.superBot().confirmShellAddProjectUsingExistProject(Constants.PROJECT1);
 
     bobIsWriting.join();
     bobIsWriting.verify();

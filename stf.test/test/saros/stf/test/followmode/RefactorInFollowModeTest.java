@@ -10,7 +10,7 @@ import org.junit.Test;
 import saros.stf.annotation.TestLink;
 import saros.stf.client.StfTestCase;
 import saros.stf.client.util.Util;
-import saros.stf.shared.Constants.TypeOfCreateProject;
+import saros.stf.shared.Constants.SessionInvitationModality;
 
 @TestLink(id = "Saros-40_followmode_and_refactoring")
 public class RefactorInFollowModeTest extends StfTestCase {
@@ -45,7 +45,7 @@ public class RefactorInFollowModeTest extends StfTestCase {
 
     ALICE.remoteBot().editor("HelloWorld.java").closeWithSave();
 
-    Util.buildSessionSequentially("foo", TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
+    Util.setUpSessionWithJavaProject("foo", SessionInvitationModality.SEQUENTIALLY, ALICE, BOB);
 
     BOB.superBot()
         .views()

@@ -50,7 +50,9 @@ public class ModifyDocumentBeforeProjectNegotiationTest extends StfTestCase {
 
     BOB.controlBot().getNetworkManipulator().synchronizeOnActivityQueue(ALICE.getJID(), 10000);
 
-    CARL.superBot().confirmShellAddProjectWithNewProject(Constants.PROJECT1);
+    CARL.superBot().internal().createJavaProject(Constants.PROJECT1);
+
+    CARL.superBot().confirmShellAddProjectUsingExistProject(Constants.PROJECT1);
 
     CARL.superBot()
         .views()

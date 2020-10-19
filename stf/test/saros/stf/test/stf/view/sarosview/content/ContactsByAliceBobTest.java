@@ -130,9 +130,12 @@ public class ContactsByAliceBobTest extends StfTestCase {
         .selectContact(BOB.getJID())
         .workTogetherOn()
         .project(Constants.PROJECT1);
+
+    BOB.superBot().views().packageExplorerView().tree().newC().javaProject(Constants.PROJECT1);
+
     BOB.superBot()
         .confirmShellSessionInvitationAndShellAddProject(
-            Constants.PROJECT1, TypeOfCreateProject.NEW_PROJECT);
+            Constants.PROJECT1, TypeOfCreateProject.EXIST_PROJECT);
 
     BOB.superBot()
         .views()

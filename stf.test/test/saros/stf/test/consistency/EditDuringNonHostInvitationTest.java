@@ -46,6 +46,8 @@ public class EditDuringNonHostInvitationTest extends StfTestCase {
         .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
         .open();
 
+    CARL.superBot().internal().createJavaProject(Constants.PROJECT1);
+
     CARL.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(ACCEPT);
 
     aliceIsWriting =
@@ -61,7 +63,7 @@ public class EditDuringNonHostInvitationTest extends StfTestCase {
 
     aliceIsWriting.start();
 
-    CARL.superBot().confirmShellAddProjectWithNewProject(Constants.PROJECT1);
+    CARL.superBot().confirmShellAddProjectUsingExistProject(Constants.PROJECT1);
 
     aliceIsWriting.join();
     aliceIsWriting.verify();
