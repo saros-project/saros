@@ -10,7 +10,7 @@ import org.junit.Test;
 import saros.session.User.Permission;
 import saros.stf.client.StfTestCase;
 import saros.stf.client.util.Util;
-import saros.stf.shared.Constants.TypeOfCreateProject;
+import saros.stf.shared.Constants.SessionInvitationModality;
 import saros.stf.test.stf.Constants;
 
 public class Share2UsersSequentiallyTest extends StfTestCase {
@@ -45,7 +45,8 @@ public class Share2UsersSequentiallyTest extends StfTestCase {
         .newC()
         .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
 
-    Util.buildSessionSequentially(Constants.PROJECT1, TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
+    Util.setUpSessionWithJavaProject(
+        Constants.PROJECT1, SessionInvitationModality.SEQUENTIALLY, ALICE, BOB);
 
     assertTrue(BOB.superBot().views().sarosView().isInSession());
     assertTrue(ALICE.superBot().views().sarosView().isInSession());

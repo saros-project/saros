@@ -17,7 +17,7 @@ import org.junit.Test;
 import saros.stf.client.StfTestCase;
 import saros.stf.client.util.Util;
 import saros.stf.server.rmi.remotebot.widget.IRemoteBotShell;
-import saros.stf.shared.Constants.TypeOfCreateProject;
+import saros.stf.shared.Constants.SessionInvitationModality;
 
 public class ShareMultipleProjectsTest extends StfTestCase {
 
@@ -63,19 +63,20 @@ public class ShareMultipleProjectsTest extends StfTestCase {
   @Test
   public void testShareMultipleWithBobAndCarlSequencetially() throws Exception {
 
-    Util.buildSessionConcurrently("foo", TypeOfCreateProject.NEW_PROJECT, ALICE, BOB, CARL);
+    Util.setUpSessionWithJavaProject(
+        "foo", SessionInvitationModality.CONCURRENTLY, ALICE, BOB, CARL);
 
     BOB.superBot().views().packageExplorerView().waitUntilClassExists("foo", "bar", "HelloAlice");
 
     CARL.superBot().views().packageExplorerView().waitUntilClassExists("foo", "bar", "HelloAlice");
 
-    Util.addProjectToSessionSequentially("foo1", TypeOfCreateProject.NEW_PROJECT, ALICE, BOB, CARL);
+    Util.addJavaProjectToSessionSequentially("foo1", ALICE, BOB, CARL);
 
     BOB.superBot().views().packageExplorerView().waitUntilClassExists("foo1", "bar", "HelloBob");
 
     CARL.superBot().views().packageExplorerView().waitUntilClassExists("foo1", "bar", "HelloBob");
 
-    Util.addProjectToSessionSequentially("foo2", TypeOfCreateProject.NEW_PROJECT, ALICE, BOB, CARL);
+    Util.addJavaProjectToSessionSequentially("foo2", ALICE, BOB, CARL);
 
     BOB.superBot().views().packageExplorerView().waitUntilClassExists("foo2", "bar", "HelloCarl");
 
@@ -85,7 +86,8 @@ public class ShareMultipleProjectsTest extends StfTestCase {
   @Test
   public void testShareSameProjectTwice() throws Exception {
 
-    Util.buildSessionConcurrently("foo", TypeOfCreateProject.NEW_PROJECT, ALICE, BOB, CARL);
+    Util.setUpSessionWithJavaProject(
+        "foo", SessionInvitationModality.CONCURRENTLY, ALICE, BOB, CARL);
 
     ALICE.remoteBot().activateWorkbench();
     ALICE.remoteBot().menu(MENU_SAROS).menu(ADD_RESOURCES).click();

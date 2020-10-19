@@ -16,7 +16,7 @@ import org.junit.Test;
 import saros.session.User.Permission;
 import saros.stf.client.StfTestCase;
 import saros.stf.client.util.Util;
-import saros.stf.shared.Constants.TypeOfCreateProject;
+import saros.stf.shared.Constants.SessionInvitationModality;
 import saros.stf.test.stf.Constants;
 
 public class NonHostInvitesContactTest extends StfTestCase {
@@ -69,7 +69,8 @@ public class NonHostInvitesContactTest extends StfTestCase {
         .newC()
         .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
 
-    Util.buildSessionSequentially(Constants.PROJECT1, TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
+    Util.setUpSessionWithJavaProject(
+        Constants.PROJECT1, SessionInvitationModality.SEQUENTIALLY, ALICE, BOB);
 
     assertTrue(BOB.superBot().views().sarosView().isInSession());
     assertTrue(ALICE.superBot().views().sarosView().isInSession());
@@ -81,9 +82,11 @@ public class NonHostInvitesContactTest extends StfTestCase {
 
     BOB.superBot().views().sarosView().selectContact(CARL.getJID()).addToSarosSession();
 
+    CARL.superBot().internal().createJavaProject(Constants.PROJECT1);
+
     CARL.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(ACCEPT);
 
-    CARL.superBot().confirmShellAddProjectWithNewProject(Constants.PROJECT1);
+    CARL.superBot().confirmShellAddProjectUsingExistProject(Constants.PROJECT1);
 
     CARL.superBot()
         .views()
@@ -104,7 +107,8 @@ public class NonHostInvitesContactTest extends StfTestCase {
         .newC()
         .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
 
-    Util.buildSessionSequentially(Constants.PROJECT1, TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
+    Util.setUpSessionWithJavaProject(
+        Constants.PROJECT1, SessionInvitationModality.SEQUENTIALLY, ALICE, BOB);
 
     assertTrue(BOB.superBot().views().sarosView().isInSession());
     assertTrue(ALICE.superBot().views().sarosView().isInSession());
@@ -116,9 +120,11 @@ public class NonHostInvitesContactTest extends StfTestCase {
 
     BOB.superBot().views().sarosView().selectContact(CARL.getJID()).addToSarosSession();
 
+    CARL.superBot().internal().createJavaProject(Constants.PROJECT1);
+
     CARL.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(ACCEPT);
 
-    CARL.superBot().confirmShellAddProjectWithNewProject(Constants.PROJECT1);
+    CARL.superBot().confirmShellAddProjectUsingExistProject(Constants.PROJECT1);
 
     CARL.superBot()
         .views()
@@ -175,7 +181,8 @@ public class NonHostInvitesContactTest extends StfTestCase {
         .newC()
         .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
 
-    Util.buildSessionSequentially(Constants.PROJECT1, TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
+    Util.setUpSessionWithJavaProject(
+        Constants.PROJECT1, SessionInvitationModality.SEQUENTIALLY, ALICE, BOB);
 
     assertTrue(BOB.superBot().views().sarosView().isInSession());
     assertTrue(ALICE.superBot().views().sarosView().isInSession());
@@ -187,9 +194,11 @@ public class NonHostInvitesContactTest extends StfTestCase {
 
     BOB.superBot().views().sarosView().selectContact(CARL.getJID()).addToSarosSession();
 
+    CARL.superBot().internal().createJavaProject(Constants.PROJECT1);
+
     CARL.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(ACCEPT);
 
-    CARL.superBot().confirmShellAddProjectWithNewProject(Constants.PROJECT1);
+    CARL.superBot().confirmShellAddProjectUsingExistProject(Constants.PROJECT1);
 
     CARL.superBot()
         .views()

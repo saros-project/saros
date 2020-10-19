@@ -43,6 +43,8 @@ public class EditDuringInvitationTest extends StfTestCase {
         .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
         .open();
 
+    CARL.superBot().internal().createJavaProject(Constants.PROJECT1);
+
     CARL.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(ACCEPT);
 
     EclipseTestThread bobIsWriting =
@@ -58,7 +60,7 @@ public class EditDuringInvitationTest extends StfTestCase {
 
     bobIsWriting.start();
 
-    CARL.superBot().confirmShellAddProjectWithNewProject(Constants.PROJECT1);
+    CARL.superBot().confirmShellAddProjectUsingExistProject(Constants.PROJECT1);
 
     bobIsWriting.join();
     bobIsWriting.verify();

@@ -9,7 +9,7 @@ import org.junit.Test;
 import saros.stf.annotation.TestLink;
 import saros.stf.client.StfTestCase;
 import saros.stf.client.util.Util;
-import saros.stf.shared.Constants.TypeOfCreateProject;
+import saros.stf.shared.Constants.SessionInvitationModality;
 
 @TestLink(id = "Saros-108_add_3_new_projects_to_a_existing_session")
 public class Editing3ProjectsTest extends StfTestCase {
@@ -30,15 +30,15 @@ public class Editing3ProjectsTest extends StfTestCase {
     ALICE.superBot().internal().createFile("foo1", "src/bar/HelloBob.java", "HelloBob");
     ALICE.superBot().internal().createFile("foo2", "src/bar/HelloCarl.java", "HelloCarl");
 
-    Util.buildSessionSequentially("foo", TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
+    Util.setUpSessionWithJavaProject("foo", SessionInvitationModality.SEQUENTIALLY, ALICE, BOB);
 
     BOB.superBot().views().packageExplorerView().waitUntilResourceIsShared("foo");
 
-    Util.addProjectToSessionSequentially("foo1", TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
+    Util.addJavaProjectToSessionSequentially("foo1", ALICE, BOB);
 
     BOB.superBot().views().packageExplorerView().waitUntilResourceIsShared("foo1");
 
-    Util.addProjectToSessionSequentially("foo2", TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
+    Util.addJavaProjectToSessionSequentially("foo2", ALICE, BOB);
 
     BOB.superBot().views().packageExplorerView().waitUntilResourceIsShared("foo2");
 

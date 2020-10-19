@@ -14,7 +14,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import saros.stf.client.StfTestCase;
 import saros.stf.client.util.Util;
-import saros.stf.shared.Constants.TypeOfCreateProject;
+import saros.stf.shared.Constants.SessionInvitationModality;
 import saros.stf.test.stf.Constants;
 
 public class AwarenessInformationVisibleAfterInvitationTest extends StfTestCase {
@@ -57,7 +57,8 @@ public class AwarenessInformationVisibleAfterInvitationTest extends StfTestCase 
         .packageExplorerView()
         .selectFile(Constants.PROJECT1, Constants.FILE1)
         .open();
-    Util.buildSessionConcurrently(Constants.PROJECT1, TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
+    Util.setUpSessionWithJavaProject(
+        Constants.PROJECT1, SessionInvitationModality.CONCURRENTLY, ALICE, BOB);
     BOB.superBot()
         .views()
         .packageExplorerView()
@@ -113,7 +114,8 @@ public class AwarenessInformationVisibleAfterInvitationTest extends StfTestCase 
         .packageExplorerView()
         .selectFile(Constants.PROJECT1, Constants.FILE1)
         .open();
-    Util.buildSessionConcurrently(Constants.PROJECT1, TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
+    Util.setUpSessionWithJavaProject(
+        Constants.PROJECT1, SessionInvitationModality.CONCURRENTLY, ALICE, BOB);
     BOB.superBot()
         .views()
         .packageExplorerView()
@@ -127,9 +129,11 @@ public class AwarenessInformationVisibleAfterInvitationTest extends StfTestCase 
 
     ALICE.superBot().views().sarosView().selectContact(CARL.getJID()).addToSarosSession();
 
+    CARL.superBot().internal().createJavaProject(Constants.PROJECT1);
+
     CARL.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(ACCEPT);
 
-    CARL.superBot().confirmShellAddProjectWithNewProject(Constants.PROJECT1);
+    CARL.superBot().confirmShellAddProjectUsingExistProject(Constants.PROJECT1);
 
     CARL.superBot()
         .views()
