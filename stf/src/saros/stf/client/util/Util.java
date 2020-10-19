@@ -8,7 +8,6 @@ import static saros.stf.shared.Constants.VIEW_SAROS;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -17,6 +16,7 @@ import java.util.concurrent.Future;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 import saros.net.xmpp.JID;
 import saros.stf.client.tester.AbstractTester;
+import saros.stf.shared.Constants.SessionInvitationModality;
 import saros.stf.shared.Constants.TypeOfCreateProject;
 
 public class Util {
@@ -59,17 +59,24 @@ public class Util {
 
   /**
    * A convenient function to quickly build a session with a project and a file. The project is
-   * created by this method so it <b>must not</b> exist before. The invitiees are invited
+   * created by this method so it <b>must not</b> exist before. The invitees are invited
    * concurrently.
    *
-   * <p><b>Note:</b> there is no guarantee that the project and its files are already shared after
-   * this method returns
+   * <p><b>Note:</b> This method does not enforce that the project nature on the inviter's side is
+   * correctly applied on the invitee's side. As a result, it is only supported for cases where the
+   * project nature is not of interest. In cases where the same project nature is required on all
+   * sides (e.g. if Java language support is needed), please use {@link
+   * #setUpSessionWithJavaProjectAndClass(String, String, String, AbstractTester,
+   * AbstractTester...)} instead.
+   *
+   * <p><b>Note:</b> There is no guarantee that the project and its files are already shared after
+   * this method returns.
    *
    * @param projectName the name of the project
-   * @param path the path of the file e.g. foo/bar/readme.txt
+   * @param path the path of the file, e.g. foo/bar/readme.txt
    * @param content the content of the file
-   * @param inviter e.g. ALICE
-   * @param invitees e.g. BOB, CARL
+   * @param inviter the inviting test user, e.g. ALICE
+   * @param invitees the invited test user(s), e.g. BOB, CARL
    * @throws IllegalStateException if the inviter or one of the invitee is not connected or is
    *     already in a session
    * @throws Exception for any other (internal) failure
@@ -90,18 +97,62 @@ public class Util {
   }
 
   /**
+   * A convenient function to quickly build a session with a java project. The project is created by
+   * this method so it <b>must not</b> exist before. The invitees are invited using the given
+   * modality.
+   *
+   * <p><b>Note:</b> There is no guarantee that the project and its files are already shared after
+   * this method returns.
+   *
+   * @param projectName the name of the project
+   * @param sessionInvitationModality the session invitation modality to use
+   * @param inviter the inviting test user, e.g. ALICE
+   * @param invitees the invited test user(s), e.g. BOB, CARL
+   * @throws IllegalStateException if the inviter or one of the invitees is not connected or is
+   *     already in a session
+   * @throws Exception for any other (internal) failure
+   */
+  public static void setUpSessionWithJavaProject(
+      String projectName,
+      SessionInvitationModality sessionInvitationModality,
+      AbstractTester inviter,
+      AbstractTester... invitees)
+      throws Exception {
+
+    assertStates(true, false, inviter, invitees);
+
+    for (AbstractTester invitee : invitees) {
+      invitee.superBot().internal().createJavaProject(projectName);
+    }
+
+    switch (sessionInvitationModality) {
+      case CONCURRENTLY:
+        buildSessionConcurrently(projectName, TypeOfCreateProject.EXIST_PROJECT, inviter, invitees);
+        break;
+
+      case SEQUENTIALLY:
+        buildSessionSequentially(projectName, TypeOfCreateProject.EXIST_PROJECT, inviter, invitees);
+        break;
+
+      default:
+        throw new IllegalArgumentException(
+            "Encountered unhandled session invitation modality " + sessionInvitationModality);
+    }
+  }
+
+  /**
    * A convenient function to quickly build a session with a java project and a class. The project
-   * is created by this method so it <b>must not</b> exist before. The invitiees are invited
+   * is created by this method so it <b>must not</b> exist before. The invitees are invited
    * concurrently.
    *
-   * <p><b>Note:</b> there is no guarantee that the project and its files are already shared after
-   * this method returns
+   * <p><b>Note:</b> There is no guarantee that the project and its files are already shared after
+   * this method returns.
    *
    * @param projectName the name of the project
    * @param packageName the name of the package
    * @param className the name of the class without .java or .class suffix
-   * @param inviter e.g. ALICE
-   * @param invitees e.g. BOB, CARL
+   * @param inviter the inviting test user, e.g. ALICE
+   * @param invitees the invited test user(s), e.g. BOB, CARL
    * @throws IllegalStateException if the inviter or one of the invitee is not connected or is
    *     already in a session
    * @throws Exception for any other (internal) failure
@@ -119,34 +170,11 @@ public class Util {
     inviter.superBot().internal().createJavaProject(projectName);
     inviter.superBot().internal().createJavaClass(projectName, packageName, className);
 
-    buildSessionConcurrently(projectName, TypeOfCreateProject.NEW_PROJECT, inviter, invitees);
-  }
+    for (AbstractTester invitee : invitees) {
+      invitee.superBot().internal().createJavaProject(projectName);
+    }
 
-  public static void setUpSessionWithJavaProjects(
-      Map<String, List<String>> projectsPkgsClasses,
-      AbstractTester inviter,
-      AbstractTester... invitees) {
-
-    throw new UnsupportedOperationException("not yet implemented");
-    // List<String> createdProjects = new ArrayList<String>();
-    //
-    // for (Iterator<String> i = projectsPkgsClasses.keySet().iterator(); i
-    // .hasNext();) {
-    // String key = i.next();
-    // if (!createdProjects.contains(key)) {
-    // createdProjects.add(key);
-    // inviter.superBot().views().packageExplorerView().tree().newC()
-    // .javaProject(key);
-    // List<String> pkgAndclass = projectsPkgsClasses.get(key);
-    // inviter.superBot().views().packageExplorerView()
-    // .selectPkg(key, pkgAndclass.get(0)).newC()
-    // .cls(key, pkgAndclass.get(0), pkgAndclass.get(1));
-    // }
-    // }
-
-    // buildSessionConcurrently(projectName,
-    // TypeOfCreateProject.NEW_PROJECT,
-    // inviter, invitees);
+    buildSessionConcurrently(projectName, TypeOfCreateProject.EXIST_PROJECT, inviter, invitees);
   }
 
   /**
@@ -171,17 +199,25 @@ public class Util {
    * Adds a project to the current session. This is done sequentially, so the project is send to the
    * invitees one after another.
    *
+   * <p><b>Note:</b> The creation type {@link TypeOfCreateProject#NEW_PROJECT} does not enforce that
+   * the project nature on the inviter's side is correctly applied on the invitee's side. As a
+   * result, it is only supported for cases where the project nature is not of interest. In cases
+   * where the same project nature is necessary on all sides (e.g. if Java language support is
+   * needed), please use {@link TypeOfCreateProject#EXIST_PROJECT}. For Java projects, the utility
+   * method {@link #addJavaProjectToSessionSequentially(String, AbstractTester, AbstractTester...)}
+   * can be used for this purpose.
+   *
    * <p><b>Note:</b> Adding a project that is already shared or does not exist results in unexpected
    * behavior.
    *
-   * <p><b>Note:</b> there is no guarantee that the project and its files are already shared after
-   * this method returns
+   * <p><b>Note:</b> There is no guarantee that the project and its files are already shared after
+   * this method returns.
    *
    * @param projectName the name of the project
    * @param projectType the type of project that should be used on the invitee side e.g new, use
    *     existing ...
-   * @param inviter e.g. ALICE
-   * @param invitees e.g. BOB, CARL
+   * @param inviter the inviting test user, e.g. ALICE
+   * @param invitees the invited test user(s), e.g. BOB, CARL
    * @throws IllegalStateException if the inviter or one of the invitee is not connected or is not
    *     in a session
    * @throws Exception for any other (internal) failure
@@ -203,19 +239,63 @@ public class Util {
   }
 
   /**
+   * Adds a project to the current session. This is done sequentially, so the project is send to the
+   * invitees one after another.
+   *
+   * <p>The projects to add is created on the invitee's side as part of this process. It <b>must
+   * not</b> already exist on the invitee's side. Adding a project that already exists on the
+   * invitee's side or is already shared results in unexpected behavior.
+   *
+   * <p><b>Note:</b> There is no guarantee that the project and its files are already shared after
+   * this method returns.
+   *
+   * @param projectName the name of the project
+   * @param inviter the inviting test user, e.g. ALICE
+   * @param invitees the invited test user(s), e.g. BOB, CARL
+   * @throws IllegalStateException if the inviter or one of the invitee is not connected or is not
+   *     in a session
+   * @throws Exception for any other (internal) failure
+   */
+  public static void addJavaProjectToSessionSequentially(
+      String projectName, AbstractTester inviter, AbstractTester... invitees) throws Exception {
+
+    assertStates(true, true, inviter, invitees);
+
+    for (AbstractTester invitee : invitees) {
+      invitee.superBot().internal().createJavaProject(projectName);
+    }
+
+    inviter.superBot().menuBar().saros().addProjects(projectName);
+
+    for (AbstractTester invitee : invitees) {
+      invitee
+          .superBot()
+          .confirmShellAddProjectUsingWhichProject(projectName, TypeOfCreateProject.EXIST_PROJECT);
+    }
+  }
+
+  /**
    * Establish a Saros session with the given invitees. Every invitee is invited one bye one.
+   *
+   * <p><b>Note:</b> The creation type {@link TypeOfCreateProject#NEW_PROJECT} does not enforce that
+   * the project nature on the inviter's side is correctly applied on the invitee's side. As a
+   * result, it is only supported for cases where the project nature is not of interest. In cases
+   * where the same project nature is necessary on all sides (e.g. if Java language support is
+   * needed), please use {@link TypeOfCreateProject#EXIST_PROJECT}. For Java projects, the utility
+   * method {@link #setUpSessionWithJavaProject(String, SessionInvitationModality, AbstractTester,
+   * AbstractTester...)} can be used for this purpose.
    *
    * <p><b>Note:</b> Establishing session with a project that is already shared or does not exist
    * results in unexpected behavior.
    *
-   * <p><b>Note:</b> there is no guarantee that the project and its files are already shared after
-   * this method returns
+   * <p><b>Note:</b> There is no guarantee that the project and its files are already shared after
+   * this method returns.
    *
    * @param projectName the name of the project to share
    * @param projectType the type of project that should be used on the invitee side e.g new, use
    *     existing ...
-   * @param inviter e.g. ALICE
-   * @param invitees e.g. BOB, CARL
+   * @param inviter the inviting test user, e.g. ALICE
+   * @param invitees the invited test user(s), e.g. BOB, CARL
    * @throws IllegalStateException if the inviter or one of the invitee is not connected or is
    *     already in a session
    * @throws Exception for any other (internal) failure
@@ -242,17 +322,25 @@ public class Util {
   /**
    * Establish a Saros session with the given invitees. All invitees are invited simultaneously.
    *
+   * <p><b>Note:</b> The creation type {@link TypeOfCreateProject#NEW_PROJECT} does not enforce that
+   * the project nature on the inviter's side is correctly applied on the invitee's side. As a
+   * result, it is only supported for cases where the project nature is not of interest. In cases
+   * where the same project nature is necessary on all sides (e.g. if Java language support is
+   * needed), please use {@link TypeOfCreateProject#EXIST_PROJECT}. For Java projects, the utility
+   * method {@link #setUpSessionWithJavaProject(String, SessionInvitationModality, AbstractTester,
+   * AbstractTester...)} can be used for this purpose.
+   *
    * <p><b>Note:</b> Establishing session with a project that is already shared or does not exist
    * results in unexpected behavior.
    *
-   * <p><b>Note:</b> there is no guarantee that the project and its files are already shared after
-   * this method returns
+   * <p><b>Note:</b> There is no guarantee that the project and its files are already shared after
+   * this method returns.
    *
    * @param projectName the name of the project to share
    * @param projectType the type of project that should be used on the invitee side e.g new, use
    *     existing ...
-   * @param inviter e.g. ALICE
-   * @param invitees e.g. BOB, CARL
+   * @param inviter the inviting test user, e.g. ALICE
+   * @param invitees the invited test user(s), e.g. BOB, CARL
    * @throws IllegalStateException if the inviter or one of the invitee is not connected or is
    *     already in a session
    * @throws Exception for any other (internal) failure
@@ -267,59 +355,6 @@ public class Util {
     assertStates(true, false, inviter, invitees);
 
     inviter.superBot().menuBar().saros().shareProjects(projectName, Util.getJID(invitees));
-
-    List<Callable<Void>> joinSessionTasks = new ArrayList<Callable<Void>>();
-    for (final AbstractTester invitee : invitees) {
-      joinSessionTasks.add(
-          new Callable<Void>() {
-            @Override
-            public Void call() throws Exception {
-              invitee
-                  .superBot()
-                  .confirmShellSessionInvitationAndShellAddProject(projectName, projectType);
-              return null;
-            }
-          });
-    }
-
-    workAll(joinSessionTasks);
-  }
-
-  /**
-   * Establish a Saros session with specific files of a project. All invitees are invited
-   * simultaneously.
-   *
-   * <p><b>Note:</b> Establishing session with a project that is already shared or does not exist
-   * results in unexpected behavior.
-   *
-   * <p><b>Note:</b> there is no guarantee that the project and its files are already shared after
-   * this method returns
-   *
-   * @param projectName the name of the project to share
-   * @param files the files of the project to share
-   * @param projectType the type of project that should be used on the invitee side e.g new, use
-   *     existing ...
-   * @param inviter e.g. ALICE
-   * @param invitees e.g. BOB, CARL
-   * @throws IllegalStateException if the inviter or one of the invitee is not connected or is
-   *     already in a session
-   * @throws Exception for any other (internal) failure
-   */
-  public static void buildFileSessionConcurrently(
-      final String projectName,
-      String[] files,
-      final TypeOfCreateProject projectType,
-      AbstractTester inviter,
-      AbstractTester... invitees)
-      throws Exception {
-
-    assertStates(true, false, inviter, invitees);
-
-    inviter
-        .superBot()
-        .menuBar()
-        .saros()
-        .shareProjectFiles(projectName, files, Util.getJID(invitees));
 
     List<Callable<Void>> joinSessionTasks = new ArrayList<Callable<Void>>();
     for (final AbstractTester invitee : invitees) {
@@ -438,8 +473,14 @@ public class Util {
   /**
    * Adds testers to the current session.
    *
-   * <p><b>Note:</b> there is no guarantee that the project and its files are already shared after
-   * this method returns
+   * <p><b>Note:</b> The creation type {@link TypeOfCreateProject#NEW_PROJECT} does not enforce that
+   * the project nature on the inviter's side is correctly applied on the invitee's side. As a
+   * result, it is only supported for cases where the project nature is not of interest. In cases
+   * where the same project nature is necessary on all sides (e.g. if Java language support is
+   * needed), please use {@link TypeOfCreateProject#EXIST_PROJECT}.
+   *
+   * <p><b>Note:</b> There is no guarantee that the project and its files are already shared after
+   * this method returns.
    *
    * @param projectName the name of the project which <b>must</b> be shared in the current session
    * @param projectType the type of project that should be used on the invitee side e.g new, use
