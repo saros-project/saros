@@ -27,19 +27,23 @@ class SharedReferencePointMapper {
   private static final Logger log = Logger.getLogger(SharedReferencePointMapper.class);
 
   /** Mapping from reference point IDs to currently registered shared reference points. */
-  private final Map<String, IReferencePoint> idToReferencePointMapping =
-      new HashMap<String, IReferencePoint>();
+  private final Map<String, IReferencePoint> idToReferencePointMapping;
 
   /** Mapping from currently registered shared reference points to their id's. */
-  private final Map<IReferencePoint, String> referencePointToIDMapping =
-      new HashMap<IReferencePoint, String>();
+  private final Map<IReferencePoint, String> referencePointToIDMapping;
 
   /**
    * Map for storing which clients have which reference points. Used by the host to determine who
    * can currently process an activity related to a particular reference point. (Non-hosts don't
    * maintain this map.)
    */
-  private final Map<User, List<String>> referencePointsOfUsers = new HashMap<User, List<String>>();
+  private final Map<User, List<String>> referencePointsOfUsers;
+
+  SharedReferencePointMapper() {
+    this.idToReferencePointMapping = new HashMap<>();
+    this.referencePointToIDMapping = new HashMap<>();
+    this.referencePointsOfUsers = new HashMap<>();
+  }
 
   /**
    * Adds a reference point to the set of currently shared reference points.
@@ -162,8 +166,10 @@ class SharedReferencePointMapper {
   public synchronized boolean isShared(IResource resource) {
     if (resource == null) return false;
 
-    if (resource.getType() == REFERENCE_POINT)
-      return idToReferencePointMapping.containsValue(resource);
+    if (resource.getType() == REFERENCE_POINT) {
+      IReferencePoint referencePoint = (IReferencePoint) resource;
+      return idToReferencePointMapping.containsValue(referencePoint);
+    }
 
     IReferencePoint referencePoint = resource.getReferencePoint();
 
@@ -178,7 +184,7 @@ class SharedReferencePointMapper {
    * @return a newly created {@link Set} with the shared reference points
    */
   public synchronized Set<IReferencePoint> getReferencePoints() {
-    return new HashSet<IReferencePoint>(idToReferencePointMapping.values());
+    return new HashSet<>(idToReferencePointMapping.values());
   }
 
   /**
@@ -217,10 +223,7 @@ class SharedReferencePointMapper {
    * @see #userHasReferencePoint(User, IReferencePoint)
    */
   public synchronized void addMissingReferencePointsToUser(User user) {
-    List<String> referencePointIds = new ArrayList<String>();
-    for (String referencePointId : idToReferencePointMapping.keySet()) {
-      referencePointIds.add(referencePointId);
-    }
+    List<String> referencePointIds = new ArrayList<>(idToReferencePointMapping.keySet());
 
     this.referencePointsOfUsers.put(user, referencePointIds);
   }
