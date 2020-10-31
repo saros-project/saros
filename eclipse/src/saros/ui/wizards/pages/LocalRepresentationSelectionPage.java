@@ -20,11 +20,14 @@ import org.eclipse.jface.dialogs.IDialogPage;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -42,6 +45,7 @@ import saros.session.ISarosSession;
 import saros.ui.ImageManager;
 import saros.ui.Messages;
 import saros.ui.util.SWTUtils;
+import saros.ui.util.WizardUtils;
 import saros.ui.widgets.wizard.ReferencePointOptionComposite;
 import saros.ui.widgets.wizard.ReferencePointOptionResult;
 import saros.ui.widgets.wizard.events.ReferencePointOptionListener;
@@ -164,9 +168,10 @@ public class LocalRepresentationSelectionPage extends WizardPage {
 
     setControl(composite);
 
-    composite.setLayout(new FillLayout());
+    composite.setLayout(new GridLayout());
 
     TabFolder tabFolder = new TabFolder(composite, SWT.TOP);
+    tabFolder.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
     for (String referencePointID : remoteReferencePointIdToNameMapping.keySet()) {
       TabItem tabItem = new TabItem(tabFolder, SWT.NONE);
@@ -212,6 +217,18 @@ public class LocalRepresentationSelectionPage extends WizardPage {
                 return;
               }
             }
+          }
+        });
+
+    Button newProjectButton = new Button(composite, SWT.PUSH);
+    newProjectButton.setImage(ImageManager.ETOOL_NEW_PROJECT);
+    newProjectButton.setLayoutData(new GridData(SWT.END, SWT.FILL, false, false));
+    newProjectButton.setText(Messages.LocalRepresentationSelectionPage_new_project_button);
+    newProjectButton.addSelectionListener(
+        new SelectionAdapter() {
+          @Override
+          public void widgetSelected(SelectionEvent e) {
+            WizardUtils.openNewProjectWizard();
           }
         });
 
