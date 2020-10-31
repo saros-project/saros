@@ -531,10 +531,7 @@ public class AddReferencePointsToSessionWizard extends Wizard {
                     if (!existingReferencePointContainers.containsValue(container)) {
 
                       if (!container.exists()) {
-                        if (container instanceof IProject) {
-                          ((IProject) container).create(null);
-
-                        } else if (container instanceof IFolder) {
+                        if (container instanceof IFolder) {
                           ((IFolder) container).create(true, true, null);
 
                         } else {
