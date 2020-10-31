@@ -172,22 +172,17 @@ public class Messages extends NLS {
   public static String LocalRepresentationSelectionPage_saros_url;
   public static String LocalRepresentationSelectionPage_title;
   public static String LocalRepresentationSelectionPage_unknown_transport_method;
-  public static String LocalRepresentationSelectionPage_warning_project_artifacts_found;
   public static String LocalRepresentationSelectionPage_warning_unsupported_encoding_found;
 
-  public static String ReferencePointOptionComposite_create_new_project;
   public static String ReferencePointOptionComposite_create_new_directory;
   public static String ReferencePointOptionComposite_directory_name;
   public static String ReferencePointOptionComposite_directory_base_path;
   public static String ReferencePointOptionComposite_existing_directory_path;
-  public static String ReferencePointOptionComposite_project_name;
   public static String ReferencePointOptionComposite_select_base_directory;
   public static String ReferencePointOptionComposite_select_existing_directory;
   public static String ReferencePointOptionComposite_tooltip_browse_button;
   public static String ReferencePointOptionComposite_tooltip_existing_directory;
   public static String ReferencePointOptionComposite_tooltip_existing_directory_path;
-  public static String ReferencePointOptionComposite_tooltip_new_project;
-  public static String ReferencePointOptionComposite_tooltip_new_project_name;
   public static String ReferencePointOptionComposite_tooltip_new_directory;
   public static String ReferencePointOptionComposite_tooltip_new_directory_name;
   public static String ReferencePointOptionComposite_tooltip_new_directory_base_path;
@@ -201,9 +196,6 @@ public class Messages extends NLS {
   public static String ReferencePointOptionResult_error_new_directory_base_does_not_exist;
   public static String ReferencePointOptionResult_error_new_directory_invalid_name;
   public static String ReferencePointOptionResult_error_new_directory_no_name_or_path;
-  public static String ReferencePointOptionResult_error_new_project_already_exists;
-  public static String ReferencePointOptionResult_error_new_project_invalid_name;
-  public static String ReferencePointOptionResult_error_new_project_no_name;
 
   public static String GeneralPreferencePage_ACCOUNT_GROUP_TITLE;
   public static String GeneralPreferencePage_ACTIVATE_BTN_TEXT;

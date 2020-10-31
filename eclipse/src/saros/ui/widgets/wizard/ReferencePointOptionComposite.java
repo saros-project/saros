@@ -29,7 +29,6 @@ public class ReferencePointOptionComposite extends Composite {
 
   /** The possible ways to represent the shared reference point that can be chosen by the user. */
   public enum LocalRepresentationOption {
-    NEW_PROJECT,
     NEW_DIRECTORY,
     EXISTING_DIRECTORY
   }
@@ -40,12 +39,6 @@ public class ReferencePointOptionComposite extends Composite {
   private final List<ReferencePointOptionListener> listeners = new ArrayList<>();
 
   private final String remoteReferencePointId;
-
-  /*
-   * Fields for the option to create a new project to represent the reference point.
-   */
-  private Button newProjectRadioButton;
-  private Text newProjectNameText;
 
   /*
    * Fields for the option to create a new directory to represent the reference point.
@@ -63,8 +56,8 @@ public class ReferencePointOptionComposite extends Composite {
   private Button existingDirectoryBrowseButton;
 
   /**
-   * Instantiates a new reference point option composite. Selects the option to create a new project
-   * by default.
+   * Instantiates a new reference point option composite. Selects the option to create a new
+   * directory by default.
    *
    * @param parent the parent composite
    * @param remoteReferencePointId the ID of the reference point for which this composite chooses a
@@ -80,13 +73,12 @@ public class ReferencePointOptionComposite extends Composite {
     layout.numColumns = 3;
     super.setLayout(layout);
 
-    createNewProjectGroup();
     createNewDirectoryGroup();
     createExistingDirectoryGroup();
 
     addDisposeListener(e -> listeners.clear());
 
-    setRadioButtonSelection(LocalRepresentationOption.NEW_PROJECT);
+    setRadioButtonSelection(LocalRepresentationOption.NEW_DIRECTORY);
   }
 
   @Override
@@ -121,10 +113,6 @@ public class ReferencePointOptionComposite extends Composite {
    * @see #getResult()
    */
   private LocalRepresentationOption getSelectedOption() {
-    if (newProjectRadioButton.getSelection()) {
-      return LocalRepresentationOption.NEW_PROJECT;
-    }
-
     if (newDirectoryRadioButton.getSelection()) {
       return LocalRepresentationOption.NEW_DIRECTORY;
     }
@@ -146,17 +134,11 @@ public class ReferencePointOptionComposite extends Composite {
   public ReferencePointOptionResult getResult() {
     LocalRepresentationOption localRepresentationOption = getSelectedOption();
 
-    String newProjectName = null;
     String newDirectoryName = null;
     String newDirectoryBase = null;
     String existingDirectory = null;
 
     switch (localRepresentationOption) {
-      case NEW_PROJECT:
-        newProjectName = newProjectNameText.getText();
-
-        break;
-
       case NEW_DIRECTORY:
         newDirectoryName = newDirectoryNameText.getText();
         newDirectoryBase = newDirectoryBasePathText.getText();
@@ -174,28 +156,7 @@ public class ReferencePointOptionComposite extends Composite {
     }
 
     return new ReferencePointOptionResult(
-        localRepresentationOption,
-        newProjectName,
-        newDirectoryName,
-        newDirectoryBase,
-        existingDirectory);
-  }
-
-  /**
-   * Sets the option to create a new project to represent the reference point as selected.
-   *
-   * <p>If a project name is given, it is set as the new value of the new project name field.
-   *
-   * @param projectName the value to set in the project name text field or <code>null</code>
-   */
-  public void setNewProjectOptionSelected(String projectName) {
-    setRadioButtonSelection(LocalRepresentationOption.NEW_PROJECT);
-
-    newProjectNameText.setFocus();
-
-    if (projectName != null) {
-      newProjectNameText.setText(projectName);
-    }
+        localRepresentationOption, newDirectoryName, newDirectoryBase, existingDirectory);
   }
 
   /**
@@ -238,56 +199,6 @@ public class ReferencePointOptionComposite extends Composite {
     if (directoryPath != null) {
       existingDirectoryPathText.setText(directoryPath);
     }
-  }
-
-  /** Create components for the option to create a new project to represent the reference point. */
-  private void createNewProjectGroup() {
-    GridData gridData;
-
-    /* Radio button */
-    newProjectRadioButton = new Button(this, SWT.RADIO);
-    newProjectRadioButton.setText(Messages.ReferencePointOptionComposite_create_new_project);
-    newProjectRadioButton.setToolTipText(
-        Messages.ReferencePointOptionComposite_tooltip_new_project);
-    newProjectRadioButton.setSelection(false);
-
-    gridData = new GridData();
-    gridData.horizontalSpan = 3;
-
-    newProjectRadioButton.setLayoutData(gridData);
-    newProjectRadioButton.addSelectionListener(
-        new SelectionListener() {
-          @Override
-          public void widgetSelected(SelectionEvent e) {
-            updateEnablement(LocalRepresentationOption.NEW_PROJECT);
-            newProjectNameText.setFocus();
-            fireValueChanged();
-            fireSelectedOptionChanged();
-          }
-
-          @Override
-          public void widgetDefaultSelected(SelectionEvent e) {
-            widgetSelected(e);
-          }
-        });
-
-    /* Label */
-    Label newProjectNameLabel = new Label(this, SWT.RIGHT);
-    newProjectNameLabel.setText(Messages.ReferencePointOptionComposite_project_name);
-    newProjectNameLabel.setToolTipText(
-        Messages.ReferencePointOptionComposite_tooltip_new_project_name);
-    newProjectNameLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
-
-    /* Text box */
-    newProjectNameText = new Text(this, SWT.BORDER);
-    newProjectNameText.setToolTipText(
-        Messages.ReferencePointOptionComposite_tooltip_new_project_name);
-
-    gridData = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
-    gridData.horizontalSpan = 2;
-
-    newProjectNameText.setLayoutData(gridData);
-    newProjectNameText.addModifyListener(e -> fireValueChanged());
   }
 
   /**
@@ -472,20 +383,14 @@ public class ReferencePointOptionComposite extends Composite {
    * radio buttons and disables all other fields.
    *
    * @param selectedOption the selected option
-   * @see #setNewProjectFieldsEnabled(boolean)
    * @see #setNewDirectoryFieldsEnabled(boolean)
    * @see #setExistingDirectoryFieldsEnabled(boolean)
    */
   private void setRadioButtonSelection(LocalRepresentationOption selectedOption) {
-    boolean newProjectOptionsSelected = false;
     boolean newDirectoryOptionsSelected = false;
     boolean existingDirectoryOptionsSelected = false;
 
     switch (selectedOption) {
-      case NEW_PROJECT:
-        newProjectOptionsSelected = true;
-        break;
-
       case NEW_DIRECTORY:
         newDirectoryOptionsSelected = true;
         break;
@@ -499,11 +404,9 @@ public class ReferencePointOptionComposite extends Composite {
             "Encountered unsupported selection option " + selectedOption);
     }
 
-    newProjectRadioButton.setSelection(newProjectOptionsSelected);
     newDirectoryRadioButton.setSelection(newDirectoryOptionsSelected);
     existingDirectoryRadioButton.setSelection(existingDirectoryOptionsSelected);
 
-    setNewProjectFieldsEnabled(newProjectOptionsSelected);
     setNewDirectoryFieldsEnabled(newDirectoryOptionsSelected);
     setExistingDirectoryFieldsEnabled(existingDirectoryOptionsSelected);
   }
@@ -516,20 +419,14 @@ public class ReferencePointOptionComposite extends Composite {
    * use {@link #setRadioButtonSelection(LocalRepresentationOption)}.
    *
    * @param selectedOption the selected option
-   * @see #setNewProjectFieldsEnabled(boolean)
    * @see #setNewDirectoryFieldsEnabled(boolean)
    * @see #setExistingDirectoryFieldsEnabled(boolean)
    */
   private void updateEnablement(LocalRepresentationOption selectedOption) {
-    boolean newProjectOptionsEnabled = false;
     boolean newDirectoryOptionsEnabled = false;
     boolean existingDirectoryOptionsEnabled = false;
 
     switch (selectedOption) {
-      case NEW_PROJECT:
-        newProjectOptionsEnabled = true;
-        break;
-
       case NEW_DIRECTORY:
         newDirectoryOptionsEnabled = true;
         break;
@@ -543,19 +440,8 @@ public class ReferencePointOptionComposite extends Composite {
             "Encountered unsupported selection option " + selectedOption);
     }
 
-    setNewProjectFieldsEnabled(newProjectOptionsEnabled);
     setNewDirectoryFieldsEnabled(newDirectoryOptionsEnabled);
     setExistingDirectoryFieldsEnabled(existingDirectoryOptionsEnabled);
-  }
-
-  /**
-   * Sets the enabled state of all fields of the option to create a new project to represent the
-   * reference point to the given value.
-   *
-   * @param enabled whether to enable the fields
-   */
-  private void setNewProjectFieldsEnabled(boolean enabled) {
-    newProjectNameText.setEnabled(enabled);
   }
 
   /**

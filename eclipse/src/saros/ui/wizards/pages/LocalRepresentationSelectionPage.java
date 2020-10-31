@@ -1,11 +1,7 @@
 package saros.ui.wizards.pages;
 
-import static saros.ui.widgets.wizard.ReferencePointOptionComposite.LocalRepresentationOption.NEW_PROJECT;
-
-import java.io.File;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -353,19 +349,16 @@ public class LocalRepresentationSelectionPage extends WizardPage {
 
     setErrorMessage(null);
 
-    String warningMessage = findAndReportClashingProjectArtifacts();
+    String warningMessage;
 
     if (!unsupportedCharsets.isEmpty()) {
-      if (warningMessage == null) {
-        warningMessage = "";
-      } else {
-        warningMessage += "\n";
-      }
-
-      warningMessage +=
+      warningMessage =
           MessageFormat.format(
               Messages.LocalRepresentationSelectionPage_warning_unsupported_encoding_found,
               StringUtils.join(unsupportedCharsets, ", "));
+
+    } else {
+      warningMessage = null;
     }
 
     setMessage(warningMessage, WARNING);
@@ -430,53 +423,6 @@ public class LocalRepresentationSelectionPage extends WizardPage {
     } else {
       currentErrors.remove(referencePointID);
     }
-  }
-
-  /**
-   * Scans the current Eclipse Workspace for existing project artifacts that would clash with the
-   * projects created as part of the resource negotiation with the current selections.
-   *
-   * @return a warning message if such artifacts are found, or <code>null</code> otherwise
-   */
-  private String findAndReportClashingProjectArtifacts() {
-    IPath workspacePath = ResourcesPlugin.getWorkspace().getRoot().getLocation();
-
-    if (workspacePath == null) {
-      return null;
-    }
-
-    File workspaceDirectory = workspacePath.toFile();
-
-    List<String> dirtyProjectNames = new ArrayList<>();
-
-    for (ReferencePointOptionComposite composite : referencePointOptionComposites.values()) {
-      ReferencePointOptionResult referencePointOptionResult = composite.getResult();
-
-      if (referencePointOptionResult.getLocalRepresentationOption() != NEW_PROJECT) {
-        continue;
-      }
-
-      String projectName = referencePointOptionResult.getNewProjectName();
-
-      if (projectName == null || projectName.isEmpty()) {
-        continue;
-      }
-
-      if (new File(workspaceDirectory, projectName).exists()) {
-        dirtyProjectNames.add(projectName);
-      }
-    }
-
-    String warningMessage = null;
-
-    if (!dirtyProjectNames.isEmpty()) {
-      warningMessage =
-          MessageFormat.format(
-              Messages.LocalRepresentationSelectionPage_warning_project_artifacts_found,
-              StringUtils.join(dirtyProjectNames, ", "));
-    }
-
-    return warningMessage;
   }
 
   /**
@@ -557,10 +503,8 @@ public class LocalRepresentationSelectionPage extends WizardPage {
   }
 
   /**
-   * Sets the reference point name as the value in the fields for the new project name and new
-   * directory name in the given reference point option composite.
-   *
-   * <p>Leaves the option to create a new project with the given reference point name as selected.
+   * Sets the reference point name as the value in the fields for the new directory name in the
+   * given reference point option composite.
    *
    * @param referencePointOptionComposite the reference point option composite to update
    * @param referencePointName the name to set in the name fields
@@ -569,7 +513,6 @@ public class LocalRepresentationSelectionPage extends WizardPage {
       ReferencePointOptionComposite referencePointOptionComposite, String referencePointName) {
 
     referencePointOptionComposite.setNewDirectoryOptionSelected(referencePointName, null);
-    referencePointOptionComposite.setNewProjectOptionSelected(referencePointName);
   }
 
   /**
