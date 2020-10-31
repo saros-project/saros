@@ -173,6 +173,7 @@ public class Messages extends NLS {
   public static String LocalRepresentationSelectionPage_title;
   public static String LocalRepresentationSelectionPage_unknown_transport_method;
   public static String LocalRepresentationSelectionPage_warning_unsupported_encoding_found;
+  public static String LocalRepresentationSelectionPage_new_project_button;
 
   public static String ReferencePointOptionComposite_create_new_directory;
   public static String ReferencePointOptionComposite_directory_name;
