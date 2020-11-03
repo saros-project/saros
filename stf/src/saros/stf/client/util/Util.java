@@ -58,6 +58,58 @@ public class Util {
   }
 
   /**
+   * A convenient function to quickly build a session with a project. The project is created by this
+   * method so it <b>must not</b> exist before. The invitees are invited using the given modality.
+   *
+   * <p><b>Note:</b> This method does not enforce that the project nature on the inviter's side is
+   * correctly applied on the invitee's side. As a result, it is only supported for cases where the
+   * project nature is not of interest. In cases where the same project nature is required on all
+   * sides (e.g. if Java language support is needed), please use {@link
+   * #setUpSessionWithJavaProject(String, SessionInvitationModality, AbstractTester,
+   * AbstractTester...)} instead.
+   *
+   * <p><b>Note:</b> There is no guarantee that the project and its files are already shared after
+   * this method returns.
+   *
+   * @param projectName the name of the project
+   * @param sessionInvitationModality the session invitation modality to use
+   * @param inviter the inviting test user, e.g. ALICE
+   * @param invitees the invited test user(s), e.g. BOB, CARL
+   * @throws IllegalStateException if the inviter or one of the invitee is not connected or is
+   *     already in a session
+   * @throws Exception for any other (internal) failure
+   */
+  public static void setUpSessionWithProject(
+      String projectName,
+      SessionInvitationModality sessionInvitationModality,
+      AbstractTester inviter,
+      AbstractTester... invitees)
+      throws Exception {
+
+    assertStates(true, false, inviter, invitees);
+
+    inviter.superBot().internal().createProject(projectName);
+
+    for (AbstractTester invitee : invitees) {
+      invitee.superBot().internal().createProject(projectName);
+    }
+
+    switch (sessionInvitationModality) {
+      case CONCURRENTLY:
+        buildSessionConcurrently(projectName, TypeOfCreateProject.EXIST_PROJECT, inviter, invitees);
+        break;
+
+      case SEQUENTIALLY:
+        buildSessionSequentially(projectName, TypeOfCreateProject.EXIST_PROJECT, inviter, invitees);
+        break;
+
+      default:
+        throw new IllegalArgumentException(
+            "Encountered unhandled session invitation modality " + sessionInvitationModality);
+    }
+  }
+
+  /**
    * A convenient function to quickly build a session with a project and a file. The project is
    * created by this method so it <b>must not</b> exist before. The invitees are invited using the
    * given modality.
@@ -96,13 +148,17 @@ public class Util {
     inviter.superBot().internal().createProject(projectName);
     inviter.superBot().internal().createFile(projectName, path, content);
 
+    for (AbstractTester invitee : invitees) {
+      invitee.superBot().internal().createProject(projectName);
+    }
+
     switch (sessionInvitationModality) {
       case CONCURRENTLY:
-        buildSessionConcurrently(projectName, TypeOfCreateProject.NEW_PROJECT, inviter, invitees);
+        buildSessionConcurrently(projectName, TypeOfCreateProject.EXIST_PROJECT, inviter, invitees);
         break;
 
       case SEQUENTIALLY:
-        buildSessionSequentially(projectName, TypeOfCreateProject.NEW_PROJECT, inviter, invitees);
+        buildSessionSequentially(projectName, TypeOfCreateProject.EXIST_PROJECT, inviter, invitees);
         break;
 
       default:
