@@ -257,7 +257,7 @@ final class ReferencePointResourceDeltaVisitor implements IResourceDeltaVisitor 
     }
 
     saros.filesystem.IFile oldFile =
-        referencePoint.getFile(ResourceConverter.toPath(referencePointRelativePath));
+        referencePoint.getFile(ResourceConverter.convertToPath(referencePointRelativePath));
 
     boolean newFileIsShared = session.isShared(newFile);
     boolean oldFileWasShared = session.isShared(oldFile);

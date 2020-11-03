@@ -22,7 +22,7 @@ public class EclipseFolder extends AbstractEclipseResource implements IFolder {
   public boolean exists(Path path) {
     Objects.requireNonNull(path, "Given path must not be null");
 
-    return getDelegate().exists(ResourceConverter.toEclipsePath(path));
+    return getDelegate().exists(ResourceConverter.convertToEclipsePath(path));
   }
 
   @Override

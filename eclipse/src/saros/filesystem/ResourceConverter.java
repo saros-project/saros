@@ -1,36 +1,33 @@
 package saros.filesystem;
 
+import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Set;
-import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.IPath;
 
 /** Utility class providing static methods to convert between Eclipse and Saros Resource objects. */
 public class ResourceConverter {
 
   /**
-   * Returns a {@link java.nio.file.Path} object for the given {@link
-   * org.eclipse.core.runtime.IPath} object.
+   * Returns a {@link Path} object for the given {@link IPath} object.
    *
    * @param eclipsePath the Eclipse path to convert
-   * @return a {@link java.nio.file.Path} object for the given {@link
-   *     org.eclipse.core.runtime.IPath} object
+   * @return a {@link Path} object for the given {@link IPath} object
    */
-  public static java.nio.file.Path toPath(org.eclipse.core.runtime.IPath eclipsePath) {
+  public static Path convertToPath(IPath eclipsePath) {
     return eclipsePath.toFile().toPath();
   }
 
   /**
-   * Returns a {@link org.eclipse.core.runtime.IPath} object for the given {@link
-   * java.nio.file.Path} object.
+   * Returns a {@link IPath} object for the given {@link Path} object.
    *
    * @param path the path to convert
-   * @return a {@link org.eclipse.core.runtime.IPath} object for the given {@link
-   *     java.nio.file.Path} object
+   * @return a {@link IPath} object for the given {@link Path} object
    */
-  public static org.eclipse.core.runtime.IPath toEclipsePath(java.nio.file.Path path) {
+  public static IPath convertToEclipsePath(Path path) {
     String localPathString = path.toString();
 
-    return Path.fromOSString(localPathString);
+    return org.eclipse.core.runtime.Path.fromOSString(localPathString);
   }
 
   /**
