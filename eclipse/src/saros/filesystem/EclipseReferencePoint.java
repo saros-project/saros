@@ -9,6 +9,7 @@ import java.util.Objects;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import saros.util.PathUtils;
 
 /** Eclipse implementation of the Saros reference point interface. */
@@ -51,10 +52,10 @@ public class EclipseReferencePoint implements IReferencePoint {
 
   @Override
   public boolean isNested(IReferencePoint otherReferencePoint) {
-    org.eclipse.core.runtime.IPath p1 = delegate.getFullPath();
+    IPath p1 = delegate.getFullPath();
 
     IContainer d2 = ResourceConverter.getDelegate(otherReferencePoint);
-    org.eclipse.core.runtime.IPath p2 = d2.getFullPath();
+    IPath p2 = d2.getFullPath();
 
     return p1.equals(p2) || p1.isPrefixOf(p2) || p2.isPrefixOf(p1);
   }
@@ -73,7 +74,7 @@ public class EclipseReferencePoint implements IReferencePoint {
   public boolean exists(Path path) {
     Objects.requireNonNull(path, "Given path must not be null");
 
-    return delegate.exists(ResourceConverter.toEclipsePath(path));
+    return delegate.exists(ResourceConverter.convertToEclipsePath(path));
   }
 
   @Override
@@ -148,7 +149,7 @@ public class EclipseReferencePoint implements IReferencePoint {
    * @return the delegate for the given relative path
    * @throws NullPointerException if the given path is <code>null</code>
    * @throws IllegalArgumentException if the given path is absolute or empty
-   * @see org.eclipse.core.resources.IContainer#getFile(org.eclipse.core.runtime.IPath)
+   * @see org.eclipse.core.resources.IContainer#getFile(IPath)
    */
   org.eclipse.core.resources.IFile getFileDelegate(Path relativePath) {
     Objects.requireNonNull(relativePath, "Given path must not be null");
@@ -160,7 +161,7 @@ public class EclipseReferencePoint implements IReferencePoint {
       throw new IllegalArgumentException("Given path must not be absolute");
     }
 
-    return delegate.getFile(ResourceConverter.toEclipsePath(relativePath));
+    return delegate.getFile(ResourceConverter.convertToEclipsePath(relativePath));
   }
 
   /**
@@ -170,7 +171,7 @@ public class EclipseReferencePoint implements IReferencePoint {
    * @return the delegate for the given relative path
    * @throws NullPointerException if the given path is <code>null</code>
    * @throws IllegalArgumentException if the given path is absolute or empty
-   * @see org.eclipse.core.resources.IContainer#getFolder(org.eclipse.core.runtime.IPath)
+   * @see org.eclipse.core.resources.IContainer#getFolder(IPath)
    */
   org.eclipse.core.resources.IFolder getFolderDelegate(Path relativePath) {
     Objects.requireNonNull(relativePath, "Given path must not be null");
@@ -182,7 +183,7 @@ public class EclipseReferencePoint implements IReferencePoint {
       throw new IllegalArgumentException("Given path must not be absolute");
     }
 
-    return delegate.getFolder(ResourceConverter.toEclipsePath(relativePath));
+    return delegate.getFolder(ResourceConverter.convertToEclipsePath(relativePath));
   }
 
   /**
@@ -279,20 +280,20 @@ public class EclipseReferencePoint implements IReferencePoint {
   private Path getReferencePointRelativePath(org.eclipse.core.resources.IResource resource) {
     Objects.requireNonNull(resource, "Given resource must not be null");
 
-    org.eclipse.core.runtime.IPath referencePointPath = delegate.getFullPath();
-    org.eclipse.core.runtime.IPath resourcePath = resource.getFullPath();
+    IPath referencePointPath = delegate.getFullPath();
+    IPath resourcePath = resource.getFullPath();
 
     if (!referencePointPath.isPrefixOf(resourcePath)) {
       return null;
     }
 
-    org.eclipse.core.runtime.IPath relativePath = resourcePath.makeRelativeTo(referencePointPath);
+    IPath relativePath = resourcePath.makeRelativeTo(referencePointPath);
 
     if (relativePath.equals(resourcePath)) {
       return null;
     }
 
-    return ResourceConverter.toPath(relativePath);
+    return ResourceConverter.convertToPath(relativePath);
   }
 
   @Override
