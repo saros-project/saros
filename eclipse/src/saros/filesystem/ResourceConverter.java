@@ -6,42 +6,6 @@ import org.eclipse.core.runtime.Path;
 
 /** Utility class providing static methods to convert between Eclipse and Saros Resource objects. */
 public class ResourceConverter {
-  /**
-   * Converts the given string into an IPath object.
-   *
-   * @param pathString the path string to convert
-   * @return an IPath object representing the given string path
-   * @throws NullPointerException if the given string is <code>null</code> or the path represented
-   *     by the string is absolute
-   * @deprecated use {@link java.nio.file.Paths#get(String, String...)} instead
-   */
-  @Deprecated
-  public static IPath convertToPath(String pathString) {
-    Objects.requireNonNull(pathString, "Given string must not be null");
-
-    Path path = new Path(pathString);
-
-    return convertToPath(path);
-  }
-
-  /**
-   * Returns an IPath object representing the given Eclipse delegate.
-   *
-   * @param eclipseDelegate the Eclipse path delegate
-   * @return an IPath object representing the given Eclipse delegate
-   * @throws NullPointerException if the given path is <code>null</code> or is absolute
-   * @deprecated use {@link #toPath(org.eclipse.core.runtime.IPath)} instead
-   */
-  @Deprecated
-  public static IPath convertToPath(org.eclipse.core.runtime.IPath eclipseDelegate) {
-    Objects.requireNonNull(eclipseDelegate, "Given Eclipse path must not be null");
-
-    if (eclipseDelegate.isAbsolute()) {
-      throw new IllegalArgumentException("Given path must not be absolute - " + eclipseDelegate);
-    }
-
-    return new EclipsePathImpl(eclipseDelegate);
-  }
 
   /**
    * Returns a {@link java.nio.file.Path} object for the given {@link
@@ -194,23 +158,6 @@ public class ResourceConverter {
       IReferencePoint referencePoint, org.eclipse.core.resources.IContainer containerDelegate) {
 
     return (IContainer) convertToResource(referencePoint, containerDelegate);
-  }
-
-  /**
-   * Returns the Eclipse delegate represented by the given an IPath object.
-   *
-   * @param path the path whose delegate to get
-   * @return the Eclipse delegate represented by the given an IPath object
-   * @throws NullPointerException if the given path is <code>null</code>
-   * @deprecated use {@link #toEclipsePath(java.nio.file.Path)} instead
-   */
-  @Deprecated
-  public static org.eclipse.core.runtime.IPath getDelegate(IPath path) {
-    Objects.requireNonNull(path, "Given path must not be null");
-
-    EclipsePathImpl eclipsePath = (EclipsePathImpl) path;
-
-    return eclipsePath.getDelegate();
   }
 
   /**

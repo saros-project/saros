@@ -7,9 +7,7 @@ import saros.core.ui.eventhandler.NegotiationHandler;
 import saros.core.ui.eventhandler.UserStatusChangeHandler;
 import saros.core.ui.eventhandler.XMPPAuthorizationHandler;
 import saros.editor.IEditorManager;
-import saros.filesystem.IPathFactory;
 import saros.intellij.editor.EditorManager;
-import saros.intellij.filesystem.PathFactory;
 import saros.intellij.preferences.IntelliJPreferences;
 import saros.intellij.preferences.PropertiesComponentAdapter;
 import saros.intellij.runtime.IntellijUISynchronizer;
@@ -63,10 +61,6 @@ public class SarosIntellijContextFactory extends AbstractContextFactory {
 
   @Override
   public void createComponents(MutablePicoContainer container) {
-
-    // Saros Core Path Support
-    container.addComponent(IPathFactory.class, new PathFactory());
-
     for (Component component : getContextComponents()) {
       container.addComponent(component.getBindKey(), component.getImplementation());
     }
