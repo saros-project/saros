@@ -12,8 +12,7 @@ public interface Constants {
 
   /** Defines how the shared project is represented on the invitee's side. */
   enum TypeOfCreateProject {
-    EXIST_PROJECT,
-    EXIST_PROJECT_WITH_COPY
+    EXIST_PROJECT
   }
 
   enum TypeOfShareProject {

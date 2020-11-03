@@ -10,7 +10,6 @@ import java.util.regex.Pattern;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import saros.stf.client.StfTestCase;
 import saros.stf.client.util.Util;
@@ -87,36 +86,5 @@ public class ShareProjectUsingExistingProjectTest extends StfTestCase {
             .packageExplorerView()
             .selectPkg(Constants.PROJECT1, Constants.PKG1)
             .existsWithRegex(Pattern.quote(Constants.CLS2) + ".*"));
-  }
-
-  @Test
-  @Ignore("The feature is currently disabled because it is not working as expected")
-  public void testShareProjectUsingExistingProjectWithCopy() throws Exception {
-    Util.buildSessionSequentially(
-        Constants.PROJECT1, TypeOfCreateProject.EXIST_PROJECT_WITH_COPY, ALICE, BOB);
-    assertTrue(
-        BOB.superBot()
-            .views()
-            .packageExplorerView()
-            .tree()
-            .existsWithRegex(Pattern.quote(Constants.PROJECT1) + ".*"));
-    assertTrue(
-        BOB.superBot()
-            .views()
-            .packageExplorerView()
-            .selectPkg(Constants.PROJECT1, Constants.PKG1)
-            .existsWithRegex(Pattern.quote(Constants.CLS2) + ".*"));
-    assertTrue(
-        BOB.superBot()
-            .views()
-            .packageExplorerView()
-            .tree()
-            .existsWithRegex(Pattern.quote(Constants.PROJECT1_COPY) + ".*"));
-    assertTrue(
-        BOB.superBot()
-            .views()
-            .packageExplorerView()
-            .selectPkg(Constants.PROJECT1_COPY, Constants.PKG1)
-            .existsWithRegex(Pattern.quote(Constants.CLS1) + ".*"));
   }
 }
