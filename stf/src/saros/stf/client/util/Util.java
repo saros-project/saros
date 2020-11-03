@@ -270,49 +270,6 @@ public class Util {
    * Adds a project to the current session. This is done sequentially, so the project is send to the
    * invitees one after another.
    *
-   * <p><b>Note:</b> The creation type {@link TypeOfCreateProject#NEW_PROJECT} does not enforce that
-   * the project nature on the inviter's side is correctly applied on the invitee's side. As a
-   * result, it is only supported for cases where the project nature is not of interest. In cases
-   * where the same project nature is necessary on all sides (e.g. if Java language support is
-   * needed), please use {@link TypeOfCreateProject#EXIST_PROJECT}. For Java projects, the utility
-   * method {@link #addJavaProjectToSessionSequentially(String, AbstractTester, AbstractTester...)}
-   * can be used for this purpose.
-   *
-   * <p><b>Note:</b> Adding a project that is already shared or does not exist results in unexpected
-   * behavior.
-   *
-   * <p><b>Note:</b> There is no guarantee that the project and its files are already shared after
-   * this method returns.
-   *
-   * @param projectName the name of the project
-   * @param projectType the type of project that should be used on the invitee side e.g new, use
-   *     existing ...
-   * @param inviter the inviting test user, e.g. ALICE
-   * @param invitees the invited test user(s), e.g. BOB, CARL
-   * @throws IllegalStateException if the inviter or one of the invitee is not connected or is not
-   *     in a session
-   * @throws Exception for any other (internal) failure
-   */
-  public static void addProjectToSessionSequentially(
-      String projectName,
-      TypeOfCreateProject projectType,
-      AbstractTester inviter,
-      AbstractTester... invitees)
-      throws Exception {
-
-    assertStates(true, true, inviter, invitees);
-
-    inviter.superBot().menuBar().saros().addProjects(projectName);
-
-    for (AbstractTester invitee : invitees) {
-      invitee.superBot().confirmShellAddProjectUsingWhichProject(projectName, projectType);
-    }
-  }
-
-  /**
-   * Adds a project to the current session. This is done sequentially, so the project is send to the
-   * invitees one after another.
-   *
    * <p>The projects to add is created on the invitee's side as part of this process. It <b>must
    * not</b> already exist on the invitee's side. Adding a project that already exists on the
    * invitee's side or is already shared results in unexpected behavior.
@@ -347,14 +304,6 @@ public class Util {
 
   /**
    * Establish a Saros session with the given invitees. Every invitee is invited one bye one.
-   *
-   * <p><b>Note:</b> The creation type {@link TypeOfCreateProject#NEW_PROJECT} does not enforce that
-   * the project nature on the inviter's side is correctly applied on the invitee's side. As a
-   * result, it is only supported for cases where the project nature is not of interest. In cases
-   * where the same project nature is necessary on all sides (e.g. if Java language support is
-   * needed), please use {@link TypeOfCreateProject#EXIST_PROJECT}. For Java projects, the utility
-   * method {@link #setUpSessionWithJavaProject(String, SessionInvitationModality, AbstractTester,
-   * AbstractTester...)} can be used for this purpose.
    *
    * <p><b>Note:</b> Establishing session with a project that is already shared or does not exist
    * results in unexpected behavior.
@@ -392,14 +341,6 @@ public class Util {
 
   /**
    * Establish a Saros session with the given invitees. All invitees are invited simultaneously.
-   *
-   * <p><b>Note:</b> The creation type {@link TypeOfCreateProject#NEW_PROJECT} does not enforce that
-   * the project nature on the inviter's side is correctly applied on the invitee's side. As a
-   * result, it is only supported for cases where the project nature is not of interest. In cases
-   * where the same project nature is necessary on all sides (e.g. if Java language support is
-   * needed), please use {@link TypeOfCreateProject#EXIST_PROJECT}. For Java projects, the utility
-   * method {@link #setUpSessionWithJavaProject(String, SessionInvitationModality, AbstractTester,
-   * AbstractTester...)} can be used for this purpose.
    *
    * <p><b>Note:</b> Establishing session with a project that is already shared or does not exist
    * results in unexpected behavior.
@@ -543,12 +484,6 @@ public class Util {
 
   /**
    * Adds testers to the current session.
-   *
-   * <p><b>Note:</b> The creation type {@link TypeOfCreateProject#NEW_PROJECT} does not enforce that
-   * the project nature on the inviter's side is correctly applied on the invitee's side. As a
-   * result, it is only supported for cases where the project nature is not of interest. In cases
-   * where the same project nature is necessary on all sides (e.g. if Java language support is
-   * needed), please use {@link TypeOfCreateProject#EXIST_PROJECT}.
    *
    * <p><b>Note:</b> There is no guarantee that the project and its files are already shared after
    * this method returns.
