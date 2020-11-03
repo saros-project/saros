@@ -7,6 +7,7 @@ import static org.junit.Assert.fail;
 import static saros.stf.client.tester.SarosTester.ALICE;
 import static saros.stf.client.tester.SarosTester.BOB;
 import static saros.stf.client.tester.SarosTester.CARL;
+import static saros.stf.shared.Constants.SessionInvitationModality.CONCURRENTLY;
 
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 import org.junit.BeforeClass;
@@ -14,7 +15,6 @@ import org.junit.Test;
 import saros.stf.annotation.TestLink;
 import saros.stf.client.StfTestCase;
 import saros.stf.client.util.Util;
-import saros.stf.shared.Constants.TypeOfCreateProject;
 
 @TestLink(id = "Saros-18_creating_new_files")
 public class CreatingNewFileTest extends StfTestCase {
@@ -26,10 +26,7 @@ public class CreatingNewFileTest extends StfTestCase {
 
   @Test
   public void testCreatingNewFileTest() throws Exception {
-
-    CARL.superBot().internal().createProject("foo");
-
-    Util.buildSessionConcurrently("foo", TypeOfCreateProject.NEW_PROJECT, CARL, ALICE, BOB);
+    Util.setUpSessionWithProject("foo", CONCURRENTLY, CARL, ALICE, BOB);
 
     ALICE.superBot().views().packageExplorerView().waitUntilResourceIsShared("foo");
     BOB.superBot().views().packageExplorerView().waitUntilResourceIsShared("foo");

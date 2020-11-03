@@ -44,7 +44,10 @@ public class ConcurrentEditingTest extends StfTestCase {
     ALICE.remoteBot().editor(FILE).setTextFromFile("test/resources/lorem.txt");
     ALICE.remoteBot().editor(FILE).navigateTo(0, 6);
 
-    Util.buildSessionSequentially(Constants.PROJECT1, TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
+    BOB.superBot().internal().createProject(Constants.PROJECT1);
+    Util.buildSessionSequentially(
+        Constants.PROJECT1, TypeOfCreateProject.EXIST_PROJECT, ALICE, BOB);
+
     BOB.superBot()
         .views()
         .packageExplorerView()

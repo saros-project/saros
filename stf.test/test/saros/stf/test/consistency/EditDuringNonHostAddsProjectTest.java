@@ -66,14 +66,16 @@ public class EditDuringNonHostAddsProjectTest extends StfTestCase {
             });
 
     // Alice receives the project and also starts typing
-    ALICE.superBot().confirmShellAddProjectWithNewProject("bar");
+    ALICE.superBot().internal().createProject("bar");
+    ALICE.superBot().confirmShellAddProjectUsingExistProject("bar");
     ALICE.superBot().views().packageExplorerView().waitUntilResourceIsShared("bar/text.txt");
     ALICE.superBot().views().packageExplorerView().selectFile("bar", "text.txt").open();
     ALICE.remoteBot().editor("text.txt").waitUntilIsActive();
     aliceIsWriting.start();
 
     // Carl receives the project and also adds some text
-    CARL.superBot().confirmShellAddProjectWithNewProject("bar");
+    CARL.superBot().internal().createProject("bar");
+    CARL.superBot().confirmShellAddProjectUsingExistProject("bar");
     CARL.superBot().views().packageExplorerView().waitUntilResourceIsShared("bar/text.txt");
     CARL.superBot().views().packageExplorerView().selectFile("bar", "text.txt").open();
     CARL.remoteBot().editor("text.txt").waitUntilIsActive();

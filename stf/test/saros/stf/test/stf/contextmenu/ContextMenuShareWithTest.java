@@ -38,9 +38,11 @@ public class ContextMenuShareWithTest extends StfTestCase {
         .selectJavaProject(Constants.PROJECT1)
         .shareWith()
         .contact(BOB.getJID());
+
+    BOB.superBot().internal().createJavaProject(Constants.PROJECT1);
     BOB.superBot()
         .confirmShellSessionInvitationAndShellAddProject(
-            Constants.PROJECT1, TypeOfCreateProject.NEW_PROJECT);
+            Constants.PROJECT1, TypeOfCreateProject.EXIST_PROJECT);
 
     BOB.superBot().views().sarosView().waitUntilIsInSession();
 

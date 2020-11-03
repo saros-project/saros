@@ -5,6 +5,7 @@ import static org.junit.Assert.fail;
 import static saros.stf.client.tester.SarosTester.ALICE;
 import static saros.stf.client.tester.SarosTester.BOB;
 import static saros.stf.client.tester.SarosTester.CARL;
+import static saros.stf.shared.Constants.SessionInvitationModality.SEQUENTIALLY;
 
 import org.junit.After;
 import org.junit.BeforeClass;
@@ -13,7 +14,6 @@ import saros.stf.annotation.TestLink;
 import saros.stf.client.StfTestCase;
 import saros.stf.client.tester.AbstractTester;
 import saros.stf.client.util.Util;
-import saros.stf.shared.Constants.TypeOfCreateProject;
 
 @TestLink(id = "Saros-131_create_same_file_at_once")
 public class CreateSameFileAtOnceTest extends StfTestCase {
@@ -31,10 +31,8 @@ public class CreateSameFileAtOnceTest extends StfTestCase {
 
   @Test
   public void testCreateSameFileAtOnce() throws Exception {
-    ALICE.superBot().internal().createProject("foo");
-    ALICE.superBot().internal().createFile("foo", "sync.dummy", "dummy");
-
-    Util.buildSessionSequentially("foo", TypeOfCreateProject.NEW_PROJECT, ALICE, BOB, CARL);
+    Util.setUpSessionWithProjectAndFile(
+        "foo", "sync.dummy", "dummy", SEQUENTIALLY, ALICE, BOB, CARL);
 
     BOB.superBot().views().packageExplorerView().waitUntilResourceIsShared("foo/sync.dummy");
     CARL.superBot().views().packageExplorerView().waitUntilResourceIsShared("foo/sync.dummy");
