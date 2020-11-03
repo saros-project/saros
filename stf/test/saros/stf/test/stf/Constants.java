@@ -33,7 +33,6 @@ public interface Constants {
   public static String NO_MATCHED_REPEAT_PASSWORD = "dddfffggggg";
   /* Project name */
   public static final String PROJECT1 = "Foo1_Saros";
-  public static final String PROJECT1_COPY = "Foo1_Saros-copy";
 
   public static final String PROJECT1_NEXT = "Foo1_1_Saros";
   public static final String PROJECT2 = "Foo2_Saros";
