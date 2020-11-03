@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import org.apache.log4j.Logger;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.runtime.CoreException;
@@ -15,8 +16,8 @@ import org.eclipse.core.runtime.OperationCanceledException;
 public class EclipseFile extends AbstractEclipseResource implements IFile {
   private static final Logger log = Logger.getLogger(EclipseFile.class);
 
-  /** @see AbstractEclipseResource#AbstractEclipseResource(EclipseReferencePoint, IPath) */
-  EclipseFile(EclipseReferencePoint referencePoint, IPath relativePath) {
+  /** @see AbstractEclipseResource#AbstractEclipseResource(EclipseReferencePoint, Path) */
+  EclipseFile(EclipseReferencePoint referencePoint, Path relativePath) {
     super(referencePoint, relativePath);
   }
 

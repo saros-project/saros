@@ -70,7 +70,7 @@ abstract class AbstractStreamProtocol {
    */
   String displayName(IFile file) {
     String referencePointName = file.getReferencePoint().getName();
-    String fileName = file.getReferencePointRelativePath().toOSString();
+    String fileName = file.getReferencePointRelativePath().toString();
 
     return referencePointName + ": " + fileName;
   }

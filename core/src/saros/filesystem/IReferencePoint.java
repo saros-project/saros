@@ -1,6 +1,7 @@
 package saros.filesystem;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
 /**
  * Represents a reference point in the local (virtual) file system.
@@ -17,7 +18,7 @@ public interface IReferencePoint extends IContainer {
    *
    * @return an empty path
    */
-  IPath getReferencePointRelativePath();
+  Path getReferencePointRelativePath();
 
   /**
    * Returns whether this reference point in combination with the other reference point represents a

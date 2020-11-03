@@ -170,6 +170,17 @@ public class PathUtilsTest {
   }
 
   @Test
+  public void testNormalizePathContainingDotDotName() {
+    Path path = Paths.get("foo", "..", "..bar");
+    Path normalizedPath = PathUtils.normalize(path);
+
+    Path expectedResult = Paths.get("..bar");
+
+    assertEquals(
+        "Normalizing path did not result in expected outcome", expectedResult, normalizedPath);
+  }
+
+  @Test
   public void testNormalizeLocalReference() {
     Path path = Paths.get(".");
     Path normalizedPath = PathUtils.normalize(path);

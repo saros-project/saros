@@ -17,7 +17,7 @@ public class ServerProjectImpl extends ServerContainerImpl implements IReference
    * @param name the project's name
    */
   public ServerProjectImpl(ServerWorkspaceImpl workspace, String name) {
-    super(workspace, ServerPathImpl.fromString(name));
+    super(workspace, Paths.get(name));
   }
 
   @Override
@@ -41,6 +41,6 @@ public class ServerProjectImpl extends ServerContainerImpl implements IReference
    * @throws IOException
    */
   public void create() throws IOException {
-    Files.createDirectory(toNioPath());
+    Files.createDirectory(getLocation());
   }
 }

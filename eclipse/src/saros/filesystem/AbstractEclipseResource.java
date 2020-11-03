@@ -3,9 +3,11 @@ package saros.filesystem;
 import static saros.filesystem.IResource.Type.FOLDER;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Objects;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.OperationCanceledException;
+import saros.util.PathUtils;
 
 /** Abstract Eclipse implementation of the Saros resource interface. */
 public abstract class AbstractEclipseResource implements IResource {
@@ -14,7 +16,7 @@ public abstract class AbstractEclipseResource implements IResource {
   protected final EclipseReferencePoint referencePoint;
 
   /** The reference-point-relative path for this resource. */
-  protected final IPath relativePath;
+  protected final Path relativePath;
 
   /**
    * Instantiates an Eclipse resource object.
@@ -24,11 +26,11 @@ public abstract class AbstractEclipseResource implements IResource {
    * @throws NullPointerException if the given reference point or path is <code>null</code>
    * @throws IllegalArgumentException if the given path is absolute or empty
    */
-  public AbstractEclipseResource(EclipseReferencePoint referencePoint, IPath relativePath) {
+  public AbstractEclipseResource(EclipseReferencePoint referencePoint, Path relativePath) {
     Objects.requireNonNull(referencePoint, "The given reference point must not be null");
     Objects.requireNonNull(relativePath, "The given relative path must not be null");
 
-    if (relativePath.segmentCount() == 0) {
+    if (PathUtils.isEmpty(relativePath)) {
       throw new IllegalArgumentException("Given path must not be empty");
 
     } else if (relativePath.isAbsolute()) {
@@ -46,7 +48,7 @@ public abstract class AbstractEclipseResource implements IResource {
 
   @Override
   public String getName() {
-    return relativePath.lastSegment();
+    return relativePath.getFileName().toString();
   }
 
   @Override
@@ -55,17 +57,17 @@ public abstract class AbstractEclipseResource implements IResource {
   }
 
   @Override
-  public IPath getReferencePointRelativePath() {
+  public Path getReferencePointRelativePath() {
     return relativePath;
   }
 
   @Override
   public IContainer getParent() {
-    if (relativePath.segmentCount() <= 1) {
+    if (relativePath.getNameCount() <= 1) {
       return referencePoint;
     }
 
-    return new EclipseFolder(referencePoint, relativePath.removeLastSegments(1));
+    return new EclipseFolder(referencePoint, PathUtils.removeLastSegments(relativePath, 1));
   }
 
   @Override
@@ -89,7 +91,7 @@ public abstract class AbstractEclipseResource implements IResource {
    * @return whether this resource is part of the git configuration directory
    */
   private boolean isGitConfig() {
-    String path = getReferencePointRelativePath().toPortableString();
+    String path = PathUtils.toPortableString(getReferencePointRelativePath());
 
     return (path.startsWith(".git/")
         || path.contains("/.git/")

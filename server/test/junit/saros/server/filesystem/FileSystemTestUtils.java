@@ -9,7 +9,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.apache.commons.io.FileUtils;
-import saros.filesystem.IPath;
 
 /**
  * Provides utility methods for the server file system implementation tests. These methods are meant
@@ -19,28 +18,14 @@ import saros.filesystem.IPath;
 class FileSystemTestUtils {
 
   /**
-   * A shorthand form for creating an {@link IPath}. When imported statically, its use significantly
-   * more compact than calling <code>ServerPathImpl.fromString(pathString)</code>.
+   * A shorthand form for creating an {@link Path}. When imported statically, it is more compact
+   * than calling <code>Paths.get(pathString)</code>.
    *
    * @param pathString the path string to create a path from
-   * @return the resulting {@link IPath}
+   * @return the resulting {@link Path}
    */
-  public static IPath path(String pathString) {
-    return ServerPathImpl.fromString(pathString);
-  }
-
-  /**
-   * Creates an absolute {@link IPath} with the segments specified by the passed relative path
-   * string. This makes it easy to construct an absolute path in an operating-system-independent
-   * way.
-   *
-   * @param pathString the path string to create the path from
-   * @return the resulting {@link IPath}
-   */
-  public static IPath absolutePath(String pathString) {
-    Path root = Paths.get("").toAbsolutePath().getRoot();
-    Path relativePath = Paths.get(pathString);
-    return ServerPathImpl.fromString(root.resolve(relativePath).toString());
+  public static Path path(String pathString) {
+    return Paths.get(pathString);
   }
 
   /**
@@ -50,7 +35,7 @@ class FileSystemTestUtils {
    * @return temporary workspace root folder
    * @throws IOException
    */
-  public static IPath createWorkspaceFolder() throws IOException {
+  public static Path createWorkspaceFolder() throws IOException {
     Path folderPath = Files.createTempDirectory("saros-test-workspace");
     return path(folderPath.toString());
   }
@@ -80,14 +65,13 @@ class FileSystemTestUtils {
   public static void createFile(ServerWorkspaceImpl workspace, String path, String content)
       throws IOException {
 
-    IPath absolutePath = workspace.getLocation().append(path);
-    Path absoluteNioPath = nioPath(absolutePath);
+    Path absolutePath = workspace.getLocation().resolve(path);
 
-    Files.createDirectories(absoluteNioPath.getParent());
-    Files.createFile(absoluteNioPath);
+    Files.createDirectories(absolutePath.getParent());
+    Files.createFile(absolutePath);
 
     if (content != null) {
-      Files.write(absoluteNioPath, content.getBytes("UTF-8"));
+      Files.write(absolutePath, content.getBytes("UTF-8"));
     }
   }
 
@@ -100,9 +84,8 @@ class FileSystemTestUtils {
    * @throws IOException if the folder creation fails
    */
   public static void createFolder(ServerWorkspaceImpl workspace, String path) throws IOException {
-
-    IPath absolutePath = workspace.getLocation().append(path);
-    Files.createDirectories(nioPath(absolutePath));
+    Path absolutePath = workspace.getLocation().resolve(path);
+    Files.createDirectories(absolutePath);
   }
 
   /**
@@ -146,16 +129,12 @@ class FileSystemTestUtils {
   public static void assertFileHasContent(
       ServerWorkspaceImpl workspace, String path, String expectedContent) throws IOException {
 
-    IPath location = resourceLocation(workspace, path);
-    byte[] actualContent = Files.readAllBytes(nioPath(location));
+    Path location = resourceLocation(workspace, path);
+    byte[] actualContent = Files.readAllBytes(location);
     assertArrayEquals(expectedContent.getBytes("UTF-8"), actualContent);
   }
 
-  private static Path nioPath(IPath path) {
-    return ((ServerPathImpl) path).getDelegate();
-  }
-
-  private static IPath resourceLocation(ServerWorkspaceImpl workspace, String path) {
-    return workspace.getLocation().append(path);
+  private static Path resourceLocation(ServerWorkspaceImpl workspace, String path) {
+    return workspace.getLocation().resolve(path);
   }
 }

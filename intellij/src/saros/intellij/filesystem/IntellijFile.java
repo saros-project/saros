@@ -10,12 +10,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Path;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import saros.filesystem.IFile;
-import saros.filesystem.IPath;
 import saros.filesystem.IResource;
 import saros.intellij.runtime.FilesystemRunner;
 
@@ -23,7 +23,7 @@ import saros.intellij.runtime.FilesystemRunner;
 public class IntellijFile extends AbstractIntellijResource implements IFile {
   private static final Logger log = Logger.getLogger(IntellijFile.class);
 
-  public IntellijFile(@NotNull IntellijReferencePoint referencePoint, @NotNull IPath relativePath) {
+  public IntellijFile(@NotNull IntellijReferencePoint referencePoint, @NotNull Path relativePath) {
     super(referencePoint, relativePath);
   }
 

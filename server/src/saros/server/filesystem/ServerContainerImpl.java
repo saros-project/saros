@@ -3,13 +3,14 @@ package saros.server.filesystem;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.io.FileUtils;
 import saros.filesystem.IContainer;
 import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
-import saros.filesystem.IPath;
 import saros.filesystem.IResource;
 
 /**
@@ -24,7 +25,7 @@ public abstract class ServerContainerImpl extends ServerResourceImpl implements 
    * @param workspace the containing workspace
    * @param path the container's path relative to the workspace's root
    */
-  public ServerContainerImpl(ServerWorkspaceImpl workspace, IPath path) {
+  public ServerContainerImpl(ServerWorkspaceImpl workspace, Path path) {
     super(workspace, path);
   }
 
@@ -39,11 +40,11 @@ public abstract class ServerContainerImpl extends ServerResourceImpl implements 
 
     File[] memberFiles = getLocation().toFile().listFiles();
     if (memberFiles == null) {
-      throw new NoSuchFileException(getLocation().toOSString());
+      throw new NoSuchFileException(getLocation().toString());
     }
 
     for (File f : memberFiles) {
-      IPath memberPath = getFullPath().append(f.getName());
+      Path memberPath = getFullPath().resolve(f.getName());
       IResource member;
 
       if (f.isDirectory()) {
@@ -59,32 +60,32 @@ public abstract class ServerContainerImpl extends ServerResourceImpl implements 
   }
 
   @Override
-  public IFile getFile(IPath path) {
+  public IFile getFile(Path path) {
     return new ServerFileImpl(getWorkspace(), getFullMemberPath(path));
   }
 
   @Override
   public IFile getFile(String pathString) {
-    return getFile(ServerPathImpl.fromString(pathString));
+    return getFile(Paths.get(pathString));
   }
 
   @Override
-  public IFolder getFolder(IPath path) {
+  public IFolder getFolder(Path path) {
     return new ServerFolderImpl(getWorkspace(), getFullMemberPath(path));
   }
 
   @Override
   public IFolder getFolder(String pathString) {
-    return getFolder(ServerPathImpl.fromString(pathString));
+    return getFolder(Paths.get(pathString));
   }
 
-  private IPath getFullMemberPath(IPath memberPath) {
-    return getFullPath().append(memberPath);
+  private Path getFullMemberPath(Path memberPath) {
+    return getFullPath().resolve(memberPath);
   }
 
   @Override
-  public boolean exists(IPath relativePath) {
-    IPath childLocation = getLocation().append(relativePath);
+  public boolean exists(Path relativePath) {
+    Path childLocation = getLocation().resolve(relativePath);
     return childLocation.toFile().exists();
   }
 }
