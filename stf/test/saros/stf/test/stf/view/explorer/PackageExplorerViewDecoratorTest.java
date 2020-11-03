@@ -3,6 +3,7 @@ package saros.stf.test.stf.view.explorer;
 import static org.junit.Assert.assertTrue;
 import static saros.stf.client.tester.SarosTester.ALICE;
 import static saros.stf.client.tester.SarosTester.BOB;
+import static saros.stf.shared.Constants.SessionInvitationModality.CONCURRENTLY;
 
 import org.junit.After;
 import org.junit.Before;
@@ -89,7 +90,8 @@ public class PackageExplorerViewDecoratorTest extends StfTestCase {
 
   @Test
   public void testPackageExplorerViewMethodsWithFullSharedProject() throws Exception {
-    Util.setUpSessionWithProjectAndFile(PROJECT, FOLDER + "/" + FILE_1, "", ALICE, BOB);
+    Util.setUpSessionWithProjectAndFile(
+        PROJECT, FOLDER + "/" + FILE_1, "", CONCURRENTLY, ALICE, BOB);
 
     BOB.superBot().views().packageExplorerView().waitUntilResourceIsShared(PROJECT);
 

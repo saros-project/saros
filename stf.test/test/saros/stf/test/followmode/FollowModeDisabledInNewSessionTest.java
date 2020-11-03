@@ -4,6 +4,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static saros.stf.client.tester.SarosTester.ALICE;
 import static saros.stf.client.tester.SarosTester.BOB;
+import static saros.stf.shared.Constants.SessionInvitationModality.CONCURRENTLY;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -20,7 +21,8 @@ public class FollowModeDisabledInNewSessionTest extends StfTestCase {
 
   @Test
   public void testFollowModeDisabledInNewSession() throws Exception {
-    Util.setUpSessionWithProjectAndFile("foo", "readme.txt", "bla bla bla", ALICE, BOB);
+    Util.setUpSessionWithProjectAndFile(
+        "foo", "readme.txt", "bla bla bla", CONCURRENTLY, ALICE, BOB);
 
     BOB.superBot().views().packageExplorerView().waitUntilResourceIsShared("foo/readme.txt");
 

@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static saros.stf.client.tester.SarosTester.ALICE;
 import static saros.stf.client.tester.SarosTester.BOB;
+import static saros.stf.shared.Constants.SessionInvitationModality.CONCURRENTLY;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -34,7 +35,7 @@ public class NetworkManipulatorTest extends StfTestCase {
 
   @Before
   public void createProjectandOpenFiles() throws Exception {
-    Util.setUpSessionWithProjectAndFile("foo", "bar.txt", "bla", ALICE, BOB);
+    Util.setUpSessionWithProjectAndFile("foo", "bar.txt", "bla", CONCURRENTLY, ALICE, BOB);
     BOB.superBot().views().packageExplorerView().waitUntilResourceIsShared("foo/bar.txt");
 
     ALICE.superBot().views().packageExplorerView().selectFile("foo", "bar.txt").open();
