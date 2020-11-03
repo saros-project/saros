@@ -31,7 +31,8 @@ public class FolderOperationsTest extends StfTestCase {
                                                                        * MByte
                                                                        */ 1024 * 1024 * 100, false);
 
-    Util.buildSessionSequentially("foo", TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
+    BOB.superBot().internal().createProject("foo");
+    Util.buildSessionSequentially("foo", TypeOfCreateProject.EXIST_PROJECT, ALICE, BOB);
 
     BOB.superBot().views().packageExplorerView().waitUntilResourceIsShared("foo/test/foo.txt");
 

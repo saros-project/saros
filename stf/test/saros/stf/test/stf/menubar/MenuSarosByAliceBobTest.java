@@ -72,6 +72,8 @@ public class MenuSarosByAliceBobTest extends StfTestCase {
     shell.bot().tree().selectTreeItemWithRegex(Pattern.quote(BOB.getBaseJid()) + ".*").check();
     shell.bot().button(FINISH).click();
 
+    BOB.superBot().internal().createJavaProject(Constants.PROJECT1);
+
     BOB.remoteBot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
     IRemoteBotShell shell2 = BOB.remoteBot().shell(SHELL_SESSION_INVITATION);
     shell2.activate();
@@ -79,7 +81,7 @@ public class MenuSarosByAliceBobTest extends StfTestCase {
 
     BOB.superBot()
         .confirmShellAddProjectUsingWhichProject(
-            Constants.PROJECT1, TypeOfCreateProject.NEW_PROJECT);
+            Constants.PROJECT1, TypeOfCreateProject.EXIST_PROJECT);
     BOB.superBot().views().sarosView().waitUntilIsInSession();
     BOB.superBot()
         .views()
@@ -102,9 +104,11 @@ public class MenuSarosByAliceBobTest extends StfTestCase {
 
     ALICE.superBot().menuBar().saros().shareProjects(Constants.PROJECT1, BOB.getJID());
 
+    BOB.superBot().internal().createJavaProject(Constants.PROJECT1);
+
     BOB.superBot()
         .confirmShellSessionInvitationAndShellAddProject(
-            Constants.PROJECT1, TypeOfCreateProject.NEW_PROJECT);
+            Constants.PROJECT1, TypeOfCreateProject.EXIST_PROJECT);
 
     BOB.superBot().views().sarosView().waitUntilIsInSession();
 
@@ -144,9 +148,11 @@ public class MenuSarosByAliceBobTest extends StfTestCase {
         .javaProjectWithClasses(Constants.PROJECT2, Constants.PKG1, Constants.CLS1);
 
     ALICE.superBot().menuBar().saros().addProjects(Constants.PROJECT2);
+
+    BOB.superBot().internal().createJavaProject(Constants.PROJECT2);
     BOB.superBot()
         .confirmShellAddProjectUsingWhichProject(
-            Constants.PROJECT2, TypeOfCreateProject.NEW_PROJECT);
+            Constants.PROJECT2, TypeOfCreateProject.EXIST_PROJECT);
 
     BOB.superBot()
         .views()

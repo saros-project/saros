@@ -3,6 +3,7 @@ package saros.stf.test.session;
 import static org.junit.Assert.assertTrue;
 import static saros.stf.client.tester.SarosTester.ALICE;
 import static saros.stf.client.tester.SarosTester.BOB;
+import static saros.stf.shared.Constants.SessionInvitationModality.CONCURRENTLY;
 
 import java.util.regex.Pattern;
 import org.junit.BeforeClass;
@@ -10,7 +11,6 @@ import org.junit.Test;
 import saros.stf.client.StfTestCase;
 import saros.stf.client.util.Util;
 import saros.stf.server.rmi.remotebot.widget.IRemoteBotEditor;
-import saros.stf.shared.Constants.TypeOfCreateProject;
 
 public class EditFileThatIsNotOpenOnRemoteSideTest extends StfTestCase {
 
@@ -51,10 +51,7 @@ public class EditFileThatIsNotOpenOnRemoteSideTest extends StfTestCase {
 
     content = builder.toString();
 
-    ALICE.superBot().internal().createProject("foo");
-    ALICE.superBot().internal().createFile("foo", "text.txt", content);
-
-    Util.buildSessionConcurrently("foo", TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
+    Util.setUpSessionWithProjectAndFile("foo", "text.txt", content, CONCURRENTLY, ALICE, BOB);
 
     BOB.superBot().views().packageExplorerView().waitUntilResourceIsShared("foo/text.txt");
 

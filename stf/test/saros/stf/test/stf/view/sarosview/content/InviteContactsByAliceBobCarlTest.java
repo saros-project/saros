@@ -46,9 +46,10 @@ public class InviteContactsByAliceBobCarlTest extends StfTestCase {
 
     ALICE.superBot().views().sarosView().selectContact(CARL.getJID()).addToSarosSession();
 
+    CARL.superBot().internal().createJavaProject(Constants.PROJECT1);
     CARL.superBot()
         .confirmShellSessionInvitationAndShellAddProject(
-            Constants.PROJECT1, TypeOfCreateProject.NEW_PROJECT);
+            Constants.PROJECT1, TypeOfCreateProject.EXIST_PROJECT);
 
     CARL.superBot().views().sarosView().waitUntilIsInSession();
 

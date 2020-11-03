@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static saros.stf.client.tester.SarosTester.ALICE;
 import static saros.stf.client.tester.SarosTester.BOB;
 import static saros.stf.client.tester.SarosTester.CARL;
+import static saros.stf.shared.Constants.SessionInvitationModality.CONCURRENTLY;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -11,7 +12,6 @@ import saros.stf.client.StfTestCase;
 import saros.stf.client.tester.AbstractTester;
 import saros.stf.client.util.EclipseTestThread;
 import saros.stf.client.util.Util;
-import saros.stf.shared.Constants.TypeOfCreateProject;
 
 public class ConcurrentEditingInsert100CharactersTest extends StfTestCase {
 
@@ -67,17 +67,14 @@ public class ConcurrentEditingInsert100CharactersTest extends StfTestCase {
 
   @Test
   public void testInsertCharactersOnTheSameLine() throws Exception {
-
-    ALICE.superBot().internal().createProject("foo");
-    ALICE
-        .superBot()
-        .internal()
-        .createFile(
-            "foo",
-            "readme.txt",
-            "package test;\n\npublic class paulaBean {\n\n\tprivate String paula = \"Brillant\";\n\n\tpublic String getPaula() {\n\t\treturn paula;\n\t}\n}");
-
-    Util.buildSessionConcurrently("foo", TypeOfCreateProject.NEW_PROJECT, ALICE, BOB, CARL);
+    Util.setUpSessionWithProjectAndFile(
+        "foo",
+        "readme.txt",
+        "package test;\n\npublic class paulaBean {\n\n\tprivate String paula = \"Brillant\";\n\n\tpublic String getPaula() {\n\t\treturn paula;\n\t}\n}",
+        CONCURRENTLY,
+        ALICE,
+        BOB,
+        CARL);
 
     BOB.superBot().views().packageExplorerView().waitUntilResourceIsShared("foo/readme.txt");
 
