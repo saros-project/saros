@@ -3,6 +3,7 @@ package saros.stf.test.consistency;
 import static org.junit.Assert.assertTrue;
 import static saros.stf.client.tester.SarosTester.ALICE;
 import static saros.stf.client.tester.SarosTester.BOB;
+import static saros.stf.shared.Constants.SessionInvitationModality.CONCURRENTLY;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -35,7 +36,7 @@ public class AddMultipleFilesTest extends StfTestCase {
   @Category(FlakyTests.class)
   @Test
   public void testAddMultipleFilesSimultaneouslyTest() throws Exception {
-    Util.setUpSessionWithProjectAndFile("foo", "main", "main", ALICE, BOB);
+    Util.setUpSessionWithProjectAndFile("foo", "main", "main", CONCURRENTLY, ALICE, BOB);
 
     BOB.superBot().views().packageExplorerView().waitUntilResourceIsShared("foo/main");
 

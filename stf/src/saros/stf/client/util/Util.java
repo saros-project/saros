@@ -59,8 +59,8 @@ public class Util {
 
   /**
    * A convenient function to quickly build a session with a project and a file. The project is
-   * created by this method so it <b>must not</b> exist before. The invitees are invited
-   * concurrently.
+   * created by this method so it <b>must not</b> exist before. The invitees are invited using the
+   * given modality.
    *
    * <p><b>Note:</b> This method does not enforce that the project nature on the inviter's side is
    * correctly applied on the invitee's side. As a result, it is only supported for cases where the
@@ -75,6 +75,7 @@ public class Util {
    * @param projectName the name of the project
    * @param path the path of the file, e.g. foo/bar/readme.txt
    * @param content the content of the file
+   * @param sessionInvitationModality the session invitation modality to use
    * @param inviter the inviting test user, e.g. ALICE
    * @param invitees the invited test user(s), e.g. BOB, CARL
    * @throws IllegalStateException if the inviter or one of the invitee is not connected or is
@@ -85,6 +86,7 @@ public class Util {
       String projectName,
       String path,
       String content,
+      SessionInvitationModality sessionInvitationModality,
       AbstractTester inviter,
       AbstractTester... invitees)
       throws Exception {
@@ -93,7 +95,20 @@ public class Util {
 
     inviter.superBot().internal().createProject(projectName);
     inviter.superBot().internal().createFile(projectName, path, content);
-    buildSessionConcurrently(projectName, TypeOfCreateProject.NEW_PROJECT, inviter, invitees);
+
+    switch (sessionInvitationModality) {
+      case CONCURRENTLY:
+        buildSessionConcurrently(projectName, TypeOfCreateProject.NEW_PROJECT, inviter, invitees);
+        break;
+
+      case SEQUENTIALLY:
+        buildSessionSequentially(projectName, TypeOfCreateProject.NEW_PROJECT, inviter, invitees);
+        break;
+
+      default:
+        throw new IllegalArgumentException(
+            "Encountered unhandled session invitation modality " + sessionInvitationModality);
+    }
   }
 
   /**

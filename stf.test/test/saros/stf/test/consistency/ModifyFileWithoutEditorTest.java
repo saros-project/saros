@@ -3,6 +3,7 @@ package saros.stf.test.consistency;
 import static org.junit.Assert.assertEquals;
 import static saros.stf.client.tester.SarosTester.ALICE;
 import static saros.stf.client.tester.SarosTester.BOB;
+import static saros.stf.shared.Constants.SessionInvitationModality.CONCURRENTLY;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -20,7 +21,8 @@ public class ModifyFileWithoutEditorTest extends StfTestCase {
 
   @Test
   public void testCreateSameFileAtOnce() throws Exception {
-    Util.setUpSessionWithProjectAndFile("foo", "readme.txt", "Chuck Norris", ALICE, BOB);
+    Util.setUpSessionWithProjectAndFile(
+        "foo", "readme.txt", "Chuck Norris", CONCURRENTLY, ALICE, BOB);
 
     BOB.superBot().views().packageExplorerView().waitUntilResourceIsShared("foo/readme.txt");
 
