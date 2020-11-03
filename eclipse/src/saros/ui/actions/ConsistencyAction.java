@@ -280,7 +280,7 @@ public class ConsistencyAction extends Action implements Disposable {
               "root resources: "
                   + file.getReferencePoint().getName()
                   + ", file:"
-                  + file.getReferencePointRelativePath().toOSString()));
+                  + file.getReferencePointRelativePath()));
 
     class OkCancelErrorDialog extends ErrorDialog {
       public OkCancelErrorDialog(

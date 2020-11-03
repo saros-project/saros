@@ -36,7 +36,6 @@ import saros.core.ui.util.CollaborationUtils;
 import saros.filesystem.IContainer;
 import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
-import saros.filesystem.IPath;
 import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.intellij.editor.DocumentAPI;
@@ -46,7 +45,6 @@ import saros.intellij.editor.ProjectAPI;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.eventhandler.IApplicationEventHandler;
 import saros.intellij.eventhandler.editor.document.LocalDocumentModificationHandler;
-import saros.intellij.filesystem.IntellijPath;
 import saros.intellij.filesystem.VirtualFileConverter;
 import saros.intellij.runtime.EDTExecutor;
 import saros.intellij.ui.Messages;
@@ -55,6 +53,7 @@ import saros.observables.FileReplacementInProgressObservable;
 import saros.session.AbstractActivityProducer;
 import saros.session.ISarosSession;
 import saros.session.User;
+import saros.util.PathUtils;
 
 /**
  * Uses a VirtualFileListener to generate and dispatch FileActivities for shared files.
@@ -673,7 +672,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
      */
     ContentIterator contentIterator =
         fileOrDir -> {
-          IPath relativePath = getRelativePath(oldFile, fileOrDir);
+          Path relativePath = getRelativePath(oldFile, fileOrDir);
 
           if (relativePath == null) {
             return true;
@@ -692,8 +691,8 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
                     .getFolder(
                         newParentWrapper
                             .getReferencePointRelativePath()
-                            .append(folderName)
-                            .append(relativePath));
+                            .resolve(folderName)
+                            .resolve(relativePath));
 
             IActivity newFolderCreatedActivity = new FolderCreatedActivity(user, newFolder);
 
@@ -705,7 +704,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
                 oldFolderWrapper
                     .getReferencePoint()
                     .getFolder(
-                        oldFolderWrapper.getReferencePointRelativePath().append(relativePath));
+                        oldFolderWrapper.getReferencePointRelativePath().resolve(relativePath));
 
             if (!session.isShared(oldFolder)) {
               log.debug(
@@ -796,7 +795,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     boolean isOpenInTextEditor = ProjectAPI.isOpenInTextEditor(project, oldFile);
 
-    IPath relativePath = getRelativePath(oldBaseParent, oldFile);
+    Path relativePath = getRelativePath(oldBaseParent, oldFile);
 
     if (relativePath == null) {
       log.warn(
@@ -810,13 +809,11 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
     }
 
     if (newBaseName != null) {
-      relativePath =
-          IntellijPath.fromString(newBaseName).append(relativePath.removeFirstSegments(1));
+      relativePath = Paths.get(newBaseName).resolve(PathUtils.removeFirstSegments(relativePath, 1));
     }
 
     if (newFileName != null) {
-      relativePath =
-          relativePath.removeLastSegments(1).append(IntellijPath.fromString(newFileName));
+      relativePath = PathUtils.removeLastSegments(relativePath, 1).resolve(newFileName);
     }
 
     IActivity activity;
@@ -826,7 +823,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       IFile newFileWrapper =
           newParentWrapper
               .getReferencePoint()
-              .getFile(newParentWrapper.getReferencePointRelativePath().append(relativePath));
+              .getFile(newParentWrapper.getReferencePointRelativePath().resolve(relativePath));
 
       activity =
           new FileActivity(
@@ -849,7 +846,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       IFile newFileWrapper =
           newParentWrapper
               .getReferencePoint()
-              .getFile(newParentWrapper.getReferencePointRelativePath().append(relativePath));
+              .getFile(newParentWrapper.getReferencePointRelativePath().resolve(relativePath));
 
       activity =
           new FileActivity(
@@ -902,7 +899,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       IFile newFileWrapper =
           newParentWrapper
               .getReferencePoint()
-              .getFile(newParentWrapper.getReferencePointRelativePath().append(relativePath));
+              .getFile(newParentWrapper.getReferencePointRelativePath().resolve(relativePath));
 
       EditorActivity openNewEditorActivity =
           new EditorActivity(user, EditorActivity.Type.ACTIVATED, newFileWrapper);
@@ -1013,11 +1010,9 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
    *     such a path could not be found
    */
   @Nullable
-  private IPath getRelativePath(@NotNull VirtualFile root, @NotNull VirtualFile file) {
+  private Path getRelativePath(@NotNull VirtualFile root, @NotNull VirtualFile file) {
     try {
-      Path relativePath = Paths.get(root.getPath()).relativize(Paths.get(file.getPath()));
-
-      return IntellijPath.fromString(relativePath.toString());
+      return Paths.get(root.getPath()).relativize(Paths.get(file.getPath()));
 
     } catch (IllegalArgumentException e) {
       log.warn(

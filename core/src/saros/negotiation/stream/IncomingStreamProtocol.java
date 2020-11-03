@@ -3,6 +3,7 @@ package saros.negotiation.stream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.BoundedInputStream;
 import org.apache.log4j.Logger;
@@ -12,6 +13,7 @@ import saros.filesystem.IFile;
 import saros.monitoring.IProgressMonitor;
 import saros.negotiation.NegotiationTools.CancelOption;
 import saros.session.ISarosSession;
+import saros.util.PathUtils;
 
 /** Implements Stream processing in {@link AbstractStreamProtocol} format. */
 public class IncomingStreamProtocol extends AbstractStreamProtocol implements AutoCloseable {
@@ -41,8 +43,8 @@ public class IncomingStreamProtocol extends AbstractStreamProtocol implements Au
       /* check stream end */
       if (referencePointID.isEmpty()) break;
 
-      String fileName = in.readUTF();
-      IFile file = session.getReferencePoint(referencePointID).getFile(fileName);
+      Path filePath = PathUtils.fromPortableString(in.readUTF());
+      IFile file = session.getReferencePoint(referencePointID).getFile(filePath);
 
       String message = "receiving " + displayName(file);
       log.debug(message);

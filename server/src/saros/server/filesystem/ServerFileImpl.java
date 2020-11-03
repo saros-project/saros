@@ -14,7 +14,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import org.apache.log4j.Logger;
 import saros.filesystem.IFile;
-import saros.filesystem.IPath;
 
 /** Server implementation of the {@link IFile} interface. */
 public class ServerFileImpl extends ServerResourceImpl implements IFile {
@@ -31,7 +30,7 @@ public class ServerFileImpl extends ServerResourceImpl implements IFile {
    * @param workspace the containing workspace
    * @param path the file's path relative to the workspace's root
    */
-  public ServerFileImpl(ServerWorkspaceImpl workspace, IPath path) {
+  public ServerFileImpl(ServerWorkspaceImpl workspace, Path path) {
     super(workspace, path);
   }
 
@@ -67,7 +66,7 @@ public class ServerFileImpl extends ServerResourceImpl implements IFile {
   @Override
   public void delete() throws IOException {
     try {
-      Files.delete(toNioPath());
+      Files.delete(getLocation());
     } catch (NoSuchFileException e) {
       log.debug("Could not delete " + getFullPath() + " because it doesn't exist (ignoring)", e);
     }
@@ -75,7 +74,7 @@ public class ServerFileImpl extends ServerResourceImpl implements IFile {
 
   @Override
   public void create(InputStream input) throws IOException {
-    Path nioPath = toNioPath();
+    Path nioPath = getLocation();
 
     Files.createDirectories(nioPath.getParent());
     Files.createFile(nioPath);
@@ -84,7 +83,7 @@ public class ServerFileImpl extends ServerResourceImpl implements IFile {
 
   @Override
   public InputStream getContents() throws IOException {
-    return Files.newInputStream(toNioPath());
+    return Files.newInputStream(getLocation());
   }
 
   @Override
@@ -111,16 +110,16 @@ public class ServerFileImpl extends ServerResourceImpl implements IFile {
     try {
       Files.move(
           tempFilePath,
-          toNioPath(),
+          getLocation(),
           StandardCopyOption.ATOMIC_MOVE,
           StandardCopyOption.REPLACE_EXISTING);
     } catch (AtomicMoveNotSupportedException e) {
-      Files.move(tempFilePath, toNioPath(), StandardCopyOption.REPLACE_EXISTING);
+      Files.move(tempFilePath, getLocation(), StandardCopyOption.REPLACE_EXISTING);
     }
   }
 
   @Override
   public long getSize() throws IOException {
-    return (long) Files.getAttribute(toNioPath(), "basic:size");
+    return (long) Files.getAttribute(getLocation(), "basic:size");
   }
 }

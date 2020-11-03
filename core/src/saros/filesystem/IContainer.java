@@ -1,6 +1,7 @@
 package saros.filesystem;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 
 /**
@@ -18,7 +19,7 @@ public interface IContainer extends IResource {
    * @return whether the resource with the given path relative to this container exists
    * @throws NullPointerException if the given path is <code>null</code>
    */
-  boolean exists(IPath relativePath);
+  boolean exists(Path relativePath);
 
   /**
    * Returns all resources contained in the container.
@@ -47,7 +48,7 @@ public interface IContainer extends IResource {
    * @throws NullPointerException if the given path is <code>null</code>
    * @throws IllegalArgumentException if the given path is absolute or empty
    */
-  IFile getFile(IPath path);
+  IFile getFile(Path path);
 
   /**
    * Returns a handle for the folder with the given relative path to this resource.
@@ -67,5 +68,5 @@ public interface IContainer extends IResource {
    * @throws NullPointerException if the given path is <code>null</code>
    * @throws IllegalArgumentException if the given path is absolute or empty
    */
-  IFolder getFolder(IPath path);
+  IFolder getFolder(Path path);
 }

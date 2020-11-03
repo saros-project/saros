@@ -226,7 +226,7 @@ public class ConsistencyButton extends AbstractSessionToolbarButton {
           .append(": ");
       sbInconsistentFiles.append(file.getReferencePoint().getName()).append(", ");
       sbInconsistentFiles.append(Messages.ConsistencyButton_inconsistent_list_file).append(": ");
-      sbInconsistentFiles.append(file.getReferencePointRelativePath().toOSString());
+      sbInconsistentFiles.append(file.getReferencePointRelativePath());
       sbInconsistentFiles.append("\n");
     }
 

@@ -6,14 +6,14 @@ import static org.junit.Assert.assertNull;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import org.easymock.EasyMock;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import saros.activities.ResourceTransportWrapper;
 import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
-import saros.filesystem.IPath;
-import saros.filesystem.IPathFactory;
 import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.filesystem.IResource.Type;
@@ -41,34 +41,19 @@ public class ResourceTransportWrapperConverterTest {
   private static IFolder folder;
 
   private static IReferencePoint referencePoint;
-  private static IPathFactory pathFactory;
 
   @BeforeClass
   public static void prepare() {
     /* Mocks */
 
-    IPath filePath = EasyMock.createMock(IPath.class);
-    IPath folderPath = EasyMock.createMock(IPath.class);
-    pathFactory = EasyMock.createMock(IPathFactory.class);
+    String actualFilePath = "foo/src/Main.java";
+    String actualFolderPath = "foo/bar/";
+    Path filePath = Paths.get(actualFilePath);
+    Path folderPath = Paths.get(actualFolderPath);
+
     referencePoint = EasyMock.createNiceMock(IReferencePoint.class);
     file = EasyMock.createNiceMock(IFile.class);
     folder = EasyMock.createNiceMock(IFolder.class);
-
-    String actualFilePath = "/foo/src/Main.java";
-
-    expect(filePath.isAbsolute()).andStubReturn(false);
-    expect(filePath.toPortableString()).andStubReturn(actualFilePath);
-
-    String actualFolderPath = "/foo/bar/";
-
-    expect(folderPath.isAbsolute()).andStubReturn(false);
-    expect(folderPath.toPortableString()).andStubReturn(actualFolderPath);
-
-    expect(pathFactory.fromPath(filePath)).andStubReturn(actualFilePath);
-    expect(pathFactory.fromString(actualFilePath)).andStubReturn(filePath);
-
-    expect(pathFactory.fromPath(folderPath)).andStubReturn(actualFolderPath);
-    expect(pathFactory.fromString(actualFolderPath)).andStubReturn(folderPath);
 
     expect(referencePoint.getFile(filePath)).andStubReturn(file);
     expect(referencePoint.getFolder(folderPath)).andStubReturn(folder);
@@ -81,7 +66,7 @@ public class ResourceTransportWrapperConverterTest {
     expect(folder.getReferencePointRelativePath()).andStubReturn(folderPath);
     expect(folder.getType()).andStubReturn(Type.FOLDER);
 
-    EasyMock.replay(filePath, folderPath, pathFactory, referencePoint, file, folder);
+    EasyMock.replay(referencePoint, file, folder);
   }
 
   @Test
@@ -95,10 +80,10 @@ public class ResourceTransportWrapperConverterTest {
 
     /* XStream */
     XStream sender = XStreamFactory.getSecureXStream(new DomDriver());
-    sender.registerConverter(new ResourceTransportWrapperConverter(session, pathFactory));
+    sender.registerConverter(new ResourceTransportWrapperConverter(session));
 
     XStream receiver = XStreamFactory.getSecureXStream(new DomDriver());
-    receiver.registerConverter(new ResourceTransportWrapperConverter(session, pathFactory));
+    receiver.registerConverter(new ResourceTransportWrapperConverter(session));
 
     /* Test */
     ResourceTransportWrapper<IFile> wrappedFile = new ResourceTransportWrapper<>(file);
@@ -139,10 +124,10 @@ public class ResourceTransportWrapperConverterTest {
 
     /* XStream */
     XStream sender = XStreamFactory.getSecureXStream(new DomDriver());
-    sender.registerConverter(new ResourceTransportWrapperConverter(senderSession, pathFactory));
+    sender.registerConverter(new ResourceTransportWrapperConverter(senderSession));
 
     XStream receiver = XStreamFactory.getSecureXStream(new DomDriver());
-    receiver.registerConverter(new ResourceTransportWrapperConverter(receiverSession, pathFactory));
+    receiver.registerConverter(new ResourceTransportWrapperConverter(receiverSession));
 
     /* Test */
     ResourceTransportWrapper<IFile> wrappedFile = new ResourceTransportWrapper<>(file);
@@ -174,10 +159,10 @@ public class ResourceTransportWrapperConverterTest {
 
     /* XStream */
     XStream sender = XStreamFactory.getSecureXStream(new DomDriver());
-    sender.registerConverter(new ResourceTransportWrapperConverter(senderSession, pathFactory));
+    sender.registerConverter(new ResourceTransportWrapperConverter(senderSession));
 
     XStream receiver = XStreamFactory.getSecureXStream(new DomDriver());
-    receiver.registerConverter(new ResourceTransportWrapperConverter(receiverSession, pathFactory));
+    receiver.registerConverter(new ResourceTransportWrapperConverter(receiverSession));
 
     /* Test */
     Dummy dummy = new Dummy(file);

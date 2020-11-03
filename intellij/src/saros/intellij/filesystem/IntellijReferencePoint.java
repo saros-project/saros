@@ -11,9 +11,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
-import saros.filesystem.IPath;
 import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
+import saros.util.PathUtils;
 
 /** Intellij implementation of the Saros reference point interface. */
 public class IntellijReferencePoint implements IReferencePoint {
@@ -64,7 +64,7 @@ public class IntellijReferencePoint implements IReferencePoint {
   }
 
   @Override
-  public boolean exists(@NotNull IPath path) {
+  public boolean exists(@NotNull Path path) {
     if (!virtualFile.exists()) {
       return false;
     }
@@ -82,7 +82,7 @@ public class IntellijReferencePoint implements IReferencePoint {
     VirtualFile[] children = virtualFile.getChildren();
 
     for (VirtualFile child : children) {
-      IPath childPath = IntellijPath.fromString(child.getName());
+      Path childPath = Paths.get(child.getName());
 
       result.add(
           child.isDirectory()
@@ -106,8 +106,8 @@ public class IntellijReferencePoint implements IReferencePoint {
 
   @Override
   @NotNull
-  public IPath getReferencePointRelativePath() {
-    return IntellijPath.EMPTY;
+  public Path getReferencePointRelativePath() {
+    return Paths.get("");
   }
 
   @Override
@@ -131,7 +131,7 @@ public class IntellijReferencePoint implements IReferencePoint {
    *     from the reference point to the file
    */
   @Nullable
-  private IPath getReferencePointRelativePath(@NotNull VirtualFile file) {
+  private Path getReferencePointRelativePath(@NotNull VirtualFile file) {
 
     String referencePointPath = virtualFile.getPath();
     String filePath = file.getPath();
@@ -141,9 +141,7 @@ public class IntellijReferencePoint implements IReferencePoint {
     }
 
     try {
-      Path relativePath = Paths.get(referencePointPath).relativize(Paths.get(filePath));
-
-      return IntellijPath.fromString(relativePath.toString());
+      return Paths.get(referencePointPath).relativize(Paths.get(filePath));
 
     } catch (IllegalArgumentException e) {
       log.warn(
@@ -160,13 +158,13 @@ public class IntellijReferencePoint implements IReferencePoint {
   @Override
   @NotNull
   public IFile getFile(@NotNull String pathString) {
-    return getFile(IntellijPath.fromString(pathString));
+    return getFile(Paths.get(pathString));
   }
 
   @Override
   @NotNull
-  public IFile getFile(@NotNull IPath path) {
-    if (path.segmentCount() == 0) {
+  public IFile getFile(@NotNull Path path) {
+    if (PathUtils.isEmpty(path)) {
       throw new IllegalArgumentException("Can not create file handle for an empty path");
     }
 
@@ -186,7 +184,7 @@ public class IntellijReferencePoint implements IReferencePoint {
       return null;
     }
 
-    IPath relativePath = getReferencePointRelativePath(file);
+    Path relativePath = getReferencePointRelativePath(file);
 
     return relativePath != null ? new IntellijFile(this, relativePath) : null;
   }
@@ -194,13 +192,13 @@ public class IntellijReferencePoint implements IReferencePoint {
   @Override
   @NotNull
   public IFolder getFolder(@NotNull String pathString) {
-    return getFolder(IntellijPath.fromString(pathString));
+    return getFolder(Paths.get(pathString));
   }
 
   @Override
   @NotNull
-  public IFolder getFolder(@NotNull IPath path) {
-    if (path.segmentCount() == 0) {
+  public IFolder getFolder(@NotNull Path path) {
+    if (PathUtils.isEmpty(path)) {
       throw new IllegalArgumentException("Can not create folder handle for an empty path");
     }
 
@@ -224,7 +222,7 @@ public class IntellijReferencePoint implements IReferencePoint {
       return null;
     }
 
-    IPath relativePath = getReferencePointRelativePath(file);
+    Path relativePath = getReferencePointRelativePath(file);
 
     return relativePath != null ? new IntellijFolder(this, relativePath) : null;
   }
@@ -253,10 +251,10 @@ public class IntellijReferencePoint implements IReferencePoint {
    * @return the virtual file or <code>null</code> if there is no such file in the VFS snapshot
    */
   @Nullable
-  VirtualFile findVirtualFile(@NotNull IPath relativePath) {
+  VirtualFile findVirtualFile(@NotNull Path relativePath) {
     if (relativePath.isAbsolute()) return null;
 
-    if (relativePath.segmentCount() == 0) return virtualFile;
+    if (PathUtils.isEmpty(relativePath)) return virtualFile;
 
     return virtualFile.findFileByRelativePath(relativePath.toString());
   }

@@ -53,6 +53,7 @@ import saros.intellij.editor.ProjectAPI;
 import saros.intellij.runtime.FilesystemRunner;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.wizards.pages.referencepointselection.SelectLocalReferencePointRepresentationPage.ReferencePointTabStateListener;
+import saros.util.PathUtils;
 
 /**
  * Panel to specify how a shared reference point is represented locally. The available options are
@@ -586,7 +587,7 @@ class ReferencePointTab {
 
     try {
       Path path = Paths.get(enteredName);
-      if (path.getNameCount() != 1) {
+      if (path.getNameCount() != 1 || PathUtils.isEmpty(path)) {
         return false;
       }
     } catch (InvalidPathException e) {

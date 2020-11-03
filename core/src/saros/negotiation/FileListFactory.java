@@ -15,6 +15,7 @@ import saros.filesystem.checksum.IChecksumCache;
 import saros.monitoring.IProgressMonitor;
 import saros.monitoring.NullProgressMonitor;
 import saros.negotiation.FileList.MetaData;
+import saros.util.PathUtils;
 
 /**
  * Offers two ways to create {@link FileList file lists}.
@@ -112,7 +113,7 @@ public class FileListFactory {
 
       if (resource.isIgnored() || !resource.exists()) continue;
 
-      String path = resource.getReferencePointRelativePath().toPortableString();
+      String path = PathUtils.toPortableString(resource.getReferencePointRelativePath());
 
       if (list.contains(path)) continue;
 
@@ -155,7 +156,8 @@ public class FileListFactory {
         monitor.subTask(
             file.getReferencePoint().getName() + ": " + file.getReferencePointRelativePath());
 
-        MetaData data = list.getMetaData(file.getReferencePointRelativePath().toPortableString());
+        MetaData data =
+            list.getMetaData(PathUtils.toPortableString(file.getReferencePointRelativePath()));
 
         Long checksum = null;
 

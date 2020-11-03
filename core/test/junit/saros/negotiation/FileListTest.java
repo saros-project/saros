@@ -1,7 +1,6 @@
 package saros.negotiation;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static saros.filesystem.IResource.Type.FILE;
@@ -14,6 +13,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -27,7 +28,6 @@ import org.junit.Before;
 import org.junit.Test;
 import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
-import saros.filesystem.IPath;
 import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.misc.xstream.XStreamFactory;
@@ -154,7 +154,7 @@ public class FileListTest {
       final String content,
       final String encoding) {
 
-    final IPath relativePath = createPathMock(path);
+    final Path relativePath = Paths.get(path);
 
     final IFile fileMock = EasyMock.createMock(IFile.class);
 
@@ -186,22 +186,10 @@ public class FileListTest {
     return fileMock;
   }
 
-  private static IPath createPathMock(final String path) {
-
-    assertFalse(path.charAt(path.length() - 1) == '/');
-
-    final IPath pathMock = EasyMock.createMock(IPath.class);
-
-    EasyMock.expect(pathMock.toPortableString()).andStubReturn(path);
-
-    EasyMock.replay(pathMock);
-    return pathMock;
-  }
-
   private static IFolder createFolderMock(
       final IReferencePoint referencePoint, final String path, final List<IResource> members) {
 
-    final IPath relativePath = createPathMock(path);
+    final Path relativePath = Paths.get(path);
 
     final IFolder folderMock = EasyMock.createMock(IFolder.class);
 
