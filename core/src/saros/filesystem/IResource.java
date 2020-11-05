@@ -14,7 +14,6 @@ public interface IResource {
     FILE,
     FOLDER,
     REFERENCE_POINT,
-    ROOT
   }
 
   /**
