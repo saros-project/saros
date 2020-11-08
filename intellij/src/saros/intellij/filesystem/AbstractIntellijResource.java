@@ -39,7 +39,7 @@ public abstract class AbstractIntellijResource implements IResource {
     }
 
     this.referencePoint = referencePoint;
-    this.relativePath = relativePath;
+    this.relativePath = PathUtils.normalize(relativePath);
   }
 
   /**
