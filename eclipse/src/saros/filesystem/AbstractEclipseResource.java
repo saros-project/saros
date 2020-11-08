@@ -38,7 +38,7 @@ public abstract class AbstractEclipseResource implements IResource {
     }
 
     this.referencePoint = referencePoint;
-    this.relativePath = relativePath;
+    this.relativePath = PathUtils.normalize(relativePath);
   }
 
   @Override

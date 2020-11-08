@@ -23,7 +23,7 @@ public abstract class ServerResourceImpl implements IResource {
    * @param path the resource's path relative to the workspace's root
    */
   public ServerResourceImpl(ServerWorkspaceImpl workspace, Path path) {
-    this.path = path;
+    this.path = PathUtils.normalize(path);
     this.workspace = workspace;
   }
 
