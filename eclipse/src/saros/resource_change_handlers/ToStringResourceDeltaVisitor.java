@@ -73,7 +73,7 @@ public class ToStringResourceDeltaVisitor implements IResourceDeltaVisitor {
 
       if (resource.isHidden()) sb.append("H ");
 
-      sb.append(resource.getFullPath().toPortableString());
+      sb.append(resource.getFullPath().toOSString());
     } else {
       sb.append("No resource");
     }

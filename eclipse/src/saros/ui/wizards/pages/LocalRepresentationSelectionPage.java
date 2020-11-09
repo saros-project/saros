@@ -283,14 +283,14 @@ public class LocalRepresentationSelectionPage extends WizardPage {
       if (selectedPath.equals(otherReferencePointPath)) {
         return MessageFormat.format(
             Messages.LocalRepresentationSelectionPage_error_reference_point_path_clash,
-            selectedPath.toPortableString(),
+            selectedPath.toOSString(),
             referencePointName,
             otherReferencePointName);
 
       } else if (otherReferencePointPath.isPrefixOf(selectedPath)) {
         return MessageFormat.format(
             Messages.LocalRepresentationSelectionPage_error_nested_selected_reference_point_paths,
-            selectedPath.toPortableString(),
+            selectedPath.toOSString(),
             referencePointName,
             otherReferencePointName);
       }
@@ -304,21 +304,21 @@ public class LocalRepresentationSelectionPage extends WizardPage {
       if (referencePointPath.equals(selectedPath)) {
         return MessageFormat.format(
             Messages.LocalRepresentationSelectionPage_error_existing_reference_point_path_clash,
-            selectedPath.toPortableString(),
+            selectedPath.toOSString(),
             referencePointName,
             sharedReferencePoint.getName());
 
       } else if (referencePointPath.isPrefixOf(selectedPath)) {
         return MessageFormat.format(
             Messages.LocalRepresentationSelectionPage_error_child_of_existing_reference_point,
-            selectedPath.toPortableString(),
+            selectedPath.toOSString(),
             referencePointName,
             sharedReferencePoint.getName());
 
       } else if (selectedPath.isPrefixOf(referencePointPath)) {
         return MessageFormat.format(
             Messages.LocalRepresentationSelectionPage_error_parent_of_existing_reference_point,
-            selectedPath.toPortableString(),
+            selectedPath.toOSString(),
             referencePointName,
             sharedReferencePoint.getName());
       }
@@ -514,7 +514,7 @@ public class LocalRepresentationSelectionPage extends WizardPage {
             ReferencePointOptionResult.getContainerForPath(previousReferencePointPath);
 
         if (desiredContainer != null && desiredContainer.exists()) {
-          String existingDirectoryPath = desiredContainer.getFullPath().toPortableString();
+          String existingDirectoryPath = desiredContainer.getFullPath().toOSString();
 
           referencePointOptionComposite.setExistingDirectoryOptionSelected(existingDirectoryPath);
         }
@@ -535,7 +535,7 @@ public class LocalRepresentationSelectionPage extends WizardPage {
 
           if (projectRelativePath.isEmpty()) {
             referencePointOptionComposite.setExistingDirectoryOptionSelected(
-                project.getFullPath().toPortableString());
+                project.getFullPath().toOSString());
 
             break;
           }
@@ -544,7 +544,7 @@ public class LocalRepresentationSelectionPage extends WizardPage {
 
           if (container.exists()) {
             referencePointOptionComposite.setExistingDirectoryOptionSelected(
-                container.getFullPath().toPortableString());
+                container.getFullPath().toOSString());
 
             break;
           }
