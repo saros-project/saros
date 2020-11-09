@@ -2,11 +2,13 @@ package saros.intellij.ui.tree;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import saros.SarosPluginContext;
 import saros.repackaged.picocontainer.annotations.Inject;
+import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
 import saros.session.User;
 
@@ -47,8 +49,23 @@ public class TreeClickListener extends MouseAdapter {
         ContactTreeRootNode.ContactInfo contactInfo =
             (ContactTreeRootNode.ContactInfo) node.getUserObject();
         if (contactInfo.isOnline()) {
-          ContactPopMenu menu = new ContactPopMenu(contactInfo);
-          menu.show(e.getComponent(), e.getX(), e.getY());
+
+          ISarosSession sarosSession = sessionManager.getSession();
+          boolean isSessionRunning = sarosSession != null;
+          boolean isHost = isSessionRunning && sarosSession.isHost();
+
+          JPopupMenu menu = null;
+
+          if (!isSessionRunning) {
+            menu = new ContactPopMenu(contactInfo);
+
+          } else if (isHost) {
+            menu = new InviteToSessionContactPopMenu(contactInfo);
+          }
+
+          if (menu != null) {
+            menu.show(e.getComponent(), e.getX(), e.getY());
+          }
         }
 
       } else if (node.getUserObject() instanceof SessionTreeRootNode.UserInfo) {
