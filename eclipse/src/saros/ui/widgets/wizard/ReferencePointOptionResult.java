@@ -293,7 +293,7 @@ public class ReferencePointOptionResult {
       throw new IllegalInputException(
           MessageFormat.format(
               Messages.ReferencePointOptionResult_error_new_directory_already_exists,
-              containerToCreate));
+              containerToCreate.getFullPath().toOSString()));
     }
 
     return containerToCreate;
