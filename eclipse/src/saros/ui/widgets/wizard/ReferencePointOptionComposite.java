@@ -463,8 +463,8 @@ public class ReferencePointOptionComposite extends Composite {
 
     if (result == null || result.length == 0) return null;
 
-    // TODO don't use portable string? drop leading delimiter?
-    return ((Path) result[0]).toPortableString();
+    // TODO drop leading delimiter?
+    return ((Path) result[0]).toOSString();
   }
 
   /**

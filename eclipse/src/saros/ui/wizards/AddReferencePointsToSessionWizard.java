@@ -797,7 +797,7 @@ public class AddReferencePointsToSessionWizard extends Wizard {
     for (Entry<String, IContainer> entry : referencePointContainers.entrySet()) {
       String referencePointId = entry.getKey();
 
-      String referencePointPath = entry.getValue().getFullPath().toPortableString();
+      String referencePointPath = entry.getValue().getFullPath().toOSString();
       String referencePointName =
           negotiation.getResourceNegotiationData(referencePointId).getReferencePointName();
 
