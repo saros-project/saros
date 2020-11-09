@@ -136,6 +136,7 @@ public class Messages {
   public static String JoinSessionWizard_inv_canceled_text2;
   public static String JoinSessionWizard_inv_canceled_text3;
   public static String JoinSessionWizard_title;
+  public static String JoinSessionWizard_task_title;
 
   public static String UserStatusChangeHandler_user_joined_title;
   public static String UserStatusChangeHandler_user_joined_message;

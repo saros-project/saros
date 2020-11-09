@@ -102,11 +102,12 @@ public class JoinSessionWizard extends Wizard {
   }
 
   /**
-   * Runs {@link IncomingSessionNegotiation#accept(IProgressMonitor)} with {@link #runTask(Runnable,
-   * String)}. If the result is a cancel or error status, it displays an error message accordingly.
+   * Runs {@link IncomingSessionNegotiation#accept(IProgressMonitor)} with {@link
+   * #runTaskAsync(Runnable, String, Runnable, Runnable)}.
+   *
+   * <p>The result of the task is displayed using {@link #showStatus(JobWithStatus)}.
    */
   private void joinSession() {
-
     JobWithStatus job =
         new JobWithStatus() {
           @Override
@@ -115,24 +116,37 @@ public class JoinSessionWizard extends Wizard {
           }
         };
 
-    runTask(job, "Joining session...");
+    runTaskAsync(
+        job, Messages.JoinSessionWizard_task_title, () -> showStatus(job), this::performCancel);
 
+    close();
+  }
+
+  /**
+   * Shows the result of the job used to join the session to the user.
+   *
+   * @param job the job whose status to show to the user
+   */
+  private void showStatus(JobWithStatus job) {
     switch (job.status) {
       case OK:
         break;
+
       case CANCEL:
       case ERROR:
         showCancelMessage(
             negotiation.getPeer(), negotiation.getErrorMessage(), CancelLocation.LOCAL);
         break;
+
       case REMOTE_CANCEL:
       case REMOTE_ERROR:
         showCancelMessage(
             negotiation.getPeer(), negotiation.getErrorMessage(), CancelLocation.REMOTE);
         break;
-    }
 
-    close();
+      default:
+        throw new IllegalArgumentException("Encountered unhandled job status " + job.status);
+    }
   }
 
   /**
