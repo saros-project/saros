@@ -19,6 +19,7 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import saros.intellij.ui.wizards.pages.AbstractWizardPage;
 import saros.intellij.ui.wizards.pages.HeaderPanel;
 import saros.intellij.ui.wizards.pages.NavigationPanel;
@@ -181,6 +182,57 @@ public abstract class Wizard extends JDialog {
                 indicator.setIndeterminate(true);
                 runnable.run();
                 indicator.stop();
+              }
+            });
+  }
+
+  /**
+   * Starts the given runnable as part of a cancelable non-modal task in a background thread. The
+   * progress is displayed in the bottom bar of the IDE.
+   *
+   * <p>The given <code>runAfter</code> runnable is run after the task finished. It is still run in
+   * cases the task was canceled or failed with an error.
+   *
+   * <p>The given <code>runOnCancel</code> runnable is run if the task is canceled.
+   *
+   * @param runnable the runnable to run as part of the task
+   * @param title the displayed title of the task
+   * @param runAfter the runnable run after the task
+   * @param runOnCancel the runnable run if the task is canceled
+   */
+  public void runTaskAsync(
+      @NotNull Runnable runnable,
+      @NotNull String title,
+      @Nullable Runnable runAfter,
+      @Nullable Runnable runOnCancel) {
+
+    ProgressManager.getInstance()
+        .run(
+            new Task.Backgroundable(project, title, true) {
+
+              @Override
+              public void run(@NotNull ProgressIndicator indicator) {
+                indicator.setIndeterminate(true);
+                runnable.run();
+                indicator.stop();
+              }
+
+              @Override
+              public void onFinished() {
+                super.onFinished();
+
+                if (runAfter != null) {
+                  runAfter.run();
+                }
+              }
+
+              @Override
+              public void onCancel() {
+                super.onCancel();
+
+                if (runOnCancel != null) {
+                  runOnCancel.run();
+                }
               }
             });
   }
