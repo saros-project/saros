@@ -42,6 +42,9 @@ public class IconManager {
   public static final ImageIcon ADD_USER_TO_SESSION =
       getIcon("/icons/elcl16/session_add_contacts_tsk.png", "add user to session");
 
+  public static final ImageIcon REMOVE_USER_FROM_SESSION =
+      getIcon("/icons/elcl16/contact_remove_tsk.png", "remove user from session");
+
   public static final ImageIcon SESSION_INVITATION_ICON =
       getIcon("/icons/saros/invitation.png", "invitation");
 
