@@ -39,6 +39,9 @@ public class IconManager {
   public static final ImageIcon OPEN_PREFERENCES_ICON =
       getIcon("/icons/famfamfam/test_con.gif", "preferences");
 
+  public static final ImageIcon ADD_USER_TO_SESSION =
+      getIcon("/icons/elcl16/session_add_contacts_tsk.png", "add user to session");
+
   public static final ImageIcon SESSION_INVITATION_ICON =
       getIcon("/icons/saros/invitation.png", "invitation");
 

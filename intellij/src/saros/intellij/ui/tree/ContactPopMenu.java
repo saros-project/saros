@@ -49,7 +49,15 @@ class ContactPopMenu extends JPopupMenu {
   ContactPopMenu(ContactTreeRootNode.ContactInfo contactInfo) {
     this.contactInfo = contactInfo;
 
-    JMenu menuShareProject = new JMenu(Messages.ContactPopMenu_root_popup_text);
+    createMenuStartSession();
+  }
+
+  /**
+   * Creates and displays a menu entry to start a session with the selected user. This dialog must
+   * only be displayed if there is not running session.
+   */
+  private void createMenuStartSession() {
+    JMenu menuShareProject = new JMenu(Messages.ContactPopMenu_start_session_popup_text);
     menuShareProject.setIcon(IconManager.SESSIONS_ICON);
 
     for (Project project : ProjectManager.getInstance().getOpenProjects()) {

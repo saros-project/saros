@@ -153,7 +153,7 @@ public class Messages {
 
   public static String Contact_saros_message_conditional;
 
-  public static String ContactPopMenu_root_popup_text;
+  public static String ContactPopMenu_start_session_popup_text;
   public static String ContactPopMenu_menu_tooltip_share_module;
   public static String ContactPopMenu_menu_tooltip_invalid_module;
   public static String ContactPopMenu_menu_entry_error_processing_project;
@@ -163,6 +163,8 @@ public class Messages {
   public static String ContactPopMenu_unsupported_ide_message_condition;
   public static String ContactPopMenu_module_not_found_title;
   public static String ContactPopMenu_module_not_found_message_condition;
+
+  public static String InviteToSessionMenu_add_to_session_popup_text;
 
   public static String ShareWithUserAction_description;
   public static String ShareWithUserAction_failed_to_share_directory_title;
