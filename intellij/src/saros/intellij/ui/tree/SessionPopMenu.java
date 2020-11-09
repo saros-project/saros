@@ -2,36 +2,51 @@ package saros.intellij.ui.tree;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import saros.SarosPluginContext;
 import saros.editor.FollowModeManager;
-import saros.repackaged.picocontainer.annotations.Inject;
-import saros.session.ISarosSessionManager;
+import saros.intellij.ui.Messages;
+import saros.intellij.ui.util.IconManager;
+import saros.session.ISarosSession;
 import saros.session.User;
 
 /** Session pop-up menu that displays the option to follow a participant. */
 class SessionPopMenu extends JPopupMenu {
-  @Inject private static ISarosSessionManager sarosSessionManager;
+  private final User user;
+  private final ISarosSession sarosSession;
 
-  static {
-    SarosPluginContext.initComponent(new SessionPopMenu());
+  SessionPopMenu(final User user, ISarosSession sarosSession) {
+    this.user = user;
+    this.sarosSession = sarosSession;
+
+    createMenuItemToFollowParticipant();
+
+    if (sarosSession.isHost()) {
+      createMenuItemToKickParticipant();
+    }
   }
 
-  /** NOP Constructor used for static dependency injection. */
-  private SessionPopMenu() {
-    // NOP
-  }
-
-  SessionPopMenu(final User user) {
-    JMenuItem menuItemFollowParticipant = new JMenuItem("Follow participant");
+  private void createMenuItemToFollowParticipant() {
+    JMenuItem menuItemFollowParticipant =
+        new JMenuItem(Messages.SessionPopMenu_follow_user, IconManager.FOLLOW_ICON);
 
     menuItemFollowParticipant.addActionListener(
         actionEvent -> {
-          FollowModeManager followModeManager =
-              sarosSessionManager.getSession().getComponent(FollowModeManager.class);
+          FollowModeManager followModeManager = sarosSession.getComponent(FollowModeManager.class);
 
           followModeManager.follow(user);
         });
 
     add(menuItemFollowParticipant);
+  }
+
+  private void createMenuItemToKickParticipant() {
+    JMenuItem menuItemKickParticipant =
+        new JMenuItem(Messages.SessionPopMenu_kick_user, IconManager.REMOVE_USER_FROM_SESSION);
+
+    menuItemKickParticipant.addActionListener(
+        actionEvent -> {
+          sarosSession.kickUser(user);
+        });
+
+    add(menuItemKickParticipant);
   }
 }

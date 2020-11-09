@@ -71,8 +71,10 @@ public class TreeClickListener extends MouseAdapter {
       } else if (node.getUserObject() instanceof SessionTreeRootNode.UserInfo) {
         SessionTreeRootNode.UserInfo userInfo = (SessionTreeRootNode.UserInfo) node.getUserObject();
         User user = userInfo.getUser();
-        if (!user.equals(sessionManager.getSession().getLocalUser())) {
-          SessionPopMenu menu = new SessionPopMenu(user);
+        ISarosSession sarosSession = sessionManager.getSession();
+
+        if (!user.equals(sarosSession.getLocalUser())) {
+          SessionPopMenu menu = new SessionPopMenu(user, sarosSession);
           menu.show(e.getComponent(), e.getX(), e.getY());
         }
 
