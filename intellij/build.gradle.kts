@@ -39,7 +39,7 @@ sourceSets {
 sarosIntellij {
     sandboxBaseDir = if (intellijSandboxDir.isNullOrBlank()) null else file(intellijSandboxDir!!)
     localIntellijHome = if (intellijHome.isNullOrBlank()) null else file(intellijHome!!)
-    intellijVersion = "IC-2019.3.4"
+    intellijVersion = "IC-2020.1.3"
 }
 
 tasks {
