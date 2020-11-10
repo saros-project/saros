@@ -100,7 +100,7 @@ public class ProjectEventHandlersFactory {
     /*
      * editor viewport change handlers
      */
-    projectEventHandlers.add(new LocalViewPortChangeHandler(editorManager));
+    projectEventHandlers.add(new LocalViewPortChangeHandler(project, editorManager));
 
     return new ProjectEventHandlers(projectEventHandlers);
   }

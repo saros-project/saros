@@ -5,6 +5,7 @@ import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.editor.event.VisibleAreaEvent;
 import com.intellij.openapi.editor.event.VisibleAreaListener;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import java.awt.Rectangle;
 import org.apache.log4j.Logger;
@@ -20,6 +21,7 @@ import saros.intellij.eventhandler.IProjectEventHandler;
 public class LocalViewPortChangeHandler implements IProjectEventHandler {
   private static final Logger log = Logger.getLogger(LocalViewPortChangeHandler.class);
 
+  private final Project project;
   private final EditorManager editorManager;
 
   private final VisibleAreaListener visibleAreaListener = this::generateViewportActivity;
@@ -34,7 +36,8 @@ public class LocalViewPortChangeHandler implements IProjectEventHandler {
    *
    * @param editorManager the EditorManager instance
    */
-  public LocalViewPortChangeHandler(EditorManager editorManager) {
+  public LocalViewPortChangeHandler(Project project, EditorManager editorManager) {
+    this.project = project;
     this.editorManager = editorManager;
 
     this.enabled = false;
@@ -130,8 +133,9 @@ public class LocalViewPortChangeHandler implements IProjectEventHandler {
       this.enabled = false;
 
     } else if (!this.enabled && enabled) {
-      // TODO add project as disposable parent once compatibility is set to above 2019.3
-      EditorFactory.getInstance().getEventMulticaster().addVisibleAreaListener(visibleAreaListener);
+      EditorFactory.getInstance()
+          .getEventMulticaster()
+          .addVisibleAreaListener(visibleAreaListener, project);
 
       this.enabled = true;
     }
