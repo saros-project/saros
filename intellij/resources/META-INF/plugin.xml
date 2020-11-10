@@ -35,7 +35,7 @@
   </vendor>
 
   <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
-  <idea-version since-build="192.6817.14"/>
+  <idea-version since-build="201.8538.31"/>
 
   <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html on how to target different products -->
   <depends>com.intellij.modules.platform</depends>
