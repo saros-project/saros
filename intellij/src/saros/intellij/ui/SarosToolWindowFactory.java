@@ -1,6 +1,7 @@
 package saros.intellij.ui;
 
-import com.intellij.ide.plugins.PluginManager;
+import com.intellij.ide.plugins.IdeaPluginDescriptor;
+import com.intellij.ide.plugins.PluginManagerCore;
 import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
@@ -17,14 +18,19 @@ public class SarosToolWindowFactory implements ToolWindowFactory {
   public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
     SarosMainPanelView sarosMainPanelView = new SarosMainPanelView(project);
 
+    IdeaPluginDescriptor sarosPluginDescriptor =
+        PluginManagerCore.getPlugin(PluginId.getId(SarosComponent.PLUGIN_ID));
+
+    if (sarosPluginDescriptor == null) {
+      throw new IllegalStateException(
+          "Could not find Saros plugin using ID " + SarosComponent.PLUGIN_ID);
+    }
+
     Content content =
         toolWindow
             .getContentManager()
             .getFactory()
-            .createContent(
-                sarosMainPanelView,
-                PluginManager.getPlugin(PluginId.getId(SarosComponent.PLUGIN_ID)).getName(),
-                false);
+            .createContent(sarosMainPanelView, sarosPluginDescriptor.getName(), false);
     toolWindow.getContentManager().addContent(content);
   }
 }
