@@ -126,12 +126,28 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode implements Dispo
     }
   }
 
+  /** Sets up the view in cases where there already is a running session when it is initialized. */
   void setInitialState() {
     ISarosSession session = sessionManager.getSession();
 
     if (session != null) {
       sessionStarted(session);
+      populateInitialState();
     }
+  }
+
+  /** Adds components to session node that would otherwise be added by the state listeners. */
+  private void populateInitialState() {
+    session.getReferencePoints().forEach(this::addReferencePointNode);
+
+    User host = session.getHost();
+    User localUser = session.getLocalUser();
+
+    session
+        .getUsers()
+        .stream()
+        .filter(user -> !user.equals(host) && !user.equals(localUser))
+        .forEach(this::addUserNode);
   }
 
   private void sessionStarted(final ISarosSession newSarosSession) {

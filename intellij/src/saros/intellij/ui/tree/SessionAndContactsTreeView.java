@@ -119,8 +119,10 @@ public class SessionAndContactsTreeView extends JTree implements Disposable {
     connectionHandler.addConnectionStateListener(connectionStateListener);
     xmppContactsService.addListener(contactsUpdateListener);
 
-    // show correct initial state
+    /* show correct initial state */
     renderConnectionState(connectionHandler.getConnectionState());
+    // contact tree must be set up first as it is adjusted as part of session tree setup
+    contactTreeRootNode.setInitialState();
     sessionTreeRootNode.setInitialState();
   }
 
