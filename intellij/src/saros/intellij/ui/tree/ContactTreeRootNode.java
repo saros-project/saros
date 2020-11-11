@@ -75,6 +75,14 @@ public class ContactTreeRootNode extends DefaultMutableTreeNode implements Dispo
     contactsService.addListener(contactsUpdate);
   }
 
+  /**
+   * Adds all contacts of the currently connected XMPP account to the contacts list. Covers cases
+   * where the component is initialized when there is already a connected account.
+   */
+  void setInitialState() {
+    contactsService.getAllContacts().forEach(this::addContact);
+  }
+
   @Override
   public void dispose() {
     contactsService.removeListener(contactsUpdate);
