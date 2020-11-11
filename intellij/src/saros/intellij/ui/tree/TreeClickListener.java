@@ -12,7 +12,7 @@ import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
 import saros.session.User;
 
-/** Tree click listener for showing {@link ContactPopMenu} or {@link SessionPopMenu}. */
+/** Tree click listener for showing {@link StartSessionContactPopMenu} or {@link SessionPopMenu}. */
 public class TreeClickListener extends MouseAdapter {
   private JTree tree;
 
@@ -57,7 +57,7 @@ public class TreeClickListener extends MouseAdapter {
           JPopupMenu menu = null;
 
           if (!isSessionRunning) {
-            menu = new ContactPopMenu(contactInfo);
+            menu = new StartSessionContactPopMenu(contactInfo);
 
           } else if (isHost) {
             menu = new InviteToSessionContactPopMenu(contactInfo);
