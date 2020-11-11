@@ -32,21 +32,21 @@ import saros.intellij.ui.util.NotificationPanel;
 import saros.net.xmpp.JID;
 
 /**
- * Contact pop-up menu for selecting a project and reference point to share. Opened when
- * right-clicking on a contact.
+ * Contact pop-up menu for selecting a project and reference point to start a session with. Opened
+ * when right-clicking on a contact.
  *
  * <p>With the current implementation, only reference points representing a module with a single
  * content root are displayed.
  */
 // TODO add menu point to open dialog to choose directory to share once added
 //  TODO move project module to separate section listed first
-class ContactPopMenu extends JPopupMenu {
+class StartSessionContactPopMenu extends JPopupMenu {
 
-  private static final Logger log = Logger.getLogger(ContactPopMenu.class);
+  private static final Logger log = Logger.getLogger(StartSessionContactPopMenu.class);
 
   private final ContactTreeRootNode.ContactInfo contactInfo;
 
-  ContactPopMenu(ContactTreeRootNode.ContactInfo contactInfo) {
+  StartSessionContactPopMenu(ContactTreeRootNode.ContactInfo contactInfo) {
     this.contactInfo = contactInfo;
 
     createMenuStartSession();
@@ -57,7 +57,8 @@ class ContactPopMenu extends JPopupMenu {
    * only be displayed if there is not running session.
    */
   private void createMenuStartSession() {
-    JMenu menuShareProject = new JMenu(Messages.ContactPopMenu_start_session_popup_text);
+    JMenu menuShareProject =
+        new JMenu(Messages.StartSessionContactPopMenu_start_session_popup_text);
     menuShareProject.setIcon(IconManager.SESSIONS_ICON);
 
     for (Project project : ProjectManager.getInstance().getOpenProjects()) {
@@ -87,7 +88,8 @@ class ContactPopMenu extends JPopupMenu {
 
     if (moduleItems == null) {
       JMenuItem errorMessageItem = new JMenuItem(project.getName());
-      errorMessageItem.setToolTipText(Messages.ContactPopMenu_menu_entry_error_processing_project);
+      errorMessageItem.setToolTipText(
+          Messages.StartSessionContactPopMenu_menu_entry_error_processing_project);
       errorMessageItem.setEnabled(false);
 
       return errorMessageItem;
@@ -116,8 +118,8 @@ class ContactPopMenu extends JPopupMenu {
       JMenuItem noModulesFoundMenuItem =
           new JMenuItem(
               nonCompliantModules.isEmpty()
-                  ? Messages.ContactPopMenu_menu_entry_no_modules_found
-                  : Messages.ContactPopMenu_menu_entry_no_valid_modules_found);
+                  ? Messages.StartSessionContactPopMenu_menu_entry_no_modules_found
+                  : Messages.StartSessionContactPopMenu_menu_entry_no_valid_modules_found);
 
       noModulesFoundMenuItem.setEnabled(false);
 
@@ -159,8 +161,8 @@ class ContactPopMenu extends JPopupMenu {
       NotificationPanel.showError(
           MessageFormat.format(
               Messages.Contact_saros_message_conditional,
-              Messages.ContactPopMenu_unsupported_ide_message_condition),
-          Messages.ContactPopMenu_unsupported_ide_title);
+              Messages.StartSessionContactPopMenu_unsupported_ide_message_condition),
+          Messages.StartSessionContactPopMenu_unsupported_ide_title);
 
       return null;
     }
@@ -185,7 +187,7 @@ class ContactPopMenu extends JPopupMenu {
         IReferencePoint wrappedModule = new IntellijReferencePoint(project, contentRoot);
 
         JMenuItem moduleItem = new JMenuItem(moduleName);
-        moduleItem.setToolTipText(Messages.ContactPopMenu_menu_tooltip_share_module);
+        moduleItem.setToolTipText(Messages.StartSessionContactPopMenu_menu_tooltip_share_module);
         moduleItem.addActionListener(new ShareDirectoryAction(project, moduleName, wrappedModule));
 
         shownModules.add(moduleItem);
@@ -198,7 +200,8 @@ class ContactPopMenu extends JPopupMenu {
 
         JMenuItem invalidModuleEntry = new JMenuItem(moduleName);
         invalidModuleEntry.setEnabled(false);
-        invalidModuleEntry.setToolTipText(Messages.ContactPopMenu_menu_tooltip_invalid_module);
+        invalidModuleEntry.setToolTipText(
+            Messages.StartSessionContactPopMenu_menu_tooltip_invalid_module);
 
         nonCompliantModules.add(invalidModuleEntry);
       }
@@ -236,8 +239,9 @@ class ContactPopMenu extends JPopupMenu {
             MessageFormat.format(
                 Messages.Contact_saros_message_conditional,
                 MessageFormat.format(
-                    Messages.ContactPopMenu_module_not_found_message_condition, moduleName)),
-            Messages.ContactPopMenu_module_not_found_title);
+                    Messages.StartSessionContactPopMenu_module_not_found_message_condition,
+                    moduleName)),
+            Messages.StartSessionContactPopMenu_module_not_found_title);
 
         return;
       }
