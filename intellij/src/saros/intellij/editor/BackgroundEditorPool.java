@@ -7,15 +7,19 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.project.ProjectManagerListener;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.messages.MessageBusConnection;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import saros.filesystem.IFile;
+import saros.intellij.filesystem.IntellijReferencePoint;
 
 /**
  * Editor pool for background editors. The pool uses an LRU cache to avoid having to many background
@@ -66,6 +70,24 @@ public class BackgroundEditorPool implements Disposable {
       };
 
   /**
+   * Releases and drops entries belonging to the closed project from the background editor pool
+   * before the project is closed.
+   *
+   * <p>This explicit handling is necessary as the teardown as part of {@link
+   * com.intellij.openapi.project.ProjectCloseHandler} acts to late (as leaving the session is run
+   * on a separate thread), leading to issues where the IDE detects the remaining editor references
+   * as memory leaks as they are only released after the teardown check.
+   */
+  @SuppressWarnings("FieldCanBeLocal")
+  private final ProjectManagerListener projectLifecycleListener =
+      new ProjectManagerListener() {
+        @Override
+        public void projectClosingBeforeSave(@NotNull Project project) {
+          dropEditorsForProject(project);
+        }
+      };
+
+  /**
    * Instantiates a new background editor pool.
    *
    * <p>Registers the pool to be torn down on application teardown to correctly release all held
@@ -78,6 +100,7 @@ public class BackgroundEditorPool implements Disposable {
 
     this.messageBusConnection = application.getMessageBus().connect();
     messageBusConnection.subscribe(AppLifecycleListener.TOPIC, appLifecycleListener);
+    messageBusConnection.subscribe(ProjectManager.TOPIC, projectLifecycleListener);
 
     Disposer.register(application, this);
   }
@@ -96,7 +119,7 @@ public class BackgroundEditorPool implements Disposable {
    * @param file the file for the document
    * @param document the document to open a background editor for.
    * @return a background editor for hte given document
-   * @see ProjectAPI#createBackgroundEditor(Document)
+   * @see ProjectAPI#createBackgroundEditor(Document, Project)
    */
   @NotNull
   synchronized Editor getBackgroundEditor(@NotNull IFile file, @NotNull Document document) {
@@ -104,7 +127,9 @@ public class BackgroundEditorPool implements Disposable {
       return backgroundEditors.get(file);
     }
 
-    Editor backgroundEditor = ProjectAPI.createBackgroundEditor(document);
+    Project project = ((IntellijReferencePoint) file.getReferencePoint()).getProject();
+
+    Editor backgroundEditor = ProjectAPI.createBackgroundEditor(document, project);
     log.debug("Created background editor for " + backgroundEditor.getDocument());
 
     backgroundEditors.put(file, backgroundEditor);
@@ -136,6 +161,26 @@ public class BackgroundEditorPool implements Disposable {
     }
 
     backgroundEditors.clear();
+  }
+
+  /**
+   * Releases all editors for the given project and removes them from the pool.
+   *
+   * @param project the project whose editors to release amd drop
+   */
+  private synchronized void dropEditorsForProject(@NotNull Project project) {
+    Iterator<Entry<IFile, Editor>> it = backgroundEditors.entrySet().iterator();
+
+    while (it.hasNext()) {
+      Entry<IFile, Editor> entry = it.next();
+      Editor editor = entry.getValue();
+
+      if (project.equals(editor.getProject())) {
+        it.remove();
+
+        releaseBackgroundEditor(editor);
+      }
+    }
   }
 
   /**

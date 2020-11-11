@@ -187,11 +187,14 @@ public class ProjectAPI {
    * boolean)} instead.
    *
    * @param document the document to open a background editor for
+   * @param project the project to associate the editor with
    * @return a background editor for the given document
    */
   @NotNull
-  public static Editor createBackgroundEditor(@NotNull Document document) {
-    return EDTExecutor.invokeAndWait(() -> editorFactory.createEditor(document));
+  public static Editor createBackgroundEditor(
+      @NotNull Document document, @NotNull Project project) {
+
+    return EDTExecutor.invokeAndWait(() -> editorFactory.createEditor(document, project));
   }
 
   /**
@@ -199,7 +202,7 @@ public class ProjectAPI {
    * needed/will no longer be used to dispose it correctly.
    *
    * <p><b>NOTE:</b> This method must only be called for background editors that were obtained using
-   * {@link #createBackgroundEditor(Document)}.
+   * {@link #createBackgroundEditor(Document, Project)}.
    *
    * @param editor the background editor to release
    * @see EditorFactory#releaseEditor(Editor)
