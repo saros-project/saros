@@ -9,7 +9,7 @@ public enum Compatibility {
   /**
    * The local version is (probably) too old to work with the remote version.
    *
-   * <p>The user should be told to upgrade
+   * <p>The user should be told to upgrade.
    */
   OLDER,
 
@@ -20,12 +20,12 @@ public enum Compatibility {
    */
   NEWER,
 
-  /** The compatibility could not be determined. */
-  UNKNOWN,
-
   /**
-   * At least one of the versions contains a qualifiers and the complete version string does not
+   * At least one of the versions contains a qualifier and the complete version string does not
    * match.
    */
-  QUALIFIER_MISMATCH
+  QUALIFIER_MISMATCH,
+
+  /** The compatibility could not be determined. */
+  UNKNOWN
 }
