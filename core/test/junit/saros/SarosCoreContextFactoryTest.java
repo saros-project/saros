@@ -39,6 +39,8 @@ public class SarosCoreContextFactoryTest {
 
     // nice mocks aren't clever enough here
     container.addComponent(
+        BindKey.bindKey(String.class, IContextKeyBindings.SarosImplementation.class), "DUMMY");
+    container.addComponent(
         BindKey.bindKey(String.class, IContextKeyBindings.SarosVersion.class), "1.0.0.dummy");
 
     // nice mocks aren't clever enough here

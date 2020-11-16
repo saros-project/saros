@@ -32,6 +32,7 @@ public interface IContextKeyBindings {
     // marker interface
   }
 
+  /** The version number of the local Saros instance. */
   @Retention(RetentionPolicy.RUNTIME)
   @Target({ElementType.FIELD, ElementType.PARAMETER})
   @Bind
@@ -39,6 +40,15 @@ public interface IContextKeyBindings {
     // marker interface
   }
 
+  /** The qualifier used to identify the IDE-specific Saros implementation. */
+  @Retention(RetentionPolicy.RUNTIME)
+  @Target({ElementType.FIELD, ElementType.PARAMETER})
+  @Bind
+  public @interface SarosImplementation {
+    // marker interface
+  }
+
+  /** The version number of the IDE Saros is running in. */
   @Retention(RetentionPolicy.RUNTIME)
   @Target({ElementType.FIELD, ElementType.PARAMETER})
   @Bind

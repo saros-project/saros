@@ -4,6 +4,7 @@ import java.util.Objects;
 import org.apache.log4j.Logger;
 import saros.annotations.Component;
 import saros.communication.InfoManager;
+import saros.context.IContextKeyBindings.SarosImplementation;
 import saros.context.IContextKeyBindings.SarosVersion;
 import saros.net.xmpp.contact.XMPPContact;
 
@@ -26,8 +27,12 @@ public class VersionManager {
   private final Version localVersion;
   private final InfoManager infoManager;
 
-  public VersionManager(@SarosVersion String version, InfoManager infoManager) {
-    this.localVersion = Version.parseVersion(version);
+  public VersionManager(
+      @SarosImplementation String implementation,
+      @SarosVersion String version,
+      InfoManager infoManager) {
+
+    this.localVersion = Version.parseVersion(implementation, version);
 
     if (this.localVersion == Version.INVALID) {
       throw new IllegalArgumentException("version string is malformed: " + version);

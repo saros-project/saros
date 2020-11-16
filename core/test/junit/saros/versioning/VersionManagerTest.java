@@ -18,6 +18,7 @@ import saros.test.fakes.net.FakeConnectionFactory.FakeConnectionFactoryResult;
 import saros.test.mocks.SarosMocks;
 
 public class VersionManagerTest {
+  private static final String DUMMY_IMPLEMENTATION_IDENTIFIER = "DUMMY";
 
   private ITransmitter aliceTransmitter;
   private IReceiver aliceReceiver;
@@ -41,9 +42,12 @@ public class VersionManagerTest {
     XMPPContactsService aliceContactsService = SarosMocks.contactsServiceMockFor(bobJID);
     bobContact = aliceContactsService.getContact(bobJID.getRAW()).get();
 
+    String[] localVersion = local.toString().split(Version.IMPLEMENTATION_SEPARATOR);
+    assert localVersion.length == 2;
+
     InfoManager infoManager =
         new InfoManager(aliceReceiver, aliceTransmitter, aliceContactsService);
-    versionManagerLocal = new VersionManager(local.toString(), infoManager);
+    versionManagerLocal = new VersionManager(localVersion[0], localVersion[1], infoManager);
 
     HashMap<String, String> info = new HashMap<>();
     info.put(VersionManager.VERSION_KEY, remote.toString());
@@ -55,11 +59,24 @@ public class VersionManagerTest {
     aliceReceiver.processPacket(reply);
   }
 
+  /**
+   * Returns a version object for the given version numbers. The object is created using {@link
+   * #DUMMY_IMPLEMENTATION_IDENTIFIER} as the implementation identifier.
+   *
+   * <p>This helper method can be used when the implementation identifier is not of interest for the
+   * test.
+   *
+   * @param versionNumbers the version numbers to parse
+   * @return a version object for the given version numbers
+   */
+  private static Version getVersion(String versionNumbers) {
+    return Version.parseVersion(DUMMY_IMPLEMENTATION_IDENTIFIER, versionNumbers);
+  }
+
   @Test
   public void testVersionsSame() {
-
-    Version local = Version.parseVersion("1.1.1");
-    Version remote = Version.parseVersion("1.1.1");
+    Version local = Version.parseVersion("A", "1.1.1");
+    Version remote = Version.parseVersion("A", "1.1.1");
 
     init(local, remote);
 
@@ -70,9 +87,35 @@ public class VersionManagerTest {
   }
 
   @Test
+  public void testVersionsDifferentImplementationIdentifiers() {
+    Version local = Version.parseVersion("A", "1.1.1");
+    Version remote = Version.parseVersion("B", "1.1.1");
+
+    init(local, remote);
+
+    VersionCompatibilityResult result =
+        versionManagerLocal.determineVersionCompatibility(bobContact);
+
+    assertEquals(Compatibility.INCOMPATIBLE_IMPLEMENTATIONS, result.getCompatibility());
+  }
+
+  @Test
+  public void testVersionsDifferentImplementationIdentifiersWithQualifier() {
+    Version local = Version.parseVersion("A", "1.1.1.r1");
+    Version remote = Version.parseVersion("B", "1.1.1.r1");
+
+    init(local, remote);
+
+    VersionCompatibilityResult result =
+        versionManagerLocal.determineVersionCompatibility(bobContact);
+
+    assertEquals(Compatibility.INCOMPATIBLE_IMPLEMENTATIONS, result.getCompatibility());
+  }
+
+  @Test
   public void testLocalMajorVersionOlder() {
-    Version local = Version.parseVersion("1.1.1");
-    Version remote = Version.parseVersion("2.1.1");
+    Version local = getVersion("1.1.1");
+    Version remote = getVersion("2.1.1");
 
     init(local, remote);
 
@@ -84,8 +127,8 @@ public class VersionManagerTest {
 
   @Test
   public void testLocalMinorVersionOlder() {
-    Version local = Version.parseVersion("1.1.1");
-    Version remote = Version.parseVersion("1.2.1");
+    Version local = getVersion("1.1.1");
+    Version remote = getVersion("1.2.1");
 
     init(local, remote);
 
@@ -97,8 +140,8 @@ public class VersionManagerTest {
 
   @Test
   public void testLocalMajorVersionNewer() {
-    Version local = Version.parseVersion("2.1.1");
-    Version remote = Version.parseVersion("1.1.1");
+    Version local = getVersion("2.1.1");
+    Version remote = getVersion("1.1.1");
 
     init(local, remote);
 
@@ -110,8 +153,8 @@ public class VersionManagerTest {
 
   @Test
   public void testLocalMinorVersionNewer() {
-    Version local = Version.parseVersion("1.2.1");
-    Version remote = Version.parseVersion("1.1.1");
+    Version local = getVersion("1.2.1");
+    Version remote = getVersion("1.1.1");
 
     init(local, remote);
 
@@ -123,8 +166,8 @@ public class VersionManagerTest {
 
   @Test
   public void testLocalMicroVersionNewer() {
-    Version local = Version.parseVersion("1.1.2");
-    Version remote = Version.parseVersion("1.1.1");
+    Version local = getVersion("1.1.2");
+    Version remote = getVersion("1.1.1");
 
     init(local, remote);
 
@@ -136,8 +179,8 @@ public class VersionManagerTest {
 
   @Test
   public void testLocalMicroVersionOlder() {
-    Version local = Version.parseVersion("1.1.1");
-    Version remote = Version.parseVersion("1.1.2");
+    Version local = getVersion("1.1.1");
+    Version remote = getVersion("1.1.2");
 
     init(local, remote);
 
@@ -150,8 +193,8 @@ public class VersionManagerTest {
   @Test
   public void testVersionsSameIncludingQualifier() {
 
-    Version local = Version.parseVersion("1.1.1.r1");
-    Version remote = Version.parseVersion("1.1.1.r1");
+    Version local = getVersion("1.1.1.r1");
+    Version remote = getVersion("1.1.1.r1");
 
     init(local, remote);
 
@@ -163,8 +206,8 @@ public class VersionManagerTest {
 
   @Test
   public void testVersionsSameOnlyQualifierDiffers() {
-    Version local = Version.parseVersion("1.1.1.r1");
-    Version remote = Version.parseVersion("1.1.1.r2");
+    Version local = getVersion("1.1.1.r1");
+    Version remote = getVersion("1.1.1.r2");
 
     init(local, remote);
 
@@ -176,8 +219,8 @@ public class VersionManagerTest {
 
   @Test
   public void testVersionsDifferentMicroWithSameQualifier() {
-    Version local = Version.parseVersion("1.1.1.r1");
-    Version remote = Version.parseVersion("1.1.2.r1");
+    Version local = getVersion("1.1.1.r1");
+    Version remote = getVersion("1.1.2.r1");
 
     init(local, remote);
 
