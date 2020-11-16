@@ -55,17 +55,7 @@ public class VersionManager {
       log.warn("contact: " + contact + ", remote version string is invalid: " + versionString);
     }
 
-    Compatibility compatibility = determineCompatibility(localVersion, remoteVersion);
+    Compatibility compatibility = localVersion.determineCompatibilityWith(remoteVersion);
     return new VersionCompatibilityResult(compatibility, localVersion, remoteVersion);
-  }
-
-  /**
-   * Compares the two given versions for compatibility. The result indicates whether the local
-   * version is compatible with the remote version.
-   */
-  private Compatibility determineCompatibility(Version localVersion, Version remoteVersion) {
-    Compatibility compatibility = Compatibility.valueOf(localVersion.compareTo(remoteVersion));
-
-    return compatibility;
   }
 }
