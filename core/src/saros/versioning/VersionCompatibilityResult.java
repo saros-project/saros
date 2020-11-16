@@ -17,7 +17,7 @@ public class VersionCompatibilityResult {
   /**
    * Returns the {@link Compatibility compatibility} of the negotiation result.
    *
-   * @return
+   * @return the {@link Compatibility compatibility} of the negotiation result
    */
   public Compatibility getCompatibility() {
     return compatibility;
@@ -26,7 +26,7 @@ public class VersionCompatibilityResult {
   /**
    * Returns the local version that was used for during the negotiation.
    *
-   * @return
+   * @return the local version that was used for during the negotiation
    */
   public Version getLocalVersion() {
     return localVersion;
@@ -35,7 +35,7 @@ public class VersionCompatibilityResult {
   /**
    * Returns the remote version that was used for during the negotiation.
    *
-   * @return
+   * @return the remote version that was used for during the negotiation
    */
   public Version getRemoteVersion() {
     return remoteVersion;
