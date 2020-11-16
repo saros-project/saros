@@ -58,6 +58,98 @@ public class VersionManagerTest {
   @Test
   public void testVersionsSame() {
 
+    Version local = Version.parseVersion("1.1.1");
+    Version remote = Version.parseVersion("1.1.1");
+
+    init(local, remote);
+
+    VersionCompatibilityResult result =
+        versionManagerLocal.determineVersionCompatibility(bobContact);
+
+    assertEquals(Compatibility.OK, result.getCompatibility());
+  }
+
+  @Test
+  public void testLocalMajorVersionOlder() {
+    Version local = Version.parseVersion("1.1.1");
+    Version remote = Version.parseVersion("2.1.1");
+
+    init(local, remote);
+
+    VersionCompatibilityResult result =
+        versionManagerLocal.determineVersionCompatibility(bobContact);
+
+    assertEquals(Compatibility.OLDER, result.getCompatibility());
+  }
+
+  @Test
+  public void testLocalMinorVersionOlder() {
+    Version local = Version.parseVersion("1.1.1");
+    Version remote = Version.parseVersion("1.2.1");
+
+    init(local, remote);
+
+    VersionCompatibilityResult result =
+        versionManagerLocal.determineVersionCompatibility(bobContact);
+
+    assertEquals(Compatibility.OLDER, result.getCompatibility());
+  }
+
+  @Test
+  public void testLocalMajorVersionNewer() {
+    Version local = Version.parseVersion("2.1.1");
+    Version remote = Version.parseVersion("1.1.1");
+
+    init(local, remote);
+
+    VersionCompatibilityResult result =
+        versionManagerLocal.determineVersionCompatibility(bobContact);
+
+    assertEquals(Compatibility.NEWER, result.getCompatibility());
+  }
+
+  @Test
+  public void testLocalMinorVersionNewer() {
+    Version local = Version.parseVersion("1.2.1");
+    Version remote = Version.parseVersion("1.1.1");
+
+    init(local, remote);
+
+    VersionCompatibilityResult result =
+        versionManagerLocal.determineVersionCompatibility(bobContact);
+
+    assertEquals(Compatibility.NEWER, result.getCompatibility());
+  }
+
+  @Test
+  public void testLocalMicroVersionNewer() {
+    Version local = Version.parseVersion("1.1.2");
+    Version remote = Version.parseVersion("1.1.1");
+
+    init(local, remote);
+
+    VersionCompatibilityResult result =
+        versionManagerLocal.determineVersionCompatibility(bobContact);
+
+    assertEquals(Compatibility.OK, result.getCompatibility());
+  }
+
+  @Test
+  public void testLocalMicroVersionOlder() {
+    Version local = Version.parseVersion("1.1.1");
+    Version remote = Version.parseVersion("1.1.2");
+
+    init(local, remote);
+
+    VersionCompatibilityResult result =
+        versionManagerLocal.determineVersionCompatibility(bobContact);
+
+    assertEquals(Compatibility.OK, result.getCompatibility());
+  }
+
+  @Test
+  public void testVersionsSameIncludingQualifier() {
+
     Version local = Version.parseVersion("1.1.1.r1");
     Version remote = Version.parseVersion("1.1.1.r1");
 
@@ -79,45 +171,19 @@ public class VersionManagerTest {
     VersionCompatibilityResult result =
         versionManagerLocal.determineVersionCompatibility(bobContact);
 
-    assertEquals(Compatibility.OK, result.getCompatibility());
+    assertEquals(Compatibility.QUALIFIER_MISMATCH, result.getCompatibility());
   }
 
   @Test
-  public void testlocalVersionOlder() {
+  public void testVersionsDifferentMicroWithSameQualifier() {
     Version local = Version.parseVersion("1.1.1.r1");
-    Version remote = Version.parseVersion("1.2.1.r1");
+    Version remote = Version.parseVersion("1.1.2.r1");
 
     init(local, remote);
 
     VersionCompatibilityResult result =
         versionManagerLocal.determineVersionCompatibility(bobContact);
 
-    assertEquals(Compatibility.OLDER, result.getCompatibility());
-  }
-
-  @Test
-  public void testlocalVersionNewer() {
-    Version local = Version.parseVersion("1.2.1.r1");
-    Version remote = Version.parseVersion("1.1.1.r1");
-
-    init(local, remote);
-
-    VersionCompatibilityResult result =
-        versionManagerLocal.determineVersionCompatibility(bobContact);
-
-    assertEquals(Compatibility.NEWER, result.getCompatibility());
-  }
-
-  @Test
-  public void testlocalVersionNewerMicro() {
-    Version local = Version.parseVersion("1.1.2.r1");
-    Version remote = Version.parseVersion("1.1.1.r1");
-
-    init(local, remote);
-
-    VersionCompatibilityResult result =
-        versionManagerLocal.determineVersionCompatibility(bobContact);
-
-    assertEquals(Compatibility.OK, result.getCompatibility());
+    assertEquals(Compatibility.QUALIFIER_MISMATCH, result.getCompatibility());
   }
 }

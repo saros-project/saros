@@ -1,8 +1,14 @@
 package saros.versioning;
 
+import static saros.versioning.Compatibility.NEWER;
+import static saros.versioning.Compatibility.OK;
+import static saros.versioning.Compatibility.OLDER;
+import static saros.versioning.Compatibility.QUALIFIER_MISMATCH;
+
+import java.util.Objects;
 import java.util.StringTokenizer;
 
-public class Version implements Comparable<Version> {
+public class Version {
 
   /** Unique version instance representing an invalid version. */
   public static final Version INVALID = new Version(0, 0, 0, "invalid");
@@ -117,21 +123,58 @@ public class Version implements Comparable<Version> {
     if (getClass() != obj.getClass()) return false;
     Version other = (Version) obj;
 
-    return this.compareTo(other) == 0;
+    return this.major == other.major
+        && this.minor == other.minor
+        && this.micro == other.micro
+        && Objects.equals(this.qualifier, other.qualifier);
   }
 
-  @Override
-  public int compareTo(Version other) {
+  /**
+   * Returns the compatibility result from comparing this version to the given version.
+   *
+   * <p>For determining compatibility, only the major and minor version numbers are checked if no
+   * qualifier is given for both versions. Differences in micro version number are always seen as
+   * compatible in such cases.
+   *
+   * <p>If at least one of the compared versions contains a qualifier, the two versions have to
+   * match completely (including the micro version number and the qualifier) to be seen as
+   * compatible.
+   *
+   * @param other the version to compare against
+   * @return the compatibility result from comparing this version to the given version
+   */
+  Compatibility determineCompatibilityWith(Version other) {
+    if (!this.qualifier.isEmpty() || !other.qualifier.isEmpty()) {
+      return this.equals(other) ? OK : QUALIFIER_MISMATCH;
+    }
 
     int result;
 
     result = major - other.major;
 
-    if (result != 0) return result;
+    if (result != 0) {
+      return valueOf(result);
+    }
 
     result = minor - other.minor;
 
-    return result;
+    return valueOf(result);
+  }
+
+  /**
+   * Given a result from a numerical comparison of a version number will return the associated
+   * Compatibility object.
+   */
+  private static Compatibility valueOf(int comparison) {
+    switch (Integer.signum(comparison)) {
+      case -1:
+        return OLDER;
+      case 0:
+        return OK;
+      case 1:
+      default:
+        return NEWER;
+    }
   }
 
   @Override

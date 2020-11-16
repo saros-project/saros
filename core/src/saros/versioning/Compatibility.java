@@ -1,7 +1,5 @@
 package saros.versioning;
 
-import java.util.Comparator;
-
 /** Enumeration to describe whether a local version is compatible with a remote one. */
 public enum Compatibility {
 
@@ -77,21 +75,5 @@ public enum Compatibility {
     }
 
     return UNKNOWN;
-  }
-
-  /**
-   * Given a result from {@link Comparator#compare(Object, Object)} will return the associated
-   * Compatibility object
-   */
-  public static Compatibility valueOf(int comparison) {
-    switch (Integer.signum(comparison)) {
-      case -1:
-        return OLDER;
-      case 0:
-        return OK;
-      case 1:
-      default:
-        return NEWER;
-    }
   }
 }
