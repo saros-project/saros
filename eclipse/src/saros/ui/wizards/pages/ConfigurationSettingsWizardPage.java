@@ -28,11 +28,7 @@ import saros.ui.util.SWTUtils;
 import saros.ui.widgets.IllustratedComposite;
 import saros.util.ThreadUtils;
 
-/**
- * Allows the user to enter general configuration parameters for use with Saros.
- *
- * @author bkahlert
- */
+/** Allows the user to enter general configuration parameters for use with Saros. */
 public class ConfigurationSettingsWizardPage extends WizardPage {
 
   private static final Logger log = Logger.getLogger(ConfigurationSettingsWizardPage.class);

@@ -1,10 +1,6 @@
 package saros.session;
 
-/**
- * A listener for {@link ISarosSession} life-cycle related events.
- *
- * @author rdjemili
- */
+/** A listener for {@link ISarosSession} life-cycle related events. */
 public interface ISessionLifecycleListener {
   /**
    * Is fired when a new session is about to start.

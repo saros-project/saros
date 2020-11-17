@@ -14,8 +14,6 @@ import saros.concurrent.jupiter.test.util.ServerSynchronizedDocument;
  * this test case simulate the unsolved dOPT Puzzle scenario which described in Fig. 2 in
  * "Operational Transformation in Real-Time Group Editors: Issues, Algorithm, Achievements", Sun
  * et.al.
- *
- * @author orieger
  */
 public class DOptPuzzleTest extends JupiterTestCase {
 

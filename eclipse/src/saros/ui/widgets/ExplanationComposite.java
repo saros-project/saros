@@ -23,7 +23,6 @@ import org.eclipse.swt.widgets.Control;
  * are constructed from aggregates of other controls.
  *
  * @see Composite
- * @author bkahlert
  */
 public class ExplanationComposite extends IllustratedComposite {
 

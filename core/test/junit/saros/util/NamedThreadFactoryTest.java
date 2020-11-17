@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-/** @author Lindner */
 public class NamedThreadFactoryTest {
 
   private final Runnable dummy =

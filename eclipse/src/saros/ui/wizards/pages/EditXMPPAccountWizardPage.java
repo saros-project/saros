@@ -15,12 +15,7 @@ import saros.repackaged.picocontainer.annotations.Inject;
 import saros.ui.Messages;
 import saros.ui.widgets.wizard.EnterXMPPAccountComposite;
 
-/**
- * Allows the user to edit a given {@link XMPPAccount}.
- *
- * @author Björn Kahlert
- * @author Stefan Rossbach
- */
+/** Allows the user to edit a given {@link XMPPAccount}. */
 public class EditXMPPAccountWizardPage extends WizardPage {
   public static final String TITLE = Messages.EditXMPPAccountWizardPage_title;
   public static final String DESCRIPTION = Messages.EditXMPPAccountWizardPage_description;

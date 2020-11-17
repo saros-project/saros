@@ -30,11 +30,7 @@ import saros.ui.ImageManager;
 import saros.ui.Messages;
 import saros.ui.util.WizardUtils;
 
-/**
- * Contains the basic preferences for Saros.
- *
- * @author Sebastian Schlaak
- */
+/** Contains the basic preferences for Saros. */
 @Component(module = "prefs")
 public final class GeneralPreferencePage extends FieldEditorPreferencePage
     implements IWorkbenchPreferencePage {

@@ -14,7 +14,6 @@ import saros.ui.util.selection.retriever.ISelectionRetriever;
  * <p>E.g. if you wish to retrieve all selected {@link IFile}s
  *
  * @param <T> selections need to be adaptable to
- * @author bkahlert
  */
 public class SelectionRetriever<T> implements ISelectionRetriever<T> {
 

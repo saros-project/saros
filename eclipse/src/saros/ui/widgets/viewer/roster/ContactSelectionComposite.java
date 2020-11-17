@@ -48,8 +48,6 @@ import saros.util.ArrayUtils;
  *   <dt><b>Events:</b>
  *   <dd>(none)
  * </dl>
- *
- * @author bkahlert
  */
 public class ContactSelectionComposite extends ViewerComposite<CheckboxTreeViewer> {
 

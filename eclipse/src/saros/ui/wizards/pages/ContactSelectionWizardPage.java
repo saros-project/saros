@@ -21,11 +21,7 @@ import saros.ui.widgets.viewer.roster.FilteredContactSelectionComposite;
 import saros.ui.widgets.viewer.roster.events.ContactSelectionChangedEvent;
 import saros.ui.widgets.viewer.roster.events.ContactSelectionListener;
 
-/**
- * Allows the user to select a {@link JID} from the Contact List.
- *
- * @author bkahlert
- */
+/** Allows the user to select a {@link JID} from the Contact List. */
 public class ContactSelectionWizardPage extends WizardPage {
   private static final Logger log = Logger.getLogger(ContactSelectionWizardPage.class);
 

@@ -36,8 +36,6 @@ import saros.synchronize.StopManager;
  * A Saros session consists of one or more shared reference point(s), which are the central concept
  * of the Saros plugin. They are associated with local directory trees and make them available for
  * synchronous/real-time collaboration.
- *
- * @author rdjemili
  */
 public interface ISarosSession {
 

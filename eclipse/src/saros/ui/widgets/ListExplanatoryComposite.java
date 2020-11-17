@@ -26,7 +26,6 @@ import saros.ui.widgets.ListExplanationComposite.ListExplanation;
  *
  * @see ListExplanationComposite
  * @see Composite
- * @author bkahlert
  */
 public class ListExplanatoryComposite extends ExplanatoryComposite {
   protected ListExplanationComposite explanationComposite;

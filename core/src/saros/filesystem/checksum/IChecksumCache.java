@@ -5,8 +5,6 @@ import saros.filesystem.IFile;
 /**
  * An interface that can be used to access checksums. So they do not need to be recalculated as long
  * as they are not invalid.
- *
- * @author Stefan Rossbach
  */
 public interface IChecksumCache {
 

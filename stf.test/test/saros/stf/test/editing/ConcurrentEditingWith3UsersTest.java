@@ -13,11 +13,7 @@ import saros.stf.client.StfTestCase;
 import saros.stf.client.util.EclipseTestThread;
 import saros.stf.client.util.Util;
 
-/**
- * This class tests the concurrent editing of three users during a session.
- *
- * @author nwarnatsch
- */
+/** This class tests the concurrent editing of three users during a session. */
 public class ConcurrentEditingWith3UsersTest extends StfTestCase {
   private EclipseTestThread aliceEditTaskThread;
   private EclipseTestThread bobEditTaskThread;

@@ -23,8 +23,6 @@ import saros.ui.wizards.ConfigurationWizard;
 /**
  * Final {@link WizardPage} for the {@link ConfigurationWizard} that summarizes the made
  * configuration.
- *
- * @author bkahlert
  */
 public class ConfigurationSummaryWizardPage extends WizardPage {
 

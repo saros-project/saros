@@ -8,11 +8,7 @@ import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.swt.widgets.Display;
 import saros.ui.util.FontUtils;
 
-/**
- * Abstract headline for use with {@link IContentProvider}s that use {@link ITreeElement}s.
- *
- * @author bkahlert
- */
+/** Abstract headline for use with {@link IContentProvider}s that use {@link ITreeElement}s. */
 public abstract class HeaderElement extends TreeElement {
   protected Font boldFont = null;
   protected Styler boldStyler =

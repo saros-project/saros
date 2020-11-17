@@ -16,8 +16,6 @@ import saros.util.ThreadUtils;
 /**
  * Abstract base class that is already capable of detecting and handling network errors occurred in
  * the {@link ActivitySequencer} component.
- *
- * @author srossbach
  */
 abstract class SessionTimeoutHandler implements Startable {
 

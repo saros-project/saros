@@ -25,12 +25,7 @@ import saros.ui.util.selection.SelectionUtils;
 import saros.ui.util.selection.retriever.SelectionRetrieverFactory;
 import saros.util.ThreadUtils;
 
-/**
- * This follow mode action is used to select the person to follow.
- *
- * @author Christopher Oezbek
- * @author Edna Rosen
- */
+/** This follow mode action is used to select the person to follow. */
 @Component(module = "action")
 public class FollowThisPersonAction extends Action implements Disposable {
 

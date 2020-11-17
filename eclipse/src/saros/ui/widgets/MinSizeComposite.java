@@ -20,7 +20,6 @@ import org.eclipse.swt.widgets.Composite;
  * are constructed from aggregates of other controls.
  *
  * @see Composite
- * @author bkahlert
  */
 public class MinSizeComposite extends Composite {
 

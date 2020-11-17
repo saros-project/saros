@@ -3,8 +3,6 @@ package saros.negotiation;
 /**
  * Listener interface for signaling termination of {@link SessionNegotiation} and {@link
  * ResourceNegotiation} negotiations.
- *
- * @author srossbach
  */
 public interface NegotiationListener {
 

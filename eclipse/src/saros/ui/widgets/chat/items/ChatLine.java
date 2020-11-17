@@ -15,11 +15,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import saros.ui.util.SWTUtils;
 
-/**
- * This composite is used to display a chat message.
- *
- * @author bkahlert
- */
+/** This composite is used to display a chat message. */
 public class ChatLine extends Composite {
   protected StyledText text;
 

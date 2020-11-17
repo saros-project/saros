@@ -11,11 +11,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import saros.ui.Messages;
 
-/**
- * This control displays an input field for text input
- *
- * @author bkahlert
- */
+/** This control displays an input field for text input */
 public class ChatInput extends Composite {
   /** When no message is entered, display this hint */
   public static final String HINT_TEXT = Messages.ChatInput_hint_text;

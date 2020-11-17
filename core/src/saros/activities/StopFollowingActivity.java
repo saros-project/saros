@@ -9,8 +9,6 @@ import saros.session.User;
  *
  * <p>TODO Consider treating {@link StartFollowingActivity} and {@link StopFollowingActivity} as
  * different types of the same class (since this class here has no logic of its own).
- *
- * @author Alexander Waldmann (contact@net-corps.de)
  */
 @XStreamAlias("stopFollowingActivity")
 public class StopFollowingActivity extends AbstractActivity {

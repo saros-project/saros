@@ -9,11 +9,7 @@ import saros.ui.Messages;
 import saros.ui.model.HeaderElement;
 import saros.ui.model.TreeElement;
 
-/**
- * Container {@link TreeElement} for a contact list.
- *
- * @author bkahlert
- */
+/** Container {@link TreeElement} for a contact list. */
 public class RosterHeaderElement extends HeaderElement {
   private final RosterContentProvider rosterContentProvider;
   private final XMPPContactsService contactsService;

@@ -22,8 +22,6 @@ import saros.stf.client.tester.AbstractTester;
  *       <pre>
  * alice.editor.isEditorOpen(&quot;MyClass.java&quot;);
  * </pre>
- *
- * @author Lin
  */
 public interface IRemoteBotEditor extends Remote {
 

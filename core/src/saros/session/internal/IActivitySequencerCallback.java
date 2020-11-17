@@ -7,8 +7,6 @@ import saros.session.User;
  * Simple callback interface for monitoring events that occur in the {@link ActivitySequencer}
  * during session runtime. Implementing interfaces <b>must</b> ensure that they will <b>not</b>
  * block on any callback that is made.
- *
- * @author srossbach
  */
 public interface IActivitySequencerCallback {
 

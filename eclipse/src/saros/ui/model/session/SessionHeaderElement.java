@@ -15,11 +15,7 @@ import saros.ui.Messages;
 import saros.ui.model.HeaderElement;
 import saros.ui.model.TreeElement;
 
-/**
- * Container {@link TreeElement} for a {@link SarosSession}
- *
- * @author bkahlert
- */
+/** Container {@link TreeElement} for a {@link SarosSession} */
 public class SessionHeaderElement extends HeaderElement {
   private final SessionInput sessionInput;
   private final EditorManager editorManager;

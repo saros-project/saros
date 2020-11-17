@@ -43,8 +43,6 @@ import saros.net.xmpp.JID;
  *
  * <p><b>Note:</b> Although this class is thread safe it is <b>not</b> recommended to manipulate and
  * use data from different threads.
- *
- * @author Stefan Rossbach
  */
 @Component(module = "account")
 public final class XMPPAccountStore {

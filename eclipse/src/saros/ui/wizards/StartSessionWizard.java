@@ -20,9 +20,6 @@ import saros.ui.wizards.pages.ResourceSelectionWizardPage;
  * Wizard for starting a session.
  *
  * <p>Starts sharing the selected resource(s) with the selected contacts(s) on finish.
- *
- * @author bkahlert
- * @author kheld
  */
 public class StartSessionWizard extends Wizard {
 

@@ -80,10 +80,8 @@ import saros.util.StackTrace;
  * <p>The EditorManager contains the testable logic. All untestable logic should only appear in
  * {@link EditorAPI}.
  *
- * @author rdjemili
- *     <p>TODO CO This class contains too many different concerns: TextEdits, Editor opening and
- *     closing, Parsing of activities, executing of activities, dirty state management,
- *     annotations...
+ * <p>TODO CO This class contains too many different concerns: TextEdits, Editor opening and
+ * closing, Parsing of activities, executing of activities, dirty state management, annotations...
  */
 @Component(module = "core")
 public class EditorManager implements IEditorManager {

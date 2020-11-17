@@ -43,8 +43,6 @@ import saros.versioning.VersionManager;
 /**
  * This is the basic core factory for Saros. All components that are created by this factory
  * <b>must</b> be working on any platform the application is running on.
- *
- * @author srossbach
  */
 public class CoreContextFactory extends AbstractContextFactory {
 

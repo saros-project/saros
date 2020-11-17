@@ -49,10 +49,6 @@ import saros.util.ThreadUtils;
 /**
  * The ActivitySequencer is responsible for making sure that transformed {@linkplain IActivity
  * activities} are sent and received in the right order.
- *
- * @author rdjemili
- * @author coezbek
- * @author marrin
  */
 public class ActivitySequencer implements Startable {
 

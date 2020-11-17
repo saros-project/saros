@@ -14,12 +14,7 @@ import saros.ui.ImageManager;
 import saros.ui.Messages;
 import saros.ui.util.CollaborationUtils;
 
-/**
- * Leaves the current Saros session. Is deactivated if there is no running session.
- *
- * @author rdjemili
- * @author oezbek
- */
+/** Leaves the current Saros session. Is deactivated if there is no running session. */
 @Component(module = "action")
 public class LeaveSessionAction extends Action implements Disposable {
 

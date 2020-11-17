@@ -21,8 +21,6 @@ import saros.session.ISarosSessionManager;
 /**
  * Bridge class that maps Eclipse Resource change events to unique identifiers by retrieving the
  * absolute path relative to the workspace and converting the path to a unique string.
- *
- * @author Stefan Rossbach
  */
 public class FileContentNotifierBridge
     implements IFileContentChangedNotifier, IResourceChangeListener, Startable {

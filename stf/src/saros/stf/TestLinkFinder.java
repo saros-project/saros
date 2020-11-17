@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-/** @author Stefan Rossbach */
 public class TestLinkFinder {
 
   private static final String STF_TEST_CASE_PACKAGE = "saros.stf.test";

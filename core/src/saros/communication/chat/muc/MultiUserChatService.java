@@ -33,13 +33,7 @@ import saros.net.ConnectionState;
 import saros.net.xmpp.IConnectionListener;
 import saros.net.xmpp.XMPPConnectionService;
 
-/**
- * This class manages the creation and destruction of {@link MultiUserChat}s.
- *
- * @author rdjemili
- * @author ahaferburg
- * @author bkahlert
- */
+/** This class manages the creation and destruction of {@link MultiUserChat}s. */
 @Component(module = "communication")
 public class MultiUserChatService extends AbstractChatService {
   private static final Logger log = Logger.getLogger(MultiUserChatService.class);

@@ -20,11 +20,7 @@ import saros.session.User;
 import saros.session.internal.ActivitySequencer;
 import saros.util.ThreadUtils;
 
-/**
- * Component for detecting network errors on the server side of a session.
- *
- * @author srossbach
- */
+/** Component for detecting network errors on the server side of a session. */
 public final class ServerSessionTimeoutHandler extends SessionTimeoutHandler {
 
   private static final Logger log = Logger.getLogger(ClientSessionTimeoutHandler.class);

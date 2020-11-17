@@ -9,11 +9,7 @@ import saros.concurrent.jupiter.TransformationException;
 import saros.concurrent.jupiter.internal.Jupiter;
 import saros.session.User;
 
-/**
- * test document to simulate the client site.
- *
- * @author orieger
- */
+/** test document to simulate the client site. */
 public class ClientSynchronizedDocument implements NetworkEventHandler, DocumentTestChecker {
 
   private static Logger log = Logger.getLogger(ClientSynchronizedDocument.class);

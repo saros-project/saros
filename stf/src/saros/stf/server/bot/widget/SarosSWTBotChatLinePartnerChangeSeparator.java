@@ -13,8 +13,6 @@ import saros.ui.widgets.chat.items.ChatLinePartnerChangeSeparator;
  * changed the chat view's looks using self defined SWT-components, which are obviously not
  * supported by SWTBot. So i need to define a corresponding SWTBot[widget name](in this case,
  * SarosSWTBotChatLinePartnerChangeSeparator) class to access every chat widgets.
- *
- * @author lchen
  */
 @SWTBotWidget(
     clasz = ChatLinePartnerChangeSeparator.class,

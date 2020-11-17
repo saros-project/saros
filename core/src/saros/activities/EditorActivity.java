@@ -32,8 +32,6 @@ import saros.session.User;
  * <p>Saving is not document- but editor-specific because one editor might perform changes on the
  * document before actually saving while others just save. An example is a Java editor with save
  * actions enabled vs. a plain text editor for the very same document.
- *
- * @author rdjemili
  */
 @XStreamAlias("editorActivity")
 public class EditorActivity extends AbstractResourceActivity<IFile> {

@@ -11,9 +11,6 @@ import saros.concurrent.jupiter.test.util.JupiterTestCase;
  * This test class contains convergence problem scenarios described in "Achieving Convergence with
  * Operational Transformation in Distributed Groupware Systems" by Abdessamad Imine, Pascal Molli,
  * Gerald Oster, Michael Rusinowitch.
- *
- * @author orieger
- * @author oezbek
  */
 public class ConvergenceProblemTest extends JupiterTestCase {
 

@@ -39,9 +39,6 @@ import saros.ui.widgets.viewer.ViewerComposite;
  *   <dt><b>Events:</b>
  *   <dd>(none)
  * </dl>
- *
- * @author bkahlert
- * @author srossbach
  */
 public abstract class SessionDisplayComposite extends ViewerComposite<TreeViewer> {
 

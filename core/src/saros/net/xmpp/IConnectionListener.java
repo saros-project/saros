@@ -25,8 +25,6 @@ import saros.net.ConnectionState;
 /**
  * A listener for changes to the current connection state. Use {@link
  * XMPPConnectionService#addListener(IConnectionListener)} to attach it.
- *
- * @author rdjemili
  */
 public interface IConnectionListener {
 

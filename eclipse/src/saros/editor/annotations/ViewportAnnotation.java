@@ -18,8 +18,6 @@ import saros.util.CoreUtils;
  * The annotation that shows the viewports of users with {@link Permission#WRITE_ACCESS}.
  *
  * <p>Configuration of this annotation is done in the plugin-xml.
- *
- * @author rdjemili
  */
 public class ViewportAnnotation extends SarosAnnotation implements IAnnotationPresentation {
 

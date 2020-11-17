@@ -7,8 +7,6 @@ import org.eclipse.jface.viewers.Viewer;
 
 /**
  * Implements a {@link ICheckStateProvider} for use with Contacts displaying JFace {@link Viewer}s.
- *
- * @author bkahlert
  */
 public class RosterCheckStateProvider implements ICheckStateProvider {
 

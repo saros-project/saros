@@ -4,13 +4,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import saros.session.User;
 
-/**
- * Activity for managing color changes.
- *
- * @author cnk
- * @author tobi
- * @author Stefan Rossbach
- */
+/** Activity for managing color changes. */
 @XStreamAlias("changeColorActivity")
 public class ChangeColorActivity extends AbstractActivity implements ITargetedActivity {
 

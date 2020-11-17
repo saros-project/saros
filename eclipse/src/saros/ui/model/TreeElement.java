@@ -4,11 +4,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.Image;
 
-/**
- * This class implements a default {@link ITreeElement}
- *
- * @author bkahlert
- */
+/** This class implements a default {@link ITreeElement} */
 public abstract class TreeElement implements ITreeElement {
 
   @Override

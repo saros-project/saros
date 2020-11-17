@@ -7,11 +7,6 @@ import java.util.Set;
 import org.eclipse.core.runtime.IAdapterManager;
 import org.eclipse.core.runtime.Platform;
 
-/**
- * @author Björn Kahlert
- * @author Stefan Rossbach
- * @author Maria Spiering
- */
 public class ArrayUtils {
 
   /**

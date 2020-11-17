@@ -20,8 +20,6 @@ import org.eclipse.swt.widgets.Display;
  * whole viewer but manually remove the element from the viewer in order to reflect the model. If
  * your viewer supports this action the element is removed. Otherwise the viewer is advised to
  * reload the model.
- *
- * @author bkahlert
  */
 public class ViewerUtils {
 

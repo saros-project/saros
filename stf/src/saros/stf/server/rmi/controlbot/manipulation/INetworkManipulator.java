@@ -7,8 +7,6 @@ import saros.net.xmpp.JID;
 /**
  * This interface gives you control to manipulate the Saros and XMPP network access. All methods
  * provided by the interface are <b>not</b> thread safe.
- *
- * @author Stefan Rossbach
  */
 public interface INetworkManipulator extends Remote {
 

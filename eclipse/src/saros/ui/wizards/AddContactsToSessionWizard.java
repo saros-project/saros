@@ -8,11 +8,7 @@ import saros.ui.Messages;
 import saros.ui.util.CollaborationUtils;
 import saros.ui.wizards.pages.ContactSelectionWizardPage;
 
-/**
- * Wizard for adding contacts to a running session.
- *
- * @author bkahlert
- */
+/** Wizard for adding contacts to a running session. */
 public class AddContactsToSessionWizard extends Wizard {
   public static final String TITLE = Messages.SessionAddContactsWizard_title;
 

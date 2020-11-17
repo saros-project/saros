@@ -5,11 +5,7 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import saros.ui.model.HeaderElement;
 import saros.ui.model.ITreeElement;
 
-/**
- * Comparator for {@link ITreeElement} for {@link SessionInput}.
- *
- * @author bkahlert
- */
+/** Comparator for {@link ITreeElement} for {@link SessionInput}. */
 public class SessionComparator extends ViewerComparator {
   private final ViewerComparator contentComparator;
 

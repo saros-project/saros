@@ -10,11 +10,7 @@ import saros.ui.ImageManager;
 import saros.ui.Messages;
 import saros.ui.wizards.pages.EditXMPPAccountWizardPage;
 
-/**
- * Wizard for editing an existing {@link XMPPAccount}.
- *
- * @author bkahlert
- */
+/** Wizard for editing an existing {@link XMPPAccount}. */
 public class EditXMPPAccountWizard extends Wizard {
   public static final String TITLE = Messages.EditXMPPAccountWizard_title;
 
