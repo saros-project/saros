@@ -13,7 +13,7 @@ public class SarosServer {
   /** The Saros version which is impersonated by the current server version. */
   // FIXME create a version handling that allows a separate server versioning
   // the current handling is tied to the current Saros/E versioning
-  public static final String SAROS_VERSION = "15.0.0";
+  public static final String SAROS_VERSION = "16.0.1";
 
   /** Initializes and starts a Saros server. */
   public SarosServer() {
