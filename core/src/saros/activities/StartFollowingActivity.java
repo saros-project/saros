@@ -7,8 +7,6 @@ import saros.session.User;
 /**
  * This activity notifies the recipient that the local user is following someone in the running
  * session
- *
- * @author Alexander Waldmann (contact@net-corps.de)
  */
 @XStreamAlias("startFollowingActivity")
 public class StartFollowingActivity extends AbstractActivity {

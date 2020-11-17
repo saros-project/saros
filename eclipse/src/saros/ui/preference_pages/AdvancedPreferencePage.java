@@ -17,9 +17,6 @@ import saros.ui.Messages;
 /**
  * Contains the advanced preferences - consisting of preferences that are geared towards developers
  * and power users and that are not necessary for normal use.
- *
- * @author rdjemili
- * @author jurke
  */
 @Component(module = "prefs")
 public class AdvancedPreferencePage extends FieldEditorPreferencePage

@@ -28,7 +28,6 @@ import saros.net.util.XMPPUtils;
  * A JID which is used to identify the users of the XMPP network.
  *
  * @valueObject A JID is a value object, i.e. it is immutable!
- * @author rdjemili
  */
 public class JID implements Serializable {
 

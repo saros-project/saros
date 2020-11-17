@@ -37,7 +37,6 @@ import saros.ui.util.SWTUtils;
 import saros.ui.views.SarosView;
 import saros.util.ThreadUtils;
 
-/** @author Stefan Rossbach */
 @Component(module = "prefs")
 public final class NetworkPreferencePage extends PreferencePage
     implements IWorkbenchPreferencePage {

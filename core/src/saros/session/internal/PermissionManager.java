@@ -18,8 +18,6 @@ import saros.util.ThreadUtils;
 /**
  * This manager is responsible for handling {@link Permission} changes. It both produces and
  * consumes activities.
- *
- * @author rdjemili
  */
 @Component(module = "core")
 public class PermissionManager extends AbstractActivityProducer implements Startable {

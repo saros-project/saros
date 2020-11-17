@@ -26,8 +26,6 @@ import saros.net.xmpp.JID;
 /**
  * This class encapsulates Smacks {@link MultiUserChat} and offers {@link ChatState}s that are
  * normally only provided by Smack for {@link Chat} s.
- *
- * @author bkahlert
  */
 public class MultiUserChat extends AbstractChat {
   private final Logger log = Logger.getLogger(MultiUserChat.class);

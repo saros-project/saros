@@ -4,11 +4,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import saros.account.XMPPAccountStore;
 
-/**
- * This interface gives you control to manipulate the Saros account store.
- *
- * @author Stefan Rossbach
- */
+/** This interface gives you control to manipulate the Saros account store. */
 public interface IAccountManipulator extends Remote {
 
   /**

@@ -13,8 +13,6 @@ import saros.stf.server.rmi.superbot.component.contextmenu.sarosview.IContextMen
 /**
  * This interface contains convenience API to perform actions in the Saros view. If not mentioned
  * otherwise all offered methods fulfill their contract by interacting only with the GUI.
- *
- * @author lchen
  */
 public interface ISarosView extends Remote {
 

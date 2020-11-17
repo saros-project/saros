@@ -18,11 +18,7 @@
  */
 package saros.context;
 
-/**
- * Abstract base class that only offers syntactic sugar for handling component creation.
- *
- * @author srossbach
- */
+/** Abstract base class that only offers syntactic sugar for handling component creation. */
 public abstract class AbstractContextFactory implements IContextFactory {
 
   public static class Component {

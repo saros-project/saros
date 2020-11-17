@@ -53,7 +53,6 @@ import org.eclipse.swt.widgets.Layout;
  *
  * @see ExplanationComposite
  * @see Composite
- * @author bkahlert
  */
 public class ExplanatoryComposite extends Composite {
   /** Uses a {@link StackLayout} to allow the switch between the contents and explanations. */

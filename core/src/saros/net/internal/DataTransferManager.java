@@ -28,10 +28,6 @@ import saros.repackaged.picocontainer.annotations.Nullable;
 /**
  * This class is responsible for handling all transfers of binary data. It maintains a map of
  * established connections and tries to reuse them.
- *
- * @author srossbach
- * @author coezbek
- * @author jurke
  */
 @Component(module = "net")
 public class DataTransferManager implements IConnectionListener, IConnectionManager {

@@ -25,7 +25,6 @@ import org.eclipse.swt.widgets.Layout;
  * </dl>
  *
  * @see ExplanationComposite
- * @author bkahlert
  */
 public class ListExplanationComposite extends ExplanationComposite {
   /**

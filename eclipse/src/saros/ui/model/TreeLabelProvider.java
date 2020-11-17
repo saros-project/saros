@@ -7,8 +7,6 @@ import org.eclipse.jface.viewers.ViewerCell;
 /**
  * Instances of this class are used in conjunction with {@link ITreeElement}s as generic {@link
  * TreeLabelProvider}s.
- *
- * @author bkahlert
  */
 public class TreeLabelProvider extends StyledCellLabelProvider {
   @Override

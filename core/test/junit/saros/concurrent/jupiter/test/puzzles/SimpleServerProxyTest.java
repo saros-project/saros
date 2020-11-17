@@ -11,8 +11,6 @@ import saros.concurrent.jupiter.test.util.ServerSynchronizedDocument;
 
 /**
  * this class contains test cases for testing init server side and communication with client sides.
- *
- * @author orieger
  */
 public class SimpleServerProxyTest extends JupiterTestCase {
 

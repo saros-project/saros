@@ -2,11 +2,7 @@ package saros.concurrent.jupiter.test.util;
 
 import saros.session.User;
 
-/**
- * handler for simulated network events.
- *
- * @author troll
- */
+/** handler for simulated network events. */
 public interface NetworkEventHandler {
 
   /**

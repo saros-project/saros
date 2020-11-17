@@ -32,10 +32,6 @@ import saros.net.xmpp.JID;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
 
-/**
- * @author rdjemili
- * @author sotitas
- */
 public abstract class SessionNegotiation extends Negotiation {
 
   private static final Logger log = Logger.getLogger(SessionNegotiation.class);

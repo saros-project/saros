@@ -45,11 +45,7 @@ import saros.stf.server.rmi.superbot.component.view.saros.ISarosView;
 import saros.stf.server.rmi.superbot.impl.SuperBot;
 import saros.stf.server.util.WidgetUtil;
 
-/**
- * This implementation of {@link ISarosView}
- *
- * @author lchen
- */
+/** This implementation of {@link ISarosView} */
 public final class SarosView extends StfRemoteObject implements ISarosView {
 
   private static final Logger log = Logger.getLogger(SarosView.class);

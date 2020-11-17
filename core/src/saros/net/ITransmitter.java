@@ -28,8 +28,6 @@ import saros.net.xmpp.JID;
  * A humble interface that is responsible for network functionality. The idea behind this interface
  * is to only encapsulates the least possible amount of functionality - the one that can't be easily
  * tested.
- *
- * @author rdjemili
  */
 @Component(module = "net")
 public interface ITransmitter {

@@ -62,8 +62,6 @@ import saros.util.ThreadUtils;
 /**
  * The SessionManager is responsible for initiating new Saros sessions and for reacting to
  * invitations. The user can be only part of one session at most.
- *
- * @author rdjemili
  */
 @Component(module = "core")
 public class SarosSessionManager implements ISarosSessionManager {

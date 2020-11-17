@@ -6,8 +6,6 @@ import org.eclipse.jface.viewers.Viewer;
 /**
  * Instances of this class are used in conjunction with {@link ITreeElement}s as generic {@link
  * ITreeContentProvider}s
- *
- * @author bkahlert
  */
 public class TreeContentProvider implements ITreeContentProvider {
 

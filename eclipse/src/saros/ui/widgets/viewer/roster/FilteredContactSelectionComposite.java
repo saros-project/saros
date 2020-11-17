@@ -35,8 +35,6 @@ import saros.ui.wizards.AddContactWizard;
  *   <dt><b>Events:</b>
  *   <dd>(none)
  * </dl>
- *
- * @author bkahlert
  */
 public final class FilteredContactSelectionComposite extends ContactSelectionComposite {
 

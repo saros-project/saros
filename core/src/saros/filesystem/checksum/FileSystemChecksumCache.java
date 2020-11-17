@@ -20,8 +20,6 @@ import saros.filesystem.IFile;
  * notifier} has to be provided that tracks file changes in the currently used file system.
  *
  * <p><b>Note:</b> This implementation is <b>NOT</b> capable of handling hash collisions.
- *
- * @author Stefan Rossbach
  */
 // TODO add probability of hash collisions, lower bound should be 1 / (2^32 *
 // 2^128)

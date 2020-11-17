@@ -9,9 +9,6 @@ import saros.ui.model.roster.RosterEntryElement;
 /**
  * This filter is responsible for hiding those contacts in the contact list that are currently part
  * of the running Saros session.
- *
- * @author srossbach
- * @author waldmann
  */
 public final class HideContactsInSessionFilter extends ViewerFilter {
 

@@ -22,10 +22,6 @@ import saros.ui.wizards.pages.CreateXMPPAccountWizardPage;
  *
  * <p><b>This Dialog is disabled due to missing Captcha Support! see {@link
  * #CREATE_DIALOG_ENABLED}</b>
- *
- * @author rdjemili
- * @author coezbek
- * @author bkahlert
  */
 public class CreateXMPPAccountWizard extends Wizard {
 

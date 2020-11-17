@@ -26,8 +26,6 @@ import saros.ui.widgets.chat.parts.SkypeStyleChatDisplay;
  * SarosSWTBot is a {@link SWTBot} with capabilities for testing specific GUI items only defined for
  * Saros like chatInput and chatLine and fixing some methods defined by SWTBot which are not really
  * working yet .
- *
- * @author lchen
  */
 public final class SarosSWTBot extends SWTBot {
 

@@ -19,8 +19,6 @@ import saros.ui.views.SarosView;
 /**
  * Checks if the host remains alone after a user left the session. If so, ask if the session should
  * be closed (optionally remember choice for workspace...)
- *
- * @author Alexander Waldmann (contact@net-corps.de)
  */
 public class HostLeftAloneInSessionHandler {
 

@@ -17,8 +17,6 @@ import saros.stf.server.rmi.superbot.component.Perspective;
  *       <pre>
  * alice.mainMenu.clickMenuPreferences();
  * </pre>
- *
- * @author Lin
  */
 public interface IWindowMenu extends Remote {
 

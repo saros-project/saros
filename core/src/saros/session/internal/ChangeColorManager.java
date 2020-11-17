@@ -28,8 +28,6 @@ import saros.session.User;
 /**
  * This manager is responsible for handling color changes and managing the currently available
  * colors. It both produces and consumes activities.
- *
- * @author Stefan Rossbach
  */
 /*
  * IMPORTANT: MAKE SURE YOU USE THE BARE JID TO LOAD/STORE COLOR IDS !!!

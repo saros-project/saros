@@ -56,11 +56,7 @@ import saros.ui.widgets.ListExplanationComposite.ListExplanation;
 import saros.ui.widgets.ListExplanatoryComposite;
 import saros.util.ThreadUtils;
 
-/**
- * This component shows chat he right side of the {@link SarosView}
- *
- * @author patbit
- */
+/** This component shows chat he right side of the {@link SarosView} */
 public class ChatRoomsComposite extends ListExplanatoryComposite {
 
   private static final Logger log = Logger.getLogger(ChatRoomsComposite.class);

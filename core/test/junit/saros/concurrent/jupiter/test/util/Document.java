@@ -12,19 +12,10 @@ import saros.filesystem.IFile;
 import saros.session.User;
 import saros.test.util.OperationHelper;
 
-/**
- * this class represent a document object for testing.
- *
- * @author troll
- * @author oezbek
- */
+/** this class represent a document object for testing. */
 public class Document {
 
-  /**
-   * Listener for jupiter document actions.
-   *
-   * @author orieger
-   */
+  /** Listener for jupiter document actions. */
   public interface JupiterDocumentListener {
 
     public void documentAction(User user);

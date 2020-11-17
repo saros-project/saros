@@ -8,11 +8,7 @@ import org.eclipse.swt.widgets.Composite;
 import saros.ui.Messages;
 import saros.ui.widgets.SimpleRoundedComposite;
 
-/**
- * This composite is used to display a separator between messages of different chat partners.
- *
- * @author bkahlert
- */
+/** This composite is used to display a separator between messages of different chat partners. */
 public class ChatLinePartnerChangeSeparator extends SimpleRoundedComposite {
 
   protected final SimpleDateFormat dateFormatter =

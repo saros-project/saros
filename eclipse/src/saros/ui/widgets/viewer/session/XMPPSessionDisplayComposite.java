@@ -23,8 +23,6 @@ import saros.ui.model.session.SessionInput;
  *   <dt><b>Events:</b>
  *   <dd>(none)
  * </dl>
- *
- * @author bkahlert
  */
 public final class XMPPSessionDisplayComposite extends SessionDisplayComposite {
 

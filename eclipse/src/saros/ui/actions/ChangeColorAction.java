@@ -25,8 +25,6 @@ import saros.ui.wizards.ColorChooserWizard;
  * This action opens a color dialog and checks whether the chosen color is different enough from
  * other colors. If yes, the new color will be sent to the sessionmembers If no, you can change a
  * new color or abort the process
- *
- * @author cnk and tobi
  */
 @Component(module = "action")
 public final class ChangeColorAction extends Action implements Disposable {

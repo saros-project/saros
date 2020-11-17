@@ -19,11 +19,7 @@ import saros.ui.wizards.pages.ConfigurationSettingsWizardPage;
 import saros.ui.wizards.pages.ConfigurationSummaryWizardPage;
 import saros.ui.wizards.pages.EnterXMPPAccountWizardPage;
 
-/**
- * A wizard to configure Saros (XMPP account, network settings, statistic submission).
- *
- * @author bkahlert
- */
+/** A wizard to configure Saros (XMPP account, network settings, statistic submission). */
 public class ConfigurationWizard extends Wizard {
 
   private final EnterXMPPAccountWizardPage enterXMPPAccountWizardPage =

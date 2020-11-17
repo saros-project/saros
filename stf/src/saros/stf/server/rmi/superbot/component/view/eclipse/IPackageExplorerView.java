@@ -8,12 +8,7 @@ import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import saros.stf.server.rmi.remotebot.widget.IRemoteBotEditor;
 import saros.stf.server.rmi.superbot.component.contextmenu.peview.IContextMenusInPEView;
 
-/**
- * This interface contains methods to select treeItems in the package explorer view
- *
- * @author lchen
- * @author Stefan Rossbach
- */
+/** This interface contains methods to select treeItems in the package explorer view */
 public interface IPackageExplorerView extends Remote {
 
   public IContextMenusInPEView tree() throws RemoteException;

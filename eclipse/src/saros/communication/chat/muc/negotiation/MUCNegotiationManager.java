@@ -17,9 +17,6 @@ import saros.session.ISarosSessionManager;
 /**
  * The MUCNegotiationManager is responsible for transmitting the Communication config of the host to
  * all other participants of the session during the Invitation process.
- *
- * @author ologa
- * @author bkahlert
  */
 /*
  * FIXME This class used to transmit something, but that's not the case anymore.

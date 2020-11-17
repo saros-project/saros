@@ -11,7 +11,6 @@ import org.eclipse.ui.IWorkbenchPart;
  * given adapter type.
  *
  * @param <T> selections need to be adaptable to
- * @author bkahlert
  */
 public interface ISelectionRetriever<T> {
 

@@ -24,11 +24,7 @@ import saros.ui.widgets.chat.items.ChatLine;
 import saros.ui.widgets.chat.items.ChatLinePartnerChangeSeparator;
 import saros.ui.widgets.chat.items.ChatLineSeparator;
 
-/**
- * This control displays a chat conversation between n users
- *
- * @author bkahlert
- */
+/** This control displays a chat conversation between n users */
 public final class SkypeStyleChatDisplay extends ScrolledComposite implements IChatDisplay {
 
   private final List<IChatDisplayListener> chatDisplayListeners =

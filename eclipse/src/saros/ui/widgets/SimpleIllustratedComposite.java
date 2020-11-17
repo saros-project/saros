@@ -26,7 +26,6 @@ import saros.ui.util.FontUtils;
  * </dl>
  *
  * @see IllustratedComposite
- * @author bkahlert
  */
 public class SimpleIllustratedComposite extends IllustratedComposite {
   public static final int LABEL_STYLES = SWT.BOLD;

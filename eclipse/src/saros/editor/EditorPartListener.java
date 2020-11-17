@@ -13,8 +13,6 @@ import org.eclipse.ui.IWorkbenchPartReference;
  * on it, e.g. to update followers.
  *
  * @see EditorManager#partInputChanged(IEditorPart)
- * @author awaldmann
- * @author nwarnatsch
  */
 public final class EditorPartListener implements IPartListener2 {
 

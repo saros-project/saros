@@ -13,11 +13,7 @@ import saros.ui.util.CollaborationUtils;
 import saros.ui.views.SarosView;
 import saros.ui.wizards.pages.ResourceSelectionWizardPage;
 
-/**
- * Wizard for adding resources to a running session.
- *
- * @author bkahlert
- */
+/** Wizard for adding resources to a running session. */
 public class AddResourcesToSessionWizard extends Wizard {
   public static final String TITLE = Messages.AddResourcesToSessionWizard_title;
 

@@ -7,11 +7,7 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.Image;
 
-/**
- * Implementations of this interface are used as elements for {@link TreeContentProvider}s
- *
- * @author bkahlert
- */
+/** Implementations of this interface are used as elements for {@link TreeContentProvider}s */
 public interface ITreeElement extends IAdaptable {
 
   /** @see IStyledLabelProvider#getStyledText(Object) */

@@ -29,7 +29,6 @@ import saros.stf.server.StfRemoteObject;
 import saros.stf.server.bot.SarosSWTBotPreferences;
 import saros.stf.server.rmi.controlbot.manipulation.INetworkManipulator;
 
-/** @author Stefan Rossbach */
 public final class NetworkManipulatorImpl extends StfRemoteObject
     implements INetworkManipulator,
         IActivityConsumer,

@@ -16,8 +16,6 @@ import org.eclipse.swt.widgets.Composite;
  *   <dt><b>Events:</b>
  *   <dd>(none)
  * </dl>
- *
- * @author bkahlert
  */
 public abstract class ViewerComposite<T extends Viewer> extends Composite {
   public static final int VIEWER_STYLE =

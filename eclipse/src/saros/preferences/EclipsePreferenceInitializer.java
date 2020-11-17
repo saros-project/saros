@@ -8,11 +8,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.osgi.service.prefs.Preferences;
 import saros.Saros;
 
-/**
- * Class used to initialize default preference values.
- *
- * @author rdjemili
- */
+/** Class used to initialize default preference values. */
 public class EclipsePreferenceInitializer extends AbstractPreferenceInitializer {
 
   /*

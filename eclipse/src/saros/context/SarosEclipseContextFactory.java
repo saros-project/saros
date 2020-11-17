@@ -30,11 +30,7 @@ import saros.ui.eventhandler.UserStatusChangeHandler;
 import saros.ui.eventhandler.XMPPAuthorizationHandler;
 import saros.ui.util.XMPPConnectionSupport;
 
-/**
- * Factory used for creating the Saros context when running as Eclipse plugin.
- *
- * @author srossbach
- */
+/** Factory used for creating the Saros context when running as Eclipse plugin. */
 public class SarosEclipseContextFactory extends AbstractContextFactory {
 
   private final Saros saros;

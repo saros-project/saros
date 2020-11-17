@@ -20,8 +20,6 @@ import saros.net.xmpp.JID;
  * Abstract base class for implementing specific types of message exchanges within the Saros
  * protocol. It offers a few utility methods, as well as an interface for coordinated cancellation
  * of negotiations.
- *
- * @author srossbach
  */
 abstract class Negotiation {
 
