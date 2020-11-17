@@ -5,7 +5,7 @@
    </description>
    <!-- The "url" attribute is used to fulfill the requirements of the Eclipse PDE tooling,
         but is unused (and therefore empty).-->
-   <feature url="" id="saros.feature" version="16.0.0">
+   <feature url="" id="saros.feature" version="16.0.1">
       <category name="DPP"/>
    </feature>
    <category-def name="DPP" label="DPP"/>
