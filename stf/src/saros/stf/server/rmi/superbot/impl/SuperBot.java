@@ -56,22 +56,6 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
   }
 
   @Override
-  public void confirmShellAddProjectWithNewProject(String projectName) throws RemoteException {
-
-    SWTBot bot = new SWTBot();
-    bot.waitUntil(
-        Conditions.shellIsActive(SHELL_ADD_RESOURCES), SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
-
-    SWTBotShell shell = bot.shell(SHELL_ADD_RESOURCES);
-    shell.activate();
-
-    shell.bot().radio(RADIO_CREATE_NEW_PROJECT).click();
-    shell.bot().textWithLabel(LABEL_NEW_PROJECT_NAME, 0).setText(projectName);
-    shell.bot().button(FINISH).click();
-    shell.bot().waitUntil(Conditions.shellCloses(shell));
-  }
-
-  @Override
   public void confirmShellAddProjectUsingExistProject(String projectName) throws RemoteException {
     SWTBot bot = new SWTBot();
     bot.waitUntil(
@@ -115,23 +99,6 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
   }
 
   @Override
-  public void confirmShellAddProjectUsingExistProjectWithCopy(String projectName)
-      throws RemoteException {
-
-    SWTBot bot = new SWTBot();
-    bot.waitUntil(
-        Conditions.shellIsActive(SHELL_ADD_RESOURCES), SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
-
-    SWTBotShell shell = bot.shell(SHELL_ADD_RESOURCES);
-    shell.activate();
-
-    shell.bot().radio("Use existing project").click();
-    shell.bot().checkBox("Create copy for working distributed. New project name:").click();
-    shell.bot().button(FINISH).click();
-    shell.bot().waitUntil(Conditions.shellCloses(shell));
-  }
-
-  @Override
   public void confirmShellAddProjectUsingWhichProject(
       String projectName, TypeOfCreateProject usingWhichProject) throws RemoteException {
     SWTBot bot = new SWTBot();
@@ -142,15 +109,12 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
     shell.activate();
 
     switch (usingWhichProject) {
-      case NEW_PROJECT:
-        confirmShellAddProjectWithNewProject(projectName);
-        break;
       case EXIST_PROJECT:
         confirmShellAddProjectUsingExistProject(projectName);
         break;
-      case EXIST_PROJECT_WITH_COPY:
-        confirmShellAddProjectUsingExistProjectWithCopy(projectName);
-        break;
+      default:
+        throw new IllegalStateException(
+            "Encountered unhandled project creation type " + usingWhichProject);
     }
   }
 

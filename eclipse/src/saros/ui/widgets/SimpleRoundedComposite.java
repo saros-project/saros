@@ -19,7 +19,6 @@ import saros.ui.util.FontUtils;
  *
  * @see RoundedComposite
  * @see Composite
- * @author bkahlert
  */
 public class SimpleRoundedComposite extends RoundedComposite {
   public static final int MARGIN_WIDTH = 4;

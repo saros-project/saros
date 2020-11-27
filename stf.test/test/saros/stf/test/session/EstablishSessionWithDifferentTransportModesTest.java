@@ -13,6 +13,7 @@ import static saros.stf.shared.Constants.PREF_NODE_SAROS_NETWORK_TRANSPORT_MODE_
 import static saros.stf.shared.Constants.PREF_NODE_SAROS_NETWORK_TRANSPORT_MODE_SOCKS5_MEDIATED_CHECKBOX;
 import static saros.stf.shared.Constants.RESTORE_DEFAULTS;
 import static saros.stf.shared.Constants.SHELL_PREFERNCES;
+import static saros.stf.shared.Constants.SessionInvitationModality.SEQUENTIALLY;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -24,7 +25,6 @@ import saros.stf.client.StfTestCase;
 import saros.stf.client.tester.AbstractTester;
 import saros.stf.client.util.Util;
 import saros.stf.server.rmi.remotebot.widget.IRemoteBotShell;
-import saros.stf.shared.Constants.TypeOfCreateProject;
 
 /**
  * This test class ensures that it is possible to establish and running sessions with different
@@ -78,11 +78,8 @@ public class EstablishSessionWithDifferentTransportModesTest extends StfTestCase
   }
 
   private void simulateSession() throws Exception {
+    Util.setUpSessionWithProjectAndFile("foo", "bar.txt", "bar", SEQUENTIALLY, ALICE, BOB);
 
-    ALICE.superBot().internal().createProject("foo");
-    ALICE.superBot().internal().createFile("foo", "bar.txt", "bar");
-
-    Util.buildSessionSequentially("foo", TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
     BOB.superBot().views().packageExplorerView().waitUntilResourceIsShared("foo/bar.txt");
     BOB.superBot().views().packageExplorerView().selectFile("foo", "bar.txt").open();
     BOB.remoteBot().editor("bar.txt").typeText("foo");

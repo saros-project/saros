@@ -25,8 +25,6 @@ import saros.ui.wizards.CreateXMPPAccountWizard;
 /**
  * Allows the user to enter an XMPP account defined by a {@link JID}, a password and an optional
  * server.
- *
- * @author bkahlert
  */
 public class EnterXMPPAccountWizardPage extends WizardPage {
 

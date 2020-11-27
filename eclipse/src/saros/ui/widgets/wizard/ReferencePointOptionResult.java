@@ -2,7 +2,6 @@ package saros.ui.widgets.wizard;
 
 import static saros.ui.widgets.wizard.ReferencePointOptionComposite.LocalRepresentationOption.EXISTING_DIRECTORY;
 import static saros.ui.widgets.wizard.ReferencePointOptionComposite.LocalRepresentationOption.NEW_DIRECTORY;
-import static saros.ui.widgets.wizard.ReferencePointOptionComposite.LocalRepresentationOption.NEW_PROJECT;
 
 import java.text.MessageFormat;
 import java.util.Objects;
@@ -20,7 +19,6 @@ import saros.ui.widgets.wizard.ReferencePointOptionComposite.LocalRepresentation
 /** Data holder class for the result of a {@link ReferencePointOptionComposite}. */
 public class ReferencePointOptionResult {
   private final LocalRepresentationOption localRepresentationOption;
-  private final String newProjectName;
   private final String newDirectoryName;
   private final String newDirectoryBase;
   private final String existingDirectory;
@@ -32,14 +30,12 @@ public class ReferencePointOptionResult {
    * <code>null</code>
    *
    * @param localRepresentationOption the representation option that was chosen
-   * @param newProjectName the name of the new project to create
    * @param newDirectoryName the name of the new directory to create
    * @param newDirectoryBase the bas path of the new directory to create
    * @param existingDirectory the existing directory to use
    */
   public ReferencePointOptionResult(
       LocalRepresentationOption localRepresentationOption,
-      String newProjectName,
       String newDirectoryName,
       String newDirectoryBase,
       String existingDirectory) {
@@ -48,13 +44,6 @@ public class ReferencePointOptionResult {
         localRepresentationOption, "The given representation option must not be null");
 
     switch (localRepresentationOption) {
-      case NEW_PROJECT:
-        Objects.requireNonNull(
-            newProjectName,
-            "The new project name must not be null if the option to create a new project is chosen");
-
-        break;
-
       case NEW_DIRECTORY:
         Objects.requireNonNull(
             newDirectoryName,
@@ -79,7 +68,6 @@ public class ReferencePointOptionResult {
     }
 
     this.localRepresentationOption = localRepresentationOption;
-    this.newProjectName = newProjectName;
     this.newDirectoryName = newDirectoryName;
     this.newDirectoryBase = newDirectoryBase;
     this.existingDirectory = existingDirectory;
@@ -92,20 +80,6 @@ public class ReferencePointOptionResult {
    */
   public LocalRepresentationOption getLocalRepresentationOption() {
     return localRepresentationOption;
-  }
-
-  /**
-   * Returns the name of the new project to create as part of the resource negotiation to represent
-   * the reference point.
-   *
-   * <p>The return value is undefined if the selected local representation option is not {@link
-   * LocalRepresentationOption#NEW_PROJECT}.
-   *
-   * @return the name of the new project to create as part of the resource negotiation to represent
-   *     the reference point
-   */
-  public String getNewProjectName() {
-    return newProjectName;
   }
 
   /**
@@ -156,7 +130,6 @@ public class ReferencePointOptionResult {
    * @param referencePointName the name of the reference point the result is belongs to
    * @return the container selected in this reference point option result
    * @throws IllegalInputException if the input contained in this result is not valid
-   * @see #getNewProjectHandle(String, String)
    * @see #getNewDirectoryHandle(String, String, String)
    * @see #getExistingDirectoryHandle(String, String)
    */
@@ -165,12 +138,7 @@ public class ReferencePointOptionResult {
 
     LocalRepresentationOption localRepresentationOption = getLocalRepresentationOption();
 
-    if (localRepresentationOption == NEW_PROJECT) {
-      String newProjectName = getNewProjectName().trim();
-
-      return getNewProjectHandle(newProjectName, referencePointName);
-
-    } else if (localRepresentationOption == NEW_DIRECTORY) {
+    if (localRepresentationOption == NEW_DIRECTORY) {
       String newDirectoryName = getNewDirectoryName().trim();
       String newDirectoryBasePath = getNewDirectoryBase().trim();
 
@@ -188,47 +156,6 @@ public class ReferencePointOptionResult {
               + "': "
               + localRepresentationOption);
     }
-  }
-
-  /**
-   * Returns a handle for the new project for the given name.
-   *
-   * @param newProjectName the name for the new project
-   * @param referencePointName the name of the reference point the result is belongs to
-   * @return a handle for the new project for the given name
-   * @throws IllegalInputException if the given project name is not valid or a project with the
-   *     given name already exists
-   */
-  private IContainer getNewProjectHandle(String newProjectName, String referencePointName)
-      throws IllegalInputException {
-
-    if (newProjectName == null || newProjectName.isEmpty()) {
-      throw new IllegalInputException(
-          MessageFormat.format(
-              Messages.ReferencePointOptionResult_error_new_project_no_name, referencePointName));
-    }
-
-    IStatus status = ResourcesPlugin.getWorkspace().validateName(newProjectName, IResource.PROJECT);
-
-    if (!status.isOK()) {
-      throw new IllegalInputException(
-          MessageFormat.format(
-              Messages.ReferencePointOptionResult_error_new_project_invalid_name,
-              referencePointName,
-              status.getMessage()));
-    }
-
-    IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(newProjectName);
-
-    if (project.exists()) {
-      throw new IllegalInputException(
-          MessageFormat.format(
-              Messages.ReferencePointOptionResult_error_new_project_already_exists,
-              referencePointName,
-              newProjectName));
-    }
-
-    return project;
   }
 
   /**

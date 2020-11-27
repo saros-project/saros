@@ -161,9 +161,10 @@ public class ContactsByAliceBobTest extends StfTestCase {
         .workTogetherOn()
         .multipleProjects("Foo", BOB.getJID());
 
+    BOB.superBot().internal().createJavaProject(Constants.PROJECT1);
     BOB.superBot()
         .confirmShellSessionInvitationAndShellAddProject(
-            Constants.PROJECT1, TypeOfCreateProject.NEW_PROJECT);
+            Constants.PROJECT1, TypeOfCreateProject.EXIST_PROJECT);
 
     ALICE.superBot().views().sarosView().leaveSession();
     ALICE.superBot().views().sarosView().waitUntilIsNotInSession();

@@ -72,8 +72,6 @@ import saros.util.CoreUtils;
  *   <dt><b>Events:</b>
  *   <dd>{@link MessageEnteredEvent}
  * </dl>
- *
- * @author bkahlert
  */
 public final class ChatControl extends Composite {
 

@@ -25,10 +25,13 @@ public class InviteAndLeaveStressTest extends StfTestCase {
     for (int i = 0; i < MAX_PROJECTS; i++) {
       ALICE.superBot().internal().createProject("foo" + i);
       ALICE.superBot().internal().createFile("foo" + i, "foo.txt", "foo");
+
+      BOB.superBot().internal().createProject("foo" + i);
+      CARL.superBot().internal().createProject("foo" + i);
     }
 
     for (int i = 0; i < MAX_PROJECTS; i++) {
-      Util.buildSessionConcurrently("foo" + i, TypeOfCreateProject.NEW_PROJECT, ALICE, BOB, CARL);
+      Util.buildSessionConcurrently("foo" + i, TypeOfCreateProject.EXIST_PROJECT, ALICE, BOB, CARL);
 
       leaveSessionHostFirst(ALICE);
     }

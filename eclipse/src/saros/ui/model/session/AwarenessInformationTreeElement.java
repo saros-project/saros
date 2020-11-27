@@ -19,8 +19,6 @@ import saros.ui.model.TreeElement;
  * This is a tree element that can be displayed as a child element of the user entry in the Saros
  * session view {@link Viewer Viewers} showing information about the state of that user / his past
  * actions or whatever awareness information migh help to be more productive in a session.
- *
- * @author Alexander Waldmann (contact@net-corps.de)
  */
 public class AwarenessInformationTreeElement extends TreeElement {
 

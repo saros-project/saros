@@ -1,42 +1,33 @@
 package saros.filesystem;
 
+import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Set;
-import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.IPath;
 
 /** Utility class providing static methods to convert between Eclipse and Saros Resource objects. */
 public class ResourceConverter {
+
   /**
-   * Converts the given string into an IPath object.
+   * Returns a {@link Path} object for the given {@link IPath} object.
    *
-   * @param pathString the path string to convert
-   * @return an IPath object representing the given string path
-   * @throws NullPointerException if the given string is <code>null</code> or the path represented
-   *     by the string is absolute
+   * @param eclipsePath the Eclipse path to convert
+   * @return a {@link Path} object for the given {@link IPath} object
    */
-  public static IPath convertToPath(String pathString) {
-    Objects.requireNonNull(pathString, "Given string must not be null");
-
-    Path path = new Path(pathString);
-
-    return convertToPath(path);
+  public static Path convertToPath(IPath eclipsePath) {
+    return eclipsePath.toFile().toPath();
   }
 
   /**
-   * Returns an IPath object representing the given Eclipse delegate.
+   * Returns a {@link IPath} object for the given {@link Path} object.
    *
-   * @param eclipseDelegate the Eclipse path delegate
-   * @return an IPath object representing the given Eclipse delegate
-   * @throws NullPointerException if the given path is <code>null</code> or is absolute
+   * @param path the path to convert
+   * @return a {@link IPath} object for the given {@link Path} object
    */
-  public static IPath convertToPath(org.eclipse.core.runtime.IPath eclipseDelegate) {
-    Objects.requireNonNull(eclipseDelegate, "Given Eclipse path must not be null");
+  public static IPath convertToEclipsePath(Path path) {
+    String localPathString = path.toString();
 
-    if (eclipseDelegate.isAbsolute()) {
-      throw new IllegalArgumentException("Given path must not be absolute - " + eclipseDelegate);
-    }
-
-    return new EclipsePathImpl(eclipseDelegate);
+    return org.eclipse.core.runtime.Path.fromOSString(localPathString);
   }
 
   /**
@@ -164,21 +155,6 @@ public class ResourceConverter {
       IReferencePoint referencePoint, org.eclipse.core.resources.IContainer containerDelegate) {
 
     return (IContainer) convertToResource(referencePoint, containerDelegate);
-  }
-
-  /**
-   * Returns the Eclipse delegate represented by the given an IPath object.
-   *
-   * @param path the path whose delegate to get
-   * @return the Eclipse delegate represented by the given an IPath object
-   * @throws NullPointerException if the given path is <code>null</code>
-   */
-  public static org.eclipse.core.runtime.IPath getDelegate(IPath path) {
-    Objects.requireNonNull(path, "Given path must not be null");
-
-    EclipsePathImpl eclipsePath = (EclipsePathImpl) path;
-
-    return eclipsePath.getDelegate();
   }
 
   /**

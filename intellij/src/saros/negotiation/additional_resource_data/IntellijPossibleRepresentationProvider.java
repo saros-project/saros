@@ -12,11 +12,10 @@ import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import saros.filesystem.IPath;
 import saros.filesystem.IReferencePoint;
-import saros.intellij.filesystem.IntellijPath;
 import saros.intellij.filesystem.IntellijReferencePoint;
 import saros.negotiation.AdditionalResourceDataFactory;
+import saros.util.PathUtils;
 
 /**
  * Intellij class providing possible representations of the shared reference point by using the
@@ -66,7 +65,7 @@ public class IntellijPossibleRepresentationProvider extends AbstractPossibleRepr
       Path contentRootPath = Paths.get(contentRoot.getPath());
       Path contentRootRelativePath = contentRootPath.relativize(referencePointPath);
 
-      String portableContentRootRelativePath = makePortable(contentRootRelativePath.toString());
+      String portableContentRootRelativePath = PathUtils.toPortableString(contentRootRelativePath);
 
       possibleRepresentations.add(new ImmutablePair<>(moduleName, portableContentRootRelativePath));
 
@@ -86,19 +85,5 @@ public class IntellijPossibleRepresentationProvider extends AbstractPossibleRepr
     }
 
     return possibleRepresentations;
-  }
-
-  /**
-   * Returns a portable representation of the given path string.
-   *
-   * @param path the path to make portable
-   * @return a portable representation of the given path string
-   * @see IPath#toPortableString()
-   */
-  // TODO replace with real logic once IPath has been removed; see #797
-  private String makePortable(String path) {
-    IPath sarosPath = IntellijPath.fromString(path);
-
-    return sarosPath.toPortableString();
   }
 }

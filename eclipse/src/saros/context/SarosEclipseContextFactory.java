@@ -10,8 +10,6 @@ import saros.communication.SkypeManager;
 import saros.communication.chat.muc.negotiation.MUCNegotiationManager;
 import saros.editor.EditorManager;
 import saros.editor.IEditorManager;
-import saros.filesystem.EclipsePathFactory;
-import saros.filesystem.IPathFactory;
 import saros.monitoring.remote.EclipseRemoteProgressIndicatorFactoryImpl;
 import saros.monitoring.remote.IRemoteProgressIndicatorFactory;
 import saros.negotiation.additional_resource_data.EclipsePossibleRepresentationProvider;
@@ -32,11 +30,7 @@ import saros.ui.eventhandler.UserStatusChangeHandler;
 import saros.ui.eventhandler.XMPPAuthorizationHandler;
 import saros.ui.util.XMPPConnectionSupport;
 
-/**
- * Factory used for creating the Saros context when running as Eclipse plugin.
- *
- * @author srossbach
- */
+/** Factory used for creating the Saros context when running as Eclipse plugin. */
 public class SarosEclipseContextFactory extends AbstractContextFactory {
 
   private final Saros saros;
@@ -66,9 +60,6 @@ public class SarosEclipseContextFactory extends AbstractContextFactory {
       Component.create(XMPPAuthorizationHandler.class),
       Component.create(ConnectingFailureHandler.class),
       Component.create(IncomingFileTransferHandler.class),
-
-      // Saros Core Path Support
-      Component.create(IPathFactory.class, EclipsePathFactory.class),
 
       // SWT EDT support
       Component.create(UISynchronizer.class, EclipseSWTSynchronizer.class),

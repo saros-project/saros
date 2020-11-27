@@ -3,12 +3,7 @@ package saros.stf.server.rmi.superbot.component.view.eclipse;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-/**
- * This interface contains convenience API to perform actions inside the console view.
- *
- * @author lchen
- * @author srossbach
- */
+/** This interface contains convenience API to perform actions inside the console view. */
 public interface IConsoleView extends Remote {
 
   /**

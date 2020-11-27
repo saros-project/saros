@@ -21,8 +21,6 @@ import saros.net.xmpp.contact.XMPPContact;
  * <p><b>IMPORTANT:</b> If you update this class, please also update the extension <code>
  * org.eclipse.core.runtime.adapters</code> in <code>plugin.xml</code>!<br>
  * Eclipse needs to know which object can be adapted to which type.
- *
- * @author bkahlert
  */
 public class RosterAdapterFactory implements IAdapterFactory {
 

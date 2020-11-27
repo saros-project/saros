@@ -3,6 +3,7 @@ package saros.stf.test.followmode;
 import static org.junit.Assert.assertEquals;
 import static saros.stf.client.tester.SarosTester.ALICE;
 import static saros.stf.client.tester.SarosTester.BOB;
+import static saros.stf.shared.Constants.SessionInvitationModality.CONCURRENTLY;
 
 import java.util.List;
 import org.eclipse.jface.bindings.keys.IKeyLookup;
@@ -28,7 +29,7 @@ public class SimpleFollowModeITest extends StfTestCase {
   @Category(FlakyTests.class)
   @Test
   public void testSimpleFollowMode() throws Exception {
-    Util.setUpSessionWithProjectAndFile("foo", "readme.txt", fileContent, ALICE, BOB);
+    Util.setUpSessionWithProjectAndFile("foo", "readme.txt", fileContent, CONCURRENTLY, ALICE, BOB);
 
     BOB.superBot().views().packageExplorerView().waitUntilResourceIsShared("foo/readme.txt");
 

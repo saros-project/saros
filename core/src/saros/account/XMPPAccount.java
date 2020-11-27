@@ -2,12 +2,7 @@ package saros.account;
 
 import java.io.Serializable;
 
-/**
- * Representation of an XMPP account.
- *
- * @author Sebastian Schlaak
- * @author Stefan Rossbach
- */
+/** Representation of an XMPP account. */
 public final class XMPPAccount implements Serializable {
 
   private static final long serialVersionUID = 1L;

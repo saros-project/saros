@@ -27,10 +27,6 @@ import saros.ui.widgets.ColorChooser.ColorSelectionListener;
  * This class is responsible for allowing the user to select his / her favorite color that should be
  * used (if available) when starting or joining a Saros session and for allowing the user to choose
  * the visible annotations.
- *
- * @author Maria Spiering
- * @author Stefan Rossbach
- * @author Vera Schlemm
  */
 @Component(module = "prefs")
 public final class PersonalizationPreferencePage extends PreferencePage

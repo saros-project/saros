@@ -4,11 +4,7 @@
  */
 package saros.observables;
 
-/**
- * Listener interface for listening to changes of a {@link ObservableValue}.
- *
- * @author oezbek
- */
+/** Listener interface for listening to changes of a {@link ObservableValue}. */
 public interface ValueChangeListener<T> {
 
   /**

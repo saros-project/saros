@@ -22,6 +22,20 @@ Find latest release in [GitHub](https://github.com/saros-project/saros/releases)
 
 You can install the plugin through the JetBrains plugin repository. This requires the `alpha` release channel. More information can be found [here](../documentation/installation.html?tab=intellij#from-the-plugin-repository).
 
-## IntelliJ (and [IntelliJ platform based IDEs](https://www.jetbrains.org/intellij/sdk/docs/intro/intellij_platform.html#ides-based-on-the-intellij-platform)) Zip
+## IntelliJ (and [IntelliJ-platform-based IDEs](https://www.jetbrains.org/intellij/sdk/docs/intro/intellij_platform.html#ides-based-on-the-intellij-platform)) Zip
 
 Find latest release in [GitHub](https://github.com/saros-project/saros/releases)
+
+
+## Development Builds
+
+For every push to the `master` branch, a development build is created and released as part of a [GitHub action](https://github.com/saros-project/saros/actions?query=workflow%3ABuild+branch%3Amaster+is%3Asuccess+event%3Apush).
+These development builds are kept for 90 days after the action was run.
+
+{% alert warning %}
+
+### Note
+
+There is no guarantee that such development builds are stable or function correctly.
+
+{% endalert %}

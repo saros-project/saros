@@ -1,8 +1,15 @@
 package saros.versioning;
 
+import static saros.versioning.Compatibility.NEWER;
+import static saros.versioning.Compatibility.OK;
+import static saros.versioning.Compatibility.OLDER;
+import static saros.versioning.Compatibility.QUALIFIER_MISMATCH;
+import static saros.versioning.Compatibility.UNKNOWN;
+
+import java.util.Objects;
 import java.util.StringTokenizer;
 
-public class Version implements Comparable<Version> {
+public class Version {
 
   /** Unique version instance representing an invalid version. */
   public static final Version INVALID = new Version(0, 0, 0, "invalid");
@@ -20,8 +27,7 @@ public class Version implements Comparable<Version> {
   private final String asString;
 
   private Version(final int major, final int minor, final int micro, final String qualifier) {
-
-    if (major < 0 || minor < 0 || micro < 0)
+    if (major < 0 || minor < 0 || micro < 0) {
       throw new IllegalArgumentException(
           "version contains negative numbers major: "
               + major
@@ -29,6 +35,7 @@ public class Version implements Comparable<Version> {
               + minor
               + " micro: "
               + micro);
+    }
 
     this.major = major;
     this.minor = minor;
@@ -58,22 +65,21 @@ public class Version implements Comparable<Version> {
    * @return a Version object representing the version identifier
    */
   public static Version parseVersion(String version) {
-    if (version == null) throw new NullPointerException("version is null");
+    Objects.requireNonNull(version, "Version must not be null");
 
-    version = version.trim();
+    String trimmedVersion = version.trim();
 
-    int major = 0;
+    if (trimmedVersion.isEmpty()) return INVALID;
+
+    int major;
     int minor = 0;
     int micro = 0;
     String qualifier = "";
 
-    if (version.isEmpty()) return INVALID;
-
-    StringTokenizer tokenizer = new StringTokenizer(version, SEPARATOR, true);
+    StringTokenizer tokenizer = new StringTokenizer(trimmedVersion, SEPARATOR, true);
 
     parse:
     try {
-
       major = Integer.parseInt(tokenizer.nextToken());
 
       if (!tokenizer.hasMoreTokens()) break parse;
@@ -95,19 +101,65 @@ public class Version implements Comparable<Version> {
       return INVALID;
     }
 
-    if (major < 0 || minor < 0 || micro < 0) return INVALID;
+    if (major < 0 || minor < 0 || micro < 0) {
+      return INVALID;
+    }
 
     return new Version(major, minor, micro, qualifier);
   }
 
+  /**
+   * Returns the compatibility result from comparing this version to the given version.
+   *
+   * <p>For determining compatibility, only the major and minor version numbers are checked if no
+   * qualifier is given for both versions. Differences in micro version number are always seen as
+   * compatible in such cases.
+   *
+   * <p>If at least one of the compared versions contains a qualifier, the two versions have to
+   * match completely (including the micro version number and the qualifier) to be seen as
+   * compatible.
+   *
+   * @param other the version to compare against
+   * @return the compatibility result from comparing this version to the given version
+   */
+  Compatibility determineCompatibilityWith(Version other) {
+    if (!this.qualifier.isEmpty() || !other.qualifier.isEmpty()) {
+      return this.equals(other) ? OK : QUALIFIER_MISMATCH;
+    }
+
+    int result;
+
+    result = major - other.major;
+
+    if (result != 0) {
+      return valueOf(result);
+    }
+
+    result = minor - other.minor;
+
+    return valueOf(result);
+  }
+
+  /**
+   * Given a result from a numerical comparison of a version number will return the associated
+   * Compatibility object.
+   */
+  private static Compatibility valueOf(int comparison) {
+    switch (Integer.signum(comparison)) {
+      case -1:
+        return OLDER;
+      case 0:
+        return OK;
+      case 1:
+        return NEWER;
+      default:
+        return UNKNOWN;
+    }
+  }
+
   @Override
   public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + major;
-    result = prime * result + micro;
-    result = prime * result + minor;
-    return result;
+    return Objects.hash(major, minor, micro, qualifier);
   }
 
   @Override
@@ -117,21 +169,10 @@ public class Version implements Comparable<Version> {
     if (getClass() != obj.getClass()) return false;
     Version other = (Version) obj;
 
-    return this.compareTo(other) == 0;
-  }
-
-  @Override
-  public int compareTo(Version other) {
-
-    int result;
-
-    result = major - other.major;
-
-    if (result != 0) return result;
-
-    result = minor - other.minor;
-
-    return result;
+    return this.major == other.major
+        && this.minor == other.minor
+        && this.micro == other.micro
+        && Objects.equals(this.qualifier, other.qualifier);
   }
 
   @Override

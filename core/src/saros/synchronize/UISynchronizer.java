@@ -3,8 +3,6 @@ package saros.synchronize;
 /**
  * Abstraction layer to the underlying UI event loop in terms of the platform event model. Should
  * only be used in non-UI components.
- *
- * @author Stefan Rossbach
  */
 public interface UISynchronizer {
 

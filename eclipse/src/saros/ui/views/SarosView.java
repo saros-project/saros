@@ -104,11 +104,7 @@ import saros.util.CoreUtils;
  * mechanics, leaving us to fill in the missing parts specific to our view.
  */
 
-/**
- * This view displays the contact list, the Saros Session and Saros Chat.
- *
- * @author patbit
- */
+/** This view displays the contact list, the Saros Session and Saros Chat. */
 @Component(module = "ui")
 public class SarosView extends ViewPart {
 

@@ -10,19 +10,9 @@ public interface Constants {
     CONCURRENTLY
   }
 
-  /**
-   * Defines how the shared project is represented on the invitee's side.
-   *
-   * <p><b>Note:</b> Using creation type {@link TypeOfCreateProject#NEW_PROJECT} does not enforce
-   * that the project nature on the inviter's side is correctly applied on the invitee's side. As a
-   * result, it is only supported for cases where the project nature is not of interest. In cases
-   * where the same project nature is necessary on all sides (e.g. if Java language support is
-   * needed), please use {@link TypeOfCreateProject#EXIST_PROJECT} instead.
-   */
+  /** Defines how the shared project is represented on the invitee's side. */
   enum TypeOfCreateProject {
-    NEW_PROJECT,
-    EXIST_PROJECT,
-    EXIST_PROJECT_WITH_COPY
+    EXIST_PROJECT
   }
 
   enum TypeOfShareProject {
@@ -384,7 +374,6 @@ public interface Constants {
    * ********************************************
    */
 
-  int CREATE_NEW_PROJECT = 1;
   int USE_EXISTING_PROJECT = 2;
   int USE_EXISTING_PROJECT_WITH_CANCEL_LOCAL_CHANGE = 3;
   int USE_EXISTING_PROJECT_WITH_COPY = 4;
@@ -411,8 +400,6 @@ public interface Constants {
    * second page of the wizard "Session invitation"
    */
   String RADIO_USING_EXISTING_DIRECTORY = get("radio_use_existing_directory");
-  String RADIO_CREATE_NEW_PROJECT = get("radio_create_new_project");
-  String LABEL_NEW_PROJECT_NAME = get("label_new_project_name");
   String LABEL_EXISTING_DIRECTORY_PATH = get("label_existing_directory_path");
 
   /* *********************************************

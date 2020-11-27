@@ -10,13 +10,13 @@ import static saros.server.filesystem.FileSystemTestUtils.createWorkspaceFolder;
 import static saros.server.filesystem.FileSystemTestUtils.path;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMockSupport;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import saros.filesystem.IFolder;
-import saros.filesystem.IPath;
 import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 
@@ -24,7 +24,7 @@ public class ServerResourceImplTest extends EasyMockSupport {
 
   private static class ExampleResource extends ServerResourceImpl {
 
-    public ExampleResource(IPath path, ServerWorkspaceImpl workspace) {
+    public ExampleResource(Path path, ServerWorkspaceImpl workspace) {
       super(workspace, path);
     }
 
@@ -78,7 +78,7 @@ public class ServerResourceImplTest extends EasyMockSupport {
   @Test
   public void getLocation() {
     assertEquals(
-        workspace.getLocation().append("project/folder/file"),
+        workspace.getLocation().resolve("project/folder/file"),
         ((ServerResourceImpl) resource).getLocation());
   }
 

@@ -11,6 +11,7 @@ import static saros.server.filesystem.FileSystemTestUtils.createWorkspaceFolder;
 import static saros.server.filesystem.FileSystemTestUtils.path;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
 import org.apache.commons.io.FileUtils;
@@ -20,7 +21,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.Test.None;
 import saros.filesystem.IContainer;
-import saros.filesystem.IPath;
 import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 
@@ -28,7 +28,7 @@ public class ServerContainerImplTest extends EasyMockSupport {
 
   private static class ExampleContainer extends ServerContainerImpl {
 
-    public ExampleContainer(IPath path, ServerWorkspaceImpl workspace) {
+    public ExampleContainer(Path path, ServerWorkspaceImpl workspace) {
       super(workspace, path);
     }
 

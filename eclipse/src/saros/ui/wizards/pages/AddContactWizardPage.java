@@ -33,7 +33,6 @@ import saros.ui.widgets.decoration.JIDCombo;
  *
  * @see <a href="http://wiki.eclipse.org/User_Interface_Guidelines#Wizards">Eclipse User Interface
  *     Guidelines</a>
- * @author bkahlert
  */
 public class AddContactWizardPage extends WizardPage {
   public static final String TITLE = "Add Contact";

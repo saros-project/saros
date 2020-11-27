@@ -21,11 +21,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 
-/**
- * This class contains static utility methods for file handling.
- *
- * @author orieger/chjacob
- */
+/** This class contains static utility methods for file handling. */
 public class FileUtils {
 
   private static Logger log = Logger.getLogger(FileUtils.class);

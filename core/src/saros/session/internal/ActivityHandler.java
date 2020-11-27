@@ -28,8 +28,6 @@ import saros.util.ThreadUtils;
  * with the {@link ConcurrentDocumentServer} and {@link ConcurrentDocumentClient}. The sending and
  * executing of activities <b>must</b> be done in {@linkplain IActivityHandlerCallback callback} as
  * it is <b>not</b> performed by this handler !
- *
- * @author Stefan Rossbach
  */
 public final class ActivityHandler implements Startable {
 

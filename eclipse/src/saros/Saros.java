@@ -22,12 +22,7 @@ import org.osgi.service.prefs.Preferences;
 import saros.annotations.Component;
 import saros.util.ThreadUtils;
 
-/**
- * The main plug-in of Saros.
- *
- * @author rdjemili
- * @author coezbek
- */
+/** The main plug-in of Saros. */
 @Component(module = "core")
 public class Saros extends AbstractUIPlugin {
 

@@ -42,7 +42,6 @@ import saros.context.IContainerContext;
 import saros.context.IContextKeyBindings;
 import saros.context.SarosEclipseSessionContextFactory;
 import saros.editor.EditorManager;
-import saros.filesystem.IPathFactory;
 import saros.net.IConnectionManager;
 import saros.net.IReceiver;
 import saros.net.ITransmitter;
@@ -265,7 +264,6 @@ public class SarosSessionTest {
 
     container.addComponent(EditorManager.class, EditorManagerMock.createMock(editorListeners));
 
-    addMockedComponent(IPathFactory.class);
     addMockedComponent(ISarosSessionManager.class);
 
     container.start();

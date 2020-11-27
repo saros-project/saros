@@ -1,25 +1,28 @@
 package saros.filesystem;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.OperationCanceledException;
+import saros.util.PathUtils;
 
 /** Eclipse implementation of the Saros folder interface. */
 public class EclipseFolder extends AbstractEclipseResource implements IFolder {
 
-  /** @see AbstractEclipseResource#AbstractEclipseResource(EclipseReferencePoint, IPath) */
-  EclipseFolder(EclipseReferencePoint referencePoint, IPath relativePath) {
+  /** @see AbstractEclipseResource#AbstractEclipseResource(EclipseReferencePoint, Path) */
+  EclipseFolder(EclipseReferencePoint referencePoint, Path relativePath) {
     super(referencePoint, relativePath);
   }
 
   @Override
-  public boolean exists(IPath path) {
+  public boolean exists(Path path) {
     Objects.requireNonNull(path, "Given path must not be null");
 
-    return getDelegate().exists(((EclipsePathImpl) path).getDelegate());
+    return getDelegate().exists(ResourceConverter.convertToEclipsePath(path));
   }
 
   @Override
@@ -38,7 +41,7 @@ public class EclipseFolder extends AbstractEclipseResource implements IFolder {
     for (org.eclipse.core.resources.IResource containedResource : containedResources) {
       String name = containedResource.getName();
 
-      IPath childPath = relativePath.append(name);
+      Path childPath = relativePath.resolve(name);
 
       if (containedResource.getType() == org.eclipse.core.resources.IResource.FILE) {
         result.add(new EclipseFile(referencePoint, childPath));
@@ -57,36 +60,36 @@ public class EclipseFolder extends AbstractEclipseResource implements IFolder {
 
   @Override
   public IFile getFile(String pathString) {
-    return getFile(ResourceConverter.convertToPath(pathString));
+    return getFile(Paths.get(pathString));
   }
 
   @Override
-  public IFile getFile(IPath path) {
+  public IFile getFile(Path path) {
     Objects.requireNonNull(path, "Given path must not be null");
 
-    if (path.segmentCount() == 0) {
+    if (PathUtils.isEmpty(path)) {
       throw new IllegalArgumentException("Can not create file handle for an empty path");
     }
 
-    IPath referencePointRelativeChildPath = relativePath.append(path);
+    Path referencePointRelativeChildPath = relativePath.resolve(path);
 
     return new EclipseFile(referencePoint, referencePointRelativeChildPath);
   }
 
   @Override
   public IFolder getFolder(String pathString) {
-    return getFolder(ResourceConverter.convertToPath(pathString));
+    return getFolder(Paths.get(pathString));
   }
 
   @Override
-  public IFolder getFolder(IPath path) {
+  public IFolder getFolder(Path path) {
     Objects.requireNonNull(path, "Given path must not be null");
 
-    if (path.segmentCount() == 0) {
+    if (PathUtils.isEmpty(path)) {
       throw new IllegalArgumentException("Can not create folder handle for an empty path");
     }
 
-    IPath referencePointRelativeChildPath = relativePath.append(path);
+    Path referencePointRelativeChildPath = relativePath.resolve(path);
 
     return new EclipseFolder(referencePoint, referencePointRelativeChildPath);
   }

@@ -5,7 +5,6 @@ import java.util.HashMap;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.StorageException;
 
-/** @author Stefan Rossbach */
 public class MemorySecurePreferences implements ISecurePreferences {
 
   private HashMap<String, Object> preferences = new HashMap<String, Object>();

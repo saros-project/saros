@@ -14,8 +14,6 @@ import saros.concurrent.jupiter.test.util.ServerSynchronizedDocument;
  * Correctness of Transformation Functions in Real-Time Groupware"
  *
  * <p>TODO Setup of all three methods looks very similar -> refactor.
- *
- * @author orieger
  */
 public class CounterExampleTest extends JupiterTestCase {
 

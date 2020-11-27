@@ -10,11 +10,7 @@ import saros.ui.ImageManager;
 import saros.ui.Messages;
 import saros.ui.wizards.pages.EnterXMPPAccountWizardPage;
 
-/**
- * A wizard that allows to enter an existing {@link XMPPAccount} or to create new one.
- *
- * @author bkahlert
- */
+/** A wizard that allows to enter an existing {@link XMPPAccount} or to create new one. */
 public final class AddXMPPAccountWizard extends Wizard {
 
   @Inject private XMPPAccountStore accountStore;

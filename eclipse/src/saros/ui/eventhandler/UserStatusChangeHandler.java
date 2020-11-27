@@ -13,8 +13,6 @@ import saros.util.CoreUtils;
 /**
  * Simple handler that informs the local user of the status changes for users in the current
  * session.
- *
- * @author srossbach
  */
 public class UserStatusChangeHandler {
 

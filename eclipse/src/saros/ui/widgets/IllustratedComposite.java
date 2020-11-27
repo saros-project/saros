@@ -26,7 +26,6 @@ import org.eclipse.swt.widgets.ScrollBar;
  * are constructed from aggregates of other controls.
  *
  * @see Composite
- * @author bkahlert
  */
 public class IllustratedComposite extends MinSizeComposite {
   public static final int STYLES = SWT.TOP | SWT.CENTER | SWT.BOTTOM;

@@ -26,12 +26,7 @@ import saros.preferences.Preferences;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.ui.Messages;
 
-/**
- * Allows the user to create an XMPP account.
- *
- * @author bkahlert
- * @author Stefan Rossbach
- */
+/** Allows the user to create an XMPP account. */
 public class CreateXMPPAccountWizardPage extends WizardPage {
 
   public static final String TITLE = Messages.CreateXMPPAccountWizardPage_title;

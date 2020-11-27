@@ -8,20 +8,20 @@ import static saros.server.filesystem.FileSystemTestUtils.createFolder;
 import static saros.server.filesystem.FileSystemTestUtils.createWorkspaceFolder;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMockSupport;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import saros.exceptions.OperationCanceledException;
-import saros.filesystem.IPath;
 import saros.filesystem.IReferencePoint;
 import saros.filesystem.IWorkspaceRunnable;
 import saros.monitoring.IProgressMonitor;
 
 public class ServerWorkspaceImplTest extends EasyMockSupport {
 
-  private IPath workspaceLocation;
+  private Path workspaceLocation;
   private ServerWorkspaceImpl workspace;
 
   @Before

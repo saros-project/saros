@@ -1,21 +1,3 @@
-/*
- * DPP - Serious Distributed Pair Programming (c) Freie Universität Berlin -
- * Fachbereich Mathematik und Informatik - 2006 (c) Riad Djemili - 2006
- *
- * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation; either version 1, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- *
- * You should have received a copy of the GNU General Public License along with
- * this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- * Ave, Cambridge, MA 02139, USA.
- */
-
 package saros.net;
 
 import java.io.IOException;
@@ -28,8 +10,6 @@ import saros.net.xmpp.JID;
  * A humble interface that is responsible for network functionality. The idea behind this interface
  * is to only encapsulates the least possible amount of functionality - the one that can't be easily
  * tested.
- *
- * @author rdjemili
  */
 @Component(module = "net")
 public interface ITransmitter {

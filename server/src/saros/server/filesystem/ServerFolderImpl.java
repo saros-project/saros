@@ -5,9 +5,9 @@ import static saros.filesystem.IResource.Type.FOLDER;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import saros.filesystem.IFolder;
-import saros.filesystem.IPath;
 
 /** Server implementation of the {@link IFolder} interface. */
 public class ServerFolderImpl extends ServerContainerImpl implements IFolder {
@@ -18,7 +18,7 @@ public class ServerFolderImpl extends ServerContainerImpl implements IFolder {
    * @param workspace the containing workspace
    * @param path the folder's path relative to the workspace's root
    */
-  public ServerFolderImpl(ServerWorkspaceImpl workspace, IPath path) {
+  public ServerFolderImpl(ServerWorkspaceImpl workspace, Path path) {
     super(workspace, path);
   }
 
@@ -30,7 +30,7 @@ public class ServerFolderImpl extends ServerContainerImpl implements IFolder {
   @Override
   public void create() throws IOException {
     try {
-      Files.createDirectory(toNioPath());
+      Files.createDirectory(getLocation());
     } catch (FileAlreadyExistsException e) {
       /*
        * That the resource already exists is only a problem for us if it's

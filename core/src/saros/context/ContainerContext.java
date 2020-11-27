@@ -56,9 +56,6 @@ import saros.repackaged.picocontainer.injectors.Reinjector;
  *
  * <p><b>Restriction:</b> Instantiating the context <b>multiple</b> times is only allowed by using
  * different class loaders !
- *
- * @author pcordes
- * @author srossbach
  */
 public class ContainerContext implements IContainerContext {
 

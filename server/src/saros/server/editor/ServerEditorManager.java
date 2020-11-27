@@ -165,7 +165,7 @@ public class ServerEditorManager implements IEditorManager {
       for (IFile file : keys) {
         ServerFileImpl serverFile = (ServerFileImpl) file;
 
-        if (serverFolder.getFullPath().isPrefixOf(serverFile.getFullPath())) {
+        if (serverFile.getFullPath().startsWith(serverFolder.getFullPath())) {
           invalidKeys.add(file);
         }
       }

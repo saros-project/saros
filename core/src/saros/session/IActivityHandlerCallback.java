@@ -8,8 +8,6 @@ import saros.session.internal.ActivityHandler;
  * Callback interface used by the {@link ActivityHandler} to notify the logic that an activity can
  * now be sent or executed. The implementing class is responsible for proper thread synchronization
  * as the callback methods may be called by multiple threads simultaneously.
- *
- * @author Stefan Rossbach
  */
 public interface IActivityHandlerCallback {
 

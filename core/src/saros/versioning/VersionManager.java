@@ -10,7 +10,7 @@ import saros.net.xmpp.contact.XMPPContact;
 /**
  * Component for figuring out whether two Saros plug-in instances with known Version are compatible.
  *
- * <p>This class compares if local and remote version (not checking qualifier) are the same.
+ * @see Version#determineCompatibilityWith(Version)
  */
 @Component(module = "core")
 public class VersionManager {
@@ -28,8 +28,10 @@ public class VersionManager {
 
   public VersionManager(@SarosVersion String version, InfoManager infoManager) {
     this.localVersion = Version.parseVersion(version);
-    if (this.localVersion == Version.INVALID)
+
+    if (this.localVersion == Version.INVALID) {
       throw new IllegalArgumentException("version string is malformed: " + version);
+    }
 
     this.infoManager = infoManager;
     infoManager.setLocalInfo(VERSION_KEY, localVersion.toString());
@@ -45,27 +47,19 @@ public class VersionManager {
     Objects.requireNonNull(contact, "contact is needed");
 
     String versionString = infoManager.getRemoteInfo(contact, VERSION_KEY).orElse(null);
+
     if (versionString == null) {
       log.warn("remote version not found for: " + contact);
       return new VersionCompatibilityResult(Compatibility.UNKNOWN, localVersion, Version.INVALID);
     }
 
     Version remoteVersion = Version.parseVersion(versionString);
+
     if (remoteVersion == Version.INVALID) {
       log.warn("contact: " + contact + ", remote version string is invalid: " + versionString);
     }
 
-    Compatibility compatibility = determineCompatibility(localVersion, remoteVersion);
+    Compatibility compatibility = localVersion.determineCompatibilityWith(remoteVersion);
     return new VersionCompatibilityResult(compatibility, localVersion, remoteVersion);
-  }
-
-  /**
-   * Compares the two given versions for compatibility. The result indicates whether the local
-   * version is compatible with the remote version.
-   */
-  private Compatibility determineCompatibility(Version localVersion, Version remoteVersion) {
-    Compatibility compatibility = Compatibility.valueOf(localVersion.compareTo(remoteVersion));
-
-    return compatibility;
   }
 }

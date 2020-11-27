@@ -21,9 +21,6 @@ import saros.net.xmpp.XMPPConnectionService;
  * This is class is responsible for handling XMPP subscriptions requests.
  *
  * <p>See also XMPP RFC 3921: http://xmpp.org/rfcs/rfc3921.html
- *
- * @author chjacob
- * @author bkahlert
  */
 @Component(module = "net")
 public class SubscriptionHandler {

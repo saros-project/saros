@@ -32,8 +32,6 @@ import saros.util.ThreadUtils;
  *
  * <p>TODO Create a separate Wizard class with the following concerns implemented more nicely:
  * Long-Running Operation after each step, cancellation by a remote party, auto-advance.
- *
- * @author rdjemili
  */
 public class JoinSessionWizard extends Wizard {
 

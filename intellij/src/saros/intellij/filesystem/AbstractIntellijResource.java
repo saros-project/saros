@@ -3,13 +3,14 @@ package saros.intellij.filesystem;
 import static saros.filesystem.IResource.Type.FOLDER;
 
 import com.intellij.openapi.vfs.VirtualFile;
+import java.nio.file.Path;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import saros.filesystem.IContainer;
-import saros.filesystem.IPath;
 import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.intellij.editor.ProjectAPI;
+import saros.util.PathUtils;
 
 /** Abstract Intellij implementation of the Saros resource interface. */
 public abstract class AbstractIntellijResource implements IResource {
@@ -18,7 +19,7 @@ public abstract class AbstractIntellijResource implements IResource {
   protected final IntellijReferencePoint referencePoint;
 
   /** Relative path from the given reference point. */
-  protected final IPath relativePath;
+  protected final Path relativePath;
 
   /**
    * Instantiates an Intellij resource object.
@@ -28,9 +29,9 @@ public abstract class AbstractIntellijResource implements IResource {
    * @throws IllegalArgumentException if the given path is absolute or empty
    */
   public AbstractIntellijResource(
-      @NotNull IntellijReferencePoint referencePoint, @NotNull IPath relativePath) {
+      @NotNull IntellijReferencePoint referencePoint, @NotNull Path relativePath) {
 
-    if (relativePath.segmentCount() == 0) {
+    if (PathUtils.isEmpty(relativePath)) {
       throw new IllegalArgumentException("Given path must not be empty");
     }
     if (relativePath.isAbsolute()) {
@@ -38,7 +39,7 @@ public abstract class AbstractIntellijResource implements IResource {
     }
 
     this.referencePoint = referencePoint;
-    this.relativePath = relativePath;
+    this.relativePath = PathUtils.normalize(relativePath);
   }
 
   /**
@@ -55,17 +56,17 @@ public abstract class AbstractIntellijResource implements IResource {
   @Override
   @NotNull
   public String getName() {
-    return relativePath.lastSegment();
+    return relativePath.getFileName().toString();
   }
 
   @Override
   @NotNull
   public IContainer getParent() {
-    if (relativePath.segmentCount() <= 1) {
+    if (relativePath.getNameCount() <= 1) {
       return referencePoint;
     }
 
-    return new IntellijFolder(referencePoint, relativePath.removeLastSegments(1));
+    return new IntellijFolder(referencePoint, PathUtils.removeLastSegments(relativePath, 1));
   }
 
   @Override
@@ -76,7 +77,7 @@ public abstract class AbstractIntellijResource implements IResource {
 
   @Override
   @NotNull
-  public IPath getReferencePointRelativePath() {
+  public Path getReferencePointRelativePath() {
     return relativePath;
   }
 
@@ -91,7 +92,7 @@ public abstract class AbstractIntellijResource implements IResource {
    * @return whether this resource is part of the git configuration directory
    */
   private boolean isGitConfig() {
-    String path = relativePath.toPortableString();
+    String path = PathUtils.toPortableString(relativePath);
 
     return (path.startsWith(".git/")
         || path.contains("/.git/")

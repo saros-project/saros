@@ -40,8 +40,6 @@ import saros.stf.server.StfRemoteObject;
  * </pre>
  *
  * For more information on how to write STF-Tests please read the user guide.
- *
- * @author lchen
  */
 public interface IShareWithC extends Remote {
 

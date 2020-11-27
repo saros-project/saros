@@ -5,25 +5,25 @@ import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+import java.nio.file.Path;
 import org.apache.log4j.Logger;
 import saros.activities.ResourceTransportWrapper;
 import saros.annotations.Component;
 import saros.communication.extensions.ActivitiesExtension;
 import saros.filesystem.IFile;
-import saros.filesystem.IPath;
-import saros.filesystem.IPathFactory;
 import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.filesystem.IResource.Type;
 import saros.repackaged.picocontainer.Startable;
 import saros.session.ISarosSession;
+import saros.util.PathUtils;
 
 /**
  * Converts session- and IDE-dependent IResource objects to a session- and IDE-independent XML
  * representation and vice versa.
  *
  * <p><b>Example:</b> The XML representation of an {@link IFile} belonging to a {@linkplain
- * IReferencePoint reference point} with the id <code>"ABC"</code> and having the {@linkplain IPath
+ * IReferencePoint reference point} with the id <code>"ABC"</code> and having the {@linkplain Path
  * reference-point-relative path} <code>"src/Main.java"</code> is:
  *
  * <pre>
@@ -40,11 +40,9 @@ public class ResourceTransportWrapperConverter implements Converter, Startable {
   private static final String TYPE = "t";
 
   private final ISarosSession session;
-  private final IPathFactory pathFactory;
 
-  public ResourceTransportWrapperConverter(ISarosSession session, IPathFactory pathFactory) {
+  public ResourceTransportWrapperConverter(ISarosSession session) {
     this.session = session;
-    this.pathFactory = pathFactory;
   }
 
   @Override
@@ -78,8 +76,8 @@ public class ResourceTransportWrapperConverter implements Converter, Startable {
       return;
     }
 
-    // TODO use IPath.toPortableString() instead?
-    String p = URLCodec.encode(pathFactory.fromPath(resource.getReferencePointRelativePath()));
+    String p =
+        URLCodec.encode(PathUtils.toPortableString(resource.getReferencePointRelativePath()));
 
     Type type = resource.getType();
 
@@ -111,7 +109,7 @@ public class ResourceTransportWrapperConverter implements Converter, Startable {
       return null;
     }
 
-    IPath path = pathFactory.fromString(p);
+    Path path = PathUtils.fromPortableString(p);
 
     Type type = Type.valueOf(t);
 

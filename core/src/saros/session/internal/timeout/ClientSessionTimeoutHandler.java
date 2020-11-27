@@ -13,11 +13,7 @@ import saros.session.ISarosSessionManager;
 import saros.session.internal.ActivitySequencer;
 import saros.util.ThreadUtils;
 
-/**
- * Component for detecting network errors on the client side of a session.
- *
- * @author srossbach
- */
+/** Component for detecting network errors on the client side of a session. */
 public final class ClientSessionTimeoutHandler extends SessionTimeoutHandler {
 
   private static final Logger log = Logger.getLogger(ClientSessionTimeoutHandler.class);

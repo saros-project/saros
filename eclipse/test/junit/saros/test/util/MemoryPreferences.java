@@ -4,7 +4,6 @@ import java.util.HashMap;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
-/** @author Stefan Rossbach */
 public class MemoryPreferences implements Preferences {
 
   private HashMap<String, Object> preferences = new HashMap<String, Object>();

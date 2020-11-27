@@ -23,9 +23,6 @@ import saros.net.xmpp.JID;
  * Handles the {@link ChatState} of a particular {@link MultiUserChat} and the propagation of
  * incoming {@link ChatState} changes. This class manages both the packet extensions and the
  * response necessary for compliance with XEP-0085.
- *
- * @author mariaspg
- * @author bkahlert
  */
 class MultiUserChatStateManager {
   private static final Logger log = Logger.getLogger(MultiUserChatStateManager.class);

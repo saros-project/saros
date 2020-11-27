@@ -3,9 +3,9 @@ package saros.server.filesystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import saros.filesystem.IContainer;
-import saros.filesystem.IPath;
 import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
+import saros.util.PathUtils;
 
 /**
  * Server implementation of the {@link IResource} interface. It represents each resource directly as
@@ -14,7 +14,7 @@ import saros.filesystem.IResource;
 public abstract class ServerResourceImpl implements IResource {
 
   private ServerWorkspaceImpl workspace;
-  private IPath path;
+  private Path path;
 
   /**
    * Creates a ServerResourceImpl.
@@ -22,8 +22,8 @@ public abstract class ServerResourceImpl implements IResource {
    * @param workspace the containing workspace
    * @param path the resource's path relative to the workspace's root
    */
-  public ServerResourceImpl(ServerWorkspaceImpl workspace, IPath path) {
-    this.path = path;
+  public ServerResourceImpl(ServerWorkspaceImpl workspace, Path path) {
+    this.path = PathUtils.normalize(path);
     this.workspace = workspace;
   }
 
@@ -36,40 +36,40 @@ public abstract class ServerResourceImpl implements IResource {
     return workspace;
   }
 
-  public IPath getFullPath() {
+  public Path getFullPath() {
     return path;
   }
 
   @Override
-  public IPath getReferencePointRelativePath() {
-    return getFullPath().removeFirstSegments(1);
+  public Path getReferencePointRelativePath() {
+    return PathUtils.removeFirstSegments(getFullPath(), 1);
   }
 
   @Override
   public String getName() {
-    return getFullPath().lastSegment();
+    return getFullPath().getFileName().toString();
   }
 
-  public IPath getLocation() {
-    return workspace.getLocation().append(path);
+  public Path getLocation() {
+    return workspace.getLocation().resolve(path);
   }
 
   @Override
   public IContainer getParent() {
-    IPath parentPath = getReferencePointRelativePath().removeLastSegments(1);
+    Path parentPath = PathUtils.removeLastSegments(getReferencePointRelativePath(), 1);
     IReferencePoint project = getReferencePoint();
-    return parentPath.segmentCount() == 0 ? project : project.getFolder(parentPath);
+    return PathUtils.isEmpty(parentPath) ? project : project.getFolder(parentPath);
   }
 
   @Override
   public IReferencePoint getReferencePoint() {
-    String projectName = getFullPath().segment(0);
+    String projectName = getFullPath().getName(0).toString();
     return workspace.getProject(projectName);
   }
 
   @Override
   public boolean exists() {
-    return Files.exists(toNioPath());
+    return Files.exists(getLocation());
   }
 
   @Override
@@ -99,15 +99,5 @@ public abstract class ServerResourceImpl implements IResource {
     result = prime * result + path.hashCode();
     result = prime * result + workspace.hashCode();
     return result;
-  }
-
-  /**
-   * Returns the resource's location as a {@link java.nio.files.Path}. This is for internal use in
-   * conjunction with the utility methods of the {@link java.nio.file.Files} class.
-   *
-   * @return location as {@link java.nio.files.Path}
-   */
-  Path toNioPath() {
-    return ((ServerPathImpl) getLocation()).getDelegate();
   }
 }

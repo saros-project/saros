@@ -12,8 +12,6 @@ import saros.session.User;
  * This operation contains a new vector time for the algorithm.
  *
  * <p>TODO TimestampOperations are never used.
- *
- * @author orieger
  */
 @XStreamAlias("timestampOp")
 public class TimestampOperation implements Operation {

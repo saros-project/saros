@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static saros.stf.client.tester.SarosTester.ALICE;
 import static saros.stf.client.tester.SarosTester.BOB;
 import static saros.stf.client.tester.SarosTester.CARL;
+import static saros.stf.shared.Constants.SessionInvitationModality.CONCURRENTLY;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -25,7 +26,8 @@ public class EditDuringNonHostAddsProjectTest extends StfTestCase {
   public void testNonHostAddsProject() throws Exception {
 
     // Initial session setup
-    Util.setUpSessionWithProjectAndFile("foo", "text.txt", "Hello World", ALICE, BOB, CARL);
+    Util.setUpSessionWithProjectAndFile(
+        "foo", "text.txt", "Hello World", CONCURRENTLY, ALICE, BOB, CARL);
     BOB.superBot().views().packageExplorerView().waitUntilResourceIsShared("foo/text.txt");
     CARL.superBot().views().packageExplorerView().waitUntilResourceIsShared("foo/text.txt");
 
@@ -64,14 +66,16 @@ public class EditDuringNonHostAddsProjectTest extends StfTestCase {
             });
 
     // Alice receives the project and also starts typing
-    ALICE.superBot().confirmShellAddProjectWithNewProject("bar");
+    ALICE.superBot().internal().createProject("bar");
+    ALICE.superBot().confirmShellAddProjectUsingExistProject("bar");
     ALICE.superBot().views().packageExplorerView().waitUntilResourceIsShared("bar/text.txt");
     ALICE.superBot().views().packageExplorerView().selectFile("bar", "text.txt").open();
     ALICE.remoteBot().editor("text.txt").waitUntilIsActive();
     aliceIsWriting.start();
 
     // Carl receives the project and also adds some text
-    CARL.superBot().confirmShellAddProjectWithNewProject("bar");
+    CARL.superBot().internal().createProject("bar");
+    CARL.superBot().confirmShellAddProjectUsingExistProject("bar");
     CARL.superBot().views().packageExplorerView().waitUntilResourceIsShared("bar/text.txt");
     CARL.superBot().views().packageExplorerView().selectFile("bar", "text.txt").open();
     CARL.remoteBot().editor("text.txt").waitUntilIsActive();

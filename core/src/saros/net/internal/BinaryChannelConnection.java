@@ -25,10 +25,6 @@ import saros.net.xmpp.JID;
  *
  * <p>send() is a reentrant method for sending data. Any number of threads can call it in parallel.
  * <b>Note:</b> The maximum number of concurrent threads is 32 !
- *
- * @author sszuecs
- * @author coezbek
- * @author srossbach
  */
 public class BinaryChannelConnection implements IByteStreamConnection {
 

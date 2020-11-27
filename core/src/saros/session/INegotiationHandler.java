@@ -9,8 +9,6 @@ import saros.negotiation.OutgoingSessionNegotiation;
  * Interface for handling incoming and outgoing session and resource negotiations. @Note
  * Implementations <b>must not</b> block on all methods that are provided by this interface.
  * Furthermore it is possible that the methods are called concurrently.
- *
- * @author srossbach
  */
 public interface INegotiationHandler {
 

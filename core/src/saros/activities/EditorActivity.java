@@ -1,22 +1,3 @@
-/*
- * DPP - Serious Distributed Pair Programming
- * (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2006
- * (c) Riad Djemili - 2006
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 1, or (at your option)
- * any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- */
 package saros.activities;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -32,8 +13,6 @@ import saros.session.User;
  * <p>Saving is not document- but editor-specific because one editor might perform changes on the
  * document before actually saving while others just save. An example is a Java editor with save
  * actions enabled vs. a plain text editor for the very same document.
- *
- * @author rdjemili
  */
 @XStreamAlias("editorActivity")
 public class EditorActivity extends AbstractResourceActivity<IFile> {

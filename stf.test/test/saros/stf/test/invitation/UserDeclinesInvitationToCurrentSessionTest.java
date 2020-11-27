@@ -6,6 +6,7 @@ import static saros.stf.client.tester.SarosTester.BOB;
 import static saros.stf.client.tester.SarosTester.CARL;
 import static saros.stf.shared.Constants.CANCEL;
 import static saros.stf.shared.Constants.SHELL_SESSION_INVITATION;
+import static saros.stf.shared.Constants.SessionInvitationModality.CONCURRENTLY;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -24,7 +25,8 @@ public class UserDeclinesInvitationToCurrentSessionTest extends StfTestCase {
 
   @Test
   public void testUserDeclinesInvitationToCurrentSession() throws Exception {
-    Util.setUpSessionWithProjectAndFile("foo", "readme.txt", "1234/1234=1", ALICE, BOB);
+    Util.setUpSessionWithProjectAndFile(
+        "foo", "readme.txt", "1234/1234=1", CONCURRENTLY, ALICE, BOB);
 
     BOB.superBot().views().packageExplorerView().waitUntilResourceIsShared("foo");
 

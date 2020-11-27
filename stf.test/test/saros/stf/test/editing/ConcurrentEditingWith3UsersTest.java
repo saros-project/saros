@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static saros.stf.client.tester.SarosTester.ALICE;
 import static saros.stf.client.tester.SarosTester.BOB;
 import static saros.stf.client.tester.SarosTester.CARL;
+import static saros.stf.shared.Constants.SessionInvitationModality.CONCURRENTLY;
 
 import org.junit.After;
 import org.junit.Before;
@@ -13,11 +14,7 @@ import saros.stf.client.StfTestCase;
 import saros.stf.client.util.EclipseTestThread;
 import saros.stf.client.util.Util;
 
-/**
- * This class tests the concurrent editing of three users during a session.
- *
- * @author nwarnatsch
- */
+/** This class tests the concurrent editing of three users during a session. */
 public class ConcurrentEditingWith3UsersTest extends StfTestCase {
   private EclipseTestThread aliceEditTaskThread;
   private EclipseTestThread bobEditTaskThread;
@@ -56,6 +53,7 @@ public class ConcurrentEditingWith3UsersTest extends StfTestCase {
         "foo",
         "readme.txt",
         "\nVerbesserung des algorithmischen Kerns, Gleichzeitiges Editieren\n",
+        CONCURRENTLY,
         ALICE,
         CARL,
         BOB);
@@ -198,6 +196,7 @@ public class ConcurrentEditingWith3UsersTest extends StfTestCase {
         "foo",
         "readme.txt",
         "\nVerbesserung des algorithmischen Kerns, Gleichzeitiges Editieren\n",
+        CONCURRENTLY,
         ALICE,
         CARL,
         BOB);

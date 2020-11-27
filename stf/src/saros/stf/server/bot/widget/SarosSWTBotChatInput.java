@@ -19,8 +19,6 @@ import saros.ui.widgets.chat.parts.ChatInput;
  * using self defined SWT-components, which are obviously not supported by SWTBot. So i need to
  * define a corresponding SWTBot[widget name](in this case, SWTBbotInput) class to access every chat
  * widgets.
- *
- * @author lchen
  */
 @SWTBotWidget(
     clasz = ChatInput.class,

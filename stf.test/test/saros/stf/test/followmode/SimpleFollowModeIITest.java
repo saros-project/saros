@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static saros.stf.client.tester.SarosTester.ALICE;
 import static saros.stf.client.tester.SarosTester.BOB;
+import static saros.stf.shared.Constants.SessionInvitationModality.CONCURRENTLY;
 
 import java.util.List;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
@@ -29,7 +30,7 @@ public class SimpleFollowModeIITest extends StfTestCase {
   @Category(FlakyTests.class)
   @Test
   public void testSimpleFollowMode() throws Exception {
-    Util.setUpSessionWithProjectAndFile("foo", "readme.txt", fileContent, ALICE, BOB);
+    Util.setUpSessionWithProjectAndFile("foo", "readme.txt", fileContent, CONCURRENTLY, ALICE, BOB);
 
     BOB.superBot().views().packageExplorerView().waitUntilResourceIsShared("foo/readme.txt");
 

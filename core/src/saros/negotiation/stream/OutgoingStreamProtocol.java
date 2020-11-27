@@ -10,6 +10,7 @@ import saros.filesystem.IFile;
 import saros.monitoring.IProgressMonitor;
 import saros.negotiation.NegotiationTools.CancelOption;
 import saros.negotiation.ResourceSharingData;
+import saros.util.PathUtils;
 
 /** Implements Stream creation in {@link AbstractStreamProtocol} format. */
 public class OutgoingStreamProtocol extends AbstractStreamProtocol {
@@ -63,10 +64,10 @@ public class OutgoingStreamProtocol extends AbstractStreamProtocol {
 
   private void writeHeader(IFile file, long fileSize) throws IOException {
     String referencePointID = resourceSharingData.getReferencePointID(file.getReferencePoint());
-    String fileName = file.getReferencePointRelativePath().toPortableString();
+    String filePath = PathUtils.toPortableString(file.getReferencePointRelativePath());
 
     out.writeUTF(referencePointID);
-    out.writeUTF(fileName);
+    out.writeUTF(filePath);
     out.writeLong(fileSize);
   }
 

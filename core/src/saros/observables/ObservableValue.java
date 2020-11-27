@@ -10,8 +10,6 @@ import java.util.Set;
 /**
  * An ObservableValue is like a normal variable (you can get and set its value), but also allows
  * listeners to register for changes.
- *
- * @author oezbek
  */
 public class ObservableValue<T> {
 

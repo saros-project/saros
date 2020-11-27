@@ -257,9 +257,11 @@ public class SessionAliceBobTest extends StfTestCase {
   public void addProjects() throws Exception {
     ALICE.superBot().views().packageExplorerView().tree().newC().javaProject(Constants.PROJECT2);
     ALICE.superBot().views().sarosView().selectSession().addProjects(Constants.PROJECT2);
+
+    BOB.superBot().internal().createJavaProject(Constants.PROJECT2);
     BOB.superBot()
         .confirmShellAddProjectUsingWhichProject(
-            Constants.PROJECT2, TypeOfCreateProject.NEW_PROJECT);
+            Constants.PROJECT2, TypeOfCreateProject.EXIST_PROJECT);
 
     // TODO remove this, we have to wait for project arrival
     // or next test cases will fail because of an uncloseable window

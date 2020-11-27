@@ -8,11 +8,7 @@ import saros.concurrent.jupiter.TransformationException;
 import saros.concurrent.jupiter.internal.Jupiter;
 import saros.session.User;
 
-/**
- * This proxy class on server represent the server side of the two-way jupiter protocol.
- *
- * @author troll
- */
+/** This proxy class on server represent the server side of the two-way jupiter protocol. */
 public class ProxySynchronizedQueue {
 
   private static final Logger log = Logger.getLogger(ProxySynchronizedQueue.class);

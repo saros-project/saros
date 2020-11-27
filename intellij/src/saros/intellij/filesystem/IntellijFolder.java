@@ -6,6 +6,8 @@ import com.intellij.openapi.vfs.VirtualFile;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.log4j.Logger;
@@ -13,16 +15,16 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
-import saros.filesystem.IPath;
 import saros.filesystem.IResource;
 import saros.intellij.runtime.FilesystemRunner;
+import saros.util.PathUtils;
 
 /** Intellij implementation of the Saros folder interface. */
 public class IntellijFolder extends AbstractIntellijResource implements IFolder {
   private static final Logger log = Logger.getLogger(IntellijFolder.class);
 
   public IntellijFolder(
-      @NotNull IntellijReferencePoint referencePoint, @NotNull IPath relativePath) {
+      @NotNull IntellijReferencePoint referencePoint, @NotNull Path relativePath) {
 
     super(referencePoint, relativePath);
   }
@@ -49,8 +51,8 @@ public class IntellijFolder extends AbstractIntellijResource implements IFolder 
   }
 
   @Override
-  public boolean exists(@NotNull IPath path) {
-    return referencePoint.exists(relativePath.append(path));
+  public boolean exists(@NotNull Path path) {
+    return referencePoint.exists(relativePath.resolve(path));
   }
 
   @Override
@@ -73,7 +75,7 @@ public class IntellijFolder extends AbstractIntellijResource implements IFolder 
     VirtualFile[] children = folder.getChildren();
 
     for (VirtualFile child : children) {
-      IPath childPath = relativePath.append(IntellijPath.fromString(child.getName()));
+      Path childPath = relativePath.resolve(child.getName());
 
       result.add(
           child.isDirectory()
@@ -87,17 +89,17 @@ public class IntellijFolder extends AbstractIntellijResource implements IFolder 
   @Override
   @NotNull
   public IFile getFile(@NotNull String pathString) {
-    return getFile(IntellijPath.fromString(pathString));
+    return getFile(Paths.get(pathString));
   }
 
   @Override
   @NotNull
-  public IFile getFile(@NotNull IPath path) {
-    if (path.segmentCount() == 0) {
+  public IFile getFile(@NotNull Path path) {
+    if (PathUtils.isEmpty(path)) {
       throw new IllegalArgumentException("Can not create file handle for an empty path");
     }
 
-    IPath referencePointRelativeChildPath = relativePath.append(path);
+    Path referencePointRelativeChildPath = relativePath.resolve(path);
 
     return new IntellijFile(referencePoint, referencePointRelativeChildPath);
   }
@@ -105,17 +107,17 @@ public class IntellijFolder extends AbstractIntellijResource implements IFolder 
   @Override
   @NotNull
   public IFolder getFolder(@NotNull String pathString) {
-    return getFolder(IntellijPath.fromString(pathString));
+    return getFolder(Paths.get(pathString));
   }
 
   @Override
   @NotNull
-  public IFolder getFolder(@NotNull IPath path) {
-    if (path.segmentCount() == 0) {
+  public IFolder getFolder(@NotNull Path path) {
+    if (PathUtils.isEmpty(path)) {
       throw new IllegalArgumentException("Can not create folder handle for an empty path");
     }
 
-    IPath referencePointRelativeChildPath = relativePath.append(path);
+    Path referencePointRelativeChildPath = relativePath.resolve(path);
 
     return new IntellijFolder(referencePoint, referencePointRelativeChildPath);
   }

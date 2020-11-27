@@ -1,11 +1,17 @@
 package saros.filesystem;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import saros.util.PathUtils;
 
 /**
  * Represents a handle for an element (normally a file or folder) in the (virtual) file system.
  *
  * <p>The referenced resources do not necessarily have to exist in the local filesystem.
+ *
+ * <p>{@link Path} objects used in conjunction with resource objects, e.g. to represent the
+ * reference-point-relative path of a resource, must be normalized using {@link
+ * PathUtils#normalize(Path)}.
  */
 public interface IResource {
 
@@ -54,7 +60,7 @@ public interface IResource {
    * @return the reference-point-relative path for the resource or an empty path if the resource is
    *     a reference point
    */
-  IPath getReferencePointRelativePath();
+  Path getReferencePointRelativePath();
 
   /**
    * Returns the type of the resource.

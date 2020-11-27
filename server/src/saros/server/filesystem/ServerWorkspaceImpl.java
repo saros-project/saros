@@ -1,8 +1,8 @@
 package saros.server.filesystem;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import saros.exceptions.OperationCanceledException;
-import saros.filesystem.IPath;
 import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.filesystem.IWorkspace;
@@ -12,18 +12,18 @@ import saros.monitoring.NullProgressMonitor;
 /** Server implementation of the {@link IWorkspace} interface. */
 public class ServerWorkspaceImpl implements IWorkspace {
 
-  private IPath location;
+  private Path location;
 
   /**
    * Creates a ServerWorkspaceImpl.
    *
    * @param location the workspace's absolute root location in the file system
    */
-  public ServerWorkspaceImpl(IPath location) {
+  public ServerWorkspaceImpl(Path location) {
     this.location = location;
   }
 
-  public IPath getLocation() {
+  public Path getLocation() {
     return location;
   }
 

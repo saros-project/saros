@@ -3,12 +3,11 @@ package saros.server;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import saros.context.AbstractContextFactory;
 import saros.context.IContextKeyBindings;
-import saros.filesystem.IPath;
-import saros.filesystem.IPathFactory;
 import saros.filesystem.IWorkspace;
 import saros.monitoring.remote.IRemoteProgressIndicatorFactory;
 import saros.preferences.IPreferenceStore;
@@ -19,8 +18,6 @@ import saros.server.console.InviteCommand;
 import saros.server.console.ServerConsole;
 import saros.server.console.ShareCommand;
 import saros.server.dummies.NullRemoteProgressIndicatorFactory;
-import saros.server.filesystem.ServerPathFactoryImpl;
-import saros.server.filesystem.ServerPathImpl;
 import saros.server.filesystem.ServerWorkspaceImpl;
 import saros.server.net.ServerFeatureAdvertiser;
 import saros.server.net.SubscriptionAuthorizer;
@@ -56,8 +53,6 @@ public class ServerContextFactory extends AbstractContextFactory {
   }
 
   private void addCoreInterfaceImplementations(MutablePicoContainer c) {
-    // File System
-    c.addComponent(IPathFactory.class, ServerPathFactoryImpl.class);
     // TODO move to session context once #980 has been resolved
     c.addComponent(IWorkspace.class, createWorkspace());
 
@@ -93,7 +88,7 @@ public class ServerContextFactory extends AbstractContextFactory {
       pathString = createTemporaryWorkspaceFolder();
     }
 
-    IPath location = ServerPathImpl.fromString(pathString);
+    Path location = Paths.get(pathString);
     return new ServerWorkspaceImpl(location);
   }
 

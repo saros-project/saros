@@ -24,11 +24,7 @@ import saros.ui.util.selection.SelectionUtils;
 import saros.ui.util.selection.retriever.SelectionRetrieverFactory;
 import saros.util.ThreadUtils;
 
-/**
- * Renames the nickname of the selected roster entry.
- *
- * @author rdjemili
- */
+/** Renames the nickname of the selected roster entry. */
 public class RenameContactAction extends Action {
 
   public static final String ACTION_ID = RenameContactAction.class.getName();

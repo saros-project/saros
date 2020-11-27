@@ -6,11 +6,7 @@ import org.easymock.EasyMock;
 import saros.filesystem.IFile;
 import saros.session.User;
 
-/**
- * This class simulates a network.
- *
- * @author troll
- */
+/** This class simulates a network. */
 public class NetworkSimulator {
 
   private HashMap<User, NetworkEventHandler> clients;

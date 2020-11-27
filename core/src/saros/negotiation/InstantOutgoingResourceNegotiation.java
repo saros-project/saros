@@ -202,8 +202,8 @@ public class InstantOutgoingResourceNegotiation extends AbstractOutgoingResource
         new Comparator<IFile>() {
           @Override
           public int compare(IFile a, IFile b) {
-            int lenA = a.getReferencePointRelativePath().segmentCount();
-            int lenB = b.getReferencePointRelativePath().segmentCount();
+            int lenA = a.getReferencePointRelativePath().getNameCount();
+            int lenB = b.getReferencePointRelativePath().getNameCount();
             return Integer.valueOf(lenA).compareTo(Integer.valueOf(lenB));
           }
         });

@@ -16,11 +16,7 @@ import saros.session.ISarosSessionManager;
 import saros.session.ISessionLifecycleListener;
 import saros.ui.util.SWTUtils;
 
-/**
- * Adds variables to Eclipse's Core {@link Expression}s in order to be used in plugin.xml.
- *
- * @author bkahlert
- */
+/** Adds variables to Eclipse's Core {@link Expression}s in order to be used in plugin.xml. */
 public class SarosSourceProvider extends AbstractSourceProvider {
 
   /** Corresponds to a service_provider variable as defined in Extension org.eclipse.ui.services. */

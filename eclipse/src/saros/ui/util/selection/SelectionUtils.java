@@ -13,11 +13,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import saros.util.ArrayUtils;
 
-/**
- * Utility class for a convenient work with the {@link ISelectionService}.
- *
- * @author bkahlert
- */
+/** Utility class for a convenient work with the {@link ISelectionService}. */
 public class SelectionUtils {
   private SelectionUtils() {
     // no instantiation allowed

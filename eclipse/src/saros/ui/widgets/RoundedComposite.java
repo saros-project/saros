@@ -33,7 +33,6 @@ import saros.ui.util.PaintUtils;
  * constructed from aggregates of other controls.
  *
  * @see Composite
- * @author bkahlert
  */
 public class RoundedComposite extends Canvas {
   /** style constants not passed to parent constructor */

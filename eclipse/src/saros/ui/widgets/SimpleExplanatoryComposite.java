@@ -57,7 +57,6 @@ import saros.ui.widgets.SimpleExplanationComposite.SimpleExplanation;
  *
  * @see SimpleExplanationComposite
  * @see Composite
- * @author bkahlert
  */
 public class SimpleExplanatoryComposite extends ExplanatoryComposite {
   protected SimpleExplanationComposite simpleExplanationComposite;
