@@ -33,5 +33,12 @@ tasks.jar {
             configurations.compile.get().map { if (it.isDirectory) it else zipTree(it) }
     )
     from("src/log4j.properties")
+
+    /**
+     * Temporary workaround for Log4J
+     * upstream issue: https://issues.apache.org/jira/browse/LOG4J2-673
+     */
+    exclude("**/Log4j2Plugins.dat")
+
     exclude("**/*.jar")
 }
