@@ -47,7 +47,9 @@ buildSrc/.gradle
 /stf/.project
 /stf.test/.project
 .DS_Store
-/.gradle/
+docs/_site
+docs/Gemfile.lock
+.gradle/
 /build/
 **/.settings/org.eclipse.buildship.core.prefs
 .classpath
@@ -58,3 +60,14 @@ buildSrc/.gradle
 # LSP
 lsp/.classpath
 lsp/build
+
+# VS Code
+vscode*/.classpath
+vscode*/.project
+vscode*/build
+vscode*/package-lock.json
+vscode*/.vscode
+*.vscode
+*.code-workspace
+*.vscodeignore
+dist/

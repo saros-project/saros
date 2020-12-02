@@ -265,6 +265,7 @@ tasks {
         from(project(":saros.server").tasks.findByName("jar"))
         into("build/distribution/server")
     }
+    
     register("sarosLsp", Copy::class) {
         dependsOn(
                 ":saros.core:test",
@@ -276,6 +277,18 @@ tasks {
 
         from(project(":saros.lsp").tasks.findByName("jar"))
         into("build/distribution/lsp")
+    }
+    
+    register("sarosVSCode", Copy::class) {
+        dependsOn(
+                "sarosLsp",
+                ":saros.vscode:packageExtension"
+        )
+        group = "Build"
+        description = "Builds and tests all modules required by the Saros VS Code Extension"
+
+        from("vscode/vsix")
+        into("build/distribution/vscode")
     }
 
     register("sarosIntellij", Copy::class) {

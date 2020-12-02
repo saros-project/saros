@@ -86,6 +86,45 @@ This is necessary in order to allow IntelliJ to execute all build and test actio
 * Click on `Open`
 * Select the repository root as project root and click `OK`
 
+## Develop with VS Code
+
+When developing with VS Code you rely on your installed extensions. When opening a file with an extension that has currently no support VS Code will ask for installing necessary plugins. When being asked either install what is suggested or install by your own preference.
+
+### Developing the VS Code Extension
+
+When developing the extension you have two ways to start the debugger:
+
+#### Using a launch configuration (preferred)
+
+Create the `launch.json` in your `.vscode` directory of the folder you opened with vscode. When using a `workspace` you have to reference your launch file there also. The `launch.json` has the following content:
+
+```json
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Run Extension",
+			"type": "extensionHost",
+			"request": "launch",
+			"runtimeExecutable": "${execPath}",			
+			"args": [
+				"--extensionDevelopmentPath=${workspaceFolder}"
+			],
+			"outFiles": [
+				"${workspaceFolder}/out/**/*.js"
+			],
+			"preLaunchTask": "gradle: prepareVSCode"
+		}
+	]
+}
+```
+
+#### Using gradle
+
+Using gradle tasks directly has the benefits of starting multiple instances of the `VS Code Extension Host` which is useful for testing multiple at once. Just open the available tasks (usually `CTRL+SHIFT+T`) and run `runVSCode` in order to start the extension in an `Extension Host`. When debugging is needed just hit `F5` and choose the NodeJs debugger and attach to the desired process.
+
+To make it more comfortable a keybinding can be assigned to that task (`keybindings.json`) or the launch configuration of the NodeJs debugger can be saved (`launch.json`) in order to attach via `F5`.
+
 ## Develop Without an IDE
 
 If you prefer to develop with a text editor (like Vim or Emacs) you can build and test
@@ -97,14 +136,17 @@ The following tasks are used to build and test the different Saros components:
 * `sarosEclipse` - Triggers the build and test of the Saros Eclipse Plugin
 * `sarosIntellij` - Triggers the build and test of the Saros IntelliJ Plugin
 * `sarosServer` - Triggers the build and test of the Saros Server
+* `sarosLsp` - Triggers the build and test of the Saros Language Server
+* `sarosVSCode` - Triggers the build and test of the Saros VS Code Extension
 * `prepareEclipse` - Executes all tasks which are required before developing in Eclipse
 * `runIde` - Starts a IntelliJ IDE containing the Saros Plugin. The IDE version depends on the value of `INTELLIJ_HOME` or the `intellijVersion` specified in the build file of the IntelliJ package.
+* `runVSCode` - Starts an VS Code (Extension Host) with the Saros Extension. Use the node debugger to attach to the process for debugging.
 
-In order to build the whole project without using existing build artifacts simply call `./gradlew cleanAll sarosEclipse sarosIntellij sarosServer`.
+In order to build the whole project without using existing build artifacts simply call `./gradlew cleanAll sarosEclipse sarosIntellij sarosServer sarosVSCode`.
 
 Gradle checks whether the component specific sources are changed. Therefore a task become a NOP if nothing changed and the build results still exist.
 If you want to force Gradle to re-execute the tasks, you have to call `./gradlew --rerun-tasks <task>...` or call the `cleanAll` task before other tasks.
-The final build results are copied into the directory `<repository root>/build/distribute/(eclipse|intellij)`.
+The final build results are copied into the directory `<repository root>/build/distribute/(eclipse|intellij|vscode|lsp)`.
 
 ### Formatting via Standalone Google Java Formatter
 

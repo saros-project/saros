@@ -22,13 +22,11 @@ public class LanguageClientAppender extends AppenderSkeleton {
 
   @Override
   public boolean requiresLayout() {
-
     return false;
   }
 
   @Override
   protected void append(LoggingEvent event) {
-
     MessageParams mp = new MessageParams();
     mp.setMessage(event.getMessage().toString());
     mp.setType(MessageType.Info);

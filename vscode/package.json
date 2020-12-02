@@ -1,0 +1,232 @@
+{
+	"name": "saros",
+	"displayName": "Saros",
+	"description": "Saros implementation for VS Code.",
+	"version": "0.0.1",
+	"publisher": "saros-dev",
+	"repository": {
+		"url": "https://github.com/saros-project/saros"
+	},
+	"engines": {
+		"vscode": "^1.38.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"activationEvents": [
+		"*"
+	],
+	"main": "./dist/extension",
+	"contributes": {
+		"commands": [
+			{
+				"command": "saros.account.add",
+				"title": "Add Account",
+				"category": "Saros",
+				"when": "initialized"
+			},
+			{
+				"command": "saros.account.update",
+				"title": "Edit Account",
+				"category": "Saros",
+				"when": "initialized"
+			},
+			{
+				"command": "saros.account.remove",
+				"title": "Remove Account",
+				"category": "Saros",
+				"when": "initialized"
+			},
+			{
+				"command": "saros.account.setActive",
+				"title": "Set Active Account",
+				"category": "Saros",
+				"when": "initialized"
+			},
+			{
+				"command": "saros.contact.add",
+				"title": "Add Contact",
+				"category": "Saros",
+				"icon": {
+					"light": "media/btn/addaccount.png",
+					"dark": "media/btn/addaccount.png"
+				},
+				"when": "connectionActive"
+			},
+			{
+				"command": "saros.contact.remove",
+				"title": "Remove Contact",
+				"category": "Saros",
+				"icon": {
+					"light": "media/btn/deleteaccount.png",
+					"dark": "media/btn/deleteaccount.png"
+				},
+				"when": "connectionActive"
+			},
+			{
+				"command": "saros.contact.rename",
+				"title": "Rename Contact",
+				"category": "Saros",
+				"icon": {
+					"light": "media/btn/changeaccount.png",
+					"dark": "media/btn/changeaccount.png"
+				},
+				"when": "connectionActive"
+			},
+			{
+				"command": "saros.connection.connect",
+				"title": "Connect",
+				"category": "Saros",
+				"icon": {
+					"light": "media/dlcl16/xmpp_connect_tsk.png",
+					"dark": "media/dlcl16/xmpp_connect_tsk.png"
+				},
+				"when": "!connectionActive"
+			},
+			{
+				"command": "saros.connection.disconnect",
+				"title": "Disconnect",
+				"category": "Saros",
+				"icon": {
+					"light": "media/dlcl16/xmpp_disconnect_tsk.png",
+					"dark": "media/dlcl16/xmpp_disconnect_tsk.png"
+				},
+				"when": "connectionActive"
+			}
+		],
+		"configuration": {
+			"title": "Saros",
+			"properties": {
+				"saros.trace.server": {
+					"scope": "window",
+					"type": "string",
+					"enum": [
+						"off",
+						"messages",
+						"verbose"
+					],
+					"default": "verbose",
+					"description": "Traces the communication between VS Code and the Saros server."
+				},
+				"saros.log.server": {
+					"scope": "window",
+					"type": "string",
+					"enum": [
+						"all",
+						"debug",
+						"error",
+						"fatal",
+						"info",
+						"off",
+						"trace",
+						"warn"
+					],
+					"default": "info",
+					"description": "Traces all loggings sent from Saros server."
+				},
+				"saros.defaultHost.client": {
+					"scope": "window",
+					"type": "string",
+					"default": "saros-con.imp.fu-berlin.de",
+					"description": "The default host that is being used for new accounts or contacts."
+				},
+				"saros.port.server": {
+					"scope": "window",
+					"type": [
+						"integer",
+						"null"
+					],
+					"default": null,
+					"description": "When set to 0 the server will be listening on a random port, otherwise it will use this port."
+				},
+				"saros.standalone.server": {
+					"scope": "window",
+					"type": "boolean",
+					"default": false,
+					"description": "When set to true the server won't be started by this extension. This is especially useful for debugging the server when developing this extension."
+				}
+			}
+		},
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "saros-view",
+					"title": "Saros",
+					"icon": "media/saros-logo.svg"
+				}
+			]
+		},
+		"views": {
+			"saros-view": [
+				{
+					"id": "saros-contacts",
+					"name": "Contact List",
+					"when": "initialized"
+				}
+			]
+		},
+		"menus": {
+			"view/title": [
+				{
+					"command": "saros.connection.connect",
+					"when": "!connectionActive && view == saros-contacts",
+					"group": "navigation"
+				},
+				{
+					"command": "saros.connection.disconnect",
+					"when": "connectionActive && view == saros-contacts",
+					"group": "navigation"
+				},
+				{
+					"command": "saros.contact.add",
+					"when": "connectionActive && view == saros-contacts"
+				}
+			],
+			"view/item/context": [
+				{
+					"command": "saros.contact.rename",
+					"when": "viewItem == contact"
+				},
+				{
+					"command": "saros.contact.remove",
+					"when": "viewItem == contact"
+				}
+			]
+		}
+	},
+	"scripts": {
+		"vscode:prepublish": "webpack --mode production",
+		"webpack": "webpack --mode development",
+		"webpack-dev": "webpack --mode development --watch",
+		"test-compile": "tsc -p ./",
+		"pretest": "npm run compile",
+		"test": "node ./out/test/runTest.js",
+		"lint": "eslint */**/*.ts --quiet",
+		"lint-fix": "eslint */**/*.ts --fix --quiet"
+	},
+	"devDependencies": {
+		"@types/glob": "^7.1.3",
+		"@types/lodash": "^4.14.159",
+		"@types/mocha": "^5.2.6",
+		"@types/node": "^10.17.28",
+		"@types/vscode": "^1.47.0",
+		"@typescript-eslint/eslint-plugin": "^2.19.2",
+		"@typescript-eslint/parser": "^2.19.2",
+		"eslint": "^6.8.0",
+		"eslint-config-google": "^0.14.0",
+		"glob": "^7.1.6",
+		"mocha": "^6.2.3",
+		"ts-loader": "^6.2.1",
+		"typescript": "^3.9.7",
+		"vsce": "^1.71.0",
+		"vscode-test": "^1.4.0",
+		"webpack": "^4.44.1",
+		"webpack-cli": "^3.3.10"
+	},
+	"dependencies": {
+		"get-port": "^5.1.1",
+		"lodash": "^4.17.19",
+		"pureimage": "^0.2.4",
+		"vscode-languageclient": "^6.1.3"
+	}
+}
