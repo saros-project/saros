@@ -12,7 +12,7 @@ For now build the Saros Language Protocol Server prior building the extension wi
 
 > `./gradlew sarosLsp`
 
-Then either copy the resulting jar from `../build/distribute` to `./out` or create a symlink with `mklink /H saros.lsp.jar "../../build/distribution/lsp/saros.lsp.jar" ` (Windows).
+Then either copy the resulting jar from `../build/distribute` to `./out` or create a symlink with `mklink /H saros.lsp.jar "../../build/distribution/lsp/saros.lsp.jar" ` (Windows) .
 
 ## Extension Settings
 
