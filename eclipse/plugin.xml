@@ -2,6 +2,12 @@
 <?eclipse version="4.6"?>
 
 <plugin>
+	<extension point="org.eclipse.e4.workbench.model" id="test_id_e4">
+		<fragment
+            apply="initial"
+            uri="fragment.e4xmi">
+      </fragment>
+	</extension>
     <extension
          point="org.eclipse.ui.views">
       <category
@@ -476,394 +482,7 @@
       </startup>
    </extension>
    <extension
-         point="org.eclipse.ui.commands">
-      <command
-            id="saros.ui.commands.Empty"
-            name="EMPTY COMMAND">
-      </command>
-      <command
-            categoryId="org.eclipse.ui.category.project"
-            id="saros.ui.commands.GettingStarted"
-            name="Getting Started...">
-      </command>
-      <command
-            categoryId="org.eclipse.ui.category.project"
-            id="saros.ui.commands.StartSarosConfiguration"
-            name="Start Saros Configuration...">
-      </command>
-      <command
-            categoryId="org.eclipse.ui.category.project"
-            id="saros.ui.commands.CreateXMPPAccount"
-            name="Create Account...">
-      </command>
-      <command
-            categoryId="org.eclipse.ui.category.project"
-            id="saros.ui.commands.AddContact"
-            name="Add Contact...">
-      </command>
-      <command
-            categoryId="org.eclipse.ui.category.project"
-            id="saros.ui.commands.OpenSarosPreferences"
-            name="Preferences...">
-      </command>
-            <command
-            categoryId="org.eclipse.ui.category.project"
-            id="saros.ui.commands.AddXMPPAccount"
-            name="Add Account...">
-      </command>
-      <command
-            categoryId="org.eclipse.ui.category.project"
-            id="saros.ui.commands.ShareResource"
-            name="Share Resource(s)...">
-      </command>
-      <command
-            categoryId="org.eclipse.ui.category.project"
-            id="saros.ui.commands.SessionLeave"
-            name="Leave Session...">
-      </command>
-      <command
-            categoryId="org.eclipse.ui.category.project"
-            id="saros.ui.commands.SessionAddResources"
-            name="Add Resource(s)...">
-      </command>
-      <command
-            categoryId="org.eclipse.ui.category.project"
-            id="saros.ui.commands.SessionAddContacts"
-            name="Add Contacts...">
-      </command>
-      <command
-            categoryId="org.eclipse.ui.category.project"
-            id="saros.ui.commands.SessionAddSelectedResources"
-            name="Add to Saros Session">
-      </command>
-      <command
-            categoryId="org.eclipse.ui.category.project"
-            id="saros.ui.commands.SessionAddSelectedContacts"
-            name="Add to Saros Session">
-      </command>
-   </extension>
-   <extension
-         point="org.eclipse.ui.handlers">
-      <handler
-            class="saros.ui.command_handlers.GettingStartedHandler"
-            commandId="saros.ui.commands.GettingStarted">
-      </handler>
-      <handler
-            class="saros.ui.command_handlers.StartSarosConfigurationHandler"
-            commandId="saros.ui.commands.StartSarosConfiguration">
-      </handler>
-      <handler
-            class="saros.ui.command_handlers.CreateXMPPAccountHandler"
-            commandId="saros.ui.commands.CreateXMPPAccount">
-      </handler>
-      <handler
-            class="saros.ui.command_handlers.AddXMPPAccountHandler"
-            commandId="saros.ui.commands.AddXMPPAccount">
-      </handler>
-      <handler
-            class="saros.ui.command_handlers.AddContactHandler"
-            commandId="saros.ui.commands.AddContact">
-         <enabledWhen>
-             <reference definitionId="saros.ui.definitions.isConnected" />
-         </enabledWhen>
-      </handler>
-      <handler
-            class="saros.ui.command_handlers.OpenSarosPreferencesHandler"
-            commandId="saros.ui.commands.OpenSarosPreferences">
-      </handler>
-      <handler
-      class="saros.ui.command_handlers.ShareResourcesHandler"
-            commandId="saros.ui.commands.ShareResource">
-         <enabledWhen>
-            <and>
-               <reference
-                     definitionId="saros.ui.definitions.isConnected">
-               </reference>
-               <not>
-                  <reference
-                        definitionId="saros.ui.definitions.isSarosSessionRunning">
-                  </reference>
-               </not>
-            </and>
-         </enabledWhen>
-      </handler>
-      <handler
-            class="saros.ui.command_handlers.SessionLeaveHandler"
-            commandId="saros.ui.commands.SessionLeave">
-         <activeWhen>
-            <and>
-               <reference
-                     definitionId="saros.ui.definitions.isConnected">
-               </reference>
-               <reference
-                     definitionId="saros.ui.definitions.isSarosSessionRunning">
-               </reference>
-            </and>
-         </activeWhen>
-      </handler>
-      <handler
-            class="saros.ui.command_handlers.SessionAddResourcesHandler"
-            commandId="saros.ui.commands.SessionAddResources">
-         <activeWhen>
-            <and>
-               <reference
-                     definitionId="saros.ui.definitions.isConnected">
-               </reference>
-               <reference
-                     definitionId="saros.ui.definitions.isSarosSessionRunning">
-               </reference>
-            </and>
-         </activeWhen>
-         <enabledWhen>
-            <reference
-                  definitionId="saros.ui.definitions.hasWriteAccess">
-            </reference>
-         </enabledWhen>
-      </handler>
-      <handler
-            class="saros.ui.command_handlers.SessionAddContactsHandler"
-            commandId="saros.ui.commands.SessionAddContacts">
-         <activeWhen>
-            <and>
-               <reference
-                     definitionId="saros.ui.definitions.isConnected">
-               </reference>
-               <reference
-                     definitionId="saros.ui.definitions.isSarosSessionRunning">
-               </reference>
-            </and>
-         </activeWhen>
-      </handler>
-      <handler
-            class="saros.ui.command_handlers.SessionAddSelectedResourcesHandler"
-            commandId="saros.ui.commands.SessionAddSelectedResources">
-         <activeWhen>
-            <and>
-               <reference
-                     definitionId="saros.ui.definitions.isConnected">
-               </reference>
-               <reference
-                     definitionId="saros.ui.definitions.isSarosSessionRunning">
-               </reference>
-               <reference
-                     definitionId="saros.ui.definitions.resourcesSelected">
-               </reference>
-               <not>
-                  <reference
-                        definitionId="saros.ui.definitions.resourcesSelectedInSarosSession">
-                  </reference>
-               </not>
-            </and>
-         </activeWhen>
-         <enabledWhen>
-            <reference
-                  definitionId="saros.ui.definitions.hasWriteAccess">
-            </reference>
-         </enabledWhen>
-      </handler>
-      <handler
-            class="saros.ui.command_handlers.SessionAddSelectedContactsHandler"
-            commandId="saros.ui.commands.SessionAddSelectedContacts">
-         <activeWhen>
-            <and>
-               <reference
-                     definitionId="saros.ui.definitions.isConnected">
-               </reference>
-               <reference
-                     definitionId="saros.ui.definitions.isSarosSessionRunning">
-               </reference>
-               <reference
-                     definitionId="saros.ui.definitions.contactsSelected">
-               </reference>
-               <not>
-                  <reference
-                        definitionId="saros.ui.definitions.contactsSelectedInSarosSession">
-                  </reference>
-               </not>
-            </and>
-         </activeWhen>
-      </handler>
-   </extension>
-   <extension
          point="org.eclipse.ui.menus">
-      <menuContribution
-            allPopups="false"
-            locationURI="menu:org.eclipse.ui.main.menu?after=additions">
-         <menu
-               id="saros.ui.main.menu"
-               label="Saros">
-            <visibleWhen
-                  checkEnabled="false">
-            </visibleWhen>
-            <separator
-                  name="DeveloperStart"
-                  visible="true">
-            </separator>
-            <separator
-                  name="DeveloperEnd"
-                  visible="true">
-            </separator>
-            <command
-                  commandId="saros.ui.commands.GettingStarted"
-                  icon="icons/view16/saros_misc.png"
-                  style="push">
-            </command>
-            <command
-                  commandId="saros.ui.commands.StartSarosConfiguration"
-                  icon="icons/view16/saros_misc.png"
-                  style="push">
-            </command>
-            <separator
-                  name="RosterStart"
-                  visible="true">
-            </separator>
-            <command
-                  commandId="saros.ui.commands.CreateXMPPAccount"
-                  icon="icons/elcl16/xmpp_create_account_tsk.png"
-                  style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="saros.ui.definitions.isCreateXMPPAccountEnabled">
-                  </reference>
-               </visibleWhen>
-            </command>
-            <command
-                  commandId="saros.ui.commands.AddXMPPAccount"
-                  icon="icons/elcl16/xmpp_create_account_tsk.png"
-                  style="push">
-            </command>
-            <command
-                  commandId="saros.ui.commands.AddContact"
-                  disabledIcon="icons/dlcl16/contact_add_tsk.png"
-                  icon="icons/elcl16/contact_add_tsk.png"
-                  style="push">
-            </command>
-            <separator
-                  name="RosterEnd"
-                  visible="true">
-            </separator>
-            <separator
-                  name="CollaborationStart"
-                  visible="true">
-            </separator>
-            <command
-                  commandId="saros.ui.commands.ShareResource"
-                  disabledIcon="icons/dlcl16/spacer.png"
-                  icon="icons/elcl16/session_tsk.png"
-                  style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                      <not>
-                        <reference
-                              definitionId="saros.ui.definitions.isSarosSessionRunning">
-                        </reference>
-                     </not>
-               </visibleWhen>
-            </command>
-           <command
-                  commandId="saros.ui.commands.SessionAddResources"
-                  disabledIcon="icons/dlcl16/session_add_reference_points_tsk.png"
-                  icon="icons/elcl16/session_add_reference_points_tsk.png"
-                  style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <and>
-                     <reference
-                           definitionId="saros.ui.definitions.isConnected">
-                     </reference>
-                     <reference
-                           definitionId="saros.ui.definitions.isSarosSessionRunning">
-                     </reference>
-                  </and>
-               </visibleWhen>
-            </command>
-            <command
-                  commandId="saros.ui.commands.SessionAddContacts"
-                  disabledIcon="icons/dlcl16/session_add_contacts_tsk.png"
-                  icon="icons/elcl16/session_add_contacts_tsk.png"
-                  style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <and>
-                     <reference
-                           definitionId="saros.ui.definitions.isConnected">
-                     </reference>
-                     <reference
-                           definitionId="saros.ui.definitions.isSarosSessionRunning">
-                     </reference>
-                     <reference
-                           definitionId="saros.ui.definitions.isSarosSessionHost">
-                     </reference>
-                  </and>
-               </visibleWhen>
-            </command>
-            <command
-                  commandId="saros.ui.commands.SessionLeave"
-                  disabledIcon="icons/dlcl16/session_leave_tsk.png"
-                  icon="icons/elcl16/session_leave_tsk.png"
-                  label="Leave Session..."
-                  style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <and>
-                     <reference
-                           definitionId="saros.ui.definitions.isConnected">
-                     </reference>
-                     <reference
-                           definitionId="saros.ui.definitions.isSarosSessionRunning">
-                     </reference>
-                     <not>
-                        <reference
-                              definitionId="saros.ui.definitions.isSarosSessionHost">
-                        </reference>
-                     </not>
-                  </and>
-               </visibleWhen>
-            </command>
-            <command
-                  commandId="saros.ui.commands.SessionLeave"
-                  disabledIcon="icons/dlcl16/session_terminate_tsk.png"
-                  icon="icons/elcl16/session_terminate_tsk.png"
-                  label="Stop Session..."
-                  style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <and>
-                     <reference
-                           definitionId="saros.ui.definitions.isConnected">
-                     </reference>
-                     <reference
-                           definitionId="saros.ui.definitions.isSarosSessionRunning">
-                     </reference>
-                     <reference
-                           definitionId="saros.ui.definitions.isSarosSessionHost">
-                     </reference>
-                  </and>
-               </visibleWhen>
-            </command>
-            <separator
-                  name="CollaborationEnd"
-                  visible="true">
-            </separator>
-            <separator
-                  name="OtherStart"
-                  visible="true">
-            </separator>
-            <separator
-                  name="OtherEnd"
-                  visible="true">
-            </separator>
-            <separator
-                  name="additions">
-            </separator>
-            <command
-                  commandId="saros.ui.commands.OpenSarosPreferences"
-                  icon="icons/elcl16/preferences_open_tsk.png"
-                  style="push">
-            </command>
-         </menu>
-      </menuContribution>
       <menuContribution
             allPopups="false"
             locationURI="popup:saros.ui.views.SarosView?before=menustart">
@@ -1088,6 +707,20 @@
             </instanceof>
          </with>
       </definition>
+      <definition id="saros.ui.definitions.notIsSarosSessionRunning">
+      	<not>
+      		<reference definitionId="saros.ui.definitions.isSarosSessionRunning">
+        	</reference>
+      	</not>
+      </definition>
+      <definition id="saros.ui.definitions.isConnectedAndSarosSessionRunning">
+      	<and>
+      		<reference definitionId="saros.ui.definitions.isConnected">
+        	</reference>
+        	<reference definitionId="saros.ui.definitions.isSarosSessionRunning">
+        	</reference>
+      	</and>
+      </definition>      
       <definition
             id="saros.ui.definitions.isSarosSessionHost">
          <with
@@ -1096,6 +729,28 @@
                   property="saros.isHost">
             </test>
          </with>
+      </definition>
+      <definition id="saros.ui.definitions.isConnectedAndSarosSessionRunningAndSarosSessionHost">
+      	<and>
+      		<reference definitionId="saros.ui.definitions.isConnected">
+        	</reference>
+        	<reference definitionId="saros.ui.definitions.isSarosSessionRunning">
+        	</reference>
+        	<reference definitionId="saros.ui.definitions.isSarosSessionHost">
+        	</reference>
+      	</and>
+      </definition>
+      <definition id="saros.ui.definitions.isConnectedAndSarosSessionRunningAndNotSarosSessionHost">
+      	<and>
+      		<reference definitionId="saros.ui.definitions.isConnected">
+        	</reference>
+        	<reference definitionId="saros.ui.definitions.isSarosSessionRunning">
+        	</reference>
+        	<not>
+	        	<reference definitionId="saros.ui.definitions.isSarosSessionHost">
+	        	</reference>
+	        </not>
+      	</and>
       </definition>
       <definition
             id="saros.ui.definitions.isInSarosSession">

@@ -187,7 +187,12 @@ public class SWTUtils {
    * @return the display of the current workbench
    */
   public static Display getDisplay() {
-    return PlatformUI.getWorkbench().getDisplay();
+    // return PlatformUI.getWorkbench().getDisplay();
+    Display display = Display.getCurrent();
+    if (display == null) {
+      display = Display.getDefault();
+    }
+    return display;
   }
 
   /**

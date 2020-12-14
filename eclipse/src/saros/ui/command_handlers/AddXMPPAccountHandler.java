@@ -1,14 +1,12 @@
 package saros.ui.command_handlers;
 
-import org.eclipse.core.commands.AbstractHandler;
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.e4.core.di.annotations.Execute;
 import saros.ui.util.WizardUtils;
 
-public class AddXMPPAccountHandler extends AbstractHandler {
+public class AddXMPPAccountHandler {
 
-  @Override
-  public Object execute(ExecutionEvent event) throws ExecutionException {
+  @Execute
+  public Object execute() {
     WizardUtils.openAddXMPPAccountWizard();
     return null;
   }

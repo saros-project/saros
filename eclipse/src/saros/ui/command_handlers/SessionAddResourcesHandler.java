@@ -1,10 +1,13 @@
 package saros.ui.command_handlers;
 
-import org.eclipse.core.commands.AbstractHandler;
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.e4.core.di.annotations.CanExecute;
+import org.eclipse.e4.core.di.annotations.Execute;
+import saros.SarosPluginContext;
+import saros.communication.connection.ConnectionHandler;
+import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.ISarosSession;
+import saros.session.ISarosSessionManager;
 import saros.ui.util.WizardUtils;
 import saros.ui.wizards.AddResourcesToSessionWizard;
 
@@ -15,11 +18,26 @@ import saros.ui.wizards.AddResourcesToSessionWizard;
  * <p>This class is used to define the behavior of the saros menu entry to add reference points to a
  * running session.
  */
-public class SessionAddResourcesHandler extends AbstractHandler {
+public class SessionAddResourcesHandler {
+  @Inject private ConnectionHandler connectionHandler;
+  @Inject private ISarosSessionManager sessionManager;
 
-  @Override
-  public Object execute(ExecutionEvent event) throws ExecutionException {
+  public SessionAddResourcesHandler() {
+    SarosPluginContext.initComponent(this);
+  }
+
+  @Execute
+  public Object execute() {
     WizardUtils.openAddResourcesToSessionWizard(null);
     return null;
+  }
+
+  @CanExecute
+  public boolean canExecute() {
+    return connectionHandler != null
+        && connectionHandler.isConnected()
+        && sessionManager != null
+        && sessionManager.getSession() != null
+        && sessionManager.getSession().hasWriteAccess();
   }
 }
