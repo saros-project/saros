@@ -1,18 +1,14 @@
 package saros.ui.command_handlers;
 
-import org.eclipse.core.commands.AbstractHandler;
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.e4.core.di.annotations.Execute;
 import saros.ui.util.SWTUtils;
 
-public class GettingStartedHandler extends AbstractHandler {
+public class GettingStartedHandler {
 
-  @Override
-  public Object execute(ExecutionEvent event) throws ExecutionException {
+  @Execute
+  public void execute() {
 
     SWTUtils.openInternalBrowser(
         "https://www.saros-project.org/documentation/getting-started.html", "Welcome to Saros");
-
-    return null;
   }
 }

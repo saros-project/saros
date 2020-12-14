@@ -1,12 +1,19 @@
 package saros.ui.command_handlers;
 
-import org.eclipse.core.commands.AbstractHandler;
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
+import javax.inject.Named;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.e4.core.di.annotations.CanExecute;
+import org.eclipse.e4.core.di.annotations.Execute;
+import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.ui.services.IServiceConstants;
+import org.eclipse.jface.viewers.ISelection;
+import saros.SarosPluginContext;
+import saros.communication.connection.ConnectionHandler;
+import saros.repackaged.picocontainer.annotations.Inject;
+import saros.session.ISarosSessionManager;
 import saros.ui.menu_contributions.StartSessionWithProjects;
 import saros.ui.util.WizardUtils;
-import saros.ui.util.selection.retriever.SelectionRetrieverFactory;
+import saros.ui.util.selection.SelectionUtils;
 
 /**
  * @JTourBusStop 1, Invitation Process:
@@ -35,12 +42,24 @@ import saros.ui.util.selection.retriever.SelectionRetrieverFactory;
  *
  * <p>Notice that this is done via the {@link saros.ui.wizards.StartSessionWizard}.
  */
-public class ShareResourcesHandler extends AbstractHandler {
+public class ShareResourcesHandler {
 
-  @Override
-  public Object execute(ExecutionEvent event) throws ExecutionException {
+  @Inject private ConnectionHandler connectionHandler;
+  @Inject private ISarosSessionManager sessionManager;
+
+  public ShareResourcesHandler() {
+    SarosPluginContext.initComponent(this);
+  }
+
+  @Execute
+  public Object execute(@Named(IServiceConstants.ACTIVE_SELECTION) @Optional ISelection selection) {
     WizardUtils.openStartSessionWizard(
-        SelectionRetrieverFactory.getSelectionRetriever(IResource.class).getSelection());
+        SelectionUtils.getAdaptableObjects(selection, IResource.class));
     return null;
+  }
+
+  @CanExecute
+  public boolean canExecute() {
+    return connectionHandler.isConnected() && sessionManager.getSession() == null;
   }
 }

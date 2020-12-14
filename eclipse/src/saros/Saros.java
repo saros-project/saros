@@ -3,6 +3,7 @@ package saros;
 import java.io.File;
 import java.io.InputStream;
 import java.util.concurrent.atomic.AtomicBoolean;
+import javax.inject.Inject;
 import org.apache.log4j.Logger;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.config.ConfigurationSource;
@@ -11,12 +12,16 @@ import org.apache.logging.log4j.core.lookup.MainMapLookup;
 import org.apache.logging.log4j.status.StatusLogger;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.ConfigurationScope;
+import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchListener;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.event.Event;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 import saros.annotations.Component;
@@ -130,8 +135,15 @@ public class Saros extends AbstractUIPlugin {
 
     isLifecycleStarted = true;
 
-    getWorkbench().addWorkbenchListener(workbenchShutdownListener);
     isInitialized = true;
+  }
+
+  @Inject
+  @Optional
+  public void applicationStarted(
+      @UIEventTopic(UIEvents.UILifeCycle.APP_STARTUP_COMPLETE) Event event, Saros saros) {
+
+    saros.getWorkbench().addWorkbenchListener(saros.workbenchShutdownListener);
   }
 
   @Override
