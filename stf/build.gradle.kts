@@ -28,9 +28,11 @@ dependencies {
     }
     compile(project(":saros.core"))
     compile(project(":saros.eclipse"))
-      // This is a workaround for https://github.com/saros-project/saros/issues/1086
+    // This is a workaround for https://github.com/saros-project/saros/issues/1086
     implementation("org.eclipse.platform:org.eclipse.urischeme:1.1.0")
-
+    // This is a workaround for https://github.com/saros-project/saros/issues/1114
+    implementation("org.eclipse.platform:org.eclipse.ui.ide:3.17.200")
+    implementation("org.eclipse.platform:org.eclipse.ui.workbench:3.120.0")
     compile(project(path = ":saros.eclipse", configuration = "testing"))
 
     releaseDep(fileTree("libs"))
