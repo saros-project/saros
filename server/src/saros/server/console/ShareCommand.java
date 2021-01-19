@@ -29,6 +29,11 @@ public class ShareCommand extends ConsoleCommand {
   }
 
   @Override
+  public int minArgument() {
+    return 1;
+  }
+
+  @Override
   public String help() {
     return "share <PATH>... - Share projects relative to the workspace with session participants";
   }

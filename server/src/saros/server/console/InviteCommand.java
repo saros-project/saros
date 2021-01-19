@@ -25,6 +25,11 @@ public class InviteCommand extends ConsoleCommand {
   }
 
   @Override
+  public int minArgument() {
+    return 1;
+  }
+
+  @Override
   public String help() {
     return "invite <JID>... - Invite users to session";
   }

@@ -51,14 +51,23 @@ public class ServerConsole implements Runnable {
         output.println("help - Print this help");
         output.println("quit - Quit Saros Server");
       } else {
+        boolean isCommand = false;
         for (ConsoleCommand command : commands) {
           List<String> cmd = Arrays.asList(line.split(" "));
           if (command.identifier().equals(cmd.get(0))) {
-            command.execute(cmd.subList(1, cmd.size()), output);
+            isCommand = true;
+            if (cmd.size() > command.minArgument()) {
+              command.execute(cmd.subList(1, cmd.size()), output);
+            } else {
+              output.println("Missing command arguments:");
+              output.println(command.help());
+            }
             break;
           }
         }
-        output.printf("Command '%s' is not known. (Type 'help' for available commands)", line);
+        if (!isCommand && !line.equals("")) {
+          output.printf("Command '%s' is not known. (Type 'help' for available commands)", line);
+        }
       }
       output.flush();
     }
