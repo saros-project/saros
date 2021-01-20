@@ -7,6 +7,8 @@ import java.util.List;
 public abstract class ConsoleCommand {
   public abstract String identifier();
 
+  public abstract int minArgument();
+
   public abstract String help();
 
   public abstract void execute(List<String> args, PrintStream out);
