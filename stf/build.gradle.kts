@@ -8,7 +8,7 @@ val junitVersion = ext.get("junitVersion")
 
 sarosEclipse {
     manifest = file("META-INF/MANIFEST.MF")
-    excludeManifestDependencies = listOf("saros.core", "saros.eclipse", "org.junit", "org.eclipse.gef")
+    excludeManifestDependencies = listOf("saros.core", "saros.eclipse", "org.junit", "org.eclipse.gef", "saros.libratory")
     isCreateBundleJar = true
     isAddDependencies = true
     pluginVersionQualifier = versionQualifier
@@ -26,6 +26,7 @@ dependencies {
     if (junitVersion != null) {
         compile(junitVersion)
     }
+    implementation(project(":saros.libratory"))
     compile(project(":saros.core"))
     compile(project(":saros.eclipse"))
     // This is a workaround for https://github.com/saros-project/saros/issues/1086

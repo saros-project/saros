@@ -182,6 +182,7 @@ tasks {
     register("generateLibAll") {
         dependsOn(
                 "cleanGenerateLibAll",
+                ":saros.libratory:generateLib",
                 ":saros.core:generateLib",
                 ":saros.eclipse:generateLib",
                 ":saros.stf:generateLib",
@@ -190,6 +191,7 @@ tasks {
 
     register("cleanGenerateLibAll") {
         doLast {
+            project(":saros.libratory").file("lib").deleteRecursively()
             project(":saros.eclipse").file("lib").deleteRecursively()
             project(":saros.core").file("lib").deleteRecursively()
             project(":saros.stf").file("lib").deleteRecursively()
@@ -233,11 +235,13 @@ tasks {
         dependsOn(
                 ":saros.core:test",
                 ":saros.eclipse:test",
-                ":saros.eclipse:jar")
+                ":saros.eclipse:jar",
+                ":saros.libratory:jar")
 
         group = "Build"
         description = "Builds and tests all modules required by Saros for Eclipse"
 
+        from(project(":saros.libratory").tasks.findByName("jar"))
         from(project(":saros.core").tasks.findByName("jar"))
         from(project(":saros.eclipse").tasks.findByName("jar"))
         into("build/distribution/eclipse")

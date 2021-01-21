@@ -19,7 +19,7 @@ configurations {
 
 sarosEclipse {
     manifest = file("META-INF/MANIFEST.MF")
-    excludeManifestDependencies = listOf("saros.core", "org.junit", "org.eclipse.gef")
+    excludeManifestDependencies = listOf("saros.libratory", "saros.core", "org.junit", "org.eclipse.gef")
     isAddPdeNature = true
     isCreateBundleJar = true
     isAddDependencies = true
@@ -39,12 +39,14 @@ sourceSets {
 }
 
 dependencies {
+    implementation(project(":saros.libratory"))
     implementation(project(":saros.core"))
     // This is a workaround for https://github.com/saros-project/saros/issues/1086
     implementation("org.eclipse.platform:org.eclipse.urischeme:1.1.0")
     // This is a workaround for https://github.com/saros-project/saros/issues/1114
     implementation("org.eclipse.platform:org.eclipse.ui.ide:3.17.200")
     implementation("org.eclipse.platform:org.eclipse.ui.workbench:3.120.0")
+    testImplementation(project(path = ":saros.libratory", configuration = "testing"))
     testImplementation(project(path = ":saros.core", configuration = "testing"))
 }
 
@@ -113,7 +115,7 @@ tasks {
      *  |- site.xml
      */
     val updateSitePreparation by registering(Copy::class) {
-        dependsOn(":saros.core:jar", ":saros.eclipse:jar")
+        dependsOn(":saros.core:jar", ":saros.libratory:jar", ":saros.eclipse:jar")
 
         into(updateSiteDirPath)
         into("features") {
@@ -122,6 +124,7 @@ tasks {
         into("plugins") {
             from(project.tasks.findByName("jar"))
             from(project(":saros.core").tasks.findByName("jar"))
+            from(project(":saros.libratory").tasks.findByName("jar"))
         }
         from("update/site.xml")
     }

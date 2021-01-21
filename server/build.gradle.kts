@@ -8,6 +8,7 @@ configurations {
 }
 
 dependencies {
+    implementation(project(":saros.libratory"))
     compile(project(":saros.core"))
     compile("org.apache.commons:commons-collections4:4.2")
 }
