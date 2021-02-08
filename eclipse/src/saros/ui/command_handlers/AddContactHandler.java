@@ -22,6 +22,6 @@ public class AddContactHandler {
 
   @CanExecute
   public boolean canExecute() {
-    return connectionHandler != null && connectionHandler.isConnected();
+    return connectionHandler.isConnected();
   }
 }

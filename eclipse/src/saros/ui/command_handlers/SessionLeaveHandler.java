@@ -24,9 +24,6 @@ public class SessionLeaveHandler {
 
   @CanExecute
   public boolean canExecute() {
-    return connectionHandler != null
-        && connectionHandler.isConnected()
-        && sessionManager != null
-        && sessionManager.getSession() != null;
+    return connectionHandler.isConnected() && sessionManager.getSession() != null;
   }
 }

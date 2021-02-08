@@ -34,10 +34,7 @@ public class SessionAddResourcesHandler {
 
   @CanExecute
   public boolean canExecute() {
-    return connectionHandler != null
-        && connectionHandler.isConnected()
-        && sessionManager != null
-        && sessionManager.getSession() != null
-        && sessionManager.getSession().hasWriteAccess();
+    final ISarosSession session = sessionManager.getSession();
+    return connectionHandler.isConnected() && session != null && session.hasWriteAccess();
   }
 }

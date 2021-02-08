@@ -9,6 +9,7 @@ import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.services.IServiceConstants;
+import org.eclipse.jface.viewers.ISelection;
 import saros.SarosPluginContext;
 import saros.communication.connection.ConnectionHandler;
 import saros.filesystem.IReferencePoint;
@@ -16,9 +17,8 @@ import saros.filesystem.ResourceConverter;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
-import saros.ui.expressions.ResourcePropertyTester;
 import saros.ui.util.WizardUtils;
-import saros.ui.util.selection.retriever.SelectionRetrieverFactory;
+import saros.ui.util.selection.SelectionUtils;
 
 /**
  * Handles the addition of selected {@link IResource}s to the running {@link ISarosSession}.
@@ -32,17 +32,16 @@ import saros.ui.util.selection.retriever.SelectionRetrieverFactory;
 public class SessionAddSelectedResourcesHandler {
   @Inject private ConnectionHandler connectionHandler;
   @Inject private ISarosSessionManager sessionManager;
-  @Inject private ResourcePropertyTester resourcePropertyTester;
 
   public SessionAddSelectedResourcesHandler() {
     SarosPluginContext.initComponent(this);
   }
 
   @Execute
-  public Object execute() {
+  public Object execute(@Named(IServiceConstants.ACTIVE_SELECTION) @Optional ISelection selection) {
 
     List<IResource> selectedResources =
-        SelectionRetrieverFactory.getSelectionRetriever(IResource.class).getSelection();
+        SelectionUtils.getAdaptableObjects(selection, IResource.class);
 
     WizardUtils.openAddResourcesToSessionWizard(new HashSet<>(selectedResources));
 
@@ -51,18 +50,23 @@ public class SessionAddSelectedResourcesHandler {
 
   @CanExecute
   public boolean canExecute(
-      @Named(IServiceConstants.ACTIVE_SELECTION) @Optional IResource resource) {
-    if (!(connectionHandler != null
-        && connectionHandler.isConnected()
-        && sessionManager != null
-        && sessionManager.getSession() != null
-        && sessionManager.getSession().hasWriteAccess())) {
+      @Named(IServiceConstants.ACTIVE_SELECTION) @Optional ISelection selection) {
+    List<IResource> resources = SelectionUtils.getAdaptableObjects(selection, IResource.class);
+    if (!(resources.size() > 0)) {
       return false;
     }
     final ISarosSession session = sessionManager.getSession();
+    if (!(connectionHandler.isConnected() && session != null && session.hasWriteAccess())) {
+      return false;
+    }
     Set<IReferencePoint> sharedReferencePoints = session.getReferencePoints();
-    saros.filesystem.IResource wrappedResource =
-        ResourceConverter.convertToResource(sharedReferencePoints, resource);
-    return !session.isShared(wrappedResource);
+    for (IResource resource : resources) {
+      saros.filesystem.IResource wrappedResource =
+          ResourceConverter.convertToResource(sharedReferencePoints, resource);
+      if (session.isShared(wrappedResource)) {
+        return false;
+      }
+    }
+    return true;
   }
 }
