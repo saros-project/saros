@@ -24,10 +24,10 @@ import saros.net.stream.IStreamService;
 import saros.net.stream.Socks5StreamService;
 import saros.net.stun.IStunService;
 import saros.net.stun.internal.StunServiceImpl;
-import saros.net.upnp.IUPnPAccess;
 import saros.net.upnp.IUPnPService;
-import saros.net.upnp.internal.UPnPAccessImpl;
 import saros.net.upnp.internal.UPnPServiceImpl;
+import saros.net.upnp.IGatewayFinder;
+import saros.net.upnp.internal.GatewayFinder;
 import saros.net.xmpp.XMPPConnectionService;
 import saros.net.xmpp.contact.XMPPContactsService;
 import saros.net.xmpp.filetransfer.XMPPFileTransferManager;
@@ -79,18 +79,18 @@ public class CoreContextFactory extends AbstractContextFactory {
       Component.create(DispatchThreadContext.class),
       Component.create(IConnectionManager.class, DataTransferManager.class),
       Component.create(
-          BindKey.bindKey(IStreamService.class, IContextKeyBindings.IBBStreamService.class),
-          IBBStreamService.class),
+	  BindKey.bindKey(IStreamService.class, IContextKeyBindings.IBBStreamService.class),
+	  IBBStreamService.class),
       Component.create(
-          BindKey.bindKey(IStreamService.class, IContextKeyBindings.Socks5StreamService.class),
-          Socks5StreamService.class),
+	  BindKey.bindKey(IStreamService.class, IContextKeyBindings.Socks5StreamService.class),
+	  Socks5StreamService.class),
       Component.create(XMPPConnectionService.class),
       Component.create(IStunService.class, StunServiceImpl.class),
       Component.create(SubscriptionHandler.class),
       Component.create(XMPPContactsService.class),
       Component.create(XMPPFileTransferManager.class),
       Component.create(IUPnPService.class, UPnPServiceImpl.class),
-      Component.create(IUPnPAccess.class, UPnPAccessImpl.class),
+      Component.create(IGatewayFinder.class, GatewayFinder.class),
       Component.create(IReceiver.class, XMPPReceiver.class),
       Component.create(ITransmitter.class, XMPPTransmitter.class),
       Component.create(RemoteProgressManager.class),

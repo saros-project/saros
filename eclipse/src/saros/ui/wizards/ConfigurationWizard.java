@@ -1,6 +1,6 @@
 package saros.ui.wizards;
 
-import org.bitlet.weupnp.GatewayDevice;
+import saros.net.upnp.IGateway;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.wizard.Wizard;
@@ -120,7 +120,7 @@ public class ConfigurationWizard extends Wizard {
     if (UserColorID.isValid(colorID))
       preferences.setValue(PreferenceConstants.FAVORITE_SESSION_COLOR_ID, colorID);
 
-    GatewayDevice gatewayDevice = configurationSettingsWizardPage.getPortmappingDevice();
+    IGateway gatewayDevice = configurationSettingsWizardPage.getPortmappingDevice();
 
     if (gatewayDevice != null)
       preferences.setValue(PreferenceConstants.AUTO_PORTMAPPING_DEVICEID, gatewayDevice.getUSN());

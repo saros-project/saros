@@ -3,7 +3,6 @@ package saros.ui.wizards.pages;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.log4j.Logger;
-import org.bitlet.weupnp.GatewayDevice;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -19,6 +18,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import saros.SarosPluginContext;
 import saros.net.upnp.IUPnPService;
+import saros.net.upnp.IGateway;
 import saros.preferences.Preferences;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.ui.ImageManager;
@@ -60,7 +60,7 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
   protected Button statisticSubmissionButton;
   protected Button errorLogSubmissionButton;
 
-  private List<GatewayDevice> gateways;
+  private List<IGateway> gateways;
 
   @Override
   public void createControl(Composite parent) {
@@ -221,7 +221,7 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
           @Override
           public void run() {
 
-            final List<GatewayDevice> currentGateways = upnpService.getGateways(false);
+            final List<IGateway> currentGateways = upnpService.getGateways(false);
 
             // GUI work from SWT thread
             SWTUtils.runSafeSWTAsync(
@@ -257,7 +257,7 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
     return this.autoConnectButton.getSelection();
   }
 
-  public GatewayDevice getPortmappingDevice() {
+  public IGateway getPortmappingDevice() {
     if (setupPortmappingButton.getSelection()) {
       int sel = gatewaysCombo.getSelectionIndex();
       if (sel != -1) {
@@ -284,7 +284,7 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
    * @param checkbox {@link Button} checkbox to enable/disable UPnP support
    */
   private void populateGatewaySelectionControls(
-      List<GatewayDevice> gateways, final Combo combo, final Label info, final Button checkbox) {
+      List<IGateway> gateways, final Combo combo, final Label info, final Button checkbox) {
 
     combo.setEnabled(false);
     checkbox.setEnabled(false);
@@ -297,10 +297,10 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
       return;
     }
 
-    this.gateways = new ArrayList<GatewayDevice>();
+    this.gateways = new ArrayList<IGateway>();
 
     // insert found gateways into combobox
-    for (GatewayDevice gw : gateways) {
+    for (IGateway gw : gateways) {
       try {
         String name = gw.getFriendlyName();
         if (!gw.isConnected()) name += Messages.UPnPUIUtils_disconnected;

@@ -46,8 +46,6 @@ dependencies {
     releaseDep(log4j2CoreVersion)
     releaseDep(log4j2BridgeVersion)
 
-    // TODO: use real release. This version is a customized SNAPSHOT
-    releaseDep(files("libs/weupnp.jar"))
     // Workaround until we updated to a newer smack version
     releaseDep(files("libs/smack-3.4.1.jar"))
     releaseDep(files("libs/smackx-3.4.1.jar"))

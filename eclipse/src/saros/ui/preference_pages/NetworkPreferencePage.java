@@ -4,7 +4,6 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
-import org.bitlet.weupnp.GatewayDevice;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -29,6 +28,7 @@ import saros.Saros;
 import saros.SarosPluginContext;
 import saros.annotations.Component;
 import saros.net.upnp.IUPnPService;
+import saros.net.upnp.IGateway;
 import saros.net.util.NetworkingUtils;
 import saros.preferences.PreferenceConstants;
 import saros.repackaged.picocontainer.annotations.Inject;
@@ -182,7 +182,7 @@ public final class NetworkPreferencePage extends PreferencePage
 
     initialize();
 
-    updateUpnpDevicesTable(new ArrayList<GatewayDevice>(), null);
+    updateUpnpDevicesTable(new ArrayList<IGateway>(), null);
     discoverUpnpGateways();
     return composite;
   }
@@ -492,7 +492,7 @@ public final class NetworkPreferencePage extends PreferencePage
           @Override
           public void run() {
 
-            final List<GatewayDevice> gateways = upnpService.getGateways(false);
+            final List<IGateway> gateways = upnpService.getGateways(false);
 
             SWTUtils.runSafeSWTAsync(
                 null,
@@ -533,7 +533,7 @@ public final class NetworkPreferencePage extends PreferencePage
     }
   }
 
-  private void updateUpnpDevicesTable(List<GatewayDevice> gateways, String defaultGatewayID) {
+  private void updateUpnpDevicesTable(List<IGateway> gateways, String defaultGatewayID) {
     upnpDevicesTable.setLinesVisible(true);
     upnpDevicesTable.setHeaderVisible(true);
 
@@ -559,7 +559,7 @@ public final class NetworkPreferencePage extends PreferencePage
     column = new TableColumn(upnpDevicesTable, SWT.NONE);
     column.setText(Messages.NetworkPreferencePage_device_ip);
 
-    for (GatewayDevice device : gateways) {
+    for (IGateway device : gateways) {
       String name;
       String internalIpAddress;
       String externalIpAddress;

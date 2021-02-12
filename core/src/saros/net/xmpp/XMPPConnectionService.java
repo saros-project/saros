@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import org.apache.log4j.Logger;
-import org.bitlet.weupnp.GatewayDevice;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
@@ -25,6 +24,7 @@ import saros.annotations.Component;
 import saros.net.ConnectionState;
 import saros.net.stun.IStunService;
 import saros.net.upnp.IUPnPService;
+import saros.net.upnp.IGateway;
 import saros.net.util.NetworkingUtils;
 import saros.repackaged.picocontainer.annotations.Nullable;
 import saros.util.ThreadUtils;
@@ -60,7 +60,7 @@ public class XMPPConnectionService {
   private int stunPort;
 
   /** The current gateway device to use for port mapping or <code>null</code>. */
-  private GatewayDevice device;
+  private IGateway device;
 
   private boolean useExternalGatewayDeviceAddress;
 
@@ -479,14 +479,14 @@ public class XMPPConnectionService {
               synchronized (portMappingLock) {
                 mappingStart.countDown();
 
-                List<GatewayDevice> devices = upnpService.getGateways(false);
+                List<IGateway> devices = upnpService.getGateways(false);
 
                 if (devices == null) {
                   log.warn("aborting UPNP port mapping due to network failure");
                   return;
                 }
 
-                for (GatewayDevice currentDevice : devices) {
+                for (IGateway currentDevice : devices) {
                   if (gatewayDeviceIDToFind.equals(currentDevice.getUSN())) {
                     device = currentDevice;
                     break;
