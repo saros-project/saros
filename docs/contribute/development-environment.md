@@ -109,7 +109,7 @@ The final build results are copied into the directory `<repository root>/build/d
 ### Formatting via Standalone Google Java Formatter
 
 * Download the **release 1.6** of the [Google Java Formatter](https://github.com/google/google-java-format/releases/tag/google-java-format-1.6) `google-java-format-<version>-all-deps.jar`
-* Call `java -jar google-java-format-<version>-all-deps.jar --dry-run --set-exit-if-changed **/*.jar` in a shell with enabled globstar (`shopt -s globstar`) to **check the formatting**
+* Call `java -jar google-java-format-<version>-all-deps.jar --dry-run --set-exit-if-changed **/*.java` in a shell with enabled globstar (`shopt -s globstar`) to **check the formatting**
   and add the option `--replace` and remove the option `--dry-run` if you want to **trigger automated formatting**.
 
 ## Format Checking in a Git Hook
