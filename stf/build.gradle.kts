@@ -13,12 +13,13 @@ sarosEclipse {
     isAddDependencies = true
     pluginVersionQualifier = versionQualifier
     eclipseVersion = eclipseVersionNr
+    configs = listOf("bundle", "bundleApi")
 }
 
 configurations {
-    val releaseDep by getting {}
+    val bundleApi by getting {}
     val compile by getting {
-        extendsFrom(releaseDep)
+        extendsFrom(bundleApi)
     }
 }
 
@@ -35,7 +36,7 @@ dependencies {
     implementation("org.eclipse.platform:org.eclipse.ui.workbench:3.120.0")
     compile(project(path = ":saros.eclipse", configuration = "testing"))
 
-    releaseDep(fileTree("libs"))
+    bundleApi(fileTree("libs"))
 }
 
 sourceSets {
