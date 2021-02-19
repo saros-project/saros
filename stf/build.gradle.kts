@@ -13,7 +13,6 @@ sarosEclipse {
     isAddDependencies = true
     pluginVersionQualifier = versionQualifier
     eclipseVersion = eclipseVersionNr
-    configs = listOf("bundle", "bundleApi")
 }
 
 configurations {

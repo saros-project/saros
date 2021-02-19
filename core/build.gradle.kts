@@ -22,11 +22,6 @@ configurations {
     // Defined in root build.gradle
     val testConfig by getting {}
 
-    // populate releaseDep while it is still used by other projects
-    val releaseDep by getting {
-        extendsFrom(bundle, bundleApi)
-    }
-
     // Default configuration
     val testCompile by getting {
         extendsFrom(testConfig)
@@ -41,7 +36,6 @@ sarosEclipse {
     isCreateBundleJar = true
     isAddPdeNature = true
     pluginVersionQualifier = versionQualifier
-    configs = listOf("bundle", "bundleApi")
 }
 
 dependencies {

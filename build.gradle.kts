@@ -51,9 +51,6 @@ subprojects {
     configurations {
         create("testing") // used to reference the testJar
         create("testConfig") // contains test dependencies that are used by all java subprojects
-        create("releaseDep") { // contains all dependencies which has to be included into the release jar/zip
-            isTransitive = false // avoid that the whole dependency tree is released
-        }
         create("bundle") { // contains all which are used by core
             isTransitive = false // avoid that the whole dependency tree is released
         }
@@ -115,7 +112,6 @@ subprojects {
          */
         register("generateLib", Copy::class) {
             into("${project.projectDir}/lib")
-            from(projectToConf.configurations.getByName("releaseDep"))
             from(projectToConf.configurations.getByName("bundle"))
             from(projectToConf.configurations.getByName("bundleApi"))
         }
