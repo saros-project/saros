@@ -1,5 +1,7 @@
 package saros.gradle.eclipse;
 
+import java.util.Arrays;
+import java.util.List;
 import org.gradle.api.GradleException;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
@@ -16,6 +18,7 @@ import saros.gradle.eclipse.configurator.OsgiDependencyConfigurator;
 public class SarosEclipsePlugin implements Plugin<Project> {
   private static final String EXTENSION_NAME = "sarosEclipse";
   private static final String PLUGIN_VERSION_CHANGE_TASK_NAME = "changeEclipsePluginVersion";
+  private static final List<String> DEFAULT_CONFIG_NAMES = Arrays.asList("releaseDep");
 
   /**
    * Method which is called when the plugin is integrated in a gradle build (e.g. with {@code apply
@@ -70,7 +73,8 @@ public class SarosEclipsePlugin implements Plugin<Project> {
 
     if (e.isCreateBundleJar()) {
       methodRequiresManifest("create bundle jar", e);
-      new JarConfigurator(p).createBundleJar(e.getManifest());
+      List<String> jarConfigs = e.getConfigs(DEFAULT_CONFIG_NAMES);
+      new JarConfigurator(p, jarConfigs).createBundleJar(e.getManifest());
     }
 
     if (e.isAddDependencies()) {

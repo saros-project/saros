@@ -54,6 +54,12 @@ subprojects {
         create("releaseDep") { // contains all dependencies which has to be included into the release jar/zip
             isTransitive = false // avoid that the whole dependency tree is released
         }
+        create("bundle") { // contains all which are used by core
+            isTransitive = false // avoid that the whole dependency tree is released
+        }
+        create("bundleApi") { // contains all dependencies which are used by all java subprojects
+            isTransitive = false // avoid that the whole dependency tree is released
+        }
     }
 
     configure<PmdExtension> {
@@ -110,6 +116,8 @@ subprojects {
         register("generateLib", Copy::class) {
             into("${project.projectDir}/lib")
             from(projectToConf.configurations.getByName("releaseDep"))
+            from(projectToConf.configurations.getByName("bundle"))
+            from(projectToConf.configurations.getByName("bundleApi"))
         }
 
         val aggregateTestResults: String? by project
@@ -138,6 +146,8 @@ subprojects {
     val log4j2Core = "org.apache.logging.log4j:log4j-core:$log4j2VersionNr"
     // Bridge that routes log4j calls to log4j2
     val log4j2Bridge = "org.apache.logging.log4j:log4j-1.2-api:$log4j2VersionNr"
+
+    projectToConf.extra["commons-lang3"] = "org.apache.commons:commons-lang3:3.8.1"
 
     projectToConf.extra["junitVersion"] = junitVersion
     projectToConf.extra["log4j2ApiVersion"] = log4j2Api
