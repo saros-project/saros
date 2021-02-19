@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+  <title>Follow Mode</title>
+  <meta charset='utf-8'>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,maximum-scale=2">
+
+  <!-- stylesheets -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+  <link rel="stylesheet" href="/assets/main.css">
+ 
+  <!-- favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#603cba">
+  <meta name="theme-color" content="#ffffff">
+</head>
+
+
+<body>
+  <div class="bg-dark">
+  <div class="container-fluid">
+    <nav id="top-nav" class="navbar navbar-expand-sm navbar-dark bg-dark py-2 px-0">
+      <!-- Logo -->
+      <a class="ml-md-3 navbar-brand" href="/">
+        <img class="float-left" src="/assets/images/logo/saros-logo.svg" />
+        <span class="text-decoration-none pl-2 d-inline d-sm-none d-md-inline pr-5">Saros</span>
+      </a>
+
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
+        aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <ul class="navbar-nav">
+        
+        
+        
+        
+        <li class="nav-item active">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/documentation">User Docs</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/releases">Releases</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/contribute">Contribute</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/contact">Contact</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/research">Research</a>
+        </li>
+        
+      </ul>
+      </div>
+
+      <!-- Social Media -->
+      <div id="media-links-nav" class="collapse navbar-collapse">
+        </ul>
+        <ul class="navbar-nav ml-auto">
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/saros-project/saros">
+              <i class="fab fa-github fa-lg"> </i>
+            </a>
+          </li>
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://gitter.im/saros-project/saros/user">
+              <i class="fab fa-gitter fa-lg"> </i>
+            </a>
+          </li>
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://groups.google.com/forum/#!forum/saros-user">
+              <i class="fas fa-envelope fa-lg"> </i>
+            </a>
+          </li>
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://twitter.com/saros_project">
+              <i class="fab fa-twitter fa-lg"> </i>
+            </a>
+          </li>
+          
+        </ul>
+      </div>
+    </nav>
+  </div>
+</div>
+
+  <div class="container-fluid">
+
+    
+    
+
+    
+
+    <div class="row justify-content-left flex-xl-nowrap">
+      <!-- Left sidebar -->
+      <div class="col-12 col-md-4 col-xl-3 my-3 px-0  ">
+        
+        <div id="sidebar" class="pl-1">
+    <ul class="nav flex-column">
+        
+
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/documentation/installation.html?tab=eclipse">Installation</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/documentation/getting-started.html?tab=eclipse">Getting Started</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/documentation/awareness-information.html">Awareness Information</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        
+        <li class="nav-item">
+
+            
+            
+            
+
+            <a class="font-weight-bold nav-link py-0 collapsable-side-item " href="#How-Tos"
+                data-target="#How-Tos" data-toggle="collapse">How-Tos</a>
+            <div id="How-Tos" class="collapse show">
+                <ul class="nav flex-column ml-2">
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/documentation/how-tos/change-colors.html">Change Colors</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link active-link py-0 pl-5"
+                            href="/documentation/how-tos/follow-mode.html">Follow Mode</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/documentation/how-tos/hostless-sessions.html">Hostless Sessions (alpha)</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/documentation/how-tos/manage-xmpp-accounts.html">Manage XMPP Accounts</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/documentation/how-tos/resolve-desynchronization.html">Resolve Desynchronization</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/documentation/how-tos/setup-xmpp.html">Setup XMPP Server</a></li>
+                    
+                </ul>
+            </div>
+        </li>
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/documentation/features.html">Features</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/documentation/compatibility.html">Compatibility</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/documentation/faq.html">FAQ</a>
+        </li>
+
+        
+        
+    </ul>
+
+</div>
+        
+      </div>
+
+      <div id="main-content"
+        class="col-12 col-md-8 col-lg-6 main-content my-3 px-sm-2 px-md-1 px-xl-0">
+
+        <h1 class="display-4">Follow Mode</h1>
+        <p>You can use this feature to follow a single participant’s navigation
+activities and changes.</p>
+<ul>
+  <li>Whenever the followed participant opens an editor for a shared file on
+their computer, a matching editor is opened in your IDE.</li>
+  <li>Any time the followed participant switches to view a different shared editor, a matching editor is switched
+to in your IDE.</li>
+  <li>As the followed participant scrolls in a shared editor, the local viewpoint is
+moved along accordingly in your IDE to ensure that you see what they see.
+You still have the ability to scroll the local viewpoint on your own,
+but it will still be reset every time the followed user scrolls their editor.</li>
+</ul>
+
+<p><strong>Prerequisite:</strong> You have to be in a <a href="/documentation/getting-started.html">session with another user</a>.</p>
+
+<p><img src="/assets/images/animation/saros-fm.gif" alt="saros follow-mode gif" class="img-fluid" /></p>
+
+<h2 id="following-another-participant">Following Another Participant</h2>
+
+<ul>
+  <li>Click the “Follow” button (<img src="/documentation/how-tos/images/icons-i/follow.png" alt="follow icon" />).</li>
+  <li>Select the user to follow from the list and click the entry.</li>
+</ul>
+
+<p><em>Alternatively:</em></p>
+
+<ul>
+  <li>Select another participant in the list of session participants in the session view (on the left) and right-click their name.</li>
+  <li>Click the option “Follow participant”.</li>
+</ul>
+
+<h2 id="leaving-the-follow-mode">Leaving the Follow Mode</h2>
+
+<!-- Uses the method selectTabs defined in ide-tabs.js -->
+<div class="shadow-sm mb-3">
+
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-tab-link nav-link p-1 eclipse active" onclick="selectTabs( 'eclipse' );" id="eclipse-tab" data-toggle="tab" href="#">
+                <img alt="Eclipse logo" src="/assets/images/logo/eclipse-logo.svg" height="30" />
+                Eclipse
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-tab-link nav-link p-1 intellij" onclick="selectTabs( 'intellij' );" id="intellij-tab" data-toggle="tab" href="#">
+                <img alt="IntelliJ logo" src="/assets/images/logo/intellij-logo.svg" height="30" /> IntelliJ
+            </a>
+        </li>
+    </ul>
+
+    <div class="tab-content border rounded-bottom border-top-0">
+        <div class="tab-pane fade px-2 pt-2 mt-0 mb-2 eclipse active show" role="tabpanel">
+            
+<ul>
+  <li>Click the “Follow” button (<img src="/documentation/how-tos/images/icons-e/follow.png" alt="follow icon" />)</li>
+</ul>
+
+<p><em>Alternatively:</em></p>
+
+<ul>
+  <li>Open the drop-down list beside the “Follow” button and click <code class="language-plaintext highlighter-rouge">Leave follow mode</code>.</li>
+</ul>
+
+<p><strong>OR</strong></p>
+
+<ul>
+  <li>Select the followee in the list of session participants in the session view (on the left) and right-click their name.</li>
+  <li>Click the option “Stop Following”.</li>
+</ul>
+
+
+        </div>
+
+        <div class="tab-pane fade px-2 pt-2 mt-0 mb-2 intellij" role="tabpanel">
+            
+            <p class="text-right mb-0">
+                <small class="text-muted">
+                    This is an alpha. See <a href="/releases/saros-i_0.3.0.html#restrictions">here</a>
+                    for restrictions.
+                </small>
+            </p>
+            
+<ul>
+  <li>Click the “Follow” button (<img src="/documentation/how-tos/images/icons-i/follow.png" alt="follow icon" />).</li>
+  <li>Click the option “Leave follow mode”.</li>
+</ul>
+
+        </div>
+    </div>
+</div>
+
+<h2 id="staying-aware-of-your-fellow-participants">Staying Aware of Your Fellow Participants</h2>
+
+<p>There are multiple ways of staying aware of what a driver is currently
+doing. See the <a href="/documentation/awareness-information.html">awareness information section</a> for more details.</p>
+
+
+      </div>
+
+      <!-- Right sidebar (TOC) -->
+      <div id="toc-bar-column" class="d-none d-lg-block col-12 col-lg-3 col-xl-3 px-0">
+        
+        <!-- element filled by loadToc() from toc.js -->
+        <ul id="toc-bar" class="sticky-top text-decoration-none nav toc-bar py-3"></ul>
+        
+      </div>
+    </div>
+  </div>
+
+  <footer class="page-footer font-small w-100 position-absolute">
+
+  <div class="text-center my-3">
+    
+    
+    <a href="https://github.com/saros-project/saros">
+      <i class="fab fa-github fa-lg text-white mr-3 mr-md-5"> </i>
+    </a>
+    
+    
+    <a href="https://gitter.im/saros-project/saros/user">
+      <i class="fab fa-gitter fa-lg text-white mr-3 mr-md-5"> </i>
+    </a>
+    
+    
+    <a href="https://groups.google.com/forum/#!forum/saros-user">
+      <i class="fas fa-envelope fa-lg text-white mr-3 mr-md-5"> </i>
+    </a>
+    
+    
+    <a href="https://twitter.com/saros_project">
+      <i class="fab fa-twitter fa-lg text-white "> </i>
+    </a>
+    
+  </div>
+
+</footer>
+  <script src="/node_modules/jquery/dist/jquery.min.js"></script>
+<script src="/node_modules/popper.js/dist/umd/popper.min.js"></script>
+<script src="/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+
+<script src="/node_modules/mermaid/dist/mermaid.min.js"></script>
+<script>
+mermaid.initialize({
+    startOnLoad: true
+});
+</script>
+<!-- load after its dependency jquery -->
+
+<script src="/assets/js/ide-tabs.js"></script>
+<script src="/assets/js/toc.js"></script>
+<script src="/assets/js/header-anchor-links.js"></script>
+
+</body>
+
+</html>

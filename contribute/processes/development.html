@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+  <title>Development Process</title>
+  <meta charset='utf-8'>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,maximum-scale=2">
+
+  <!-- stylesheets -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+  <link rel="stylesheet" href="/assets/main.css">
+ 
+  <!-- favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#603cba">
+  <meta name="theme-color" content="#ffffff">
+</head>
+
+
+<body>
+  <div class="bg-dark">
+  <div class="container-fluid">
+    <nav id="top-nav" class="navbar navbar-expand-sm navbar-dark bg-dark py-2 px-0">
+      <!-- Logo -->
+      <a class="ml-md-3 navbar-brand" href="/">
+        <img class="float-left" src="/assets/images/logo/saros-logo.svg" />
+        <span class="text-decoration-none pl-2 d-inline d-sm-none d-md-inline pr-5">Saros</span>
+      </a>
+
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
+        aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <ul class="navbar-nav">
+        
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/documentation">User Docs</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/releases">Releases</a>
+        </li>
+        
+        
+        
+        <li class="nav-item active">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/contribute">Contribute</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/contact">Contact</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/research">Research</a>
+        </li>
+        
+      </ul>
+      </div>
+
+      <!-- Social Media -->
+      <div id="media-links-nav" class="collapse navbar-collapse">
+        </ul>
+        <ul class="navbar-nav ml-auto">
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/saros-project/saros">
+              <i class="fab fa-github fa-lg"> </i>
+            </a>
+          </li>
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://gitter.im/saros-project/saros/user">
+              <i class="fab fa-gitter fa-lg"> </i>
+            </a>
+          </li>
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://groups.google.com/forum/#!forum/saros-user">
+              <i class="fas fa-envelope fa-lg"> </i>
+            </a>
+          </li>
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://twitter.com/saros_project">
+              <i class="fab fa-twitter fa-lg"> </i>
+            </a>
+          </li>
+          
+        </ul>
+      </div>
+    </nav>
+  </div>
+</div>
+
+  <div class="container-fluid">
+
+    
+    
+
+    
+
+    <div class="row justify-content-left flex-xl-nowrap">
+      <!-- Left sidebar -->
+      <div class="col-12 col-md-4 col-xl-3 my-3 px-0  ">
+        
+        <div id="sidebar" class="pl-1">
+    <ul class="nav flex-column">
+        
+
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/development-environment.html">Development Environment</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/guidelines.html">Guidelines</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/best-practices.html">Best Practices</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/documentation.html">Documentation Writing</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/saros-testing-framework.html">Saros Testing Framework</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/saros-server.html">Saros Server Development</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/logging.html">Logging</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        
+        <li class="nav-item">
+
+            
+            
+            
+
+            <a class="font-weight-bold nav-link py-0 collapsable-side-item " href="#Processes"
+                data-target="#Processes" data-toggle="collapse">Processes</a>
+            <div id="Processes" class="collapse show">
+                <ul class="nav flex-column ml-2">
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link active-link py-0 pl-5"
+                            href="/contribute/processes/development.html">Development Process</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/contribute/processes/continuous-integration.html">Continuous Integration</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/contribute/processes/review.html">Review Process</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/contribute/processes/release.html">Release Process</a></li>
+                    
+                </ul>
+            </div>
+        </li>
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/open-topics.html">Open Topics</a>
+        </li>
+
+        
+        
+    </ul>
+
+</div>
+        
+      </div>
+
+      <div id="main-content"
+        class="col-12 col-md-8 col-lg-6 main-content my-3 px-sm-2 px-md-1 px-xl-0">
+
+        <h1 class="display-4">Development Process</h1>
+        <h2 id="development-workflow">Development Workflow</h2>
+
+<p>Our development workflow bases on the standard <a href="https://guides.github.com/activities/forking/">GitHub fork workflow</a>.</p>
+
+<p>Before a pull request is merged, it will have to pass out <a href="/contribute/processes/review.html">review process</a>.</p>
+
+<h2 id="pull-request-structure">Pull Request Structure</h2>
+
+<p>In the Saros project, we use two different strategies to merge pull requests: <a href="#squash-and-merge">squash and merge</a> and <a href="#rebase-and-merge">rebase and merge</a>.</p>
+
+<p>Even though only maintainers can merge pull requests (meaning you can’t actively choose the strategy to use), these different merge strategies have different requirements and are used in different cases, so please have them in mind when creating a pull request.
+Which strategy is used to merge a particular pull request depends on the size, content and structure of the commits contained in the pull request. This is explained in more detail in the corresponding subsections.</p>
+
+<p>Independently of the merge strategy, please make sure that all commits have an <a href="../guidelines.html#commit-message">appropriate commit message</a>.</p>
+
+<h3 id="squash-and-merge"><a href="https://help.github.com/articles/about-pull-request-merges/#squash-and-merge-your-pull-request-commits">Squash and Merge</a></h3>
+
+<p><em>This is the preferred merging strategy for small and coherent changes.</em></p>
+
+<p>If your change only touches a specific file, functionality, or API and is not “to large” (this is somewhat subjective and will be up to you and the reviewers; as a general rule of thumb, it should not change more than 200 lines of code).
+This allows the changes to be bundled into one concise commit.</p>
+
+<h3 id="rebase-and-merge"><a href="https://help.github.com/en/articles/about-pull-request-merges#rebase-and-merge-your-pull-request-commits">Rebase and Merge</a></h3>
+
+<p><em>This is the preferred merging strategy for larger changes.</em></p>
+
+<p>If the pull request contains many changes (touches many different files/areas of the code and changes a large number of lines of code), we would prefer to split it into multiple commits make the review process easier and improve the usability of the git history.
+This is especially true if your pull requests contains changes made by automated tools (i.e. refactorings) as they can be large in size but don’t need to be reviewed as thoroughly.
+So please make sure to structure you pull request accordingly by splitting it into sensible commits.</p>
+
+<p>Furthermore, to enable us to retain this structure when merging the pull request, please make sure to keep the commit history of the pull request clean (only include commits that are supposed to end up on the main repository) and not to include any merge commits (as they unnecessarily pollute the history) in your pull request so that it can be easily rebased and merged.
+This will most likely require you to rebase and amend your branch locally when updating your changes and then force push it to your fork to update the pull request.</p>
+
+
+      </div>
+
+      <!-- Right sidebar (TOC) -->
+      <div id="toc-bar-column" class="d-none d-lg-block col-12 col-lg-3 col-xl-3 px-0">
+        
+        <!-- element filled by loadToc() from toc.js -->
+        <ul id="toc-bar" class="sticky-top text-decoration-none nav toc-bar py-3"></ul>
+        
+      </div>
+    </div>
+  </div>
+
+  <footer class="page-footer font-small w-100 position-absolute">
+
+  <div class="text-center my-3">
+    
+    
+    <a href="https://github.com/saros-project/saros">
+      <i class="fab fa-github fa-lg text-white mr-3 mr-md-5"> </i>
+    </a>
+    
+    
+    <a href="https://gitter.im/saros-project/saros/user">
+      <i class="fab fa-gitter fa-lg text-white mr-3 mr-md-5"> </i>
+    </a>
+    
+    
+    <a href="https://groups.google.com/forum/#!forum/saros-user">
+      <i class="fas fa-envelope fa-lg text-white mr-3 mr-md-5"> </i>
+    </a>
+    
+    
+    <a href="https://twitter.com/saros_project">
+      <i class="fab fa-twitter fa-lg text-white "> </i>
+    </a>
+    
+  </div>
+
+</footer>
+  <script src="/node_modules/jquery/dist/jquery.min.js"></script>
+<script src="/node_modules/popper.js/dist/umd/popper.min.js"></script>
+<script src="/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+
+<script src="/node_modules/mermaid/dist/mermaid.min.js"></script>
+<script>
+mermaid.initialize({
+    startOnLoad: true
+});
+</script>
+<!-- load after its dependency jquery -->
+
+<script src="/assets/js/ide-tabs.js"></script>
+<script src="/assets/js/toc.js"></script>
+<script src="/assets/js/header-anchor-links.js"></script>
+
+</body>
+
+</html>

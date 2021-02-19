@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+  <title>Coding and Commit Guidelines</title>
+  <meta charset='utf-8'>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,maximum-scale=2">
+
+  <!-- stylesheets -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+  <link rel="stylesheet" href="/assets/main.css">
+ 
+  <!-- favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#603cba">
+  <meta name="theme-color" content="#ffffff">
+</head>
+
+
+<body>
+  <div class="bg-dark">
+  <div class="container-fluid">
+    <nav id="top-nav" class="navbar navbar-expand-sm navbar-dark bg-dark py-2 px-0">
+      <!-- Logo -->
+      <a class="ml-md-3 navbar-brand" href="/">
+        <img class="float-left" src="/assets/images/logo/saros-logo.svg" />
+        <span class="text-decoration-none pl-2 d-inline d-sm-none d-md-inline pr-5">Saros</span>
+      </a>
+
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
+        aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <ul class="navbar-nav">
+        
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/documentation">User Docs</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/releases">Releases</a>
+        </li>
+        
+        
+        
+        <li class="nav-item active">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/contribute">Contribute</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/contact">Contact</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/research">Research</a>
+        </li>
+        
+      </ul>
+      </div>
+
+      <!-- Social Media -->
+      <div id="media-links-nav" class="collapse navbar-collapse">
+        </ul>
+        <ul class="navbar-nav ml-auto">
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/saros-project/saros">
+              <i class="fab fa-github fa-lg"> </i>
+            </a>
+          </li>
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://gitter.im/saros-project/saros/user">
+              <i class="fab fa-gitter fa-lg"> </i>
+            </a>
+          </li>
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://groups.google.com/forum/#!forum/saros-user">
+              <i class="fas fa-envelope fa-lg"> </i>
+            </a>
+          </li>
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://twitter.com/saros_project">
+              <i class="fab fa-twitter fa-lg"> </i>
+            </a>
+          </li>
+          
+        </ul>
+      </div>
+    </nav>
+  </div>
+</div>
+
+  <div class="container-fluid">
+
+    
+    
+
+    
+
+    <div class="row justify-content-left flex-xl-nowrap">
+      <!-- Left sidebar -->
+      <div class="col-12 col-md-4 col-xl-3 my-3 px-0  ">
+        
+        <div id="sidebar" class="pl-1">
+    <ul class="nav flex-column">
+        
+
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/development-environment.html">Development Environment</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item active-link font-weight-bold py-0"
+                href="/contribute/guidelines.html">Guidelines</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/best-practices.html">Best Practices</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/documentation.html">Documentation Writing</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/saros-testing-framework.html">Saros Testing Framework</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/saros-server.html">Saros Server Development</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/logging.html">Logging</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        
+        <li class="nav-item">
+
+            
+            
+            
+
+            <a class="font-weight-bold nav-link py-0 collapsable-side-item collapsed" href="#Processes"
+                data-target="#Processes" data-toggle="collapse">Processes</a>
+            <div id="Processes" class="collapse ">
+                <ul class="nav flex-column ml-2">
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/contribute/processes/development.html">Development Process</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/contribute/processes/continuous-integration.html">Continuous Integration</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/contribute/processes/review.html">Review Process</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/contribute/processes/release.html">Release Process</a></li>
+                    
+                </ul>
+            </div>
+        </li>
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/open-topics.html">Open Topics</a>
+        </li>
+
+        
+        
+    </ul>
+
+</div>
+        
+      </div>
+
+      <div id="main-content"
+        class="col-12 col-md-8 col-lg-6 main-content my-3 px-sm-2 px-md-1 px-xl-0">
+
+        <h1 class="display-4">Coding and Commit Guidelines</h1>
+        <h2 id="git">Git</h2>
+
+<h3 id="configuration">Configuration</h3>
+<ol>
+  <li>
+    <p>Make sure that both “Author” and “Committer” conform to the format:</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>John Doe &lt;john.doe@anywhere.com&gt;
+</code></pre></div>    </div>
+
+    <p>The following formats are <strong>not</strong> allowed: “<strong>johnd</strong>
+&lt;john.doe@…&gt;” or “<strong>johnny</strong> &lt;john.doe@…&gt;” or
+“<strong>John</strong> &lt;john.doe@…&gt;”</p>
+  </li>
+  <li>
+    <p>Make sure you commit files with Unix line endings. Refer to the <a href="https://git-scm.com/book/tr/v2/Customizing-Git-Git-Configuration#Formatting-and-Whitespace">Git
+manual</a>
+for more information.</p>
+  </li>
+</ol>
+
+<h3 id="commit-message">Commit Message</h3>
+
+<ol>
+  <li>Follow the general rule of how Git commit messages are formatted.
+Refer to the <a href="https://git-scm.com/book/en/v2/Distributed-Git-Contributing-to-a-Project#_commit_guidelines">Git manual</a> for
+more information. In particular, every patch must have an
+informative short summary or “subject line” (also see next point in
+the list) and it should have a more detailed explanation below.</li>
+  <li>In addition, use one of the following <strong>type tags</strong> in the subject
+line to make it easier for people to understand what your commit was
+about:</li>
+</ol>
+
+<table>
+  <thead>
+    <tr>
+      <th>Tag</th>
+      <th>Includes</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">[NOP]</code></td>
+      <td> </td>
+      <td>This commit did not have any effect and only concerns whitespace, removing unused methods, fixing documentation typos, etc.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">[TASK]</code></td>
+      <td><code class="language-plaintext highlighter-rouge">[NOP]</code></td>
+      <td>Adds things that need to be done.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">[DOC]</code></td>
+      <td><code class="language-plaintext highlighter-rouge">[TASK]</code></td>
+      <td>Improves JavaDocs or comments.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">[INTERNAL]</code></td>
+      <td><code class="language-plaintext highlighter-rouge">[DOC]</code></td>
+      <td>Only affects the details of the implementation without any effects to users of the component.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">[API]</code></td>
+      <td><code class="language-plaintext highlighter-rouge">[INTERNAL]</code></td>
+      <td>Affects the interface or dependencies of a component without creating any new functionality or fixing an existing bug.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">[REFACTOR]</code></td>
+      <td> </td>
+      <td><code class="language-plaintext highlighter-rouge">API</code> or <code class="language-plaintext highlighter-rouge">INTERNAL</code> changes, which are done using automated tool support. So while <code class="language-plaintext highlighter-rouge">REFACTOR</code> changes usually result in large diffs, they are not very error prone. Caution: A refactoring should always be a separate patch, because refactorings are very hard to read.</td>
+    </tr>
+    <tr>
+      <td>(<code class="language-plaintext highlighter-rouge">[FIX]</code> | <code class="language-plaintext highlighter-rouge">[FIX] #bug id</code>)</td>
+      <td><code class="language-plaintext highlighter-rouge">[INTERNAL]</code></td>
+      <td>Fixes a bug. If existing, please attach the SourceForge bug tracker ID.</td>
+    </tr>
+    <tr>
+      <td>(<code class="language-plaintext highlighter-rouge">[FEATURE]</code>|<code class="language-plaintext highlighter-rouge">[FEATURE] #feature id</code>)</td>
+      <td><code class="language-plaintext highlighter-rouge">[INTERNAL]</code></td>
+      <td>Improves the functionality of the software. If existing, please attach the SourceForge feature tracker ID.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">[LOG]</code></td>
+      <td><code class="language-plaintext highlighter-rouge">[DOC]</code></td>
+      <td>Improves Logging with Log4j.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">[UI]</code></td>
+      <td><code class="language-plaintext highlighter-rouge">[INTERNAL]</code></td>
+      <td>Improvements to the user interface.</td>
+    </tr>
+    <tr>
+      <td>(<code class="language-plaintext highlighter-rouge">[JUNIT]</code>|<code class="language-plaintext highlighter-rouge">[STF]</code>)</td>
+      <td><code class="language-plaintext highlighter-rouge">[INTERNAL]</code></td>
+      <td>Improves testing – either JUnit tests or STF tests.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">[BUILD]</code></td>
+      <td><code class="language-plaintext highlighter-rouge">[TASK]</code></td>
+      <td>Changes the way how the sources are compiled or distributed, e.g. changes to build scripts, MANIFEST files, or update sites.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The following <strong>scope tags</strong> can (and should) be used in addition to
+ make it easier to track what part of Saros your commit is changing.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Tag</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">[E]</code></td>
+      <td>This commit ONLY affects the Eclipse version of Saros</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">[I]</code></td>
+      <td>IntelliJ version of Saros</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">[VSC]</code></td>
+      <td>Visual Studio Code version of Saros</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">[S]</code></td>
+      <td>Saros Server</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">[HTML]</code></td>
+      <td>Saros HTML UI</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">[CORE]</code></td>
+      <td>Saros core</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Example usage: <code class="language-plaintext highlighter-rouge">[INTERNAL][I]</code> = Only affects the details of the
+implementation in IntelliJ.
+If you can’t decide on a single type tag, you probably mixed up
+different concerns and should consider splitting your patch.</p>
+
+<h2 id="coding-rules">Coding Rules</h2>
+
+<h3 id="formatting">Formatting</h3>
+
+<p>We expect source code to be formatted and cleaned up using an automated
+tool prior to submission. The formatting is also checked by the CI server
+and will fail if a commit does not comply with the formatting rules.
+See the <a href="/contribute/development-environment.html">development environment documentation</a> for more information.</p>
+
+<h3 id="naming-conventions">Naming Conventions</h3>
+<p>We use the conventions defined in <a href="http://www.oracle.com/technetwork/java/codeconventions-135099.html#367">Java TM Programming Language, Chapter 9</a>.</p>
+
+<p>The only differences and additional conventions are:</p>
+<ul>
+  <li>Non-Listener interfaces should be preceded by an I.<br />
+e.g. <code class="language-plaintext highlighter-rouge">IProject</code>, <code class="language-plaintext highlighter-rouge">IPreferenceStore</code></li>
+  <li>Listener interfaces should use the name of their corresponding class and add Listener to it.<br />
+e.g. <code class="language-plaintext highlighter-rouge">MouseListener</code></li>
+  <li>All test case classes must end with <code class="language-plaintext highlighter-rouge">Test</code>.<br />
+e.g <code class="language-plaintext highlighter-rouge">HelloWorldTest</code></li>
+  <li>A test suite classes must contain  <code class="language-plaintext highlighter-rouge">TestSuite</code>.<br /></li>
+  <li>Every test class that is used for White-Box testing must be declared in the same package.<br />
+e.g. <code class="language-plaintext highlighter-rouge">foo.bar.HelloWorld</code> -&gt; <code class="language-plaintext highlighter-rouge">foo.bar.HelloWorldTest</code></li>
+  <li>STF test cases must be put in any subpackage of <code class="language-plaintext highlighter-rouge">saros.stf.test</code>.<br />
+e.g <code class="language-plaintext highlighter-rouge">saros.stf.test.account.AccountPreferencePageTest</code></li>
+</ul>
+
+<h3 id="structure">Structure</h3>
+
+<h4 id="getters-and-setters">Getters and Setters</h4>
+
+<ul>
+  <li>Use getters and setters by default except for very good reason</li>
+  <li>Internal Local Entity Classes do not need (but may) use
+getters/setters</li>
+  <li>Internal collections may be returned from classes, but it MUST be
+clearly indicated whether the returned value MUST not be changed
+(then an immutable view should be returned) or whether a user of a
+class MAY change the collection (in which case the class must ensure
+that the behavior is well defined, for instance using an
+observable collection)</li>
+</ul>
+
+<h4 id="class-member-visibility">Class Member Visibility</h4>
+
+<p>By default, all fields and methods should be <strong><code class="language-plaintext highlighter-rouge">private</code></strong>. For any field
+or method with a visibility higher than <strong><code class="language-plaintext highlighter-rouge">private </code></strong>(visible from the
+outside) there MUST be a detailed JavaDoc explanation. Thus, especially
+making something <code class="language-plaintext highlighter-rouge">public </code>should be a deliberate and conscious act.</p>
+
+<p>To facilitate testing, you may be tempted to make members more
+accessible. This is fine up to <strong>package-private</strong> (no modifier). But it
+is not acceptable to make a member part of a package’s API
+(<code class="language-plaintext highlighter-rouge">protected </code>or <code class="language-plaintext highlighter-rouge">public</code>) solely for testing purposes.</p>
+
+<h4 id="final-members-and-variables">Final Members and Variables</h4>
+
+<ul>
+  <li>For class variables: By default, make them final, unless you find a
+good reason not to. It makes the code easier to understand when you
+know where changes are expected to happen.</li>
+  <li>For local variables and parameters: In principle, the same rule
+applies as for class variables. But since local variables and
+parameters have a limited scope, the additional information gained
+through the presence of a final modifier is not tremendous.
+Therefore, we tend to not use the final keyword here.</li>
+  <li>For methods: By default, don’t make them final, unless you have good
+reason not to. After all, we want to use
+object-oriented programming.</li>
+</ul>
+
+<h4 id="classes-and-interfaces">Classes and Interfaces</h4>
+
+<ul>
+  <li>Take your time, look at the environment of your code and think. When
+it comes to the establishment of classes and interfaces, there is a
+lot of mistakes to make that work against the designed architecture
+and make solving problems afterwards very expensive.</li>
+  <li>Components must implement an interface if they access
+external resources. Implementing an interface to combine things to
+reusable units is always a good idea, but before doing so make sure
+that there is no such similar implementation in place already and
+how the newly created one would fit into the architecture.</li>
+  <li>If you develop a listener interface with more than one method, you
+should in most cases provide an abstract base implementation which
+provides empty implementations, because in many cases implementors
+of your interface will not want to implement all methods. Also it
+helps to improve ability to change the program, as methods can be
+added to the interface more easily.
+    <ul>
+      <li>see <a href="#naming-conventions">Naming Conventions</a> for
+more information</li>
+    </ul>
+  </li>
+  <li>Do not implement more than one listener interface per class,
+especially if using a top level class, because it makes the code
+much less readable and makes you more likely to forget unregistering
+your listener.
+    <ul>
+      <li>Anonymous inner-classes assigned to fields are much better:</li>
+    </ul>
+  </li>
+</ul>
+
+<p>Instead of:</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">A</span> <span class="kd">implements</span> <span class="no">B</span><span class="o">,</span> <span class="no">C</span><span class="o">,</span> <span class="no">D</span> <span class="o">{</span>
+  <span class="o">...</span>
+<span class="o">}</span>
+</code></pre></div></div>
+<p>you should write:</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">A</span> <span class="kd">implements</span> <span class="no">D</span> <span class="o">{</span>
+  <span class="o">...</span>
+
+  <span class="no">B</span> <span class="n">b</span> <span class="o">=</span> <span class="k">new</span> <span class="no">B</span><span class="o">(){</span>
+    <span class="o">...</span>
+  <span class="o">};</span>
+
+  <span class="no">C</span> <span class="n">c</span> <span class="o">=</span> <span class="k">new</span> <span class="no">C</span><span class="o">(){</span>
+    <span class="o">...</span>
+  <span class="o">};</span>
+
+  <span class="o">...</span>
+</code></pre></div></div>
+
+<h4 id="control-flow">Control Flow</h4>
+
+<p>Test whether you can return from a method instead of testing whether
+you should execute a block of code.</p>
+
+<p>Instead of:</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">foo</span><span class="o">(){</span>
+      <span class="c1">//some code</span>
+
+      <span class="k">if</span> <span class="o">(</span><span class="n">condition</span><span class="o">){</span>
+        <span class="c1">// long block of code</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
+</code></pre></div></div>
+
+<p>you should write:</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">foo</span><span class="o">(){</span>
+      <span class="c1">//some code</span>
+
+      <span class="k">if</span> <span class="o">(!</span><span class="n">condition</span><span class="o">)</span>
+        <span class="k">return</span><span class="o">;</span>
+
+      <span class="c1">// long block of code</span>
+    <span class="o">}</span>
+</code></pre></div></div>
+
+<p>Furthermore, there is no need to put the code after the return
+statement into an explicit “else”-branch. You can easily save one
+level of block-nesting.</p>
+
+<h4 id="checking-parameters">Checking Parameters</h4>
+
+<ul>
+  <li>Methods may assume that they are called with correct non-null input
+unless the method specifies that it allows incorrect or null input.</li>
+  <li>If a parameter may be <code class="language-plaintext highlighter-rouge">null </code>or is checked add a <code class="language-plaintext highlighter-rouge">@param</code>-JavaDoc
+that indicates this.</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>        <span class="cm">/**
+         * Get positions of slashes in the filename.
+         * @param filename may be null
+         * @return Null-based indices into the string
+                   pointing to the slash positions.
+         */</span>
+
+        <span class="kd">public</span> <span class="kt">int</span><span class="o">[]</span> <span class="nf">findAllSlashes</span><span class="o">(</span><span class="nc">String</span> <span class="n">filename</span><span class="o">)</span> <span class="o">{</span>
+          <span class="k">if</span> <span class="o">(</span><span class="n">filename</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
+            <span class="k">return</span> <span class="k">new</span> <span class="kt">int</span><span class="o">[];</span>
+          <span class="o">...</span>
+        <span class="o">}</span>
+</code></pre></div></div>
+
+<ul>
+  <li>If a method checks for correct parameters it should throw an
+<code class="language-plaintext highlighter-rouge">IllegalArgumentException </code>in case of error.
+    <ul>
+      <li>It is recommended to perform checking in particular at important
+component boundaries. For instance, we had a central entry point
+were events were buffered for sending over the network. Somehow
+a <code class="language-plaintext highlighter-rouge">null </code>event was inserted into the buffer queue and caused a
+<code class="language-plaintext highlighter-rouge">NullPointerException </code>later on. The programmer of the method
+which inserted the event into the buffer should have checked at
+this important boundary with many callers.</li>
+    </ul>
+  </li>
+  <li>Use assert to check for complex preconditions, that cost a lot
+during runtime.</li>
+</ul>
+
+
+      </div>
+
+      <!-- Right sidebar (TOC) -->
+      <div id="toc-bar-column" class="d-none d-lg-block col-12 col-lg-3 col-xl-3 px-0">
+        
+        <!-- element filled by loadToc() from toc.js -->
+        <ul id="toc-bar" class="sticky-top text-decoration-none nav toc-bar py-3"></ul>
+        
+      </div>
+    </div>
+  </div>
+
+  <footer class="page-footer font-small w-100 position-absolute">
+
+  <div class="text-center my-3">
+    
+    
+    <a href="https://github.com/saros-project/saros">
+      <i class="fab fa-github fa-lg text-white mr-3 mr-md-5"> </i>
+    </a>
+    
+    
+    <a href="https://gitter.im/saros-project/saros/user">
+      <i class="fab fa-gitter fa-lg text-white mr-3 mr-md-5"> </i>
+    </a>
+    
+    
+    <a href="https://groups.google.com/forum/#!forum/saros-user">
+      <i class="fas fa-envelope fa-lg text-white mr-3 mr-md-5"> </i>
+    </a>
+    
+    
+    <a href="https://twitter.com/saros_project">
+      <i class="fab fa-twitter fa-lg text-white "> </i>
+    </a>
+    
+  </div>
+
+</footer>
+  <script src="/node_modules/jquery/dist/jquery.min.js"></script>
+<script src="/node_modules/popper.js/dist/umd/popper.min.js"></script>
+<script src="/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+
+<script src="/node_modules/mermaid/dist/mermaid.min.js"></script>
+<script>
+mermaid.initialize({
+    startOnLoad: true
+});
+</script>
+<!-- load after its dependency jquery -->
+
+<script src="/assets/js/ide-tabs.js"></script>
+<script src="/assets/js/toc.js"></script>
+<script src="/assets/js/header-anchor-links.js"></script>
+
+</body>
+
+</html>

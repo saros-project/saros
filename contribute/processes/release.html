@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+  <title>Release Process</title>
+  <meta charset='utf-8'>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,maximum-scale=2">
+
+  <!-- stylesheets -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+  <link rel="stylesheet" href="/assets/main.css">
+ 
+  <!-- favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#603cba">
+  <meta name="theme-color" content="#ffffff">
+</head>
+
+
+<body>
+  <div class="bg-dark">
+  <div class="container-fluid">
+    <nav id="top-nav" class="navbar navbar-expand-sm navbar-dark bg-dark py-2 px-0">
+      <!-- Logo -->
+      <a class="ml-md-3 navbar-brand" href="/">
+        <img class="float-left" src="/assets/images/logo/saros-logo.svg" />
+        <span class="text-decoration-none pl-2 d-inline d-sm-none d-md-inline pr-5">Saros</span>
+      </a>
+
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
+        aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <ul class="navbar-nav">
+        
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/documentation">User Docs</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/releases">Releases</a>
+        </li>
+        
+        
+        
+        <li class="nav-item active">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/contribute">Contribute</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/contact">Contact</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/research">Research</a>
+        </li>
+        
+      </ul>
+      </div>
+
+      <!-- Social Media -->
+      <div id="media-links-nav" class="collapse navbar-collapse">
+        </ul>
+        <ul class="navbar-nav ml-auto">
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/saros-project/saros">
+              <i class="fab fa-github fa-lg"> </i>
+            </a>
+          </li>
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://gitter.im/saros-project/saros/user">
+              <i class="fab fa-gitter fa-lg"> </i>
+            </a>
+          </li>
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://groups.google.com/forum/#!forum/saros-user">
+              <i class="fas fa-envelope fa-lg"> </i>
+            </a>
+          </li>
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://twitter.com/saros_project">
+              <i class="fab fa-twitter fa-lg"> </i>
+            </a>
+          </li>
+          
+        </ul>
+      </div>
+    </nav>
+  </div>
+</div>
+
+  <div class="container-fluid">
+
+    
+    
+
+    
+
+    <div class="row justify-content-left flex-xl-nowrap">
+      <!-- Left sidebar -->
+      <div class="col-12 col-md-4 col-xl-3 my-3 px-0  ">
+        
+        <div id="sidebar" class="pl-1">
+    <ul class="nav flex-column">
+        
+
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/development-environment.html">Development Environment</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/guidelines.html">Guidelines</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/best-practices.html">Best Practices</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/documentation.html">Documentation Writing</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/saros-testing-framework.html">Saros Testing Framework</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/saros-server.html">Saros Server Development</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/logging.html">Logging</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        
+        <li class="nav-item">
+
+            
+            
+            
+
+            <a class="font-weight-bold nav-link py-0 collapsable-side-item " href="#Processes"
+                data-target="#Processes" data-toggle="collapse">Processes</a>
+            <div id="Processes" class="collapse show">
+                <ul class="nav flex-column ml-2">
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/contribute/processes/development.html">Development Process</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/contribute/processes/continuous-integration.html">Continuous Integration</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/contribute/processes/review.html">Review Process</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link active-link py-0 pl-5"
+                            href="/contribute/processes/release.html">Release Process</a></li>
+                    
+                </ul>
+            </div>
+        </li>
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/open-topics.html">Open Topics</a>
+        </li>
+
+        
+        
+    </ul>
+
+</div>
+        
+      </div>
+
+      <div id="main-content"
+        class="col-12 col-md-8 col-lg-6 main-content my-3 px-sm-2 px-md-1 px-xl-0">
+
+        <h1 class="display-4">Release Process</h1>
+        <h2 id="when-do-we-release">When do we release?</h2>
+
+<p>We publish releases when a relevant set of changes is integrated in the master branch and the team wants to release.</p>
+
+<h2 id="how-do-i-create-the-release-artifacts">How do I create the release artifacts?</h2>
+<p>In the following the task which are required to build all release artifacts are described.</p>
+
+<p>Please make sure before creating the artifacts that <strong>all unit and stf tests are successful.</strong></p>
+
+<h3 id="eclipse">Eclipse</h3>
+
+<p><strong>Artifacts:</strong></p>
+<ul>
+  <li>Update Site</li>
+  <li>Drop-in</li>
+</ul>
+
+<h4 id="prerequisite">Prerequisite</h4>
+<p>If there were any changes to the Saros core since the last release, make sure to also increase the version number of the <code class="language-plaintext highlighter-rouge">saros.core</code> osgi bundle.
+If only the <code class="language-plaintext highlighter-rouge">saros.eclipse</code> version is increased, a Saros update (via the update-site) would lead to a corrupted Saros installation that consists of the new <code class="language-plaintext highlighter-rouge">saros.eclipse</code> bundle and the <code class="language-plaintext highlighter-rouge">saros.core</code> version of the previous release.</p>
+
+<h4 id="update-site">Update Site</h4>
+
+<ul>
+  <li>Open an eclipse instance which contains a working <a href="https://www.saros-project.org/contribute/development-environment.html">Saros development setup</a></li>
+  <li>Open the project <code class="language-plaintext highlighter-rouge">Saros Update Site</code></li>
+  <li>Open the file <code class="language-plaintext highlighter-rouge">site.xml</code></li>
+  <li>Make sure that the category <code class="language-plaintext highlighter-rouge">DPP</code> contains the current feature <code class="language-plaintext highlighter-rouge">saros.feature*</code></li>
+  <li>Click on <code class="language-plaintext highlighter-rouge">Build All</code></li>
+  <li>The Update Site is created in the <code class="language-plaintext highlighter-rouge">Saros Update Site</code> project directory</li>
+</ul>
+
+<h4 id="drop-in">Drop-in</h4>
+
+<ul>
+  <li>Open an eclipse instance which contains a working <a href="https://www.saros-project.org/contribute/development-environment.html">Saros development setup</a></li>
+  <li>Open <code class="language-plaintext highlighter-rouge">File &gt; Export… &gt; Plug-in Development &gt; Deployable features</code></li>
+  <li>Choose feature</li>
+  <li>Destination: Directory</li>
+  <li>Choose target directory name: <code class="language-plaintext highlighter-rouge">saros-dropin-&lt;version&gt;</code></li>
+  <li>Click Finish</li>
+  <li>In the dropin folder, delete the files <code class="language-plaintext highlighter-rouge">artifacts.jar</code> and <code class="language-plaintext highlighter-rouge">content.jar</code></li>
+  <li>Add the readme: <code class="language-plaintext highlighter-rouge">This is the Saros Eclipse plugin dropin archive. You can install it by unzipping it to eclipse/dropins and restarting Eclipse.</code></li>
+  <li>Create a zip file from the folder</li>
+</ul>
+
+<h3 id="intellij-idea">IntelliJ IDEA</h3>
+
+<p><strong>Artifacts:</strong></p>
+<ul>
+  <li>Plug-in zip</li>
+</ul>
+
+<h4 id="plug-in-zip">Plug-In zip</h4>
+
+<ul>
+  <li>Open bash</li>
+  <li>Navigate to the Saros repository dir</li>
+  <li>Execute the command <code class="language-plaintext highlighter-rouge">./gradlew sarosIntellij</code></li>
+  <li>You find the zip here: <code class="language-plaintext highlighter-rouge">./build/distribution/intellij/saros.inteliij.zip</code></li>
+</ul>
+
+<h2 id="how-do-i-test-the-artifacts">How do I test the artifacts?</h2>
+
+<p>As mentioned before you should already executed all unit and STF tests (which has to be successful).</p>
+
+<p>The release artifacts are manually tested with at least one other person:</p>
+<ul>
+  <li>You have to install the artifact and start a session.</li>
+  <li>During this session you should check (at least) that the basic features are working.</li>
+</ul>
+
+<h3 id="eclipse-update-site">Eclipse Update-site</h3>
+
+<p>The following instructions use port <code class="language-plaintext highlighter-rouge">9090</code> and <code class="language-plaintext highlighter-rouge">8080</code> and a python development webserver
+(Use <code class="language-plaintext highlighter-rouge">python -m SimpleHTTPServer &lt;port&gt;</code> if you use <code class="language-plaintext highlighter-rouge">python2</code> instead of <code class="language-plaintext highlighter-rouge">python3</code>).
+However, you can use other HTTP-servers (e.g. the php development server) and ports.</p>
+
+<p>In order to test the update-site <a href="#update-site">you created</a> (in this excample in the directory <code class="language-plaintext highlighter-rouge">&lt;update-site-dir&gt;</code>), you have to:</p>
+<ol>
+  <li><strong>Host the update-site</strong>
+    <ul>
+      <li>Open a terminal</li>
+      <li>Change the directory to <code class="language-plaintext highlighter-rouge">&lt;update-site-dir&gt;</code></li>
+      <li>Spawn a local HTTP-server that hosts the update-site content:<br />
+ <code class="language-plaintext highlighter-rouge">python -m http.server 9090</code></li>
+    </ul>
+  </li>
+  <li><strong>Host the composite update-site</strong>
+    <ul>
+      <li>In the directory <code class="language-plaintext highlighter-rouge">&lt;saros-repo&gt;/docs/update-site/eclipse</code> change the <code class="language-plaintext highlighter-rouge">location</code> reference in the files <code class="language-plaintext highlighter-rouge">compositeArtifacts.xml</code> and
+ <code class="language-plaintext highlighter-rouge">compositeContent.xml</code> to reference the locally hosted artifacts:<br />
+ Change <code class="language-plaintext highlighter-rouge">&lt;child location='https://saros-project.github.io/update-site-artifacts' /&gt;</code> to <code class="language-plaintext highlighter-rouge">&lt;child location='http://localhost:9090' /&gt;</code>.</li>
+      <li>Open a second terminal</li>
+      <li>Change the directory to <code class="language-plaintext highlighter-rouge">&lt;saros-repo&gt;/docs/update-site/eclipse</code></li>
+      <li>Spawn a local HTTP-server that hosts the composite update-site:<br />
+ <code class="language-plaintext highlighter-rouge">python -m http.server 8080</code></li>
+    </ul>
+  </li>
+  <li><strong>Install Saros</strong> via the composite update-site <code class="language-plaintext highlighter-rouge">http://localhost:8080</code></li>
+</ol>
+
+<h2 id="how-do-i-release-the-artifacts">How do I release the artifacts?</h2>
+<p>In the following the technical steps which are required for releasing artifacts are described.</p>
+
+<h3 id="eclipse-1">Eclipse</h3>
+
+<p><strong>Channels:</strong></p>
+<ul>
+  <li>Update Site</li>
+  <li>Eclipse Marketplace</li>
+  <li>GitHub Releases (See below)</li>
+</ul>
+
+<p><strong>Attention</strong>: The <strong>Eclipse Marketplace</strong> uses the <strong>Update Site</strong> in order to provide the plug-in.
+Therefore it is not possible to release via the update site without updating the marketplace.</p>
+
+<h4 id="update-site-1">Update Site</h4>
+<p>The update site is hosted via GitHub Pages. Therefore you just have to change the content of the repository <a href="https://github.com/saros-project/update-site-artifacts">update-site-artifacts</a>
+in order to change the update site.</p>
+
+<p><strong>What is released via this channel?</strong>
+We release the update site (which consists of: the directories <code class="language-plaintext highlighter-rouge">plugins</code> and <code class="language-plaintext highlighter-rouge">features</code>, and the Jars <code class="language-plaintext highlighter-rouge">artifacts.jar</code> and <code class="language-plaintext highlighter-rouge">content.jar</code>) via this channel.</p>
+
+<p><strong>Login process</strong></p>
+
+<ul>
+  <li>Login with the <code class="language-plaintext highlighter-rouge">saros-infrastructure</code> user</li>
+</ul>
+
+<p><strong>Release process</strong></p>
+
+<ul>
+  <li>Create a pull request that contains the new update site</li>
+  <li>Merge the pull request</li>
+  <li>Check that the update site is deployed successfully</li>
+</ul>
+
+<h4 id="eclipse-marketplace">Eclipse Marketplace</h4>
+
+<p><strong>What is released via this channel?</strong>
+The Saros for Eclipse plug-in is released via this channel, but you don’t have to release the artifact explicit via
+this channel, because the Marketplace uses the <strong>Update Site</strong>.
+As long as the infrastructure does not change (like the update site location) just update <strong>Version number</strong> information
+in the marketplace.</p>
+
+<p><strong>Login process</strong></p>
+
+<ul>
+  <li>Login with the saros-outreach user</li>
+</ul>
+
+<p><strong>Release/Metadata change process</strong></p>
+
+<ul>
+  <li>Search for the plug-in “Saros”</li>
+  <li>Click on Saros</li>
+  <li>Click on the <code class="language-plaintext highlighter-rouge">Edit</code> tab</li>
+  <li>Change corresponding metadata (as <strong>Version number</strong>)</li>
+  <li>Submit form with <code class="language-plaintext highlighter-rouge">Save</code></li>
+</ul>
+
+<h3 id="intellij-idea-1">IntelliJ IDEA</h3>
+
+<p><strong>Channels:</strong></p>
+<ul>
+  <li>JetBrains Plugin Repository</li>
+  <li>GitHub Releases (See below)</li>
+</ul>
+
+<p>Attention: We are currently releasing the Saros for IntelliJ plug-in via the <code class="language-plaintext highlighter-rouge">alpha</code> channel of the JetBrains Plugin Repository
+instead of the <code class="language-plaintext highlighter-rouge">stable</code> channel (which is the default channel).</p>
+
+<h4 id="jetbrains-plugin-repository">JetBrains Plugin Repository</h4>
+
+<p><strong>What is released via this channel?</strong>
+We release the IntelliJ IDEA plug-in zip via this repository.</p>
+
+<p><strong>Login process</strong></p>
+
+<ul>
+  <li>Login as user <code class="language-plaintext highlighter-rouge">saros-infrastructure</code> in <a href="https://github.com">GitHub</a></li>
+  <li>Open the <a href="https://plugins.jetbrains.com/">JetBrains Plugin Repository</a></li>
+  <li>Click on <code class="language-plaintext highlighter-rouge">Sign In</code></li>
+  <li>Instead of entering user credentials, choose the login via GitHub (click on the GitHub icon)</li>
+</ul>
+
+<p><strong>Release process</strong></p>
+
+<ul>
+  <li>Open the drop-down menu which appears if you hover over the username</li>
+  <li>Click on <code class="language-plaintext highlighter-rouge">Upload plugin</code></li>
+  <li>Fill the form:
+    <ul>
+      <li>JAR/ZIP file to upload: Upload the plug-in as zip archive</li>
+      <li>License: Paste link to GPLv2: <a href="https://opensource.org/licenses/GPL-2.0">https://opensource.org/licenses/GPL-2.0</a></li>
+      <li>Category: Choose <strong>TeamWork</strong></li>
+      <li>Channel: Use the <code class="language-plaintext highlighter-rouge">alpha</code> channel</li>
+    </ul>
+  </li>
+  <li>Submit form</li>
+</ul>
+
+<h3 id="github-releases-intellij-and-eclipse">GitHub Releases (IntelliJ and Eclipse)</h3>
+
+<p><strong>What is released via this channel?</strong>
+We release the Saros for Eclipse drop-in and the Saros for IntelliJ zip via this channel.</p>
+
+<p><strong>Login process</strong></p>
+
+<ul>
+  <li>Login as a user with write access in <a href="https://github.com">GitHub</a> (e.g. <code class="language-plaintext highlighter-rouge">saros-infrastructure</code>)</li>
+</ul>
+
+<p><strong>Release process</strong></p>
+
+<ul>
+  <li>Navigate to the <a href="https://github.com/saros-project/saros">GitHub Saros page</a></li>
+  <li>Click on the <code class="language-plaintext highlighter-rouge">releases</code> tab</li>
+  <li>Click on <code class="language-plaintext highlighter-rouge">draft a new release</code></li>
+  <li>Fill the form:
+    <ul>
+      <li>Tag: <code class="language-plaintext highlighter-rouge">saros-&lt;ide&gt;-&lt;version&gt;</code> (e.g. <code class="language-plaintext highlighter-rouge">saros-intellij-0.1.1</code>)</li>
+      <li>Tag target: a commit id</li>
+      <li>Release title: Short title as <code class="language-plaintext highlighter-rouge">Saros for &lt;ide&gt; &lt;version&gt;</code></li>
+      <li>Description: Short description of artifacts and link the release notes</li>
+      <li>Upload binaries as artifacts (e.g. drop-in, plug-in zip)</li>
+    </ul>
+  </li>
+  <li>Submit form with <code class="language-plaintext highlighter-rouge">Publish release</code> (or <code class="language-plaintext highlighter-rouge">Save draft</code> if you don’t want to publish the release)</li>
+</ul>
+
+
+      </div>
+
+      <!-- Right sidebar (TOC) -->
+      <div id="toc-bar-column" class="d-none d-lg-block col-12 col-lg-3 col-xl-3 px-0">
+        
+        <!-- element filled by loadToc() from toc.js -->
+        <ul id="toc-bar" class="sticky-top text-decoration-none nav toc-bar py-3"></ul>
+        
+      </div>
+    </div>
+  </div>
+
+  <footer class="page-footer font-small w-100 position-absolute">
+
+  <div class="text-center my-3">
+    
+    
+    <a href="https://github.com/saros-project/saros">
+      <i class="fab fa-github fa-lg text-white mr-3 mr-md-5"> </i>
+    </a>
+    
+    
+    <a href="https://gitter.im/saros-project/saros/user">
+      <i class="fab fa-gitter fa-lg text-white mr-3 mr-md-5"> </i>
+    </a>
+    
+    
+    <a href="https://groups.google.com/forum/#!forum/saros-user">
+      <i class="fas fa-envelope fa-lg text-white mr-3 mr-md-5"> </i>
+    </a>
+    
+    
+    <a href="https://twitter.com/saros_project">
+      <i class="fab fa-twitter fa-lg text-white "> </i>
+    </a>
+    
+  </div>
+
+</footer>
+  <script src="/node_modules/jquery/dist/jquery.min.js"></script>
+<script src="/node_modules/popper.js/dist/umd/popper.min.js"></script>
+<script src="/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+
+<script src="/node_modules/mermaid/dist/mermaid.min.js"></script>
+<script>
+mermaid.initialize({
+    startOnLoad: true
+});
+</script>
+<!-- load after its dependency jquery -->
+
+<script src="/assets/js/ide-tabs.js"></script>
+<script src="/assets/js/toc.js"></script>
+<script src="/assets/js/header-anchor-links.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+  <title>Saros Testing Framework (STF)</title>
+  <meta charset='utf-8'>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,maximum-scale=2">
+
+  <!-- stylesheets -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+  <link rel="stylesheet" href="/assets/main.css">
+ 
+  <!-- favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#603cba">
+  <meta name="theme-color" content="#ffffff">
+</head>
+
+
+<body>
+  <div class="bg-dark">
+  <div class="container-fluid">
+    <nav id="top-nav" class="navbar navbar-expand-sm navbar-dark bg-dark py-2 px-0">
+      <!-- Logo -->
+      <a class="ml-md-3 navbar-brand" href="/">
+        <img class="float-left" src="/assets/images/logo/saros-logo.svg" />
+        <span class="text-decoration-none pl-2 d-inline d-sm-none d-md-inline pr-5">Saros</span>
+      </a>
+
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
+        aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <ul class="navbar-nav">
+        
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/documentation">User Docs</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/releases">Releases</a>
+        </li>
+        
+        
+        
+        <li class="nav-item active">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/contribute">Contribute</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/contact">Contact</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/research">Research</a>
+        </li>
+        
+      </ul>
+      </div>
+
+      <!-- Social Media -->
+      <div id="media-links-nav" class="collapse navbar-collapse">
+        </ul>
+        <ul class="navbar-nav ml-auto">
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/saros-project/saros">
+              <i class="fab fa-github fa-lg"> </i>
+            </a>
+          </li>
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://gitter.im/saros-project/saros/user">
+              <i class="fab fa-gitter fa-lg"> </i>
+            </a>
+          </li>
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://groups.google.com/forum/#!forum/saros-user">
+              <i class="fas fa-envelope fa-lg"> </i>
+            </a>
+          </li>
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://twitter.com/saros_project">
+              <i class="fab fa-twitter fa-lg"> </i>
+            </a>
+          </li>
+          
+        </ul>
+      </div>
+    </nav>
+  </div>
+</div>
+
+  <div class="container-fluid">
+
+    
+    
+
+    
+
+    <div class="row justify-content-left flex-xl-nowrap">
+      <!-- Left sidebar -->
+      <div class="col-12 col-md-4 col-xl-3 my-3 px-0  ">
+        
+        <div id="sidebar" class="pl-1">
+    <ul class="nav flex-column">
+        
+
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/development-environment.html">Development Environment</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/guidelines.html">Guidelines</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/best-practices.html">Best Practices</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/documentation.html">Documentation Writing</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item active-link font-weight-bold py-0"
+                href="/contribute/saros-testing-framework.html">Saros Testing Framework</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/saros-server.html">Saros Server Development</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/logging.html">Logging</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        
+        <li class="nav-item">
+
+            
+            
+            
+
+            <a class="font-weight-bold nav-link py-0 collapsable-side-item collapsed" href="#Processes"
+                data-target="#Processes" data-toggle="collapse">Processes</a>
+            <div id="Processes" class="collapse ">
+                <ul class="nav flex-column ml-2">
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/contribute/processes/development.html">Development Process</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/contribute/processes/continuous-integration.html">Continuous Integration</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/contribute/processes/review.html">Review Process</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/contribute/processes/release.html">Release Process</a></li>
+                    
+                </ul>
+            </div>
+        </li>
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/open-topics.html">Open Topics</a>
+        </li>
+
+        
+        
+    </ul>
+
+</div>
+        
+      </div>
+
+      <div id="main-content"
+        class="col-12 col-md-8 col-lg-6 main-content my-3 px-sm-2 px-md-1 px-xl-0">
+
+        <h1 class="display-4">Saros Testing Framework (STF)</h1>
+        <p>For further information about STF take a look at the <a href="https://saros-build.imp.fu-berlin.de/stf/STF_Manual.pdf">STF User Manual</a>.
+This document is not up-to-date, but still contains useful information about the STF.</p>
+
+<h2 id="eclipse">Eclipse</h2>
+
+<h3 id="prerequisites">Prerequisites</h3>
+
+<p>You need a <a href="/contribute/development-environment.html">development environment</a> with <strong>Eclipse 4.8</strong> which is currently the only supported eclipse version.</p>
+
+<h3 id="configuration">Configuration</h3>
+
+<ul>
+  <li>Before you can run the STF tests you need four XMPP accounts. If you want to use our XMPP server you can create accounts as described in the <a href="../documentation/getting-started.html?tab=eclipse">user documentation</a>.</li>
+  <li>Then you have to create the file <code class="language-plaintext highlighter-rouge">configuration.properties</code> in directory <code class="language-plaintext highlighter-rouge">stf/src/saros/stf/client</code>.</li>
+  <li>Add the following lines to the config and <strong>replace the placeholders with your credentials</strong> (make sure <strong>every tester has an unique JID</strong>)</li>
+</ul>
+
+<div class="language-properties highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="py">ALICE_JID</span> <span class="p">=</span> <span class="s">&lt;insert user here&gt;@&lt;insert domain here&gt;/Saros</span>
+<span class="py">ALICE_PASSWORD</span> <span class="p">=</span> <span class="s">&lt;insert password here&gt;</span>
+<span class="py">ALICE_HOST</span> <span class="p">=</span> <span class="s">localhost</span>
+<span class="py">ALICE_PORT</span> <span class="p">=</span> <span class="s">12345</span>
+
+<span class="py">BOB_JID</span> <span class="p">=</span> <span class="s">&lt;insert user here&gt;@&lt;insert domain here&gt;/Saros</span>
+<span class="py">BOB_PASSWORD</span> <span class="p">=</span> <span class="s">&lt;insert password here&gt;</span>
+<span class="py">BOB_HOST</span> <span class="p">=</span> <span class="s">localhost</span>
+<span class="py">BOB_PORT</span> <span class="p">=</span> <span class="s">12346</span>
+
+<span class="py">CARL_JID</span> <span class="p">=</span> <span class="s">&lt;insert user here&gt;@&lt;insert domain here&gt;/Saros</span>
+<span class="py">CARL_PASSWORD</span> <span class="p">=</span> <span class="s">&lt;insert password here&gt;</span>
+<span class="py">CARL_HOST</span> <span class="p">=</span> <span class="s">localhost</span>
+<span class="py">CARL_PORT</span> <span class="p">=</span> <span class="s">12347</span>
+
+<span class="py">DAVE_JID</span> <span class="p">=</span> <span class="s">&lt;insert user here&gt;@&lt;insert domain here&gt;/Saros</span>
+<span class="py">DAVE_PASSWORD</span> <span class="p">=</span> <span class="s">&lt;insert password here&gt;</span>
+<span class="py">DAVE_HOST</span> <span class="p">=</span> <span class="s">localhost</span>
+<span class="py">DAVE_PORT</span> <span class="p">=</span> <span class="s">12348</span>
+</code></pre></div></div>
+
+<h3 id="prepare-dependencies">Prepare Dependencies</h3>
+
+<p>Eclipse uses the <code class="language-plaintext highlighter-rouge">META-INF/MANIFEST.MF</code> in order to resolve dependencies inside the launch config.
+Therefore the current workaround is to execute the Gradle task <code class="language-plaintext highlighter-rouge">generateLibAll</code> in order to generate a directory <code class="language-plaintext highlighter-rouge">lib</code> that contains the required dependencies.</p>
+
+<h3 id="run-tests">Run Tests</h3>
+
+<ol>
+  <li>Start the <strong>required launch configurations</strong> which are located
+in the directory <code class="language-plaintext highlighter-rouge">stf/launch</code> by <strong>right clicking the
+launch file</strong> and chose <strong>Run As &gt; Saros_STF_&lt;name&gt;</strong>. This
+will start a new Eclipse instance with the selected launch
+configuration.
+You only need to run the appropriate launch file(s). E.g. the
+test <code class="language-plaintext highlighter-rouge">AccountPreferenceTest.java</code> in the package
+<code class="language-plaintext highlighter-rouge">saros.stf.test.account</code> only needs the tester
+<em>ALICE</em>. In this case you only need to start <em>Saros_STF_Alice</em>.</li>
+  <li><strong>Right click</strong> on the test you want to run and select <strong>Run As &gt; JUnit test</strong></li>
+</ol>
+
+<h2 id="intellij">IntelliJ</h2>
+
+<p>It is not possible to run the Eclipse STF tests from within IntelliJ or execute STF tests for IntelliJ.
+However IntelliJ/Gradle supports to run multiple IntelliJ instances from within IntelliJ in order to test Saros by hand.</p>
+
+<h3 id="run-multiple-intellij-instances-for-testing">Run Multiple IntelliJ Instances for Testing</h3>
+
+<ul>
+  <li>Open the <code class="language-plaintext highlighter-rouge">Gradle</code> tool window</li>
+  <li>Open the task directory <code class="language-plaintext highlighter-rouge">saros.intellij &gt; Tasks &gt; intellij</code></li>
+  <li>Execute task <code class="language-plaintext highlighter-rouge">runIde</code> for each IntelliJ IDEA instance you need.</li>
+</ul>
+
+<p>Each simultaneously execution of <code class="language-plaintext highlighter-rouge">runIde</code> creates a sandbox directory in the <code class="language-plaintext highlighter-rouge">build</code> directory of the IntelliJ project.
+If you want to configure the parent directory of the sandbox directories you have to set the environment variable <code class="language-plaintext highlighter-rouge">SAROS_INTELLIJ_SANDBOX</code>
+to the corresponding directory.</p>
+
+<h3 id="debugging-sarose-using-intellij">Debugging Saros/E using IntelliJ</h3>
+
+<p>Even though it is currently not possible to run the STF (or start a new Eclipse instance with the built plugin) from within IntelliJ IDEA,
+it is possible to use IntelliJ as the debugging client.</p>
+
+<p>To do so, you will first have to start the needed Eclipse tasks.
+The tasks are named <code class="language-plaintext highlighter-rouge">Remore Debugging - Saros_STF_[USER]</code> (e.g. <code class="language-plaintext highlighter-rouge">Remore Debugging - Saros_STF_Alice</code>).
+The tasks will hold until a debugger is attached.</p>
+
+<p>To attach the IntelliJ debugger, call the matching run configuration <code class="language-plaintext highlighter-rouge">Saros/E Debugging - STF [USER]</code> (e.g. <code class="language-plaintext highlighter-rouge">Saros/E Debugging - STF Alice</code>).</p>
+
+<h2 id="without-an-ide">Without an IDE</h2>
+
+<h3 id="test-intellij-by-hand">Test IntelliJ by Hand</h3>
+
+<p>If you want to test IntelliJ by hand simply call the Gradle task <code class="language-plaintext highlighter-rouge">./gradlew runIde</code> as within IntelliJ. If you close the IntelliJ instance
+by killing the Gradle process per terminal the IntelliJ workspaces cannot be reused. Therefore you should close the instances by closing the IDE window.</p>
+
+<h3 id="start-eclipse-stf-tests">Start Eclipse STF Tests</h3>
+
+<p>If you want to execute the Eclipse STF tests without an IDE you can use the docker setup which is used in the CI server.
+In order to use the corresponding script you need a current <strong>docker installation</strong>.</p>
+
+<ul>
+  <li>Open a bash terminal</li>
+  <li>Change the current working directory to the Saros repository root directory</li>
+  <li>Create the directory <code class="language-plaintext highlighter-rouge">stf_ws</code> which is used by the containers to store test artifacts</li>
+  <li>Execute <code class="language-plaintext highlighter-rouge">export CONFIG_DIR=travis/config SCRIPT_DIR=travis/script/stf</code></li>
+  <li>Create the required docker contains by executing<br />
+<code class="language-plaintext highlighter-rouge">./travis/script/stf/setup_stf_container.sh $PWD</code></li>
+  <li>Start the STF tests by executing
+<code class="language-plaintext highlighter-rouge">docker exec -t stf_coordinator /home/ci/saros_src/travis/script/stf/coordinator/start_stf_tests.sh</code></li>
+</ul>
+
+<h3 id="clean-test-environment">Clean Test Environment</h3>
+
+<p>In order to clean the environment you have to stop and remove all created containers and
+remove the network.</p>
+
+<ul>
+  <li>Stop and remove containers <code class="language-plaintext highlighter-rouge">docker rm -f stf_worker_1 stf_prosody_test.org stf_coordinator</code></li>
+  <li>Remove network <code class="language-plaintext highlighter-rouge">docker network rm stf_test_network</code></li>
+  <li>Remove the <code class="language-plaintext highlighter-rouge">stf_ws</code> directory</li>
+</ul>
+
+<h3 id="view-eclipse-test-instances">View Eclipse Test Instances</h3>
+
+<p>If you want to see how the tests are performed you have install a vncviewer.
+Start the vncviewer and connect to the vncservers running on the test container. You have to connect to host <code class="language-plaintext highlighter-rouge">localhost</code> and the ports <code class="language-plaintext highlighter-rouge">5901</code>, <code class="language-plaintext highlighter-rouge">5902</code>, <code class="language-plaintext highlighter-rouge">5903</code> and <code class="language-plaintext highlighter-rouge">5904</code>.</p>
+
+
+      </div>
+
+      <!-- Right sidebar (TOC) -->
+      <div id="toc-bar-column" class="d-none d-lg-block col-12 col-lg-3 col-xl-3 px-0">
+        
+        <!-- element filled by loadToc() from toc.js -->
+        <ul id="toc-bar" class="sticky-top text-decoration-none nav toc-bar py-3"></ul>
+        
+      </div>
+    </div>
+  </div>
+
+  <footer class="page-footer font-small w-100 position-absolute">
+
+  <div class="text-center my-3">
+    
+    
+    <a href="https://github.com/saros-project/saros">
+      <i class="fab fa-github fa-lg text-white mr-3 mr-md-5"> </i>
+    </a>
+    
+    
+    <a href="https://gitter.im/saros-project/saros/user">
+      <i class="fab fa-gitter fa-lg text-white mr-3 mr-md-5"> </i>
+    </a>
+    
+    
+    <a href="https://groups.google.com/forum/#!forum/saros-user">
+      <i class="fas fa-envelope fa-lg text-white mr-3 mr-md-5"> </i>
+    </a>
+    
+    
+    <a href="https://twitter.com/saros_project">
+      <i class="fab fa-twitter fa-lg text-white "> </i>
+    </a>
+    
+  </div>
+
+</footer>
+  <script src="/node_modules/jquery/dist/jquery.min.js"></script>
+<script src="/node_modules/popper.js/dist/umd/popper.min.js"></script>
+<script src="/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+
+<script src="/node_modules/mermaid/dist/mermaid.min.js"></script>
+<script>
+mermaid.initialize({
+    startOnLoad: true
+});
+</script>
+<!-- load after its dependency jquery -->
+
+<script src="/assets/js/ide-tabs.js"></script>
+<script src="/assets/js/toc.js"></script>
+<script src="/assets/js/header-anchor-links.js"></script>
+
+</body>
+
+</html>

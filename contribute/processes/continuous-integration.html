@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+  <title>Continuous Integration Process</title>
+  <meta charset='utf-8'>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,maximum-scale=2">
+
+  <!-- stylesheets -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+  <link rel="stylesheet" href="/assets/main.css">
+ 
+  <!-- favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#603cba">
+  <meta name="theme-color" content="#ffffff">
+</head>
+
+
+<body>
+  <div class="bg-dark">
+  <div class="container-fluid">
+    <nav id="top-nav" class="navbar navbar-expand-sm navbar-dark bg-dark py-2 px-0">
+      <!-- Logo -->
+      <a class="ml-md-3 navbar-brand" href="/">
+        <img class="float-left" src="/assets/images/logo/saros-logo.svg" />
+        <span class="text-decoration-none pl-2 d-inline d-sm-none d-md-inline pr-5">Saros</span>
+      </a>
+
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
+        aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <ul class="navbar-nav">
+        
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/documentation">User Docs</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/releases">Releases</a>
+        </li>
+        
+        
+        
+        <li class="nav-item active">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/contribute">Contribute</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/contact">Contact</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/research">Research</a>
+        </li>
+        
+      </ul>
+      </div>
+
+      <!-- Social Media -->
+      <div id="media-links-nav" class="collapse navbar-collapse">
+        </ul>
+        <ul class="navbar-nav ml-auto">
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/saros-project/saros">
+              <i class="fab fa-github fa-lg"> </i>
+            </a>
+          </li>
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://gitter.im/saros-project/saros/user">
+              <i class="fab fa-gitter fa-lg"> </i>
+            </a>
+          </li>
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://groups.google.com/forum/#!forum/saros-user">
+              <i class="fas fa-envelope fa-lg"> </i>
+            </a>
+          </li>
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://twitter.com/saros_project">
+              <i class="fab fa-twitter fa-lg"> </i>
+            </a>
+          </li>
+          
+        </ul>
+      </div>
+    </nav>
+  </div>
+</div>
+
+  <div class="container-fluid">
+
+    
+    
+
+    
+
+    <div class="row justify-content-left flex-xl-nowrap">
+      <!-- Left sidebar -->
+      <div class="col-12 col-md-4 col-xl-3 my-3 px-0  ">
+        
+        <div id="sidebar" class="pl-1">
+    <ul class="nav flex-column">
+        
+
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/development-environment.html">Development Environment</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/guidelines.html">Guidelines</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/best-practices.html">Best Practices</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/documentation.html">Documentation Writing</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/saros-testing-framework.html">Saros Testing Framework</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/saros-server.html">Saros Server Development</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/logging.html">Logging</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        
+        <li class="nav-item">
+
+            
+            
+            
+
+            <a class="font-weight-bold nav-link py-0 collapsable-side-item " href="#Processes"
+                data-target="#Processes" data-toggle="collapse">Processes</a>
+            <div id="Processes" class="collapse show">
+                <ul class="nav flex-column ml-2">
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/contribute/processes/development.html">Development Process</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link active-link py-0 pl-5"
+                            href="/contribute/processes/continuous-integration.html">Continuous Integration</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/contribute/processes/review.html">Review Process</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/contribute/processes/release.html">Release Process</a></li>
+                    
+                </ul>
+            </div>
+        </li>
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/open-topics.html">Open Topics</a>
+        </li>
+
+        
+        
+    </ul>
+
+</div>
+        
+      </div>
+
+      <div id="main-content"
+        class="col-12 col-md-8 col-lg-6 main-content my-3 px-sm-2 px-md-1 px-xl-0">
+
+        <h1 class="display-4">Continuous Integration Process</h1>
+        <p>We are using GitHub Actions as CI server solution (see <a href="https://docs.github.com/en/actions/configuring-and-managing-workflows">here</a> for more information).</p>
+
+<h2 id="build-and-tests">Build and Tests</h2>
+
+<p>Whenever commits are pushed to a branch of the main repository or Pull Requests are created or changed, GitHub Actions triggers a new job that builds and tests the state of the updated branch.
+During the test phase, only the JUnit tests (excluding STF tests) are executed.</p>
+
+<p>See configuration <a href="https://github.com/saros-project/saros/blob/master/.github/workflows/build.yml"><code class="language-plaintext highlighter-rouge">build.yml</code></a>.</p>
+
+<h2 id="static-code-analysis">Static Code Analysis</h2>
+
+<h3 id="codacy">Codacy</h3>
+
+<p>The static code analysis is executed for each commit and Pull Request to scan the code and binaries.
+This scan only looks at the changes made by the pushed commits, meaning it will not analyze existing/unchanged code.
+The results of the analysis are available through the GitHub interface or can be viewed using the <a href="https://app.codacy.com/project/Saros/saros/dashboard">Codacy web interface</a>.</p>
+
+<p>Configured in the admin interface of our <a href="https://app.codacy.com/manual/Saros/saros/dashboard">codacy project</a>.</p>
+
+<h3 id="pmd">PMD</h3>
+
+<p>We use the checker tool PMD for analyzing our Java code. PMD is executed by Codacy, but the <a href="https://github.com/saros-project/saros/blob/master/ruleset.xml">configuration</a>
+is located in our repository and Codacy only uses the version on the master branch. Therefore, we execute PMD in a workflow if a commit is pushed or a Pull Request is
+opened (or updated) that changes the configurations.</p>
+
+<p>See configuration <a href="https://github.com/saros-project/saros/blob/master/.github/workflows/build_pmd.yml"><code class="language-plaintext highlighter-rouge">build_pmd.yml</code></a>.</p>
+
+<h2 id="stf">STF</h2>
+
+<p>The STF test execution is triggered for each push to the master branch and each branch with the prefix <code class="language-plaintext highlighter-rouge">pr/stf/</code>.
+Furthermore, it is possible to <a href="https://github.blog/changelog/2020-07-06-github-actions-manual-triggers-with-workflow_dispatch/">manually trigger</a> the STF
+workflow with:</p>
+<ul>
+  <li>Open the project’s <a href="https://github.com/saros-project/saros/actions?query=workflow%3A%22STF+Tests%22"><code class="language-plaintext highlighter-rouge">Actions</code> tab</a> (with the selected workflow <code class="language-plaintext highlighter-rouge">STF Tests</code>).</li>
+  <li>Click the drop-down button <code class="language-plaintext highlighter-rouge">Run workflow</code>.</li>
+  <li>Select a branch.</li>
+  <li>If needed, add arguments that are handed to <a href="https://github.com/saros-project/saros/blob/master/run_stf.sh"><code class="language-plaintext highlighter-rouge">run_stf.sh</code></a>.
+If you want to run the <strong>STF self tests</strong> (located in <code class="language-plaintext highlighter-rouge">stf/test</code>) that test the framework (and are not intended to test Saros) add the argument <code class="language-plaintext highlighter-rouge">--self</code>.</li>
+  <li>Click the button <code class="language-plaintext highlighter-rouge">Run workflow</code></li>
+</ul>
+
+<p>See configuration <a href="https://github.com/saros-project/saros/blob/master/.github/workflows/stf.yml"><code class="language-plaintext highlighter-rouge">stf.yml</code></a>.</p>
+
+<h2 id="java-11-compatibility">Java 11 Compatibility</h2>
+
+<p>We build Saros every week with JDK 11 to verify that the project is still compatible
+with JDK 11.</p>
+
+<p>See configuration <a href="https://github.com/saros-project/saros/blob/master/.github/workflows/build_jdk11.yml"><code class="language-plaintext highlighter-rouge">build_jdk11.yml</code></a></p>
+
+<h2 id="documentation">Documentation</h2>
+
+<p>All documentation changes (via pushing a commit or opening a Pull Request) trigger a build of the Jekyll documentation.
+If these changes are pushed to the master branch, the result is published as new website.</p>
+
+<p>See configuration <a href="https://github.com/saros-project/saros/blob/master/.github/workflows/build_doc.yml"><code class="language-plaintext highlighter-rouge">build_doc.yml</code></a></p>
+
+
+      </div>
+
+      <!-- Right sidebar (TOC) -->
+      <div id="toc-bar-column" class="d-none d-lg-block col-12 col-lg-3 col-xl-3 px-0">
+        
+        <!-- element filled by loadToc() from toc.js -->
+        <ul id="toc-bar" class="sticky-top text-decoration-none nav toc-bar py-3"></ul>
+        
+      </div>
+    </div>
+  </div>
+
+  <footer class="page-footer font-small w-100 position-absolute">
+
+  <div class="text-center my-3">
+    
+    
+    <a href="https://github.com/saros-project/saros">
+      <i class="fab fa-github fa-lg text-white mr-3 mr-md-5"> </i>
+    </a>
+    
+    
+    <a href="https://gitter.im/saros-project/saros/user">
+      <i class="fab fa-gitter fa-lg text-white mr-3 mr-md-5"> </i>
+    </a>
+    
+    
+    <a href="https://groups.google.com/forum/#!forum/saros-user">
+      <i class="fas fa-envelope fa-lg text-white mr-3 mr-md-5"> </i>
+    </a>
+    
+    
+    <a href="https://twitter.com/saros_project">
+      <i class="fab fa-twitter fa-lg text-white "> </i>
+    </a>
+    
+  </div>
+
+</footer>
+  <script src="/node_modules/jquery/dist/jquery.min.js"></script>
+<script src="/node_modules/popper.js/dist/umd/popper.min.js"></script>
+<script src="/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+
+<script src="/node_modules/mermaid/dist/mermaid.min.js"></script>
+<script>
+mermaid.initialize({
+    startOnLoad: true
+});
+</script>
+<!-- load after its dependency jquery -->
+
+<script src="/assets/js/ide-tabs.js"></script>
+<script src="/assets/js/toc.js"></script>
+<script src="/assets/js/header-anchor-links.js"></script>
+
+</body>
+
+</html>

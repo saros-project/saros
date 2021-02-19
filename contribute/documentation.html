@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+  <title>Documentation Writing</title>
+  <meta charset='utf-8'>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,maximum-scale=2">
+
+  <!-- stylesheets -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+  <link rel="stylesheet" href="/assets/main.css">
+ 
+  <!-- favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#603cba">
+  <meta name="theme-color" content="#ffffff">
+</head>
+
+
+<body>
+  <div class="bg-dark">
+  <div class="container-fluid">
+    <nav id="top-nav" class="navbar navbar-expand-sm navbar-dark bg-dark py-2 px-0">
+      <!-- Logo -->
+      <a class="ml-md-3 navbar-brand" href="/">
+        <img class="float-left" src="/assets/images/logo/saros-logo.svg" />
+        <span class="text-decoration-none pl-2 d-inline d-sm-none d-md-inline pr-5">Saros</span>
+      </a>
+
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
+        aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <ul class="navbar-nav">
+        
+        
+        
+        
+        <li class="nav-item active">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/documentation">User Docs</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/releases">Releases</a>
+        </li>
+        
+        
+        
+        <li class="nav-item active">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/contribute">Contribute</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/contact">Contact</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/research">Research</a>
+        </li>
+        
+      </ul>
+      </div>
+
+      <!-- Social Media -->
+      <div id="media-links-nav" class="collapse navbar-collapse">
+        </ul>
+        <ul class="navbar-nav ml-auto">
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/saros-project/saros">
+              <i class="fab fa-github fa-lg"> </i>
+            </a>
+          </li>
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://gitter.im/saros-project/saros/user">
+              <i class="fab fa-gitter fa-lg"> </i>
+            </a>
+          </li>
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://groups.google.com/forum/#!forum/saros-user">
+              <i class="fas fa-envelope fa-lg"> </i>
+            </a>
+          </li>
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://twitter.com/saros_project">
+              <i class="fab fa-twitter fa-lg"> </i>
+            </a>
+          </li>
+          
+        </ul>
+      </div>
+    </nav>
+  </div>
+</div>
+
+  <div class="container-fluid">
+
+    
+    
+
+    
+
+    <div class="row justify-content-left flex-xl-nowrap">
+      <!-- Left sidebar -->
+      <div class="col-12 col-md-4 col-xl-3 my-3 px-0  ">
+        
+        <div id="sidebar" class="pl-1">
+    <ul class="nav flex-column">
+        
+
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/development-environment.html">Development Environment</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/guidelines.html">Guidelines</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/best-practices.html">Best Practices</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item active-link font-weight-bold py-0"
+                href="/contribute/documentation.html">Documentation Writing</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/saros-testing-framework.html">Saros Testing Framework</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/saros-server.html">Saros Server Development</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/logging.html">Logging</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        
+        <li class="nav-item">
+
+            
+            
+            
+
+            <a class="font-weight-bold nav-link py-0 collapsable-side-item collapsed" href="#Processes"
+                data-target="#Processes" data-toggle="collapse">Processes</a>
+            <div id="Processes" class="collapse ">
+                <ul class="nav flex-column ml-2">
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/contribute/processes/development.html">Development Process</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/contribute/processes/continuous-integration.html">Continuous Integration</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/contribute/processes/review.html">Review Process</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/contribute/processes/release.html">Release Process</a></li>
+                    
+                </ul>
+            </div>
+        </li>
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/open-topics.html">Open Topics</a>
+        </li>
+
+        
+        
+    </ul>
+
+</div>
+        
+      </div>
+
+      <div id="main-content"
+        class="col-12 col-md-8 col-lg-6 main-content my-3 px-sm-2 px-md-1 px-xl-0">
+
+        <h1 class="display-4">Documentation Writing</h1>
+        <p>In order to change the documentation, you just simply follow the common <a href="/contribute/processes/development.html">development process</a>.
+The changes are deployed as soon as they are merged into the master branch.</p>
+
+<h2 id="guidelines">Guidelines</h2>
+<p>We prefer a small documentation that contains only important information which are related to Saros. In order to achieve this
+please follow these guidelines:</p>
+<ul>
+  <li><strong>Remove obsoleted documentation</strong></li>
+  <li>Rather <strong>reference information</strong> than copy them</li>
+  <li>Keep the documentation <strong>short and clear</strong> (e.g. by using lists)</li>
+  <li>Avoid new nested link structures and link lists</li>
+</ul>
+
+<h3 id="hosting-and-ci">Hosting and CI</h3>
+
+<p>We use <a href="https://pages.github.com/">GitHub Pages</a> for hosting our documentation.
+The static content is automatically published to the <code class="language-plaintext highlighter-rouge">gh-pages</code> branch. It is not
+intended to change the content manually (you have to change the content in the <code class="language-plaintext highlighter-rouge">docs</code>
+directory on the master branch).</p>
+
+<h2 id="create-and-change-diagrams">Create and Change Diagrams</h2>
+<p>In order to create diagrams, we use <a href="https://mermaid-js.github.io/mermaid/#/">mermaid</a>.
+There currently is no jekyll integration for this, meaning you have to add html tags into your
+markdown file:</p>
+<div class="language-markdown highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"mermaid"</span> <span class="na">markdown=</span><span class="s">"0"</span><span class="nt">&gt;</span>
+mermaid content...
+<span class="nt">&lt;/div&gt;</span>
+</code></pre></div></div>
+
+<div class="alert alert-warning" role="alert">
+  <p>Don’t forget the <strong><code class="language-plaintext highlighter-rouge">markdown="0"</code></strong> attribute in order to avoid Jekyll converting the mermaid code to html.</p>
+</div>
+
+<h2 id="write-alerts">Write Alerts</h2>
+
+<p>In order to write an (Bootstrap) <a href="https://getbootstrap.com/docs/4.0/components/alerts/">alert box</a>  like:</p>
+<div class="alert alert-danger" role="alert">
+  <h3 id="danger-warning">Danger warning</h3>
+</div>
+<p>you have to use our custom <code class="language-plaintext highlighter-rouge">alert</code> <a href="https://jekyllrb.com/docs/plugins/tags/#tag-blocks">Jekyll Tag Block</a>.</p>
+<div class="language-markdown highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{% alert danger %}
+<span class="gu">### Danger warning</span>
+{% endalert %}
+</code></pre></div></div>
+<p>Possible alerts are: <code class="language-plaintext highlighter-rouge">primary</code>, <code class="language-plaintext highlighter-rouge">secondary</code>, <code class="language-plaintext highlighter-rouge">success</code>, <code class="language-plaintext highlighter-rouge">danger</code>, <code class="language-plaintext highlighter-rouge">warning</code>, <code class="language-plaintext highlighter-rouge">info</code>, <code class="language-plaintext highlighter-rouge">light</code>, <code class="language-plaintext highlighter-rouge">dark</code></p>
+
+<p>If you want to inspect or change the corresponding code see <code class="language-plaintext highlighter-rouge">docs/_plugins/alert.rb</code>.</p>
+
+<h2 id="write-accordions">Write Accordions</h2>
+
+<p>In order to write an (Bootstrap) <a href="https://getbootstrap.com/docs/4.0/components/collapse/#accordion-example">accordion</a> like:</p>
+
+<div class="accordion mb-4" id="accordion-example-accordion-id">
+  <div class="card">
+  <div id="accordion-example-accordion-id-heading-1">
+    <button class="btn btn-link text-left text-decoration-none collapsed" data-toggle="collapse" data-target="#accordion-example-accordion-id-collapse-1" aria-expanded="false" aria-controls="accordion-example-accordion-id-collapse-1">
+      <h5 id="entry-h5">Entry h5</h5>
+
+    </button>
+  </div>
+  <div id="accordion-example-accordion-id-collapse-1" class="collapse" aria-labelledby="accordion-example-accordion-id-heading-1" data-parent="#accordion-example-accordion-id">
+    <div class="card-body">
+<p>Content</p>
+</div>
+  </div>
+</div>
+
+  <div class="card">
+  <div id="accordion-example-accordion-id-heading-2">
+    <button class="btn btn-link text-left text-decoration-none collapsed" data-toggle="collapse" data-target="#accordion-example-accordion-id-collapse-2" aria-expanded="false" aria-controls="accordion-example-accordion-id-collapse-2">
+      <h3 id="entry-h3">Entry h3</h3>
+
+    </button>
+  </div>
+  <div id="accordion-example-accordion-id-collapse-2" class="collapse" aria-labelledby="accordion-example-accordion-id-heading-2" data-parent="#accordion-example-accordion-id">
+    <div class="card-body">
+<p>Content</p>
+</div>
+  </div>
+</div>
+
+</div>
+
+<p>you have to use our custom <code class="language-plaintext highlighter-rouge">accordion</code> and <code class="language-plaintext highlighter-rouge">collapsible</code> <a href="https://jekyllrb.com/docs/plugins/tags/#tag-blocks">Jekyll Tag Block</a>.</p>
+<div class="language-markdown highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{% accordion example-accordion-id %}
+{% collapsible Entry h5%}
+Content
+{% endcollapsible %}
+{% collapsible ### Entry h3%}
+Content
+{% endcollapsible %}
+{% endaccordion %}
+</code></pre></div></div>
+
+<p>The <code class="language-plaintext highlighter-rouge">collapsible</code> entry uses a default heading of h5. If you need another heading, define it in markdown (as in <code class="language-plaintext highlighter-rouge">### Entry h3</code>).
+If you want to inspect or change the corresponding code see <code class="language-plaintext highlighter-rouge">docs/_plugins/accordion.rb</code> and <code class="language-plaintext highlighter-rouge">docs/_plugins/collapsible.rb</code>.</p>
+
+<h2 id="write-ide-specific-documentation">Write IDE Specific Documentation</h2>
+<p>Use the following tags if you want to embed an IDE specific part into a documentation or want to provide IDE specific versions of a page.</p>
+
+<p><strong>Markdown:</strong></p>
+<div class="language-markdown highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{% capture eclipse %}
+<span class="gu">## Eclipse content here</span>
+Eclipse content here
+{% endcapture %}
+{% capture intellij %}
+<span class="gu">## Intellij content here</span>
+Intellij content here
+{% endcapture %}
+{% include ide-tabs.html eclipse=eclipse intellij=intellij %}
+</code></pre></div></div>
+<p><strong>Rendered Markdown:</strong></p>
+
+<!-- Uses the method selectTabs defined in ide-tabs.js -->
+<div class="shadow-sm mb-3">
+
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-tab-link nav-link p-1 eclipse active" onclick="selectTabs( 'eclipse' );" id="eclipse-tab" data-toggle="tab" href="#">
+                <img alt="Eclipse logo" src="/assets/images/logo/eclipse-logo.svg" height="30" />
+                Eclipse
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-tab-link nav-link p-1 intellij" onclick="selectTabs( 'intellij' );" id="intellij-tab" data-toggle="tab" href="#">
+                <img alt="IntelliJ logo" src="/assets/images/logo/intellij-logo.svg" height="30" /> IntelliJ
+            </a>
+        </li>
+    </ul>
+
+    <div class="tab-content border rounded-bottom border-top-0">
+        <div class="tab-pane fade px-2 pt-2 mt-0 mb-2 eclipse active show" role="tabpanel">
+            
+<h2 id="eclipse-content-here">Eclipse Content Here</h2>
+<p>Eclipse content here</p>
+
+        </div>
+
+        <div class="tab-pane fade px-2 pt-2 mt-0 mb-2 intellij" role="tabpanel">
+            
+            <p class="text-right mb-0">
+                <small class="text-muted">
+                    This is an alpha. See <a href="/releases/saros-i_0.3.0.html#restrictions">here</a>
+                    for restrictions.
+                </small>
+            </p>
+            
+<h2 id="intellij-content-here">IntelliJ Content Here</h2>
+<p>Intellij content here</p>
+
+        </div>
+    </div>
+</div>
+
+<h2 id="reference-ide-specific-documentation">Reference IDE Specific Documentation</h2>
+
+<p>You can reference the IDE specific version of a page via a URL parameter <code class="language-plaintext highlighter-rouge">tab=&lt;ide&gt;</code> (e.g. <code class="language-plaintext highlighter-rouge">&lt;url&gt;?tab=intellij</code> or <code class="language-plaintext highlighter-rouge">&lt;url&gt;?tab=eclipse</code>).
+Example:</p>
+<ul>
+  <li><a href="?tab=intellij">IntelliJ content of this page</a></li>
+  <li><a href="?tab=eclipse">Eclipse content of this page</a></li>
+</ul>
+
+<h2 id="compile-github-pages">Compile GitHub Pages</h2>
+
+<h3 id="compile-locally">Compile Locally</h3>
+<h4 id="install-required-tools-and-dependencies">Install Required Tools and Dependencies</h4>
+
+<ul>
+  <li><a href="https://www.ruby-lang.org/en/documentation/installation/">Install ruby 2.x or higher</a></li>
+  <li>Install bundler:
+    <ul>
+      <li>Execute:<code class="language-plaintext highlighter-rouge">gem install bundler</code></li>
+    </ul>
+  </li>
+  <li>Install <a href="https://www.npmjs.com/get-npm">npm</a>.</li>
+  <li>Change dir to the documentation directory (<code class="language-plaintext highlighter-rouge">&lt;repository_dir&gt;/docs</code>)</li>
+  <li>Install jekyll and its dependencies
+    <ul>
+      <li>Execute <code class="language-plaintext highlighter-rouge">npm install</code></li>
+      <li>Execute <code class="language-plaintext highlighter-rouge">bundle install</code></li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="compile-and-show-documentation">Compile and Show Documentation</h4>
+
+<ul>
+  <li>Execute <code class="language-plaintext highlighter-rouge">bundle exec jekyll serve</code>
+    <ul>
+      <li>This command spawns a web server on port 4000</li>
+    </ul>
+  </li>
+  <li>Open you browser and open <code class="language-plaintext highlighter-rouge">localhost:4000</code></li>
+  <li>Use <code class="language-plaintext highlighter-rouge">bundle exec jekyll serve -i</code> for the interactive mode that reloads the page after content changes.</li>
+</ul>
+
+<h5 id="troubleshooting">Troubleshooting</h5>
+
+<ul>
+  <li><strong>If</strong> <code class="language-plaintext highlighter-rouge">bundle exec jekyll serve</code>
+<strong>fails with</strong> <code class="language-plaintext highlighter-rouge">bundler: command not found: jekyll</code>
+<strong>try</strong> <code class="language-plaintext highlighter-rouge">jekyll serve</code></li>
+</ul>
+
+<h2 id="find-broken-links-automatically">Find broken links automatically</h2>
+
+<p>You can use <a href="https://github.com/gjtorikian/html-proofer"><code class="language-plaintext highlighter-rouge">html-proofer</code></a> to
+verify your build results (produced by <code class="language-plaintext highlighter-rouge">bundle exec jekyll serve</code> or <code class="language-plaintext highlighter-rouge">bundle exec jekyll build</code>)
+in the directory <code class="language-plaintext highlighter-rouge">docs/_site</code>.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>htmlproofer <span class="se">\</span>
+  ./_site <span class="se">\</span>
+  <span class="nt">--assume-extension</span> <span class="se">\ </span><span class="c"># Allows urls without a file extension</span>
+  <span class="nt">--allow-hash-href</span> <span class="se">\ </span><span class="c"># Allow hash refs (e.g. '#test')</span>
+  <span class="nt">--alt-ignore</span> <span class="s1">'/.*/'</span><span class="se">\ </span><span class="c"># Ignore missing "alt" warning</span>
+  <span class="nt">--file-ignore</span> <span class="s2">"/node_modules</span><span class="se">\/</span><span class="s2">.*/"</span> <span class="c"># Ignore html files in the 'node_modules' dir</span>
+</code></pre></div></div>
+
+<p>If you want to exclude external links add the option <code class="language-plaintext highlighter-rouge">--disable-external</code>.</p>
+
+
+      </div>
+
+      <!-- Right sidebar (TOC) -->
+      <div id="toc-bar-column" class="d-none d-lg-block col-12 col-lg-3 col-xl-3 px-0">
+        
+        <!-- element filled by loadToc() from toc.js -->
+        <ul id="toc-bar" class="sticky-top text-decoration-none nav toc-bar py-3"></ul>
+        
+      </div>
+    </div>
+  </div>
+
+  <footer class="page-footer font-small w-100 position-absolute">
+
+  <div class="text-center my-3">
+    
+    
+    <a href="https://github.com/saros-project/saros">
+      <i class="fab fa-github fa-lg text-white mr-3 mr-md-5"> </i>
+    </a>
+    
+    
+    <a href="https://gitter.im/saros-project/saros/user">
+      <i class="fab fa-gitter fa-lg text-white mr-3 mr-md-5"> </i>
+    </a>
+    
+    
+    <a href="https://groups.google.com/forum/#!forum/saros-user">
+      <i class="fas fa-envelope fa-lg text-white mr-3 mr-md-5"> </i>
+    </a>
+    
+    
+    <a href="https://twitter.com/saros_project">
+      <i class="fab fa-twitter fa-lg text-white "> </i>
+    </a>
+    
+  </div>
+
+</footer>
+  <script src="/node_modules/jquery/dist/jquery.min.js"></script>
+<script src="/node_modules/popper.js/dist/umd/popper.min.js"></script>
+<script src="/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+
+<script src="/node_modules/mermaid/dist/mermaid.min.js"></script>
+<script>
+mermaid.initialize({
+    startOnLoad: true
+});
+</script>
+<!-- load after its dependency jquery -->
+
+<script src="/assets/js/ide-tabs.js"></script>
+<script src="/assets/js/toc.js"></script>
+<script src="/assets/js/header-anchor-links.js"></script>
+
+</body>
+
+</html>

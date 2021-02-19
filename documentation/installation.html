@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+  <title>Install Saros</title>
+  <meta charset='utf-8'>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,maximum-scale=2">
+
+  <!-- stylesheets -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+  <link rel="stylesheet" href="/assets/main.css">
+ 
+  <!-- favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#603cba">
+  <meta name="theme-color" content="#ffffff">
+</head>
+
+
+<body>
+  <div class="bg-dark">
+  <div class="container-fluid">
+    <nav id="top-nav" class="navbar navbar-expand-sm navbar-dark bg-dark py-2 px-0">
+      <!-- Logo -->
+      <a class="ml-md-3 navbar-brand" href="/">
+        <img class="float-left" src="/assets/images/logo/saros-logo.svg" />
+        <span class="text-decoration-none pl-2 d-inline d-sm-none d-md-inline pr-5">Saros</span>
+      </a>
+
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
+        aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <ul class="navbar-nav">
+        
+        
+        
+        
+        <li class="nav-item active">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/documentation">User Docs</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/releases">Releases</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/contribute">Contribute</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/contact">Contact</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/research">Research</a>
+        </li>
+        
+      </ul>
+      </div>
+
+      <!-- Social Media -->
+      <div id="media-links-nav" class="collapse navbar-collapse">
+        </ul>
+        <ul class="navbar-nav ml-auto">
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/saros-project/saros">
+              <i class="fab fa-github fa-lg"> </i>
+            </a>
+          </li>
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://gitter.im/saros-project/saros/user">
+              <i class="fab fa-gitter fa-lg"> </i>
+            </a>
+          </li>
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://groups.google.com/forum/#!forum/saros-user">
+              <i class="fas fa-envelope fa-lg"> </i>
+            </a>
+          </li>
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://twitter.com/saros_project">
+              <i class="fab fa-twitter fa-lg"> </i>
+            </a>
+          </li>
+          
+        </ul>
+      </div>
+    </nav>
+  </div>
+</div>
+
+  <div class="container-fluid">
+
+    
+    
+
+    
+
+    <div class="row justify-content-left flex-xl-nowrap">
+      <!-- Left sidebar -->
+      <div class="col-12 col-md-4 col-xl-3 my-3 px-0  ">
+        
+        <div id="sidebar" class="pl-1">
+    <ul class="nav flex-column">
+        
+
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item active-link font-weight-bold py-0"
+                href="/documentation/installation.html?tab=eclipse">Installation</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/documentation/getting-started.html?tab=eclipse">Getting Started</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/documentation/awareness-information.html">Awareness Information</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        
+        <li class="nav-item">
+
+            
+            
+            
+
+            <a class="font-weight-bold nav-link py-0 collapsable-side-item collapsed" href="#How-Tos"
+                data-target="#How-Tos" data-toggle="collapse">How-Tos</a>
+            <div id="How-Tos" class="collapse ">
+                <ul class="nav flex-column ml-2">
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/documentation/how-tos/change-colors.html">Change Colors</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/documentation/how-tos/follow-mode.html">Follow Mode</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/documentation/how-tos/hostless-sessions.html">Hostless Sessions (alpha)</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/documentation/how-tos/manage-xmpp-accounts.html">Manage XMPP Accounts</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/documentation/how-tos/resolve-desynchronization.html">Resolve Desynchronization</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/documentation/how-tos/setup-xmpp.html">Setup XMPP Server</a></li>
+                    
+                </ul>
+            </div>
+        </li>
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/documentation/features.html">Features</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/documentation/compatibility.html">Compatibility</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/documentation/faq.html">FAQ</a>
+        </li>
+
+        
+        
+    </ul>
+
+</div>
+        
+      </div>
+
+      <div id="main-content"
+        class="col-12 col-md-8 col-lg-6 main-content my-3 px-sm-2 px-md-1 px-xl-0">
+
+        <h1 class="display-4">Install Saros</h1>
+        <p>Here you will find a guide <strong>on how to install Saros</strong>.
+If you want to know how to set up Saros,
+have a look at the <a href="/documentation/getting-started.html">getting started</a> guide.</p>
+
+<h2 id="prerequisites">Prerequisites</h2>
+
+<!-- Uses the method selectTabs defined in ide-tabs.js -->
+<div class="shadow-sm mb-3">
+
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-tab-link nav-link p-1 eclipse active" onclick="selectTabs( 'eclipse' );" id="eclipse-tab" data-toggle="tab" href="#">
+                <img alt="Eclipse logo" src="/assets/images/logo/eclipse-logo.svg" height="30" />
+                Eclipse
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-tab-link nav-link p-1 intellij" onclick="selectTabs( 'intellij' );" id="intellij-tab" data-toggle="tab" href="#">
+                <img alt="IntelliJ logo" src="/assets/images/logo/intellij-logo.svg" height="30" /> IntelliJ
+            </a>
+        </li>
+    </ul>
+
+    <div class="tab-content border rounded-bottom border-top-0">
+        <div class="tab-pane fade px-2 pt-2 mt-0 mb-2 eclipse active show" role="tabpanel">
+            
+<p>Saros/E requires</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">JDK 8</code> or newer</li>
+  <li><code class="language-plaintext highlighter-rouge">Eclipse 4.8</code> or newer (download <a href="http://www.eclipse.org/downloads/">here</a>)</li>
+</ul>
+
+
+        </div>
+
+        <div class="tab-pane fade px-2 pt-2 mt-0 mb-2 intellij" role="tabpanel">
+            
+            <p class="text-right mb-0">
+                <small class="text-muted">
+                    This is an alpha. See <a href="/releases/saros-i_0.3.0.html#restrictions">here</a>
+                    for restrictions.
+                </small>
+            </p>
+            
+<p>Saros/I requires</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">JDK 8</code> or newer</li>
+  <li><code class="language-plaintext highlighter-rouge">IntelliJ 2019.2.3</code> or newer (download <a href="https://www.jetbrains.com/idea/download/">here</a>)
+    <ul>
+      <li>Other <a href="https://www.jetbrains.org/intellij/sdk/docs/intro/intellij_platform.html#ides-based-on-the-intellij-platform">IDEs based on the IntelliJ platform</a> version <code class="language-plaintext highlighter-rouge">2019.2.3</code> or newer are supported as well</li>
+    </ul>
+  </li>
+</ul>
+
+
+        </div>
+    </div>
+</div>
+
+<h2 id="installation-steps">Installation Steps</h2>
+
+<!-- Uses the method selectTabs defined in ide-tabs.js -->
+<div class="shadow-sm mb-3">
+
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-tab-link nav-link p-1 eclipse active" onclick="selectTabs( 'eclipse' );" id="eclipse-tab" data-toggle="tab" href="#">
+                <img alt="Eclipse logo" src="/assets/images/logo/eclipse-logo.svg" height="30" />
+                Eclipse
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-tab-link nav-link p-1 intellij" onclick="selectTabs( 'intellij' );" id="intellij-tab" data-toggle="tab" href="#">
+                <img alt="IntelliJ logo" src="/assets/images/logo/intellij-logo.svg" height="30" /> IntelliJ
+            </a>
+        </li>
+    </ul>
+
+    <div class="tab-content border rounded-bottom border-top-0">
+        <div class="tab-pane fade px-2 pt-2 mt-0 mb-2 eclipse active show" role="tabpanel">
+            
+<h3 id="via-eclipse-marketplace">Via Eclipse Marketplace</h3>
+
+<p>You can install Saros from the <a href="http://marketplace.eclipse.org/content/saros-distributed-collaborative-editing-and-pair-programming-0">Eclipse Marketplace
+website</a>
+or from within Eclipse:</p>
+
+<ol>
+  <li>Open Eclipse</li>
+  <li>Open the marketplace: <em>Menu &gt; Help &gt; Eclipse Marketplace…</em></li>
+  <li>Search for “Saros”</li>
+  <li>Click on the “Install” button</li>
+</ol>
+
+<h3 id="via-update-site">Via Update Site</h3>
+
+<p><strong>The Eclipse plugin update site is:
+<a href="https://www.saros-project.org/update-site/eclipse">https://www.saros-project.org/update-site/eclipse</a></strong></p>
+
+<ol>
+  <li>Open Eclipse</li>
+  <li>Open the software updates manager: <em>Menu &gt; Help &gt; Install New Software…</em></li>
+  <li>In the <em>Available Software</em> wizard select <em>Add</em></li>
+  <li>Enter <code class="language-plaintext highlighter-rouge">https://www.saros-project.org/update-site/eclipse</code> in the Location field; press OK</li>
+  <li>Choose the plugin in the list of available software and select it</li>
+  <li>In the next window select <em>Next </em>to confirm installation</li>
+  <li>Accept the license agreement and select <em>Finish</em></li>
+  <li>Restart Eclipse</li>
+</ol>
+
+<h3 id="as-dropin">As Dropin</h3>
+
+<ol>
+  <li>Download the <a href="https://github.com/saros-project/saros/releases">latest <em>saros-dropin-*.zip</em>
+from GitHub</a>.</li>
+  <li>Decompress the archives into the dropins folder of your
+Eclipse installation.</li>
+  <li>Restart Eclipse.</li>
+</ol>
+
+
+        </div>
+
+        <div class="tab-pane fade px-2 pt-2 mt-0 mb-2 intellij" role="tabpanel">
+            
+            <p class="text-right mb-0">
+                <small class="text-muted">
+                    This is an alpha. See <a href="/releases/saros-i_0.3.0.html#restrictions">here</a>
+                    for restrictions.
+                </small>
+            </p>
+            
+<p>This is still an alpha release of Saros/I, so expect it to be a bit rough around the edges. Before using the plugin for the first time, please have a look at the release
+notes, especially the <a href="/releases/saros-i_0.3.0.html#disclaimer">disclaimer</a> and the current <a href="/releases/saros-i_0.3.0.html#restrictions">restrictions of the plugin</a>.</p>
+
+<p>Saros/I can be installed from the JetBrains plugin repository or from disk.</p>
+
+<h3 id="from-the-plugin-repository">From the Plugin Repository</h3>
+
+<p>Saros/I is currently released through the <code class="language-plaintext highlighter-rouge">alpha</code> release channel. To be able find the plugin on the market place, you will first have to add the <code class="language-plaintext highlighter-rouge">alpha</code> release channel to your list of plugin repositories. A guide on how to do this is given <a href="https://plugins.jetbrains.com/docs/marketplace/custom-release-channels.html#CustomReleaseChannels-ConfiguringaCustomChannelinIntelliJPlatformBasedIDEs">here</a>.</p>
+
+<ul>
+  <li>Open the <a href="https://www.jetbrains.com/help/idea/settings-preferences-dialog.html">settings/preferences menu</a>.</li>
+  <li>Select the “Plugins” section.</li>
+  <li>Select the tab “Marketplace”.</li>
+  <li>Search for “Saros” in the search bar and select the entry from the list.</li>
+  <li>Click the “Install” button.</li>
+  <li>Close the settings menu.</li>
+  <li>Restart the IDE.</li>
+</ul>
+
+<h3 id="from-disk">From Disk</h3>
+<p>The zip file containing the plugin can be downloaded from our <a href="https://github.com/saros-project/saros/releases">release page</a>.</p>
+
+<ul>
+  <li>Open the <a href="https://www.jetbrains.com/help/idea/settings-preferences-dialog.html">settings/preferences menu</a>.</li>
+  <li>Select the “Plugins” section.</li>
+  <li>Click the settings icon (gear/cog) and choose “Install plugin from disk…”.</li>
+  <li>Navigate to the directory containing the plugin zip.</li>
+  <li>Select the zip file.</li>
+  <li>Click OK.</li>
+  <li>Restart the IDE.</li>
+</ul>
+
+
+        </div>
+    </div>
+</div>
+
+<h2 id="good-to-know">Good to Know</h2>
+
+<ul>
+  <li>Please note that Saros requires higher bandwidth and lower latency
+than normal chatting, so public chat servers might be too slow for
+smooth operation of Saros.</li>
+</ul>
+
+
+      </div>
+
+      <!-- Right sidebar (TOC) -->
+      <div id="toc-bar-column" class="d-none d-lg-block col-12 col-lg-3 col-xl-3 px-0">
+        
+        <!-- element filled by loadToc() from toc.js -->
+        <ul id="toc-bar" class="sticky-top text-decoration-none nav toc-bar py-3"></ul>
+        
+      </div>
+    </div>
+  </div>
+
+  <footer class="page-footer font-small w-100 position-absolute">
+
+  <div class="text-center my-3">
+    
+    
+    <a href="https://github.com/saros-project/saros">
+      <i class="fab fa-github fa-lg text-white mr-3 mr-md-5"> </i>
+    </a>
+    
+    
+    <a href="https://gitter.im/saros-project/saros/user">
+      <i class="fab fa-gitter fa-lg text-white mr-3 mr-md-5"> </i>
+    </a>
+    
+    
+    <a href="https://groups.google.com/forum/#!forum/saros-user">
+      <i class="fas fa-envelope fa-lg text-white mr-3 mr-md-5"> </i>
+    </a>
+    
+    
+    <a href="https://twitter.com/saros_project">
+      <i class="fab fa-twitter fa-lg text-white "> </i>
+    </a>
+    
+  </div>
+
+</footer>
+  <script src="/node_modules/jquery/dist/jquery.min.js"></script>
+<script src="/node_modules/popper.js/dist/umd/popper.min.js"></script>
+<script src="/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+
+<script src="/node_modules/mermaid/dist/mermaid.min.js"></script>
+<script>
+mermaid.initialize({
+    startOnLoad: true
+});
+</script>
+<!-- load after its dependency jquery -->
+
+<script src="/assets/js/ide-tabs.js"></script>
+<script src="/assets/js/toc.js"></script>
+<script src="/assets/js/header-anchor-links.js"></script>
+
+</body>
+
+</html>

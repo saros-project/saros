@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+  <title>Best Practices</title>
+  <meta charset='utf-8'>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,maximum-scale=2">
+
+  <!-- stylesheets -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+  <link rel="stylesheet" href="/assets/main.css">
+ 
+  <!-- favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#603cba">
+  <meta name="theme-color" content="#ffffff">
+</head>
+
+
+<body>
+  <div class="bg-dark">
+  <div class="container-fluid">
+    <nav id="top-nav" class="navbar navbar-expand-sm navbar-dark bg-dark py-2 px-0">
+      <!-- Logo -->
+      <a class="ml-md-3 navbar-brand" href="/">
+        <img class="float-left" src="/assets/images/logo/saros-logo.svg" />
+        <span class="text-decoration-none pl-2 d-inline d-sm-none d-md-inline pr-5">Saros</span>
+      </a>
+
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
+        aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <ul class="navbar-nav">
+        
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/documentation">User Docs</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/releases">Releases</a>
+        </li>
+        
+        
+        
+        <li class="nav-item active">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/contribute">Contribute</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/contact">Contact</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/research">Research</a>
+        </li>
+        
+      </ul>
+      </div>
+
+      <!-- Social Media -->
+      <div id="media-links-nav" class="collapse navbar-collapse">
+        </ul>
+        <ul class="navbar-nav ml-auto">
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/saros-project/saros">
+              <i class="fab fa-github fa-lg"> </i>
+            </a>
+          </li>
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://gitter.im/saros-project/saros/user">
+              <i class="fab fa-gitter fa-lg"> </i>
+            </a>
+          </li>
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://groups.google.com/forum/#!forum/saros-user">
+              <i class="fas fa-envelope fa-lg"> </i>
+            </a>
+          </li>
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://twitter.com/saros_project">
+              <i class="fab fa-twitter fa-lg"> </i>
+            </a>
+          </li>
+          
+        </ul>
+      </div>
+    </nav>
+  </div>
+</div>
+
+  <div class="container-fluid">
+
+    
+    
+
+    
+
+    <div class="row justify-content-left flex-xl-nowrap">
+      <!-- Left sidebar -->
+      <div class="col-12 col-md-4 col-xl-3 my-3 px-0  ">
+        
+        <div id="sidebar" class="pl-1">
+    <ul class="nav flex-column">
+        
+
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/development-environment.html">Development Environment</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/guidelines.html">Guidelines</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item active-link font-weight-bold py-0"
+                href="/contribute/best-practices.html">Best Practices</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/documentation.html">Documentation Writing</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/saros-testing-framework.html">Saros Testing Framework</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/saros-server.html">Saros Server Development</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/logging.html">Logging</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        
+        <li class="nav-item">
+
+            
+            
+            
+
+            <a class="font-weight-bold nav-link py-0 collapsable-side-item collapsed" href="#Processes"
+                data-target="#Processes" data-toggle="collapse">Processes</a>
+            <div id="Processes" class="collapse ">
+                <ul class="nav flex-column ml-2">
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/contribute/processes/development.html">Development Process</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/contribute/processes/continuous-integration.html">Continuous Integration</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/contribute/processes/review.html">Review Process</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/contribute/processes/release.html">Release Process</a></li>
+                    
+                </ul>
+            </div>
+        </li>
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/open-topics.html">Open Topics</a>
+        </li>
+
+        
+        
+    </ul>
+
+</div>
+        
+      </div>
+
+      <div id="main-content"
+        class="col-12 col-md-8 col-lg-6 main-content my-3 px-sm-2 px-md-1 px-xl-0">
+
+        <h1 class="display-4">Best Practices</h1>
+        <h2 id="code-structure">Code Structure</h2>
+
+<h3 id="getters-and-setters">Getters and Setters</h3>
+
+<ul>
+  <li>Use getters and setters by default except for very good reason</li>
+  <li>Internal Local Entity Classes do not need (but may) use
+getters/setters</li>
+  <li>Internal collections may be returned from classes, but it MUST be
+clearly indicated whether the returned value MUST not be changed
+(then an immutable view should be returned) or whether a user of a
+class MAY change the collection (in which case the class must ensure
+that the behavior is well defined, for instance using an
+observable collection)</li>
+</ul>
+
+<h3 id="class-member-visibility">Class Member Visibility</h3>
+
+<p>By default all fields and methods should be <strong><code class="language-plaintext highlighter-rouge">private</code></strong>. For any field
+or method with a visibility higher than <strong><code class="language-plaintext highlighter-rouge">private </code></strong>(visible from the
+outside) there MUST be a detailed JavaDoc explanation. Thus, especially
+making something <code class="language-plaintext highlighter-rouge">public </code>should be a deliberate and conscious act.</p>
+
+<p>To facilitate testing, you may be tempted to make members more
+accessible. This is fine up to <strong>package-private</strong> (no modifier). But it
+is not acceptable to make a member part of a package’s API
+(<code class="language-plaintext highlighter-rouge">protected </code>or <code class="language-plaintext highlighter-rouge">public</code>) solely for testing purposes.</p>
+
+<h3 id="final-members-and-variables">Final Members and Variables</h3>
+
+<ul>
+  <li>For class variables: By default, make them final, unless you find a
+good reason not to. It makes the code easier to understand when you
+know where changes are expected to happen.</li>
+  <li>For local variables and parameters: In principle, the same rule
+applies as for class variables. But since local variables and
+parameters have a limited scope, the additional information gained
+through the presence of a final modifier is not tremendous.
+Therefore, we tend to not use the final keyword here.</li>
+  <li>For methods: By default, don’t make them final, unless you have good
+reason not to. After all, we want to use
+object-oriented programming.</li>
+</ul>
+
+<h3 id="classes-and-interfaces">Classes and Interfaces</h3>
+
+<ul>
+  <li>Take your time, look at the environment of your code and think. When
+it comes to the establishment of classes and interfaces, there is a
+lot of mistakes to make that work against the designed architecture
+and make solving problems afterwards very expensive.</li>
+  <li>Components must implement an interface if they access
+external resources. Implementing an interface to combine things to
+reusable units is always a good idea, but before doing so make sure
+that there is no such similar implementation in place already and
+how the newly created one would fit into the architecture.</li>
+  <li>If you develop a listener interface with more than one method, you
+should in most cases provide an abstract base implementation which
+provides empty implementations, because in many cases implementors
+of your interface will not want to implement all methods. Also it
+helps to improve ability to change the program, as methods can be
+added to the interface more easily.
+    <ul>
+      <li>see <a href="/contribute/guidelines.html#naming-conventions">Naming Conventions</a> for
+more information</li>
+    </ul>
+  </li>
+  <li>Do not implement more than one listener interface per class,
+especially if using a top level class, because it makes the code
+much less readable and makes you more likely to forget unregistering
+your listener.
+    <ul>
+      <li>Anonymous inner-classes assigned to fields are much better:</li>
+    </ul>
+  </li>
+</ul>
+
+<p>Instead of:</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">A</span> <span class="kd">implements</span> <span class="no">B</span><span class="o">,</span> <span class="no">C</span><span class="o">,</span> <span class="no">D</span> <span class="o">{</span>
+  <span class="o">...</span>
+<span class="o">}</span>
+</code></pre></div></div>
+<p>you should write:</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">A</span> <span class="kd">implements</span> <span class="no">D</span> <span class="o">{</span>
+  <span class="o">...</span>
+
+  <span class="no">B</span> <span class="n">b</span> <span class="o">=</span> <span class="k">new</span> <span class="no">B</span><span class="o">(){</span>
+    <span class="o">...</span>
+  <span class="o">};</span>
+
+  <span class="no">C</span> <span class="n">c</span> <span class="o">=</span> <span class="k">new</span> <span class="no">C</span><span class="o">(){</span>
+    <span class="o">...</span>
+  <span class="o">};</span>
+
+  <span class="o">...</span>
+</code></pre></div></div>
+
+<h3 id="control-flow">Control Flow</h3>
+
+<p>Test whether you can return from a method instead of testing whether
+you should execute a block of code.</p>
+
+<p>Instead of:</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">foo</span><span class="o">(){</span>
+      <span class="c1">//some code</span>
+
+      <span class="k">if</span> <span class="o">(</span><span class="n">condition</span><span class="o">){</span>
+        <span class="c1">// long block of code</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
+</code></pre></div></div>
+
+<p>you should write:</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">foo</span><span class="o">(){</span>
+      <span class="c1">//some code</span>
+
+      <span class="k">if</span> <span class="o">(!</span><span class="n">condition</span><span class="o">)</span>
+        <span class="k">return</span><span class="o">;</span>
+
+      <span class="c1">// long block of code</span>
+    <span class="o">}</span>
+</code></pre></div></div>
+
+<p>Furthermore, there is no need to put the code after the return
+statement into an explicit “else”-branch. You can easily save one
+level of block-nesting.</p>
+
+<h3 id="checking-parameters">Checking Parameters</h3>
+
+<ul>
+  <li>Methods may assume that they are called with correct non-null input
+unless the method specifies that it allows incorrect or null input.</li>
+  <li>If a parameter may be <code class="language-plaintext highlighter-rouge">null </code>or is checked add a <code class="language-plaintext highlighter-rouge">@param</code>-JavaDoc
+that indicates this.</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>        <span class="cm">/**
+         * Get positions of slashes in the filename.
+         * @param filename may be null
+         * @return Null-based indices into the string
+                   pointing to the slash positions.
+         */</span>
+
+        <span class="kd">public</span> <span class="kt">int</span><span class="o">[]</span> <span class="nf">findAllSlashes</span><span class="o">(</span><span class="nc">String</span> <span class="n">filename</span><span class="o">)</span> <span class="o">{</span>
+          <span class="k">if</span> <span class="o">(</span><span class="n">filename</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
+            <span class="k">return</span> <span class="k">new</span> <span class="kt">int</span><span class="o">[];</span>
+          <span class="o">...</span>
+        <span class="o">}</span>
+</code></pre></div></div>
+
+<ul>
+  <li>If a method checks for correct parameters it should throw an
+<code class="language-plaintext highlighter-rouge">IllegalArgumentException</code> in case of error.
+    <ul>
+      <li>It is recommended to perform checking in particular at important
+component boundaries. For instance, we had a central entry point
+were events were buffered for sending over the network. Somehow
+a <code class="language-plaintext highlighter-rouge">null </code>event was inserted into the buffer queue and caused a
+<code class="language-plaintext highlighter-rouge">NullPointerException</code> later on. The programmer of the method
+which inserted the event into the buffer should have checked at
+this important boundary with many callers.</li>
+    </ul>
+  </li>
+  <li>Use assert to check for complex preconditions, that cost a lot
+during runtime.</li>
+</ul>
+
+<h2 id="usability">Usability</h2>
+
+<p>Saros/E is an Eclipse IDE Plugin. Therefore it needs to meet
+the <a href="http://wiki.eclipse.org/User_Interface_Guidelines#Checklist_For_Developers">Eclipse User Interface Guidelines</a>.</p>
+
+<h3 id="standard-heuristics-for-system-design">Standard Heuristics for System Design</h3>
+
+<p>When improving Saros either technically or visually you should check
+if you followed the <a href="https://www.nngroup.com/articles/ten-usability-heuristics">10 basic heuristics for good user interfaces</a>.</p>
+
+<p>You do not need many users for this, usually 3 users are enough to quickly find out the most
+important. You can kindly ask them record their test with a tool like <a href="http://www.screencast-o-matic.com">Screencast-O-Matic</a>.</p>
+
+<h3 id="progress-and-cancellation-101">Progress and Cancellation 101</h3>
+
+<p>Whenever a method is long-running, i.e. there is a chance that it will
+take longer than 100ms or involves any external factors such as the user
+or input/output, the software engineer is responsible to provide a way
+to track progress of the operation and provide to the caller the
+possibility to cancel the operation.</p>
+
+<p>If the software engineer does not provide such opportunity the user
+experience might be reduced. For instance in Saros, there used to be no
+possibility to cancel a file transfer from one user to the other but
+just to cancel in between the files. This behavior seems okay, but once
+we started to see archive files of 10 MB and more, which could only be
+canceled by disconnecting from the Jabber-Server, the undesirability of
+the behavior becomes pretty clear.</p>
+
+<p>Fortunately enough there is a straight-forward and simple solution,
+which also improves the general threading behavior of the application:
+The class to use is called <code class="language-plaintext highlighter-rouge">SubMonitor</code> which implements the
+<code class="language-plaintext highlighter-rouge">IProgressMonitor</code> interface.</p>
+
+<p>Now all methods which are long running, need to be changed to take a
+<code class="language-plaintext highlighter-rouge">SubMonitor</code> as a last parameter (this is our convention):</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="nc">Result</span> <span class="nf">computeSomething</span><span class="o">(</span><span class="nc">List</span> <span class="n">input</span><span class="o">,</span> <span class="o">...,</span> <span class="nc">SubMonitor</span> <span class="n">progress</span><span class="o">){</span>
+  <span class="c1">//something</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>Inside those methods, first, we need to initialize the <code class="language-plaintext highlighter-rouge">ProgressMonitor</code>
+with the name of the task and the number of steps this task will take
+(if the number of steps is unknown we set it to a large integer, 10000
+is our convention):</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">progress</span><span class="o">.</span><span class="na">beginTask</span><span class="o">(</span><span class="s">"Computing Something"</span><span class="o">,</span> <span class="n">input</span><span class="o">.</span><span class="na">size</span><span class="o">());</span>
+</code></pre></div></div>
+
+<p>Now whenever we have made some progress towards this task, we can report
+this to the monitor:</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="o">(</span><span class="nc">Something</span> <span class="n">some</span> <span class="o">:</span> <span class="n">input</span><span class="o">)</span> <span class="o">{</span>
+  <span class="o">...</span> <span class="n">process</span> <span class="n">input</span>
+  <span class="n">progress</span><span class="o">.</span><span class="na">worked</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>At the end of the task, we should report, that we are done with the
+task:</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">progress</span><span class="o">.</span><span class="na">done</span><span class="o">()</span>
+</code></pre></div></div>
+<p>This basic contract of <code class="language-plaintext highlighter-rouge">beginTask()</code>, <code class="language-plaintext highlighter-rouge">worked()</code>, and <code class="language-plaintext highlighter-rouge">done()</code> is
+sufficient to achieve the basic uses of progress monitoring.</p>
+
+<h4 id="nesting-progress">Nesting Progress</h4>
+
+<p>In many cases the situation is a little bit more complicated, as the
+operation that is long-running is making calls to other long-running
+operations as well. To solve this problem, we need to create <strong>child
+progress monitors</strong>, which consume a given number of work steps from
+their parent:</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kt">void</span> <span class="nf">computeInTwoSteps</span><span class="o">(</span><span class="nc">IProgressMonitor</span> <span class="n">monitor</span><span class="o">){</span>
+    <span class="nc">SubMonitor</span> <span class="n">subMonitor</span> <span class="o">=</span> <span class="nc">SubMonitor</span><span class="o">.</span><span class="na">convert</span><span class="o">(</span>
+                                     <span class="n">monitor</span><span class="o">,</span>
+                                     <span class="s">"Compute in two steps"</span><span class="o">,</span>
+                                     <span class="mi">2</span>
+                                   <span class="o">);</span>
+    <span class="n">progress</span><span class="o">.</span><span class="na">beginTask</span><span class="o">(</span><span class="s">"Compute in two steps"</span><span class="o">,</span> <span class="mi">2</span><span class="o">);</span>
+    <span class="n">computeFirstStep</span><span class="o">(</span><span class="n">subMonitor</span><span class="o">.</span><span class="na">newChild</span><span class="o">(</span><span class="mi">1</span><span class="o">));</span>
+    <span class="n">computeSecondStep</span><span class="o">(</span><span class="n">subMonitor</span><span class="o">.</span><span class="na">newChild</span><span class="o">(</span><span class="mi">1</span><span class="o">));</span>
+    <span class="n">progress</span><span class="o">.</span><span class="na">done</span><span class="o">();</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>This code will pass two SubMonitors to the two methods, which then are
+free to use them just as the parent method did:</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kt">void</span> <span class="nf">computeFirstStep</span><span class="o">(</span><span class="nc">SubMonitor</span> <span class="n">progress</span><span class="o">){</span>
+
+  <span class="n">progress</span><span class="o">.</span><span class="na">beginTask</span><span class="o">(</span><span class="s">"Compute the first step"</span><span class="o">,</span> <span class="mi">140</span><span class="o">);</span>
+  <span class="o">...</span>
+  <span class="n">progress</span><span class="o">.</span><span class="na">worked</span><span class="o">(</span><span class="mi">5</span><span class="o">);</span> <span class="c1">// etc.</span>
+  <span class="o">...</span>
+  <span class="n">progress</span><span class="o">.</span><span class="na">done</span><span class="o">();</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h4 id="reporting-information-to-the-user">Reporting Information to the User</h4>
+
+<p>A progress monitor provides 3 ways to report information from a long
+running operation to the user</p>
+
+<ul>
+  <li>The amount of steps already worked as given by <code class="language-plaintext highlighter-rouge">worked()</code></li>
+  <li>The name of the task, as set using <code class="language-plaintext highlighter-rouge">beginTask(String)</code> and
+<code class="language-plaintext highlighter-rouge">setTaskName(String)</code></li>
+  <li>The name of the sub-task, as set using <code class="language-plaintext highlighter-rouge">subTask(String)</code></li>
+</ul>
+
+<p>This information is typically presented to the user as a Dialog with a
+message being equal to the task name of the top level progress monitor, a
+progress bar showing the growing amount of work already done and a label
+for the current sub-task which switches every time the sub-task is being
+set.</p>
+
+<p>Since the taskName is fixed (by default), only the top level task name
+is shown to the user. The task name of the nested operations are never
+shown to the user. To report status messages from nested operations, the
+sub-task needs to be used:</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kt">void</span> <span class="nf">computeInTwoSteps</span><span class="o">(</span><span class="nc">SubMonitor</span> <span class="n">progress</span><span class="o">){</span>
+
+  <span class="n">progress</span><span class="o">.</span><span class="na">beginTask</span><span class="o">(</span><span class="s">"Compute in two steps"</span><span class="o">,</span> <span class="mi">2</span><span class="o">);</span>
+
+  <span class="n">progress</span><span class="o">.</span><span class="na">subTask</span><span class="o">(</span><span class="s">"Two Step Computation: Step 1"</span><span class="o">);</span>
+  <span class="n">computeFirstStep</span><span class="o">(</span><span class="n">progress</span><span class="o">.</span><span class="na">newChild</span><span class="o">(</span><span class="mi">1</span><span class="o">));</span>
+
+  <span class="n">progress</span><span class="o">.</span><span class="na">subTask</span><span class="o">(</span><span class="s">"Two Step Computation: Step 2"</span><span class="o">);</span>
+  <span class="n">computeSecondStep</span><span class="o">(</span><span class="n">progress</span><span class="o">.</span><span class="na">newChild</span><span class="o">(</span><span class="mi">1</span><span class="o">));</span>
+
+  <span class="n">progress</span><span class="o">.</span><span class="na">done</span><span class="o">();</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h4 id="dealing-with-operations-of-unspecified-length">Dealing With Operations of Unspecified Length</h4>
+
+<p>To have a progress dialog on operations for which the amount of steps
+are unknown, the following solution is recommended:</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">while</span> <span class="o">(!</span><span class="n">done</span><span class="o">()){</span>
+  <span class="o">...</span> <span class="k">do</span> <span class="n">work</span>
+
+  <span class="n">progress</span><span class="o">.</span><span class="na">setWorkRemaining</span><span class="o">(</span><span class="mi">1000</span><span class="o">);</span>
+  <span class="n">progress</span><span class="o">.</span><span class="na">worked</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>This code will advance the progress bar 0,1% of the remaining total of
+the progress monitor and thus logarithmically approach 100% worked. The
+percentage 0,1% should be adjusted to achieve 50% progress on the
+expected number of work steps.</p>
+
+<h4 id="cancellation">Cancellation</h4>
+
+<p>To achieve <strong>cancellation</strong> support in an operation, we should check
+frequently whether the user has requested that we stop our tasks:</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="o">(</span><span class="nc">Something</span> <span class="n">some</span> <span class="o">:</span> <span class="n">input</span><span class="o">){</span>
+  <span class="k">if</span> <span class="o">(</span><span class="n">progress</span><span class="o">.</span><span class="na">isCanceled</span><span class="o">())</span>
+    <span class="k">return</span><span class="o">;</span>
+  <span class="o">...</span> <span class="n">process</span> <span class="n">input</span>
+  <span class="n">progress</span><span class="o">.</span><span class="na">worked</span><span class="o">(</span><span class="mi">1</span><span class="o">)</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>The easiest way to response to a request for cancellation is to just
+return as shown above, but in most cases this is undesirable, because
+the caller will not know whether the operation finished or not. Instead,
+methods should rather throw a <code class="language-plaintext highlighter-rouge">CancellationException</code> so that a caller
+can recognize that the operation was canceled:</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="nc">BigInteger</span> <span class="nf">factorial</span><span class="o">(</span><span class="kt">int</span> <span class="n">n</span><span class="o">,</span> <span class="nc">SubMonitor</span> <span class="n">progress</span><span class="o">){</span>
+
+  <span class="n">progress</span><span class="o">.</span><span class="na">beginTask</span><span class="o">(</span><span class="s">"Computing Factorial of "</span> <span class="o">+</span> <span class="n">n</span><span class="o">,</span> <span class="n">n</span><span class="o">);</span>
+
+  <span class="nc">BigInteger</span> <span class="n">result</span> <span class="o">=</span> <span class="nc">BigInteger</span><span class="o">.</span><span class="na">ONE</span><span class="o">;</span>
+
+  <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">progress</span><span class="o">.</span><span class="na">isCanceled</span><span class="o">())</span>
+      <span class="k">throw</span> <span class="k">new</span> <span class="nf">CancellationException</span><span class="o">();</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="na">multiply</span><span class="o">(</span><span class="nc">BigInteger</span><span class="o">.</span><span class="na">valueOf</span><span class="o">(</span><span class="n">i</span><span class="o">));</span>
+    <span class="n">progress</span><span class="o">.</span><span class="na">worked</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span>
+  <span class="o">}</span>
+
+  <span class="n">progress</span><span class="o">.</span><span class="na">done</span><span class="o">();</span>
+  <span class="k">return</span> <span class="n">result</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>BTW: It is a convention that we try to avoid <code class="language-plaintext highlighter-rouge">InterruptedException</code> for
+this, because it is a checked exception and thus cumbersome for the
+caller. To maintain this convention, a method MUST specify whether it is
+cancelable, by providing the demonstrated JavaDoc tag.</p>
+
+<h3 id="error-handling">Error Handling</h3>
+
+<p>The first step to achieve this, is to make sure that you notice when
+things go wrong. Thus, all Runnables passed to Threads or Executors and
+all methods called from 3rd party software, such as Actions called from
+Eclipse, or Listeners from the network API need to be made secure as to
+catch all <code class="language-plaintext highlighter-rouge">RuntimeException</code> that might have slipped up.</p>
+
+<p>Use the following method for this (you might want to pass up
+<code class="language-plaintext highlighter-rouge">RuntimeException</code>s up the stack as well):</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="cm">/**
+     * Return a new Runnable which runs the given runnable but catches all
+     * RuntimeExceptions and logs them to the given logger.
+     *
+     * Errors are logged and rethrown.
+     *
+     * This method does NOT actually run the given runnable, but only wraps it.
+     */</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="nc">Runnable</span> <span class="nf">wrapSafe</span><span class="o">(</span><span class="kd">final</span> <span class="nc">Logger</span> <span class="n">log</span><span class="o">,</span> <span class="kd">final</span> <span class="nc">Runnable</span> <span class="n">runnable</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">return</span> <span class="k">new</span> <span class="nf">Runnable</span><span class="o">()</span> <span class="o">{</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">run</span><span class="o">()</span> <span class="o">{</span>
+          <span class="k">try</span> <span class="o">{</span>
+            <span class="n">runnable</span><span class="o">.</span><span class="na">run</span><span class="o">();</span>
+          <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">RuntimeException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">log</span><span class="o">.</span><span class="na">error</span><span class="o">(</span><span class="s">"Internal Error:"</span><span class="o">,</span> <span class="n">e</span><span class="o">);</span>
+          <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">Error</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">log</span><span class="o">.</span><span class="na">error</span><span class="o">(</span><span class="s">"Internal Fatal Error:"</span><span class="o">,</span> <span class="n">e</span><span class="o">);</span>
+
+            <span class="c1">// Rethrow errors (such as an OutOfMemoryError)</span>
+            <span class="k">throw</span> <span class="n">e</span><span class="o">;</span>
+          <span class="o">}</span>
+        <span class="o">}</span>
+      <span class="o">};</span>
+    <span class="o">}</span>
+</code></pre></div></div>
+
+<p>When developing in Eclipse the following code-snippets might help:</p>
+
+<ul>
+  <li>Error reporting to the user can be done using an ErrorDialog:
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="nc">Display</span><span class="o">.</span><span class="na">getDefault</span><span class="o">().</span><span class="na">syncExec</span><span class="o">(</span><span class="k">new</span> <span class="nc">Runnable</span><span class="o">()</span> <span class="o">{</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">run</span><span class="o">()</span> <span class="o">{</span>
+            <span class="nc">MessageDialog</span><span class="o">.</span><span class="na">openError</span><span class="o">(</span>
+                <span class="nc">Display</span><span class="o">.</span><span class="na">getDefault</span><span class="o">().</span><span class="na">getActiveShell</span><span class="o">(),</span>
+                <span class="s">"Dialog Title"</span><span class="o">,</span> <span class="s">"Error message"</span>
+            <span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">});</span>
+</code></pre></div>    </div>
+  </li>
+  <li>Error reporting for the developer can be done using the ErrorLog:
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="nc">YourPlugin</span><span class="o">.</span><span class="na">getDefault</span><span class="o">().</span><span class="na">getLog</span><span class="o">().</span><span class="na">log</span><span class="o">(</span>
+      <span class="k">new</span> <span class="nf">Status</span><span class="o">(</span><span class="nc">IStatus</span><span class="o">.</span><span class="na">ERROR</span><span class="o">,</span> <span class="s">"Plug-In ID goes here"</span><span class="o">,</span> <span class="nc">IStatus</span><span class="o">.</span><span class="na">ERROR</span><span class="o">,</span> <span class="n">message</span><span class="o">,</span> <span class="n">e</span><span class="o">));</span>
+</code></pre></div>    </div>
+  </li>
+  <li>Input from the user needs always to be checked and untainted
+on input.
+    <ul>
+      <li>Error messages need to be human readable.</li>
+      <li>Exceptions need to be handled correctly, i.e.
+        <ul>
+          <li>If the program could do something about the exception it
+should try (for instance repeat an failed operation).</li>
+          <li><del>Otherwise an unchecked exception should be thrown to
+prevent =throws=-clauses littering the code.</del></li>
+          <li>If you can’t handle the exception then throw it back to the
+caller</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<p>Anti-example:</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="kd">public</span> <span class="nc">Javadoc</span> <span class="nf">updateJavadoc</span><span class="o">(</span><span class="nc">String</span> <span class="n">filename</span><span class="o">,</span> <span class="nc">String</span> <span class="n">name</span><span class="o">,</span>
+      <span class="nc">String</span> <span class="n">newJavadocText</span><span class="o">,</span> <span class="kt">int</span> <span class="n">isType</span><span class="o">)</span> <span class="o">{</span>
+      <span class="nc">Javadoc</span> <span class="n">jd</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+      <span class="k">try</span> <span class="o">{</span>
+        <span class="o">...</span> <span class="nc">Try</span> <span class="n">to</span> <span class="n">update</span> <span class="nc">Javadoc</span> <span class="o">...</span>
+      <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span> <span class="c1">// No, no, no!</span>
+        <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+      <span class="o">}</span>
+
+      <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"The new javadoc-------\n"</span> <span class="o">+</span> <span class="n">jd</span><span class="o">);</span>
+      <span class="k">return</span> <span class="n">jd</span><span class="o">;</span>
+    <span class="o">}</span>
+</code></pre></div></div>
+<p>How to do it right:</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="kd">public</span> <span class="nc">Javadoc</span> <span class="nf">updateJavadoc</span><span class="o">(</span><span class="nc">String</span> <span class="n">filename</span><span class="o">,</span> <span class="nc">String</span> <span class="n">name</span><span class="o">,</span> <span class="nc">String</span> <span class="n">newJavadocText</span><span class="o">,</span> <span class="kt">int</span> <span class="n">isType</span><span class="o">)</span>
+      <span class="kd">throws</span> <span class="nc">IOException</span> <span class="o">{</span>
+
+      <span class="nc">Javadoc</span> <span class="n">jd</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+      <span class="k">try</span> <span class="o">{</span>
+        <span class="o">...</span> <span class="nc">Try</span> <span class="n">to</span> <span class="n">update</span> <span class="nc">Javadoc</span> <span class="o">...</span>
+      <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">IOException</span> <span class="n">e</span><span class="o">){</span> <span class="c1">// Catch the checked exceptions that occur</span>
+        <span class="c1">// bring the internal logic back to a stable state (if you can)</span>
+        <span class="k">throw</span> <span class="n">e</span><span class="o">;</span> <span class="c1">// let the caller handle this exception</span>
+      <span class="o">}</span>
+
+      <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"The new javadoc-------\n"</span> <span class="o">+</span> <span class="n">jd</span><span class="o">);</span>
+      <span class="k">return</span> <span class="n">jd</span><span class="o">;</span>
+    <span class="o">}</span>
+</code></pre></div></div>
+
+<h4 id="dealing-with-interruptedexception">Dealing with InterruptedException</h4>
+
+<ul>
+  <li>When calling a blocking method, Java uses InterruptedException to
+signal that the waiting thread was told to stop waiting.</li>
+  <li>As a caller to a blocking method it is your responsibility to deal
+with the possibility of being interrupted. This is why exception is
+checked in Java.</li>
+  <li>The contract of InterruptedException is the following:
+    <ul>
+      <li>If interrupted a method honoring the contract MUST either throw
+the InterruptedException or set the interrupt-flag.</li>
+    </ul>
+  </li>
+  <li>Since the InterruptException-contract is assumed to be honored by
+all methods in Java, there are three ways of dealing with the
+InterruptedException:
+    <ol>
+      <li>Re-throwing the InterruptedException to tell callers that this
+method might be interrupted: As we do not like checked exception
+this is an inferior solution to the problem.</li>
+      <li>Resetting the interrupt flag
+        <ul>
+          <li>It is your responsibility to always reset the Interrupt flag
+in case you catch the Exception, because somebody who called
+you might depend on it. This will look like this and is the
+normal case for 90% of all cases:
+            <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="k">try</span> <span class="o">{</span>
+      <span class="nc">Thread</span><span class="o">.</span><span class="na">sleep</span><span class="o">(</span><span class="mi">500</span><span class="o">);</span>
+    <span class="o">}</span> <span class="k">catch</span><span class="o">(</span><span class="nc">InterruptedException</span> <span class="n">e</span><span class="o">){</span>
+      <span class="c1">// The line of code will continue after the catch</span>
+      <span class="nc">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">().</span><span class="na">interrupt</span><span class="o">();</span>
+    <span class="o">}</span>
+</code></pre></div>            </div>
+          </li>
+          <li>This is recommended even if you are sure that you will never
+be interrupted (because the program might change in
+the future)</li>
+          <li>Special case: Spinning / Busy Waiting
+            <ul>
+              <li>If you use Thread.sleep() inside a while() loop, then
+you cannot use the above pattern without leaving the
+while loop, because Thread.sleep() (all methods that
+honor the contract of InterruptedException) will return
+immediately without sleeping. Thus your while loop
+becomes a busy waiting loop.</li>
+              <li>If you really do not want to be interruptible, then you
+need to do the following:
+                <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="kt">boolean</span> <span class="n">interrupted</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+    <span class="k">try</span> <span class="o">{</span>
+      <span class="k">while</span> <span class="o">(</span><span class="n">looping</span><span class="o">){</span>
+        <span class="c1">// do stuff</span>
+        <span class="k">try</span> <span class="o">{</span>
+          <span class="nc">Thread</span><span class="o">.</span><span class="na">sleep</span><span class="o">(</span><span class="mi">500</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span><span class="o">(</span><span class="nc">InterruptedException</span> <span class="n">e</span><span class="o">){</span>
+          <span class="n">interrupted</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+        <span class="o">}</span>
+      <span class="o">}</span>
+    <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">interrupted</span><span class="o">)</span>
+        <span class="c1">// The line of code will continue after the catch</span>
+        <span class="nc">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">().</span><span class="na">interrupt</span><span class="o">();</span>
+    <span class="o">}</span>
+</code></pre></div>                </div>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>Tell others that you violate the contract: Add to the signature
+of your method, that you do not support the contract
+of Thread.interrupt(). Be aware that by violating the
+InterruptedException-contract you put all your callers into
+violation as well (since if handle an InterruptedException
+incorrectly they cannot honor the contract anymore). Use the
+following to tell callers that you do not honor the contract:
+        <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="cm">/**
+     * @nonInterruptable This method does not support being interrupted
+     */</span>
+</code></pre></div>        </div>
+      </li>
+    </ol>
+  </li>
+  <li>BTW: There is no obligation in the contract for you to exit as
+quickly as possible.</li>
+  <li>For more read: <a href="https://www.ibm.com/developerworks/library/j-jtp05236/index.html">https://www.ibm.com/developerworks/library/j-jtp05236/index.html</a></li>
+</ul>
+
+<h2 id="broadcast-listener">Broadcast Listener</h2>
+
+<p>To avoid repeated code blocks in an Observable like</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">Observable</span> <span class="o">{</span>
+
+  <span class="nc">List</span> <span class="n">listeners</span> <span class="o">=</span> <span class="k">new</span> <span class="o">...</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">addListener</span><span class="o">(</span><span class="nc">Listener</span> <span class="n">listener</span><span class="o">){</span><span class="n">listeners</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">listener</span><span class="o">)}</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">removeListener</span><span class="o">(</span><span class="nc">Listener</span> <span class="n">listener</span><span class="o">){...}</span>
+
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">someMethod</span><span class="o">()</span> <span class="o">{</span>
+    <span class="o">...</span>
+    <span class="c1">// notify all listeners</span>
+    <span class="k">for</span> <span class="o">(</span><span class="nc">Listener</span> <span class="n">l</span> <span class="o">:</span> <span class="n">listeners</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">l</span><span class="o">.</span><span class="na">notify</span><span class="o">();</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">someMethod2</span><span class="o">()</span> <span class="o">{</span>
+    <span class="o">...</span>
+    <span class="c1">// notify all listeners again</span>
+    <span class="k">for</span> <span class="o">(</span><span class="nc">Listener</span> <span class="n">l</span> <span class="o">:</span> <span class="n">listeners</span><span class="o">)</span> <span class="o">{</span>
+     <span class="n">l</span><span class="o">.</span><span class="na">notify</span><span class="o">();</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+<p>It is recommended to use a helper class <code class="language-plaintext highlighter-rouge">BroadcastListener</code> that
+provides a method to notify all its registered listeners. The
+<code class="language-plaintext highlighter-rouge">BroadcastListener</code> should be a singleton managed by <code class="language-plaintext highlighter-rouge">PicoContainer</code>.</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">BroadcastListener</span> <span class="kd">implements</span> <span class="nc">Listener</span> <span class="o">{</span>
+
+  <span class="nc">List</span> <span class="n">listeners</span> <span class="o">=</span> <span class="k">new</span> <span class="o">...</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">add</span><span class="o">(</span><span class="nc">Listener</span> <span class="n">listener</span><span class="o">){</span><span class="n">listeners</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">listener</span><span class="o">)}</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">remove</span><span class="o">(</span><span class="nc">Listener</span> <span class="n">listener</span><span class="o">){...}</span>
+
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">notify</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">for</span> <span class="o">(</span><span class="nc">Listener</span> <span class="n">l</span> <span class="o">:</span> <span class="n">listeners</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">l</span><span class="o">.</span><span class="na">notify</span><span class="o">();</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>The code for an Observable therefore becomes much simpler. It only needs
+to know the <code class="language-plaintext highlighter-rouge">BroadcastListener</code> and can easily notify all registered
+listeners at once.</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">Observable</span> <span class="o">{</span>
+
+  <span class="nc">BroadcastListener</span> <span class="n">listener</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">BroadcastListener</span><span class="o">();</span>
+
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">someMethod</span><span class="o">(){</span>
+    <span class="o">...</span>
+    <span class="n">listener</span><span class="o">.</span><span class="na">notify</span><span class="o">();</span>
+  <span class="o">}</span>
+
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">someMethod2</span><span class="o">(){</span>
+    <span class="o">...</span>
+    <span class="n">listener</span><span class="o">.</span><span class="na">notify</span><span class="o">();</span>
+   <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h2 id="software-design-rules">Software Design Rules</h2>
+
+<ul>
+  <li>Distinguish clearly between the common building blocks of
+applications, namely:
+    <ul>
+      <li>Services - Providers of functionality that can be well
+encapsulated</li>
+      <li>Entities - Mutable classes that represent the business world.
+Group these into aggregates.</li>
+      <li>Values - Use the <a href="http://www.c2.com/cgi/wiki?ValueObject">Value Object
+Pattern</a> to ensure that
+users of the class can rely on the objects to be immutable and
+all methods to be side effect free. This helps A LOT when using
+a class.</li>
+    </ul>
+  </li>
+  <li>
+    <p>Avoid implementing many interfaces in the same class wherever
+possible (more than one is necessary only in rare cases). Use nested
+or anonymous classes instead. It makes it much easier to understand
+and modify your code.</p>
+  </li>
+  <li>The Singleton Pattern is a inferior solution to define the
+architecture of an application compared to using Dependency
+Injection. To achieve the lazy semantics often
+also associated with the Singleton Pattern you should inject a
+dependency to a lazy initializer of the component that you actually
+need instead.</li>
+</ul>
+
+<h2 id="threading-and-concurrency">Threading and Concurrency</h2>
+
+<ul>
+  <li>Try to avoid instantiating the class <code class="language-plaintext highlighter-rouge">Thread</code> directly but
+rather use a <code class="language-plaintext highlighter-rouge">ThreadFactory</code> (in particular the <code class="language-plaintext highlighter-rouge">NamedThreadFactory</code>
+so that your threads are named) or even better an <code class="language-plaintext highlighter-rouge">Executor</code>.</li>
+  <li>Spend some time learning about the <a href="https://docs.oracle.com/javase/6/docs/api/java/util/concurrent/package-summary.html">Java Concurrency library java.util.concurrent</a>.</li>
+</ul>
+
+<h2 id="kinds-of-comments">Kinds of Comments</h2>
+
+<p>This section is based on Steve McConnell’s Code Complete, Chapter 32.</p>
+
+<p>There are six categories of comments:</p>
+
+<ol>
+  <li><strong>Repeat of the Code</strong>
+    <ul>
+      <li>If something is not complex and thus documentation repeats code,
+you should not document at all. For instance, don’t document
+getters and setters (an exception would be to explain what the
+variable actually contains that you are getting).</li>
+      <li>A counter-example:
+        <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="cm">/**
+     * return a stack of String,
+     * @param text
+     * @return Stack
+     */</span>
+
+    <span class="kd">public</span> <span class="nc">Stack</span> <span class="nf">getFormatJavadocLine</span><span class="o">(</span><span class="nc">String</span> <span class="n">text</span><span class="o">)</span> <span class="o">{</span>
+
+      <span class="nc">StringTokenizer</span> <span class="n">st</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">StringTokenizer</span><span class="o">(</span><span class="n">text</span><span class="o">,</span> <span class="s">"\n"</span><span class="o">);</span>
+      <span class="nc">Stack</span> <span class="n">stack</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Stack</span><span class="o">();</span>
+
+      <span class="k">while</span> <span class="o">(</span><span class="n">st</span><span class="o">.</span><span class="na">hasMoreTokens</span><span class="o">())</span> <span class="o">{</span>
+        <span class="n">stack</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">st</span><span class="o">.</span><span class="na">nextToken</span><span class="o">());</span>
+      <span class="o">}</span>
+
+      <span class="k">return</span> <span class="n">stack</span><span class="o">;</span>
+    <span class="o">}</span>
+</code></pre></div>        </div>
+      </li>
+      <li>The documentation is absolutely useless as it just repeats the
+signature and even fails to explain the method name. Furthermore
+the method name is wrong for the task that is
+actually performed. The important question whether this method
+returns a stack of the individual lines in text from top to
+bottom or bottom to top remains unanswered.</li>
+    </ul>
+  </li>
+  <li><strong>Explanation of the Code</strong>
+    <ul>
+      <li>If the code needs to be explained, it is usually better to
+improve the code instead of adding comments.</li>
+    </ul>
+  </li>
+  <li><strong>Marker in the Code</strong>
+    <ul>
+      <li>Marker comments are notes for the developers that the work isn’t
+done yet. They should not be left in the code. If you have to
+mark a section in the code, use „TODO“. This way all marker
+comments will be standardized and it is easier to locate them.
+        <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="cm">/*
+     * TODO FIX: Our caller should be able to distinguish whether the
+     * query failed or it is an IM client which sends back the message
+     */</span>
+</code></pre></div>        </div>
+      </li>
+    </ul>
+  </li>
+  <li><strong>Summary of the Code</strong>
+    <ul>
+      <li>Comments that summarize the code in a few sentences can be
+valuable especially for readers who haven’t written the code.
+They can scan these comments more quickly than the code.
+        <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="cm">/*
+     * move all chess pieces to start position
+     */</span>
+</code></pre></div>        </div>
+      </li>
+    </ul>
+  </li>
+  <li><strong>Description of the Code’s Intent</strong>
+    <ul>
+      <li>Intent comments explain the purpose of a section of code. In
+contrast to the summary comments which operate at the level of
+the solution the intent comment operates at the level of
+the problem.
+        <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="cm">/*
+     * initialize a new chess game
+     */</span>
+</code></pre></div>        </div>
+      </li>
+    </ul>
+  </li>
+  <li><strong>Information that cannot possibly be expressed by the Code Itself</strong>
+    <ul>
+      <li>Some information needs to be written in comments since they
+cannot be expressed in code. This can be copyright notices,
+version numbers, notes about the code’s design, optimization
+notes and so on.</li>
+    </ul>
+  </li>
+</ol>
+
+<p>Acceptable code comments are summary comments (4.), intent comments
+(5.), and information that cannot be expressed in code (6.). Markers
+(3.) are acceptable during development but should be removed before
+release. Try to avoid comments that repeat (1.) or explain the code
+(2.).</p>
+
+
+      </div>
+
+      <!-- Right sidebar (TOC) -->
+      <div id="toc-bar-column" class="d-none d-lg-block col-12 col-lg-3 col-xl-3 px-0">
+        
+        <!-- element filled by loadToc() from toc.js -->
+        <ul id="toc-bar" class="sticky-top text-decoration-none nav toc-bar py-3"></ul>
+        
+      </div>
+    </div>
+  </div>
+
+  <footer class="page-footer font-small w-100 position-absolute">
+
+  <div class="text-center my-3">
+    
+    
+    <a href="https://github.com/saros-project/saros">
+      <i class="fab fa-github fa-lg text-white mr-3 mr-md-5"> </i>
+    </a>
+    
+    
+    <a href="https://gitter.im/saros-project/saros/user">
+      <i class="fab fa-gitter fa-lg text-white mr-3 mr-md-5"> </i>
+    </a>
+    
+    
+    <a href="https://groups.google.com/forum/#!forum/saros-user">
+      <i class="fas fa-envelope fa-lg text-white mr-3 mr-md-5"> </i>
+    </a>
+    
+    
+    <a href="https://twitter.com/saros_project">
+      <i class="fab fa-twitter fa-lg text-white "> </i>
+    </a>
+    
+  </div>
+
+</footer>
+  <script src="/node_modules/jquery/dist/jquery.min.js"></script>
+<script src="/node_modules/popper.js/dist/umd/popper.min.js"></script>
+<script src="/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+
+<script src="/node_modules/mermaid/dist/mermaid.min.js"></script>
+<script>
+mermaid.initialize({
+    startOnLoad: true
+});
+</script>
+<!-- load after its dependency jquery -->
+
+<script src="/assets/js/ide-tabs.js"></script>
+<script src="/assets/js/toc.js"></script>
+<script src="/assets/js/header-anchor-links.js"></script>
+
+</body>
+
+</html>

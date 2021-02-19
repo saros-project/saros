@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+  <title>Manage XMPP Accounts</title>
+  <meta charset='utf-8'>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,maximum-scale=2">
+
+  <!-- stylesheets -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+  <link rel="stylesheet" href="/assets/main.css">
+ 
+  <!-- favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#603cba">
+  <meta name="theme-color" content="#ffffff">
+</head>
+
+
+<body>
+  <div class="bg-dark">
+  <div class="container-fluid">
+    <nav id="top-nav" class="navbar navbar-expand-sm navbar-dark bg-dark py-2 px-0">
+      <!-- Logo -->
+      <a class="ml-md-3 navbar-brand" href="/">
+        <img class="float-left" src="/assets/images/logo/saros-logo.svg" />
+        <span class="text-decoration-none pl-2 d-inline d-sm-none d-md-inline pr-5">Saros</span>
+      </a>
+
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
+        aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <ul class="navbar-nav">
+        
+        
+        
+        
+        <li class="nav-item active">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/documentation">User Docs</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/releases">Releases</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/contribute">Contribute</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/contact">Contact</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/research">Research</a>
+        </li>
+        
+      </ul>
+      </div>
+
+      <!-- Social Media -->
+      <div id="media-links-nav" class="collapse navbar-collapse">
+        </ul>
+        <ul class="navbar-nav ml-auto">
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/saros-project/saros">
+              <i class="fab fa-github fa-lg"> </i>
+            </a>
+          </li>
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://gitter.im/saros-project/saros/user">
+              <i class="fab fa-gitter fa-lg"> </i>
+            </a>
+          </li>
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://groups.google.com/forum/#!forum/saros-user">
+              <i class="fas fa-envelope fa-lg"> </i>
+            </a>
+          </li>
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://twitter.com/saros_project">
+              <i class="fab fa-twitter fa-lg"> </i>
+            </a>
+          </li>
+          
+        </ul>
+      </div>
+    </nav>
+  </div>
+</div>
+
+  <div class="container-fluid">
+
+    
+    
+
+    
+
+    <div class="row justify-content-left flex-xl-nowrap">
+      <!-- Left sidebar -->
+      <div class="col-12 col-md-4 col-xl-3 my-3 px-0  ">
+        
+        <div id="sidebar" class="pl-1">
+    <ul class="nav flex-column">
+        
+
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/documentation/installation.html?tab=eclipse">Installation</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/documentation/getting-started.html?tab=eclipse">Getting Started</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/documentation/awareness-information.html">Awareness Information</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        
+        <li class="nav-item">
+
+            
+            
+            
+
+            <a class="font-weight-bold nav-link py-0 collapsable-side-item " href="#How-Tos"
+                data-target="#How-Tos" data-toggle="collapse">How-Tos</a>
+            <div id="How-Tos" class="collapse show">
+                <ul class="nav flex-column ml-2">
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/documentation/how-tos/change-colors.html">Change Colors</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/documentation/how-tos/follow-mode.html">Follow Mode</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/documentation/how-tos/hostless-sessions.html">Hostless Sessions (alpha)</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link active-link py-0 pl-5"
+                            href="/documentation/how-tos/manage-xmpp-accounts.html">Manage XMPP Accounts</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/documentation/how-tos/resolve-desynchronization.html">Resolve Desynchronization</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/documentation/how-tos/setup-xmpp.html">Setup XMPP Server</a></li>
+                    
+                </ul>
+            </div>
+        </li>
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/documentation/features.html">Features</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/documentation/compatibility.html">Compatibility</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/documentation/faq.html">FAQ</a>
+        </li>
+
+        
+        
+    </ul>
+
+</div>
+        
+      </div>
+
+      <div id="main-content"
+        class="col-12 col-md-8 col-lg-6 main-content my-3 px-sm-2 px-md-1 px-xl-0">
+
+        <h1 class="display-4">Manage XMPP Accounts</h1>
+        <p>This page described how to manage your XMPP accounts (<strong>not your contacts</strong>).
+Therefore, the information is only relevant if you want to replace an old account with a new one,
+update the information for an added account (like the password), or you want to use multiple accounts.</p>
+
+<!-- Uses the method selectTabs defined in ide-tabs.js -->
+<div class="shadow-sm mb-3">
+
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-tab-link nav-link p-1 eclipse active" onclick="selectTabs( 'eclipse' );" id="eclipse-tab" data-toggle="tab" href="#">
+                <img alt="Eclipse logo" src="/assets/images/logo/eclipse-logo.svg" height="30" />
+                Eclipse
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-tab-link nav-link p-1 intellij" onclick="selectTabs( 'intellij' );" id="intellij-tab" data-toggle="tab" href="#">
+                <img alt="IntelliJ logo" src="/assets/images/logo/intellij-logo.svg" height="30" /> IntelliJ
+            </a>
+        </li>
+    </ul>
+
+    <div class="tab-content border rounded-bottom border-top-0">
+        <div class="tab-pane fade px-2 pt-2 mt-0 mb-2 eclipse active show" role="tabpanel">
+            
+<h2 id="saros-account-preferences">Saros Account Preferences</h2>
+
+<p>Most of the following configuration steps are located in the
+Saros account preferences. You can open these preferences:</p>
+<ul>
+  <li>By opening <code class="language-plaintext highlighter-rouge">Window &gt; Preferences</code> and selecting the <code class="language-plaintext highlighter-rouge">Saros</code> entry. <strong>OR</strong></li>
+  <li>By opening the “Saros” drop-down menu in the menu bar and clicking on <code class="language-plaintext highlighter-rouge">Preferences</code>. <strong>OR</strong></li>
+  <li>By opening the drop-down menu beside the “Connect” button (<img src="/documentation/images/icons/connect.png" alt="connect icon" />) in the Saros view
+and clicking on <code class="language-plaintext highlighter-rouge">Configure Accounts...</code>.</li>
+</ul>
+
+<h2 id="add-an-account">Add an Account</h2>
+
+<ul>
+  <li>In the top bar of the Saros view, open the drop-down menu beside the “Connect” button (<img src="/documentation/images/icons/connect.png" alt="connect icon" />).</li>
+  <li>Select option <code class="language-plaintext highlighter-rouge">Add Account...</code>.</li>
+  <li>Follow the steps of the wizard.</li>
+</ul>
+
+<p><em>Alternatively</em> via menu bar:</p>
+
+<ul>
+  <li>Open the “Saros” drop-down menu in the menu bar.</li>
+  <li>Select option <code class="language-plaintext highlighter-rouge">Add Account...</code>.</li>
+  <li>Follow the steps of the wizard.</li>
+</ul>
+
+<p><em>Alternatively</em> via preferences:</p>
+
+<ul>
+  <li>Open the <a href="#saros-account-preferences">Saros account preferences</a></li>
+  <li>Click on <code class="language-plaintext highlighter-rouge">Add Account</code>.</li>
+  <li>Follow the steps of the wizard.</li>
+</ul>
+
+<h2 id="remove-an-account">Remove an Account</h2>
+
+<ul>
+  <li>Open the <a href="#saros-account-preferences">Saros account preferences</a></li>
+  <li>Select the account you want to remove in the <code class="language-plaintext highlighter-rouge">XMPP Accounts</code> list.</li>
+  <li>Click on <code class="language-plaintext highlighter-rouge">Remove Account</code>.</li>
+</ul>
+
+<h2 id="modify-an-account">Modify an Account</h2>
+
+<ul>
+  <li>Open the <a href="#saros-account-preferences">Saros account preferences</a></li>
+  <li>Select the account you want to modify in the <code class="language-plaintext highlighter-rouge">XMPP Accounts</code> list.</li>
+  <li>Click on <code class="language-plaintext highlighter-rouge">Edit Account</code>.</li>
+  <li>Change the JID or the password. (If you want to change network specific information, open the <code class="language-plaintext highlighter-rouge">Advanced Options</code>.)</li>
+  <li>Click on <code class="language-plaintext highlighter-rouge">Finish</code>.</li>
+</ul>
+
+<h2 id="change-the-default-account">Change the Default Account</h2>
+
+<ul>
+  <li>Open the <a href="#saros-account-preferences">Saros account preferences</a>.</li>
+  <li>Select the account you want to define as default account.</li>
+  <li>Click on <code class="language-plaintext highlighter-rouge">Activate Account</code>.</li>
+</ul>
+
+
+        </div>
+
+        <div class="tab-pane fade px-2 pt-2 mt-0 mb-2 intellij" role="tabpanel">
+            
+            <p class="text-right mb-0">
+                <small class="text-muted">
+                    This is an alpha. See <a href="/releases/saros-i_0.3.0.html#restrictions">here</a>
+                    for restrictions.
+                </small>
+            </p>
+            
+<h2 id="add-an-account">Add an Account</h2>
+
+<ul>
+  <li>In the top bar of the Saros view, click the “Connect” button (<img src="/documentation/images/icons/connect.png" alt="connect icon" />).</li>
+  <li>Choose <code class="language-plaintext highlighter-rouge">Add account...</code> from the pop-up menu.</li>
+</ul>
+
+<div class="alert alert-warning" role="alert">
+  <h2 id="note">Note</h2>
+  <p>As mentioned in the section <a href="/releases/saros-i_0.3.0.html#missing-features">missing features</a>, Saros for IntelliJ <strong>does currently not support the creation, management, or deletion of XMPP accounts</strong>.</p>
+
+  <p>If you accidentally made a typo while entering your username or password, the created account entry can currently only be changed or deleted through Saros for Eclipse.</p>
+
+  <p>Alternatively, you could delete the Saros account store <code class="language-plaintext highlighter-rouge">~/.saros/config.dat</code>. <strong>Note that this will remove all stored XMPP accounts from the local configuration.</strong> They can be re-added after restarting Saros.</p>
+
+</div>
+
+
+        </div>
+    </div>
+</div>
+
+
+
+      </div>
+
+      <!-- Right sidebar (TOC) -->
+      <div id="toc-bar-column" class="d-none d-lg-block col-12 col-lg-3 col-xl-3 px-0">
+        
+        <!-- element filled by loadToc() from toc.js -->
+        <ul id="toc-bar" class="sticky-top text-decoration-none nav toc-bar py-3"></ul>
+        
+      </div>
+    </div>
+  </div>
+
+  <footer class="page-footer font-small w-100 position-absolute">
+
+  <div class="text-center my-3">
+    
+    
+    <a href="https://github.com/saros-project/saros">
+      <i class="fab fa-github fa-lg text-white mr-3 mr-md-5"> </i>
+    </a>
+    
+    
+    <a href="https://gitter.im/saros-project/saros/user">
+      <i class="fab fa-gitter fa-lg text-white mr-3 mr-md-5"> </i>
+    </a>
+    
+    
+    <a href="https://groups.google.com/forum/#!forum/saros-user">
+      <i class="fas fa-envelope fa-lg text-white mr-3 mr-md-5"> </i>
+    </a>
+    
+    
+    <a href="https://twitter.com/saros_project">
+      <i class="fab fa-twitter fa-lg text-white "> </i>
+    </a>
+    
+  </div>
+
+</footer>
+  <script src="/node_modules/jquery/dist/jquery.min.js"></script>
+<script src="/node_modules/popper.js/dist/umd/popper.min.js"></script>
+<script src="/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+
+<script src="/node_modules/mermaid/dist/mermaid.min.js"></script>
+<script>
+mermaid.initialize({
+    startOnLoad: true
+});
+</script>
+<!-- load after its dependency jquery -->
+
+<script src="/assets/js/ide-tabs.js"></script>
+<script src="/assets/js/toc.js"></script>
+<script src="/assets/js/header-anchor-links.js"></script>
+
+</body>
+
+</html>
