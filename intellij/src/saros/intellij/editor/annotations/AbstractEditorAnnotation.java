@@ -2,7 +2,6 @@ package saros.intellij.editor.annotations;
 
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.markup.HighlighterLayer;
 import com.intellij.openapi.editor.markup.HighlighterTargetArea;
 import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.openapi.editor.markup.TextAttributes;
@@ -28,6 +27,9 @@ import saros.session.User;
  * currently open, the annotations also holds the current {@link Editor} representing the file. The
  * held <code>IFile</code> is used to determine the file the annotation belongs to, even when there
  * is currently no editor available for the file.
+ *
+ * <p>The different annotation layers used by Saros are declared in {@link
+ * AnnotationHighlighterLayers}.
  *
  * @see AnnotationRange
  */
@@ -393,6 +395,8 @@ abstract class AbstractEditorAnnotation {
    * @param start the start of the highlighted area
    * @param end the end of the highlighted area
    * @param editor the editor to create the highlighter for
+   * @param textAttributes the text attributes defining the look of the range highlighter
+   * @param highlighterLayer the highlighter layer of the range highlighter
    * @param file the file for the editor
    * @return a RangeHighlighter with the given parameters or <code>null</code> if the given end
    *     position is located after the document end
@@ -403,6 +407,7 @@ abstract class AbstractEditorAnnotation {
       int end,
       @NotNull Editor editor,
       @NotNull TextAttributes textAttributes,
+      int highlighterLayer,
       @NotNull IFile file) {
 
     int documentLength = editor.getDocument().getTextLength();
@@ -434,7 +439,7 @@ abstract class AbstractEditorAnnotation {
                     .addRangeHighlighter(
                         start,
                         end,
-                        HighlighterLayer.LAST,
+                        highlighterLayer,
                         textAttributes,
                         HighlighterTargetArea.EXACT_RANGE),
         ModalityState.defaultModalityState());
