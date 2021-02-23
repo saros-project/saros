@@ -1,6 +1,8 @@
 package saros.intellij.editor.annotations;
 
 import static com.intellij.openapi.editor.colors.EditorColors.CARET_COLOR;
+import static saros.intellij.editor.annotations.AnnotationHighlighterLayers.CARET_HIGHLIGHTER_LAYER;
+import static saros.intellij.editor.annotations.AnnotationHighlighterLayers.SELECTION_HIGHLIGHTER_LAYER;
 
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
@@ -98,7 +100,8 @@ class SelectionAnnotation extends AbstractEditorAnnotation {
       TextAttributes selectionTextAttributes = getSelectionTextAttributes(editor, user);
 
       RangeHighlighter rangeHighlighter =
-          addRangeHighlighter(start, end, editor, selectionTextAttributes, file);
+          addRangeHighlighter(
+              start, end, editor, selectionTextAttributes, SELECTION_HIGHLIGHTER_LAYER, file);
 
       if (rangeHighlighter == null) {
         throw new IllegalStateException(
@@ -148,7 +151,8 @@ class SelectionAnnotation extends AbstractEditorAnnotation {
     int end = annotationRange.getEnd();
 
     RangeHighlighter rangeHighlighter =
-        AbstractEditorAnnotation.addRangeHighlighter(start, end, editor, textAttributes, file);
+        AbstractEditorAnnotation.addRangeHighlighter(
+            start, end, editor, textAttributes, SELECTION_HIGHLIGHTER_LAYER, file);
 
     if (rangeHighlighter != null) {
       annotationRange.addRangeHighlighter(rangeHighlighter);
@@ -190,7 +194,12 @@ class SelectionAnnotation extends AbstractEditorAnnotation {
 
     caretHighlighter =
         AbstractEditorAnnotation.addRangeHighlighter(
-            caretPosition, caretPosition, editor, caretTextAttributes, file);
+            caretPosition,
+            caretPosition,
+            editor,
+            caretTextAttributes,
+            CARET_HIGHLIGHTER_LAYER,
+            file);
 
     if (caretHighlighter == null) {
       log.warn("Could not create caret highlighter for position " + caretPosition + " for " + this);

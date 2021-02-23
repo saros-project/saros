@@ -1,5 +1,7 @@
 package saros.intellij.editor.annotations;
 
+import static saros.intellij.editor.annotations.AnnotationHighlighterLayers.CONTRIBUTION_HIGHLIGHTER_LAYER;
+
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.editor.markup.RangeHighlighter;
@@ -76,7 +78,13 @@ class ContributionAnnotation extends AbstractEditorAnnotation {
       AnnotationRange annotationRange;
       if (editor != null) {
         RangeHighlighter rangeHighlighter =
-            addRangeHighlighter(currentStart, currentEnd, editor, contributionTextAttributes, file);
+            addRangeHighlighter(
+                currentStart,
+                currentEnd,
+                editor,
+                contributionTextAttributes,
+                CONTRIBUTION_HIGHLIGHTER_LAYER,
+                file);
 
         if (rangeHighlighter == null) {
           throw new IllegalStateException(
@@ -117,7 +125,8 @@ class ContributionAnnotation extends AbstractEditorAnnotation {
       int end = annotationRange.getEnd();
 
       RangeHighlighter rangeHighlighter =
-          AbstractEditorAnnotation.addRangeHighlighter(start, end, editor, textAttributes, file);
+          AbstractEditorAnnotation.addRangeHighlighter(
+              start, end, editor, textAttributes, CONTRIBUTION_HIGHLIGHTER_LAYER, file);
 
       if (rangeHighlighter != null) {
         annotationRange.addRangeHighlighter(rangeHighlighter);
