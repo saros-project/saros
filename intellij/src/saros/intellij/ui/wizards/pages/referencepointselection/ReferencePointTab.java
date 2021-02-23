@@ -578,23 +578,30 @@ class ReferencePointTab {
    * TODO check for other separators? Intellij also sees '\' as a separator on unix but this is not
    *  detected by the Java Unix path implementation
    */
-  // TODO check whether resource with same name already exists in chosen base directory
   private boolean hasValidNewDirectoryName() {
-    String enteredName = newDirectoryNameTextField.getText();
-    if (enteredName.isEmpty()) {
+    String enteredName = newDirectoryNameTextField.getText().trim();
+
+    if (enteredName.isEmpty() || enteredName.contains(File.pathSeparator)) {
       return false;
     }
 
     try {
-      Path path = Paths.get(enteredName);
-      if (path.getNameCount() != 1 || PathUtils.isEmpty(path)) {
+      Path enteredNamePath = Paths.get(enteredName);
+
+      if (PathUtils.isEmpty(enteredNamePath)
+          || enteredNamePath.getNameCount() != 1
+          || enteredNamePath.isAbsolute()) {
+
         return false;
       }
+
+      Path enteredBasePath = Paths.get(newDirectoryBasePathTextField.getText());
+
+      return !enteredBasePath.resolve(enteredName).toFile().exists();
+
     } catch (InvalidPathException e) {
       return false;
     }
-
-    return true;
   }
 
   /**
