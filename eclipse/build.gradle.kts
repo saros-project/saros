@@ -10,6 +10,8 @@ import com.diffplug.gradle.pde.EclipseRelease
 val versionQualifier = ext.get("versionQualifier") as String
 val eclipseVersionNr = ext.get("eclipseVersion") as String
 
+val commonsIo = ext.get("commons-io2") as String
+
 configurations {
     val testConfig by getting {}
     getByName("testImplementation") {
@@ -40,6 +42,7 @@ sourceSets {
 
 dependencies {
     implementation(project(":saros.core"))
+    implementation(commonsIo)
     // This is a workaround for https://github.com/saros-project/saros/issues/1086
     implementation("org.eclipse.platform:org.eclipse.urischeme:1.1.0")
     // This is a workaround for https://github.com/saros-project/saros/issues/1114

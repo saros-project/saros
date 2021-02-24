@@ -6,6 +6,8 @@ val versionQualifier: String? = ext.get("versionQualifier") as String?
 val intellijHome: String? = ext.get("intellijHome") as String?
 val intellijSandboxDir: String? = ext.get("intellijSandboxDir") as String?
 
+val commonsIo = ext.get("commons-io2") as String
+
 configurations {
     val testConfig by getting {}
     val testCompile by getting {
@@ -15,6 +17,7 @@ configurations {
 
 dependencies {
     compile(project(path = ":saros.core", configuration = "plain"))
+    implementation(commonsIo)
 
     compile("org.easytesting:fest-assert:1.2")
     compile("org.easytesting:fest-reflect:1.2")

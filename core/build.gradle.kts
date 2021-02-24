@@ -5,6 +5,7 @@ plugins {
 
 val versionQualifier = ext.get("versionQualifier") as String
 val commonsLang = ext.get("commons-lang3") as String
+val commonsIo = ext.get("commons-io2") as String
 
 val log4j2ApiVersion = ext.get("log4j2ApiVersion") as String
 val log4j2CoreVersion = ext.get("log4j2CoreVersion") as String
@@ -40,7 +41,7 @@ sarosEclipse {
 
 dependencies {
     bundle("commons-codec:commons-codec:1.3")
-    bundleApi("commons-io:commons-io:2.0.1")
+    bundle(commonsIo)
     bundleApi(commonsLang)
 
     bundle("javax.jmdns:jmdns:3.4.1")

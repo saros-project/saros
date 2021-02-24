@@ -144,6 +144,7 @@ subprojects {
     val log4j2Bridge = "org.apache.logging.log4j:log4j-1.2-api:$log4j2VersionNr"
 
     projectToConf.extra["commons-lang3"] = "org.apache.commons:commons-lang3:3.8.1"
+    projectToConf.extra["commons-io2"] = "commons-io:commons-io:2.0.1"
 
     projectToConf.extra["junitVersion"] = junitVersion
     projectToConf.extra["log4j2ApiVersion"] = log4j2Api
