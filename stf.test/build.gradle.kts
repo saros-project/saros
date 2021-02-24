@@ -5,6 +5,8 @@ plugins {
 
 val eclipseVersionNr = ext.get("eclipseVersion") as String
 
+val commonsLang = ext.get("commons-lang3") as String
+
 sarosEclipse {
     manifest = file("META-INF/MANIFEST.MF")
     excludeManifestDependencies = listOf("org.junit", "saros.eclipse", "saros.core")
@@ -25,6 +27,7 @@ configurations {
 }
 
 dependencies {
+    implementation(commonsLang)
     val stfTestCompile by configurations
     stfTestCompile(project(":saros.stf"))
     stfTestCompile(project(path = ":saros.stf", configuration = "testing"))
