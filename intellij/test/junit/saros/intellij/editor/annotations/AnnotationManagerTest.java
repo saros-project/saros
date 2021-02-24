@@ -1787,7 +1787,7 @@ public class AnnotationManagerTest {
 
     prepareMockAddRemoveRangeHighlighters();
     mockAddSelectionRangeHighlightersWithGivenRangeHighlighters(selectionRangePairs);
-    mockAddCaretRangeHighlighters(end);
+    mockAddRemoveCaretRangeHighlighters(end, file, editor);
     mockAddContributionRangeHighlightersWithGivenRangeHighlighters(contributionRangePairs);
     replayMockAddRemoveRangeHighlighters();
 

@@ -44,8 +44,9 @@ class AnnotationQueue<E extends AbstractEditorAnnotation> extends AnnotationStor
    * Removes and returns the oldest element of the annotation queue if the queue has reached its
    * maximum size.
    *
-   * <p><b>NOTE:</b> This does not remove the annotation from the local editor. This method should
-   * always be called before {@link #addAnnotation(AbstractEditorAnnotation)}.
+   * <p><b>NOTE:</b> This calls {@link AbstractEditorAnnotation#dispose()} on the removed
+   * annotation, removing it from the local editor. This method should always be called before
+   * {@link #addAnnotation(AbstractEditorAnnotation)}.
    *
    * @return the oldest element of the annotation queue if the queue has reached its maximum size or
    *     <code>null</code> otherwise
