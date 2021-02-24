@@ -1,7 +1,6 @@
 package saros.intellij.editor.annotations;
 
 import com.intellij.openapi.editor.Editor;
-import java.util.List;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -95,12 +94,7 @@ public class AnnotationManager implements Disposable {
    * @param file the file the annotation belongs to
    */
   public void removeSelectionAnnotation(@NotNull User user, @NotNull IFile file) {
-    List<SelectionAnnotation> currentSelectionAnnotation =
-        selectionAnnotationStore.removeAnnotations(user, file);
-
-    for (SelectionAnnotation annotation : currentSelectionAnnotation) {
-      annotation.removeLocalRepresentation();
-    }
+    selectionAnnotationStore.removeAnnotations(user, file);
   }
 
   /**
@@ -144,10 +138,7 @@ public class AnnotationManager implements Disposable {
       return;
     }
 
-    ContributionAnnotation dequeuedAnnotation = contributionAnnotationQueue.removeIfFull();
-    if (dequeuedAnnotation != null) {
-      dequeuedAnnotation.removeLocalRepresentation();
-    }
+    contributionAnnotationQueue.removeIfFull();
 
     contributionAnnotationQueue.addAnnotation(contributionAnnotation);
   }
@@ -357,13 +348,9 @@ public class AnnotationManager implements Disposable {
    * @param user the user whose annotations to remove
    */
   public void removeAnnotations(@NotNull User user) {
-    for (SelectionAnnotation annotation : selectionAnnotationStore.removeAnnotations(user)) {
-      annotation.removeLocalRepresentation();
-    }
+    selectionAnnotationStore.removeAnnotations(user);
 
-    for (ContributionAnnotation annotation : contributionAnnotationQueue.removeAnnotations(user)) {
-      annotation.removeLocalRepresentation();
-    }
+    contributionAnnotationQueue.removeAnnotations(user);
   }
 
   /**
@@ -376,12 +363,10 @@ public class AnnotationManager implements Disposable {
    */
   public void removeAnnotations(@NotNull IFile file) {
     for (SelectionAnnotation annotation : selectionAnnotationStore.getAnnotations(file)) {
-      annotation.removeLocalRepresentation();
       selectionAnnotationStore.removeAnnotation(annotation);
     }
 
     for (ContributionAnnotation annotation : contributionAnnotationQueue.getAnnotations(file)) {
-      annotation.removeLocalRepresentation();
       contributionAnnotationQueue.removeAnnotation(annotation);
     }
   }
@@ -391,13 +376,9 @@ public class AnnotationManager implements Disposable {
    * annotation stores.
    */
   private void removeAllAnnotations() {
-    for (SelectionAnnotation annotation : selectionAnnotationStore.removeAllAnnotations()) {
-      annotation.removeLocalRepresentation();
-    }
+    selectionAnnotationStore.removeAllAnnotations();
 
-    for (ContributionAnnotation annotation : contributionAnnotationQueue.removeAllAnnotations()) {
-      annotation.removeLocalRepresentation();
-    }
+    contributionAnnotationQueue.removeAllAnnotations();
   }
 
   /**

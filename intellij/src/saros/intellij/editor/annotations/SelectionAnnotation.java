@@ -225,6 +225,26 @@ class SelectionAnnotation extends AbstractEditorAnnotation {
     super.removeLocalRepresentation();
   }
 
+  @Override
+  protected void dispose() {
+    Editor editor = getEditor();
+
+    if (caretHighlighter != null && caretHighlighter.isValid()) {
+      if (editor != null) {
+        removeRangeHighlighter(editor, caretHighlighter);
+
+      } else {
+        log.warn(
+            "Could not remove caret range highlighter "
+                + caretHighlighter
+                + " during teardown as no editor is present. annotation: "
+                + this);
+      }
+    }
+
+    super.dispose();
+  }
+
   /**
    * Returns the text attributes used for selection annotation range highlighters.
    *

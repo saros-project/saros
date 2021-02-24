@@ -82,7 +82,8 @@ class AnnotationStore<E extends AbstractEditorAnnotation> {
   /**
    * Removes the given annotation from the <code>AnnotationStore</code>.
    *
-   * <p><b>NOTE:</b> This does not remove the annotation from the local editor.
+   * <p><b>NOTE:</b> This calls {@link AbstractEditorAnnotation#dispose()} on the given annotation,
+   * removing it from the local editor.
    *
    * @param annotation the annotation to remove
    */
@@ -90,6 +91,8 @@ class AnnotationStore<E extends AbstractEditorAnnotation> {
 
     User user = annotation.getUser();
     IFile file = annotation.getFile();
+
+    annotation.dispose();
 
     Map<User, List<E>> annotationsForFile = annotationMap.get(file);
 
@@ -115,7 +118,8 @@ class AnnotationStore<E extends AbstractEditorAnnotation> {
   /**
    * Removes all annotations belonging to the given user and file combination.
    *
-   * <p><b>NOTE:</b> This does not remove the annotations from the local editor.
+   * <p><b>NOTE:</b> This calls {@link AbstractEditorAnnotation#dispose()} on the removed
+   * annotations, removing them from the local editors.
    *
    * @param user the user whose annotations to remove
    * @param file the file whose annotations to remove
@@ -140,13 +144,16 @@ class AnnotationStore<E extends AbstractEditorAnnotation> {
       return Collections.emptyList();
     }
 
+    storedAnnotations.forEach(AbstractEditorAnnotation::dispose);
+
     return storedAnnotations;
   }
 
   /**
    * Removes all annotations belonging to the given user from the <code>AnnotationStore</code>.
    *
-   * <p><b>NOTE:</b> This does not remove the annotations from the local editors.
+   * <p><b>NOTE:</b> This calls {@link AbstractEditorAnnotation#dispose()} on the removed
+   * annotations, removing them from the local editors.
    *
    * <p>This method should be used to remove annotations of users who left the session from the
    * store.
@@ -179,13 +186,16 @@ class AnnotationStore<E extends AbstractEditorAnnotation> {
 
     emptyFileStores.forEach(annotationMap::remove);
 
+    removedAnnotations.forEach(AbstractEditorAnnotation::dispose);
+
     return removedAnnotations;
   }
 
   /**
    * Removes all annotations from the <code>AnnotationStore</code>.
    *
-   * <p><b>NOTE:</b> This does not remove the annotations from the local editors.
+   * <p><b>NOTE:</b> This calls {@link AbstractEditorAnnotation#dispose()} on the removed
+   * annotations, removing them from the local editors.
    *
    * <p>This method should be used to remove all annotations after the session has ended.
    *
@@ -208,6 +218,8 @@ class AnnotationStore<E extends AbstractEditorAnnotation> {
         });
 
     annotationMap.clear();
+
+    removedAnnotations.forEach(AbstractEditorAnnotation::dispose);
 
     return removedAnnotations;
   }

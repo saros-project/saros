@@ -386,6 +386,28 @@ abstract class AbstractEditorAnnotation {
     return annotationRanges.isEmpty();
   }
 
+  /** Tears down the annotation, removing any remaining range highlighters. */
+  protected void dispose() {
+    for (AnnotationRange annotationRange : annotationRanges) {
+      RangeHighlighter rangeHighlighter = annotationRange.getRangeHighlighter();
+
+      if (rangeHighlighter == null || !rangeHighlighter.isValid()) {
+        continue;
+      }
+
+      if (editor != null) {
+        removeRangeHighlighter(editor, rangeHighlighter);
+
+      } else {
+        log.warn(
+            "Could not remove range highlighter during teardown of range "
+                + annotationRange
+                + " as no editor is present. annotation: "
+                + this);
+      }
+    }
+  }
+
   /**
    * Creates a RangeHighlighter with the given position and text attributes for the given editor.
    *
