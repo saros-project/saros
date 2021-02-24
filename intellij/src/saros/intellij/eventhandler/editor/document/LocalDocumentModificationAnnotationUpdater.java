@@ -12,12 +12,12 @@ import saros.intellij.editor.annotations.AnnotationManager;
 import saros.session.ISarosSession;
 
 /**
- * Tracks modifications of Documents and adjusts the local annotations accordingly if the document
- * is not currently open in an editor.
+ * Tracks modifications of Documents and adjusts the local annotations accordingly.
  *
  * @see com.intellij.openapi.editor.event.DocumentListener
  */
-public class LocalClosedEditorModificationHandler extends AbstractLocalDocumentModificationHandler {
+public class LocalDocumentModificationAnnotationUpdater
+    extends AbstractLocalDocumentModificationHandler {
   private final AnnotationManager annotationManager;
 
   private final DocumentListener documentListener =
@@ -28,7 +28,7 @@ public class LocalClosedEditorModificationHandler extends AbstractLocalDocumentM
         }
       };
 
-  public LocalClosedEditorModificationHandler(
+  public LocalDocumentModificationAnnotationUpdater(
       Project project,
       EditorManager editorManager,
       ISarosSession sarosSession,
@@ -40,9 +40,13 @@ public class LocalClosedEditorModificationHandler extends AbstractLocalDocumentM
   }
 
   /**
-   * Adjusts the annotations for the resource represented by the changed document if it is not
-   * currently open in an editor. If it is currently open in an editor, this will be done
-   * automatically by Intellij.
+   * Adjusts the annotations for the resource represented by the changed document as necessary.
+   *
+   * <p>Calculates the new annotation positions if the document is currently not open in an editor.
+   *
+   * <p>Only prunes the annotations that were invalidated by text removals if the document is open
+   * in an editor. The positions of the remaining annotations will be adjusted automatically by
+   * Intellij.
    *
    * @param event the event to react to
    * @see DocumentListener#beforeDocumentChange(DocumentEvent)
