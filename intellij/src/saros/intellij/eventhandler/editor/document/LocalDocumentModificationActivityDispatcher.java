@@ -15,7 +15,8 @@ import saros.session.ISarosSession;
  *
  * @see DocumentListener#beforeDocumentChange(DocumentEvent)
  */
-public class LocalDocumentModificationHandler extends AbstractLocalDocumentModificationHandler {
+public class LocalDocumentModificationActivityDispatcher
+    extends AbstractLocalDocumentModificationHandler {
 
   private final DocumentListener documentListener =
       new DocumentListener() {
@@ -25,7 +26,7 @@ public class LocalDocumentModificationHandler extends AbstractLocalDocumentModif
         }
       };
 
-  public LocalDocumentModificationHandler(
+  public LocalDocumentModificationActivityDispatcher(
       Project project, EditorManager editorManager, ISarosSession sarosSession) {
 
     super(project, editorManager, sarosSession);

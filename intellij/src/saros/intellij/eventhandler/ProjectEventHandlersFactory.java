@@ -10,8 +10,8 @@ import saros.intellij.editor.LocalEditorManipulator;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.eventhandler.colorscheme.AnnotationReloader;
 import saros.intellij.eventhandler.editor.caret.LocalCaretPositionChangeHandler;
-import saros.intellij.eventhandler.editor.document.LocalClosedEditorModificationHandler;
-import saros.intellij.eventhandler.editor.document.LocalDocumentModificationHandler;
+import saros.intellij.eventhandler.editor.document.LocalDocumentModificationActivityDispatcher;
+import saros.intellij.eventhandler.editor.document.LocalDocumentModificationAnnotationUpdater;
 import saros.intellij.eventhandler.editor.editorstate.AnnotationUpdater;
 import saros.intellij.eventhandler.editor.editorstate.EditorStatusChangeActivityDispatcher;
 import saros.intellij.eventhandler.editor.editorstate.PreexistingSelectionDispatcher;
@@ -72,11 +72,11 @@ public class ProjectEventHandlersFactory {
      * document modification handlers
      */
     projectEventHandlers.add(
-        new LocalClosedEditorModificationHandler(
+        new LocalDocumentModificationAnnotationUpdater(
             project, editorManager, sarosSession, annotationManager));
 
     projectEventHandlers.add(
-        new LocalDocumentModificationHandler(project, editorManager, sarosSession));
+        new LocalDocumentModificationActivityDispatcher(project, editorManager, sarosSession));
 
     /*
      * editor state change handlers

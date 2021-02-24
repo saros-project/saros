@@ -44,7 +44,7 @@ import saros.intellij.editor.LocalEditorHandler;
 import saros.intellij.editor.ProjectAPI;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.eventhandler.IApplicationEventHandler;
-import saros.intellij.eventhandler.editor.document.LocalDocumentModificationHandler;
+import saros.intellij.eventhandler.editor.document.LocalDocumentModificationActivityDispatcher;
 import saros.intellij.filesystem.VirtualFileConverter;
 import saros.intellij.runtime.EDTExecutor;
 import saros.intellij.ui.Messages;
@@ -103,7 +103,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
          * configuration files.
          *
          * <p>File changes done though an Intellij editor are processed in the {@link
-         * LocalDocumentModificationHandler} instead.
+         * LocalDocumentModificationActivityDispatcher} instead.
          *
          * @param event
          */
@@ -200,7 +200,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
    * Notifies the other session participants of the local save of the given file.
    *
    * @param virtualFileEvent the event to react to
-   * @see LocalDocumentModificationHandler
+   * @see LocalDocumentModificationActivityDispatcher
    * @see VirtualFileListener#beforeContentsChange(VirtualFileEvent)
    */
   private void generateEditorSavedActivity(@NotNull VirtualFileEvent virtualFileEvent) {
