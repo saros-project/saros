@@ -3,61 +3,85 @@
   <option name="SAROS_DEFAULT_TEXT_SELECTION">
     <value>
       <option name="BACKGROUND" value="CFCFCF"/>
+      <option name="EFFECT_COLOR" value="CFCFCF"/>
+      <option name="EFFECT_TYPE" value="0"/>
     </value>
   </option>
   <option name="SAROS_DEFAULT_TEXT_CONTRIBUTION">
     <value>
       <option name="BACKGROUND" value="A7A7A7"/>
+      <option name="EFFECT_COLOR" value="A7A7A7"/>
+      <option name="EFFECT_TYPE" value="0"/>
     </value>
   </option>
   <option name="SAROS_TEXT_SELECTION_0">
     <value>
       <option name="BACKGROUND" value="B7E0F0"/>
+      <option name="EFFECT_COLOR" value="B7E0F0"/>
+      <option name="EFFECT_TYPE" value="0"/>
     </value>
   </option>
   <option name="SAROS_TEXT_CONTRIBUTION_0">
     <value>
       <option name="BACKGROUND" value="8DCEE7"/>
+      <option name="EFFECT_COLOR" value="8DCEE7"/>
+      <option name="EFFECT_TYPE" value="0"/>
     </value>
   </option>
   <option name="SAROS_TEXT_SELECTION_1">
     <value>
       <option name="BACKGROUND" value="D0CDA4"/>
+      <option name="EFFECT_COLOR" value="D0CDA4"/>
+      <option name="EFFECT_TYPE" value="0"/>
     </value>
   </option>
   <option name="SAROS_TEXT_CONTRIBUTION_1">
     <value>
       <option name="BACKGROUND" value="BFBB82"/>
+      <option name="EFFECT_COLOR" value="BFBB82"/>
+      <option name="EFFECT_TYPE" value="0"/>
     </value>
   </option>
   <option name="SAROS_TEXT_SELECTION_2">
     <value>
       <option name="BACKGROUND" value="DCEDA6"/>
+      <option name="EFFECT_COLOR" value="DCEDA6"/>
+      <option name="EFFECT_TYPE" value="0"/>
     </value>
   </option>
   <option name="SAROS_TEXT_CONTRIBUTION_2">
     <value>
       <option name="BACKGROUND" value="BADC51"/>
+      <option name="EFFECT_COLOR" value="BADC51"/>
+      <option name="EFFECT_TYPE" value="0"/>
     </value>
   </option>
   <option name="SAROS_TEXT_SELECTION_3">
     <value>
       <option name="BACKGROUND" value="F6F6D3"/>
+      <option name="EFFECT_COLOR" value="F6F6D3"/>
+      <option name="EFFECT_TYPE" value="0"/>
     </value>
   </option>
   <option name="SAROS_TEXT_CONTRIBUTION_3">
     <value>
       <option name="BACKGROUND" value="EDEDA9"/>
+      <option name="EFFECT_COLOR" value="EDEDA9"/>
+      <option name="EFFECT_TYPE" value="0"/>
     </value>
   </option>
   <option name="SAROS_TEXT_SELECTION_4">
     <value>
       <option name="BACKGROUND" value="B8D2D1"/>
+      <option name="EFFECT_COLOR" value="B8D2D1"/>
+      <option name="EFFECT_TYPE" value="0"/>
     </value>
   </option>
   <option name="SAROS_TEXT_CONTRIBUTION_4">
     <value>
       <option name="BACKGROUND" value="89B4B2"/>
+      <option name="EFFECT_COLOR" value="89B4B2"/>
+      <option name="EFFECT_TYPE" value="0"/>
     </value>
   </option>
 </list>
