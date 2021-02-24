@@ -193,8 +193,9 @@ abstract class AbstractEditorAnnotation {
    * for every <code>AnnotationRange</code>. This is needed as the position of a <code>
    * RangeHighlighter</code> can be changed by Intellij.
    *
-   * <p>If a <code>RangeHighlighter</code> has become invalid, the <code>AnnotationRange</code> is
-   * removed from the annotation.
+   * <p>If a <code>RangeHighlighter</code> has become invalid or covers a range of size 0, the
+   * <code>AnnotationRange</code> is removed from the annotation. Existing zero-width range
+   * highlighters are also removed from the editor.
    *
    * <p><b>NOTE:</b> It is possible that a annotation does not contain any annotation ranges after
    * this operation. Such annotations are not removed automatically and should therefore be removed
@@ -204,10 +205,33 @@ abstract class AbstractEditorAnnotation {
    * @see AnnotationRange#updateRange()
    */
   void updateBoundaries() {
-    annotationRanges.removeIf(
-        annotationRange ->
-            annotationRange.getRangeHighlighter() != null
-                && !annotationRange.getRangeHighlighter().isValid());
+    for (Iterator<AnnotationRange> iterator = annotationRanges.iterator(); iterator.hasNext(); ) {
+      AnnotationRange annotationRange = iterator.next();
+
+      RangeHighlighter rangeHighlighter = annotationRange.getRangeHighlighter();
+
+      if (rangeHighlighter == null) {
+        continue;
+      }
+
+      if (!rangeHighlighter.isValid()) {
+        iterator.remove();
+
+      } else if (rangeHighlighter.getStartOffset() == rangeHighlighter.getEndOffset()) {
+        if (editor != null) {
+          removeRangeHighlighter(editor, rangeHighlighter);
+
+        } else {
+          log.warn(
+              "Could not remove zero-width range highlighter of range "
+                  + annotationRange
+                  + " as no editor is present. annotation: "
+                  + this);
+        }
+
+        iterator.remove();
+      }
+    }
 
     annotationRanges.forEach(AnnotationRange::updateRange);
   }
