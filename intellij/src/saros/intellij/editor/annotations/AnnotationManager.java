@@ -245,8 +245,8 @@ public class AnnotationManager implements Disposable {
   /**
    * Updates all annotations for the given file in all annotation stores by checking if an editor
    * for the annotation is present and then updating the stored annotation range if it has changed.
-   * If the annotation is marked as not valid by the editor, it is removed from the annotation
-   * store.
+   * If the annotation is marked as not valid by the editor or has a width of 0, it is removed from
+   * the annotation store.
    *
    * <p>This method must be called <b>before</b> the editor is closed.
    *

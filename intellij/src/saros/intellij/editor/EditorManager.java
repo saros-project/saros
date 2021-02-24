@@ -286,8 +286,14 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
             int oldEnd,
             int newEnd) {
 
-          if (oldEnd != start && editor == null) {
-            annotationManager.moveAnnotationsAfterDeletion(file, start, oldEnd);
+          if (oldEnd != start) {
+            if (editor == null) {
+              annotationManager.moveAnnotationsAfterDeletion(file, start, oldEnd);
+
+            } else {
+              // ensure that annotations invalidated by deletion are pruned
+              annotationManager.updateAnnotationStore(file);
+            }
           }
 
           if (newEnd != start) {

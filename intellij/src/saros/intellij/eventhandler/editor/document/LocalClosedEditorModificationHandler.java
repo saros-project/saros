@@ -60,17 +60,22 @@ public class LocalClosedEditorModificationHandler extends AbstractLocalDocumentM
     String newText = event.getNewFragment().toString();
     String replacedText = event.getOldFragment().toString();
 
-    if (!ProjectAPI.isOpen(project, document)) {
+    boolean isOpenInEditor = ProjectAPI.isOpen(project, document);
 
-      int replacedTextLength = replacedText.length();
-      if (replacedTextLength > 0) {
+    int replacedTextLength = replacedText.length();
+    if (replacedTextLength > 0) {
+      if (isOpenInEditor) {
+        // ensure that annotations invalidated by deletion are pruned
+        annotationManager.updateAnnotationStore(file);
+
+      } else {
         annotationManager.moveAnnotationsAfterDeletion(file, offset, offset + replacedTextLength);
       }
+    }
 
-      int newTextLength = newText.length();
-      if (newTextLength > 0) {
-        annotationManager.moveAnnotationsAfterAddition(file, offset, offset + newTextLength);
-      }
+    int newTextLength = newText.length();
+    if (!isOpenInEditor && newTextLength > 0) {
+      annotationManager.moveAnnotationsAfterAddition(file, offset, offset + newTextLength);
     }
   }
 
