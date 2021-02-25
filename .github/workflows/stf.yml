@@ -6,6 +6,13 @@ on:
       - 'pr/stf/**'
       - 'master'
 
+  pull_request:
+    paths:
+      - 'core/**'
+      - 'eclipse/**'
+      - 'stf/**'
+      - 'stf.test/**'
+
   workflow_dispatch:
     inputs:
       arguments:
