@@ -14,6 +14,7 @@ configurations {
 }
 
 dependencies {
+    implementation(project(":saros.libratory", configuration = "plain"))
     compile(project(path = ":saros.core", configuration = "plain"))
 
     compile("org.easytesting:fest-assert:1.2")
@@ -21,6 +22,7 @@ dependencies {
     compile("org.easytesting:fest-swing:1.2.1")
     compile("org.easytesting:fest-util:1.1.3")
 
+    testImplementation(project(path = ":saros.libratory", configuration = "testing"))
     testCompile(project(path = ":saros.core", configuration = "testing"))
 }
 

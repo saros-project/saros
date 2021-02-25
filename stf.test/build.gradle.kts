@@ -7,7 +7,7 @@ val eclipseVersionNr = ext.get("eclipseVersion") as String
 
 sarosEclipse {
     manifest = file("META-INF/MANIFEST.MF")
-    excludeManifestDependencies = listOf("org.junit", "saros.eclipse", "saros.core")
+    excludeManifestDependencies = listOf("org.junit", "saros.eclipse", "saros.core", "saros.libratory")
     isAddDependencies = true
     eclipseVersion = eclipseVersionNr
 }

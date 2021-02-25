@@ -27,27 +27,29 @@ configurations {
 
 sarosEclipse {
     manifest = file("META-INF/MANIFEST.MF")
-    excludeManifestDependencies = listOf("saros.libratory")
     isCreateBundleJar = true
     isAddPdeNature = true
     pluginVersionQualifier = versionQualifier
 }
 
 dependencies {
-    implementation(project(":saros.libratory"))
+    releaseDep(log4j2ApiVersion)
+    releaseDep(log4j2CoreVersion)
+    releaseDep(log4j2BridgeVersion)
 
-    releaseDep("commons-codec:commons-codec:1.3")
-    releaseDep("commons-io:commons-io:2.0.1")
-    releaseDep("org.apache.commons:commons-lang3:3.8.1")
-
-    releaseDep("javax.jmdns:jmdns:3.4.1")
-    releaseDep("com.thoughtworks.xstream:xstream:1.4.10")
-    releaseDep("org.gnu.inet:libidn:1.15")
+    // TODO: use real release. This version is a customized SNAPSHOT
+    releaseDep(files("libs/weupnp.jar"))
+    // Workaround until we updated to a newer smack version
+    releaseDep(files("libs/smack-3.4.1.jar"))
+    releaseDep(files("libs/smackx-3.4.1.jar"))
+    releaseDep("xpp3:xpp3:1.1.4c")
+    // Workaround until we can publish and use (without a user token) the repackaged jar in GitHub Packages
+    releaseDep(rootProject.files("libs/picocontainer-2.11.2-patched_relocated.jar"))
 }
 
 sourceSets {
     main {
-        java.srcDirs("src")
+        java.srcDirs("src", "patches")
         resources.srcDirs("resources")
     }
     test {
