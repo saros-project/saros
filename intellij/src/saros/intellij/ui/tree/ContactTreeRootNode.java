@@ -3,9 +3,11 @@ package saros.intellij.ui.tree;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.util.ui.UIUtil;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Vector;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
@@ -104,11 +106,29 @@ public class ContactTreeRootNode extends DefaultMutableTreeNode implements Dispo
 
     add(new DefaultMutableTreeNode(contactInfo));
 
+    sortEntries();
+
     treeView.reloadModelNode(this);
 
     if (noContactsToDisplayBefore) {
       treeView.expandPath(new TreePath(getPath()));
     }
+  }
+
+  /** Sorts the nodes displayed in the contacts view alphabetically. */
+  private void sortEntries() {
+    ((Vector<?>) this.children)
+        .sort(
+            (Comparator<Object>)
+                (o1, o2) -> {
+                  DefaultMutableTreeNode n1 = (DefaultMutableTreeNode) o1;
+                  DefaultMutableTreeNode n2 = (DefaultMutableTreeNode) o2;
+
+                  ContactInfo c1 = (ContactInfo) n1.getUserObject();
+                  ContactInfo c2 = (ContactInfo) n2.getUserObject();
+
+                  return c1.title.compareTo(c2.title);
+                });
   }
 
   private ContactInfo getContact(XMPPContact contact) {
