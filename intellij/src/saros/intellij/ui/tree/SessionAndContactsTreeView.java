@@ -5,6 +5,9 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.util.ui.UIUtil;
 import java.awt.Component;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -188,10 +191,9 @@ public class SessionAndContactsTreeView extends JTree implements Disposable {
   }
 
   private void updateTree() {
-    DefaultTreeModel model = (DefaultTreeModel) (getModel());
-    model.reload();
+    reloadModel();
 
-    expandRow(2);
+    expandPath(new TreePath(contactTreeRootNode.getPath()));
   }
 
   protected ContactTreeRootNode getContactTreeRootNode() {
@@ -200,5 +202,73 @@ public class SessionAndContactsTreeView extends JTree implements Disposable {
 
   private SarosTreeRootNode getSarosTreeRootNode() {
     return (SarosTreeRootNode) getModel().getRoot();
+  }
+
+  /** Reloads the entire tree model, trying to preserve the current tree expansion. */
+  void reloadModel() {
+    List<TreePath> paths = getExpandedPaths();
+
+    ((DefaultTreeModel) getModel()).reload();
+
+    expandPaths(paths);
+  }
+
+  /**
+   * Reloads the given tree node, trying to preserve the current tree expansion.
+   *
+   * @param node the tree node to reload
+   */
+  void reloadModelNode(DefaultMutableTreeNode node) {
+    List<TreePath> paths = getExpandedPaths(node);
+
+    ((DefaultTreeModel) getModel()).reload(node);
+
+    expandPaths(paths);
+  }
+
+  /**
+   * Returns the paths of all currently expanded elements of the tree.
+   *
+   * @return the paths of all currently expanded elements of the tree
+   */
+  private List<TreePath> getExpandedPaths() {
+    List<TreePath> expandedPaths = new ArrayList<>();
+
+    expandedPaths.addAll(getExpandedPaths(sessionTreeRootNode));
+    expandedPaths.addAll(getExpandedPaths(contactTreeRootNode));
+
+    return expandedPaths;
+  }
+
+  /**
+   * Returns the paths of all currently expanded elements under the given node.
+   *
+   * @param node the node whose expanded paths to return
+   * @return the paths of all currently expanded elements under the given node
+   */
+  private List<TreePath> getExpandedPaths(DefaultMutableTreeNode node) {
+    List<TreePath> expandedPaths = new ArrayList<>();
+
+    Enumeration<TreePath> expandedSessionPaths =
+        getExpandedDescendants(new TreePath(node.getPath()));
+
+    if (expandedSessionPaths != null) {
+      while (expandedSessionPaths.hasMoreElements()) {
+        expandedPaths.add(expandedSessionPaths.nextElement());
+      }
+    }
+
+    return expandedPaths;
+  }
+
+  /**
+   * Expands all given paths.
+   *
+   * @param pathsToExpand the paths to expand
+   */
+  private void expandPaths(List<TreePath> pathsToExpand) {
+    for (TreePath pathToExpand : pathsToExpand) {
+      expandPath(pathToExpand);
+    }
   }
 }
