@@ -4,6 +4,9 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.JBMenuItem;
 import com.intellij.openapi.ui.JBPopupMenu;
 import com.intellij.util.ui.UIUtil;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -130,10 +133,15 @@ public class FollowButton extends AbstractSessionToolbarButton {
       return;
     }
 
+    List<JMenuItem> followUserMenuItems = new ArrayList<>();
+
     for (User user : currentSession.getRemoteUsers()) {
-      JMenuItem menuItem = createItemForUser(user);
-      popupMenu.add(menuItem);
+      followUserMenuItems.add(createItemForUser(user));
     }
+
+    followUserMenuItems.sort(Comparator.comparing(JMenuItem::getText));
+
+    followUserMenuItems.forEach(popupMenu::add);
 
     popupMenu.addSeparator();
 
