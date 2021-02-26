@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 import saros.SarosPluginContext;
 import saros.filesystem.IReferencePoint;
 import saros.intellij.ui.util.IconManager;
@@ -168,7 +169,7 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode implements Dispo
     sessionNodeList.put(newSarosSession, newSession);
 
     treeModel.insertNodeInto(newSession, this, getChildCount());
-    treeModel.reload(this);
+    treeView.reloadModelNode(this);
 
     add(newSession);
 
@@ -181,7 +182,8 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode implements Dispo
 
     addUserNode(newSarosSession.getLocalUser());
 
-    treeView.expandRow(1);
+    treeView.expandPath(new TreePath(getPath()));
+    treeView.expandPath(new TreePath(newSession.getPath()));
   }
 
   private void removeSessionNode(ISarosSession oldSarosSession) {
@@ -197,8 +199,7 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode implements Dispo
       setUserObject(TREE_TITLE_NO_SESSIONS);
     }
 
-    treeModel.reload(this);
-    treeView.expandRow(2);
+    treeView.reloadModelNode(this);
   }
 
   private void addReferencePointNode(IReferencePoint referencePoint) {
@@ -208,7 +209,7 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode implements Dispo
       DefaultMutableTreeNode referencePointNode = new DefaultMutableTreeNode(referencePointInfo);
       treeModel.insertNodeInto(referencePointNode, sessionNode, sessionNode.getChildCount());
 
-      treeModel.reload(sessionNode);
+      treeView.reloadModelNode(sessionNode);
     }
   }
 
@@ -219,7 +220,7 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode implements Dispo
 
     treeView.getContactTreeRootNode().hideContact(user.getJID());
 
-    treeModel.reload(this);
+    treeView.reloadModelNode(this);
   }
 
   private void removeUserNode(User user) {
@@ -229,7 +230,8 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode implements Dispo
 
     remove(nUser);
     treeView.getContactTreeRootNode().showContact(user.getJID());
-    treeModel.reload();
+
+    treeView.reloadModelNode(this);
   }
 
   private void removeAllUserNodes() {

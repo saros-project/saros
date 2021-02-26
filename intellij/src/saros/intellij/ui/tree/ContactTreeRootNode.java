@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 import saros.SarosPluginContext;
 import saros.intellij.ui.util.IconManager;
 import saros.intellij.ui.views.SarosMainPanelView;
@@ -54,8 +55,8 @@ public class ContactTreeRootNode extends DefaultMutableTreeNode implements Dispo
                       .ifPresent(
                           info -> {
                             info.updateStatusIcon();
-                            treeView.collapseRow(2);
-                            treeView.expandRow(2);
+                            treeView.collapsePath(new TreePath(ContactTreeRootNode.this.getPath()));
+                            treeView.expandPath(new TreePath(ContactTreeRootNode.this.getPath()));
                           });
                 }
               });
@@ -100,6 +101,8 @@ public class ContactTreeRootNode extends DefaultMutableTreeNode implements Dispo
     visibleContactsMap.put(contact, contactInfo);
 
     add(new DefaultMutableTreeNode(contactInfo));
+
+    treeView.reloadModelNode(this);
   }
 
   private ContactInfo getContact(XMPPContact contact) {
@@ -137,6 +140,8 @@ public class ContactTreeRootNode extends DefaultMutableTreeNode implements Dispo
         break;
       }
     }
+
+    treeView.reloadModelNode(this);
   }
 
   /**
