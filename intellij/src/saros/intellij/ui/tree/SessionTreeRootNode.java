@@ -4,9 +4,11 @@ import com.intellij.openapi.Disposable;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.util.ui.UIUtil;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
@@ -218,9 +220,55 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode implements Dispo
     userNodeList.put(user, nUser);
     treeModel.insertNodeInto(nUser, this, getChildCount());
 
+    sortNodes();
+
     treeView.getContactTreeRootNode().hideContact(user.getJID());
 
     treeView.reloadModelNode(this);
+  }
+
+  /**
+   * Sorts the nodes displayed in the session view.
+   *
+   * <p>Any non-user node displayed as part of the session tree is sorted to the front. The relative
+   * position between such nodes is preserved.
+   *
+   * <p>Sorts the user nodes so that the session host is always displayed first. Sorts the remaining
+   * user nodes alphabetically.
+   */
+  private void sortNodes() {
+    ((Vector<?>) this.children)
+        .sort(
+            (Comparator<Object>)
+                (o1, o2) -> {
+                  DefaultMutableTreeNode n1 = (DefaultMutableTreeNode) o1;
+                  DefaultMutableTreeNode n2 = (DefaultMutableTreeNode) o2;
+
+                  Object u1 = n1.getUserObject();
+                  Object u2 = n2.getUserObject();
+
+                  if (u1 instanceof UserInfo && u2 instanceof UserInfo) {
+                    UserInfo i1 = (UserInfo) n1.getUserObject();
+                    UserInfo i2 = (UserInfo) n2.getUserObject();
+
+                    if (i1.user.isHost()) {
+                      return -1;
+                    } else if (i2.user.isHost()) {
+                      return 1;
+                    }
+
+                    return i1.title.compareTo(i2.title);
+
+                  } else if (u1 instanceof UserInfo) {
+                    return 1;
+
+                  } else if (u2 instanceof UserInfo) {
+                    return -1;
+
+                  } else {
+                    return 0;
+                  }
+                });
   }
 
   private void removeUserNode(User user) {
