@@ -6,6 +6,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.vfs.VirtualFile;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -46,9 +47,12 @@ public class SarosResourceShareGroup extends ActionGroup {
       return new AnAction[0];
     }
 
+    List<XMPPContact> contacts = new ArrayList<>(contactsService.getAllContacts());
+    contacts.sort(Comparator.comparing(contact -> contact.getBareJid().toString()));
+
     int userCount = 1;
     List<AnAction> list = new ArrayList<>();
-    for (XMPPContact contact : contactsService.getAllContacts()) {
+    for (XMPPContact contact : contacts) {
       if (contact.getStatus().isOnline()) {
         list.add(new ShareWithUserAction(contact.getBareJid(), userCount));
         userCount++;
