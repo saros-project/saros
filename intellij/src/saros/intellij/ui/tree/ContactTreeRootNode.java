@@ -97,12 +97,18 @@ public class ContactTreeRootNode extends DefaultMutableTreeNode implements Dispo
     ContactInfo contactInfo = getContact(contact);
     if (contactInfo != null) return;
 
+    boolean noContactsToDisplayBefore = visibleContactsMap.isEmpty();
+
     contactInfo = new ContactInfo(contact);
     visibleContactsMap.put(contact, contactInfo);
 
     add(new DefaultMutableTreeNode(contactInfo));
 
     treeView.reloadModelNode(this);
+
+    if (noContactsToDisplayBefore) {
+      treeView.expandPath(new TreePath(getPath()));
+    }
   }
 
   private ContactInfo getContact(XMPPContact contact) {
