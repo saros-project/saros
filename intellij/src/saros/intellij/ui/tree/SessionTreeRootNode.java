@@ -304,18 +304,33 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode implements Dispo
     }
   }
 
-  protected class UserInfo extends LeafInfo {
+  protected static class UserInfo extends LeafInfo {
     private final User user;
 
     public UserInfo(User user) {
-      super(
-          (user.isHost() ? "Host " : "") + CoreUtils.determineUserDisplayName(user),
-          IconManager.CONTACT_ONLINE_ICON);
+      super(getUserNodeLabel(user), IconManager.CONTACT_ONLINE_ICON);
       this.user = user;
     }
 
     public User getUser() {
       return user;
+    }
+
+    /**
+     * Returns the label to use for the node of the given user.
+     *
+     * @param user the user whose node label to return
+     * @return the label to use for the node of the given user
+     */
+    private static String getUserNodeLabel(User user) {
+      String userName = CoreUtils.determineUserDisplayName(user);
+
+      if (!user.isHost()) {
+        return userName;
+
+      } else {
+        return "<html><i><b>Host</b></i> " + userName + "</html>";
+      }
     }
   }
 
