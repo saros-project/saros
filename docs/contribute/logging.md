@@ -10,13 +10,18 @@ Since Saros is an IDE plugin, the log dir depends on the IDEs configurations.
 Therefore, initializing the logging in Saros comprises the steps:
 1. The default log4j2 initializing is executed that uses the configuration file `log4j2.xml` (has to be included in the classpath).
 2. Our custom initializing starts:
-  * We determine the IDEs log directory and the required log level (e.g. `all` if Saros is running the debug-mode).
+  * We determine the IDEs log directory and the required log level (e.g. `debug` if Saros is running the debug-mode).
   * We set the main arguments `logLevel` and `logDir`.
   * We force log4j to reinitialize with the log configuration `saros_log4j2.xml` that uses the defined arguments ( with the format `main:<argument>`).
 
 See the initializing in the classes [`Saros`](https://github.com/saros-project/saros/blob/master/eclipse/src/saros/Saros.java) (in Eclipse)
 or [`SarosComponent`](https://github.com/saros-project/saros/blob/master/intellij/src/saros/intellij/SarosComponent.java) (in IntelliJ)
-for example implementations. Sometimes (as in the Saros Server) using the default initializing is enough. 
+for example implementations. Sometimes (as in the Saros Server) using the default initializing is enough.
+
+### Settings a different log level during development
+
+Sometimes you might have the need for a different log level during development, e.g. if you are interested in `trace` level logging.
+To adjust the log level, you can modify the `root` log level in the `Loggers` section of the `saros_log4j2.xml`.
 
 ## Ongoing migration from log4j-1.2 -> log4j2
 

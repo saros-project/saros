@@ -36,7 +36,7 @@ Using this configuration file requires to set the main arguments:
 
   <Loggers>
 
-    <Root level="all">
+    <Root level="debug">
       <AppenderRef ref="SarosConsoleAppender"/>
       <AppenderRef ref="FileLogAppender"/>
       <AppenderRef ref="ErrorFileAppender"/>
