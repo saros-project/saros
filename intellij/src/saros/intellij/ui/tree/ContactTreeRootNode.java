@@ -52,14 +52,7 @@ public class ContactTreeRootNode extends DefaultMutableTreeNode implements Dispo
                 } else if (updateType == UpdateType.REMOVED) {
                   contact.ifPresent(ContactTreeRootNode.this::removeContact);
                 } else if (updateType == UpdateType.STATUS) {
-                  contact
-                      .map(ContactTreeRootNode.this::getContact)
-                      .ifPresent(
-                          info -> {
-                            info.updateStatusIcon();
-                            treeView.collapsePath(new TreePath(ContactTreeRootNode.this.getPath()));
-                            treeView.expandPath(new TreePath(ContactTreeRootNode.this.getPath()));
-                          });
+                  contact.ifPresent(ContactTreeRootNode.this::updateContactStatus);
                 }
               });
         }
@@ -94,6 +87,11 @@ public class ContactTreeRootNode extends DefaultMutableTreeNode implements Dispo
   /**
    * Adds the node of the given contact to the tree model. The contact will be visible. Does nothing
    * if the contact is already present(either visible, or hidden).
+   *
+   * <p>If a new entry is added, the list of displayed contacts is sorted.
+   *
+   * @param contact the added contact
+   * @see #sortEntries()
    */
   private void addContact(XMPPContact contact) {
     ContactInfo contactInfo = getContact(contact);
@@ -115,7 +113,32 @@ public class ContactTreeRootNode extends DefaultMutableTreeNode implements Dispo
     }
   }
 
-  /** Sorts the nodes displayed in the contacts view alphabetically. */
+  /**
+   * Updates status icon of the node for the given contact and re-sorts the list of displayed
+   * contacts.
+   *
+   * @param contact the contact whose status was updated
+   * @see #sortEntries()
+   */
+  private void updateContactStatus(XMPPContact contact) {
+    ContactInfo contactInfo = getContact(contact);
+
+    if (contactInfo == null) {
+      return;
+    }
+
+    contactInfo.updateStatusIcon();
+
+    sortEntries();
+
+    treeView.reloadModelNode(this);
+  }
+
+  /**
+   * Sorts the nodes displayed in the contacts view. The nodes are sorted as separate groups for
+   * online and offline contacts. Online contacts are displayed first, offline contacts second. The
+   * contacts in each of the two groups are sorted alphabetically.
+   */
   private void sortEntries() {
     ((Vector<?>) this.children)
         .sort(
@@ -126,6 +149,12 @@ public class ContactTreeRootNode extends DefaultMutableTreeNode implements Dispo
 
                   ContactInfo c1 = (ContactInfo) n1.getUserObject();
                   ContactInfo c2 = (ContactInfo) n2.getUserObject();
+
+                  if (c1.isOnline() && !c2.isOnline()) {
+                    return -1;
+                  } else if (!c1.isOnline() && c2.isOnline()) {
+                    return 1;
+                  }
 
                   return c1.title.compareTo(c2.title);
                 });
