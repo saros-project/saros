@@ -221,18 +221,6 @@ public class SWTUtils {
 
     if (display.isDisposed()) return null;
 
-    final IWorkbench workbench = PlatformUI.getWorkbench();
-
-    final IWorkbenchWindow activeWorkbenchWindow = workbench.getActiveWorkbenchWindow();
-
-    if (activeWorkbenchWindow != null && !activeWorkbenchWindow.getShell().isDisposed())
-      return activeWorkbenchWindow.getShell();
-
-    final IWorkbenchWindow[] workbenchWindows = workbench.getWorkbenchWindows();
-
-    if (workbenchWindows.length > 0 && !workbenchWindows[0].getShell().isDisposed())
-      return workbenchWindows[0].getShell();
-
     return display.getActiveShell();
   }
 }

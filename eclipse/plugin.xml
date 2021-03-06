@@ -2,40 +2,12 @@
 <?eclipse version="4.6"?>
 
 <plugin>
-	<extension point="org.eclipse.e4.workbench.model" id="test_id_e4">
+	<extension point="org.eclipse.e4.workbench.model" id="saros.ui.fragment">
 		<fragment
             apply="initial"
             uri="fragment.e4xmi">
       </fragment>
 	</extension>
-    <extension
-         point="org.eclipse.ui.views">
-      <category
-            id="saros.Saros"
-            name="Saros"/>
-      <category
-            id="saros.Developer"
-            name="Saros Development">
-      </category>
-     <view
-           category="saros.Saros"
-           class="saros.ui.views.SarosView"
-           icon="icons/view16/saros_misc.png"
-           id="saros.ui.views.SarosView"
-           name="Saros">
-     </view>
-   </extension>
-   <extension
-         point="org.eclipse.ui.perspectiveExtensions">
-      <perspectiveExtension targetID="*">
-         <view
-               id="saros.ui.views.SarosView"
-               ratio="0.5"
-               relationship="right"
-               relative="org.eclipse.ui.views.TaskList">
-         </view>
-      </perspectiveExtension>
-   </extension>
    <extension
          point="org.eclipse.ui.decorators">
       <decorator
@@ -473,104 +445,6 @@
       <enablement>
          <instanceof value="org.eclipse.core.resources.IResource"/>
       </enablement>
-   </extension>
-   <extension
-         id="saros.startup"
-         point="org.eclipse.ui.startup">
-      <startup
-            class="saros.StartupSaros">
-      </startup>
-   </extension>
-   <extension
-         point="org.eclipse.ui.menus">
-      <menuContribution
-            allPopups="false"
-            locationURI="popup:saros.ui.views.SarosView?before=menustart">
-         <command
-               commandId="saros.ui.commands.ShareResource"
-               disabledIcon="icons/dlcl16/spacer.png"
-               icon="icons/elcl16/session_tsk.png"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <and>
-                  <reference
-                        definitionId="saros.ui.definitions.isConnected">
-                  </reference>
-                  <not>
-                     <reference
-                           definitionId="saros.ui.definitions.isSarosSessionRunning">
-                     </reference>
-                  </not>
-                  <reference
-                        definitionId="saros.ui.definitions.sessionHeadlineSelected">
-                  </reference>
-               </and>
-            </visibleWhen>
-         </command>
-         <command
-               commandId="saros.ui.commands.SessionAddResources"
-               disabledIcon="icons/dlcl16/session_add_reference_points_tsk.png"
-               icon="icons/elcl16/session_add_reference_points_tsk.png"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <and>
-                  <reference
-                        definitionId="saros.ui.definitions.isConnected">
-                  </reference>
-                  <reference
-                        definitionId="saros.ui.definitions.isSarosSessionRunning">
-                  </reference>
-                  <reference
-                        definitionId="saros.ui.definitions.sessionHeadlineSelected">
-                  </reference>
-               </and>
-            </visibleWhen>
-         </command>
-         <command
-               commandId="saros.ui.commands.AddContact"
-               disabledIcon="icons/dlcl16/contact_add_tsk.png"
-               icon="icons/elcl16/contact_add_tsk.png"
-               style="push">
-            <visibleWhen checkEnabled="false">
-               <and>
-                  <not>
-                     <reference definitionId="saros.ui.definitions.contactsSelected" />
-                  </not>
-                  <not>
-                     <reference definitionId="saros.ui.definitions.participantsSelected" />
-                  </not>
-                  <not>
-                     <reference definitionId="saros.ui.definitions.sessionHeadlineSelected" />
-                  </not>
-               </and>
-            </visibleWhen>
-         </command>
-         <command
-               commandId="saros.ui.commands.SessionAddContacts"
-               disabledIcon="icons/dlcl16/session_add_contacts_tsk.png"
-               icon="icons/elcl16/session_add_contacts_tsk.png"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <and>
-                  <reference
-                        definitionId="saros.ui.definitions.isConnected">
-                  </reference>
-                  <reference
-                        definitionId="saros.ui.definitions.isSarosSessionRunning">
-                  </reference>
-                  <reference
-                        definitionId="saros.ui.definitions.sessionHeadlineSelected">
-                  </reference>
-                  <reference
-                        definitionId="saros.ui.definitions.isSarosSessionHost">
-                  </reference>
-               </and>
-            </visibleWhen>
-         </command>
-      </menuContribution>
    </extension>
    <extension
          id="saros.ui.definitions.isResource"

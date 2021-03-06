@@ -104,13 +104,14 @@ Export-Package: saros;
    org.eclipse.jface.viewers,
    saros.invitation,
    saros.net",
- saros.ui.command_handlers,
  saros.ui.decorators;
   uses:="org.eclipse.core.runtime,
    saros.resource_change_handlers,
    org.eclipse.jface.viewers,
    saros.editor,
    saros.invitation",
+ saros.ui.e4.command_handlers,
+ saros.ui.handlers.menu,
  saros.ui.model,
  saros.ui.preference_pages,
  saros.ui.util,
@@ -142,4 +143,8 @@ Bundle-Vendor: Saros Project
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: javax.annotation;version="1.2.0",
  javax.inject,
- org.eclipse.core.filesystem
+ org.eclipse.core.filesystem,
+ org.eclipse.e4.core.commands,
+ org.eclipse.e4.core.services.events,
+ org.eclipse.e4.ui.workbench.modeling,
+ org.osgi.service.event;version="1.4.0"
