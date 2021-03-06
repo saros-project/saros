@@ -66,6 +66,23 @@
         <children xsi:type="menu:HandledMenuItem" xmi:id="_migkoD1nEeuEmIEsBAz29g" elementId="saros.eclipse.handledmenuitem.8" iconURI="platform:/plugin/saros.eclipse/icons/elcl16/preferences_open_tsk.png" command="_h9fTkDYPEeuIF8EFjFT7JQ"/>
       </children>
     </elements>
+    <elements xsi:type="menu:MenuContribution" xmi:id="_ByuqgH4UEeuUg7lI4gSrKw" elementId="saros.eclipse.menucontribution.3" positionInParent="after=additions" parentId="popup">
+      <children xsi:type="menu:MenuSeparator" xmi:id="_FZumYH4UEeuUg7lI4gSrKw" elementId="CollaborationStart" accessibilityPhrase="CollaborationStart"/>
+      <children xsi:type="menu:MenuSeparator" xmi:id="_Fjm7IH4UEeuUg7lI4gSrKw" elementId="CollaborationEnd" visible="false" accessibilityPhrase="CollaborationEnd"/>
+    </elements>
+    <elements xsi:type="menu:MenuContribution" xmi:id="_d03YYG-WEeuyL4e0Us5MYQ" elementId="saros.eclipse.menucontribution.1" positionInParent="after=additions" parentId="popup">
+      <children xsi:type="menu:HandledMenuItem" xmi:id="_XrOIcG4IEeuU94HWMR4Cpw" elementId="saros.eclipse.handledmenuitem.shareresources" label="Share Resource(s)..." iconURI="platform:/plugin/saros.eclipse/icons/elcl16/session_tsk.png" tooltip="Share the Selected Resources With Your Contacts" command="_pZa5oDYPEeuIF8EFjFT7JQ">
+        <visibleWhen xsi:type="ui:CoreExpression" xmi:id="_efLvkG4IEeuU94HWMR4Cpw" coreExpressionId="saros.ui.definitions.notIsSarosSessionRunningResourcesSelected"/>
+      </children>
+      <children xsi:type="menu:HandledMenuItem" xmi:id="_4oNG4G4IEeuU94HWMR4Cpw" elementId="saros.eclipse.handledmenuitem.14" iconURI="platform:/plugin/saros.eclipse/icons/elcl16/session_add_reference_points_tsk.png" command="_6kVtgDYPEeuIF8EFjFT7JQ">
+        <visibleWhen xsi:type="ui:CoreExpression" xmi:id="_FSExcG4JEeuU94HWMR4Cpw" coreExpressionId="saros.ui.definitions.isConnectedIsSarosSessionRunningResourcesSelected"/>
+      </children>
+    </elements>
+    <elements xsi:type="menu:MenuContribution" xmi:id="_ZrPbIG-XEeuyL4e0Us5MYQ" elementId="saros.eclipse.menucontribution.2" positionInParent="before=menustart" parentId="popup">
+      <children xsi:type="menu:HandledMenuItem" xmi:id="_QgOE4G4JEeuU94HWMR4Cpw" elementId="saros.eclipse.handledmenuitem.15" iconURI="platform:/plugin/saros.eclipse/icons/elcl16/session_add_contacts_tsk.png" command="_8TldkDYPEeuIF8EFjFT7JQ">
+        <visibleWhen xsi:type="ui:CoreExpression" xmi:id="_Q0VTsG4JEeuU94HWMR4Cpw" coreExpressionId="saros.ui.definitions.isConnectedIsSarosSessionRunningIsSarosSessionHostContactsSelectedContactsOnline"/>
+      </children>
+    </elements>
   </fragments>
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_Gf3wkFNKEeu08YCit0yDew" featurename="addons" parentElementId="xpath:/">
     <elements xsi:type="application:Addon" xmi:id="_HnzB8FNKEeu08YCit0yDew" elementId="saros.eclipse.addon.lifecycle" contributionURI="bundleclass://saros.eclipse/saros.Saros"/>

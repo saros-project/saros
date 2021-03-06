@@ -571,124 +571,118 @@
             </visibleWhen>
          </command>
       </menuContribution>
-      <menuContribution
-            allPopups="false"
-            locationURI="popup:org.eclipse.ui.popup.any?after=additions">
-         <separator
-               name="CollaborationStart"
-               visible="true">
-         </separator>
-         <separator
-               name="CollaborationEnd"
-               visible="false">
-         </separator>
-      </menuContribution>
-      
-      <!-- Eclipse Context Menus Hooks !-->
-      
-      <menuContribution
-            allPopups="false"
-            locationURI="popup:org.eclipse.ui.popup.any?after=additions">
-         <command
-               commandId="saros.ui.commands.ShareResource"
-               disabledIcon="icons/dlcl16/spacer.png"
-               icon="icons/elcl16/session_tsk.png"
-               label="Share Resource(s)..."
-               style="push"
-               tooltip="Share the Selected Resources With Your Contacts">
-            <visibleWhen
-                  checkEnabled="false">
-               <and>
-                  <not>
-                     <reference
-                           definitionId="saros.ui.definitions.isSarosSessionRunning">
-                     </reference>
-                  </not>
-                  <reference
-                        definitionId="saros.ui.definitions.resourcesSelected">
-                  </reference>
-               </and>
-            </visibleWhen>
-         </command>
-            <command
-                  commandId="saros.ui.commands.SessionAddSelectedResources"
-                  disabledIcon="icons/dlcl16/session_add_reference_points_tsk.png"
-                  icon="icons/elcl16/session_add_reference_points_tsk.png"
-                  style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <and>
-                     <reference
-                           definitionId="saros.ui.definitions.isConnected">
-                     </reference>
-                     <reference
-                           definitionId="saros.ui.definitions.isSarosSessionRunning">
-                     </reference>
-                     <reference
-                           definitionId="saros.ui.definitions.resourcesSelected">
-                     </reference>
-                  </and>
-               </visibleWhen>
-            </command>
-      </menuContribution>
-      
-      <menuContribution
-            allPopups="false"
-            locationURI="popup:org.eclipse.ui.popup.any?before=menustart">
-         <!-- See SarosView, the context menu is created manually 
-         <command
-               commandId="saros.ui.commands.ShareResource"
-               disabledIcon="icons/dlcl16/spacer.png"
-               icon="icons/elcl16/session_tsk.png"
-               label="Share Project(s)..."
-               style="push"
-               tooltip="Share Projects With Selected Contacts">
-            <visibleWhen
-                  checkEnabled="false">
-               <and>
-                  <not>
-                     <reference
-                           definitionId="saros.ui.definitions.isSarosSessionRunning">
-                     </reference>
-                  </not>
-                  <reference
-                        definitionId="saros.ui.definitions.contactsSelected">
-                  </reference>
-               </and>
-            </visibleWhen>
-         </command>
-         -->
-         <command
-               commandId="saros.ui.commands.SessionAddSelectedContacts"
-               disabledIcon="icons/dlcl16/session_add_contacts_tsk.png"
-               icon="icons/elcl16/session_add_contacts_tsk.png"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <and>
-                  <reference
-                        definitionId="saros.ui.definitions.isConnected">
-                  </reference>
-                  <reference
-                        definitionId="saros.ui.definitions.isSarosSessionRunning">
-                  </reference>
-                  <reference
-                        definitionId="saros.ui.definitions.isSarosSessionHost">
-                  </reference>
-                  <reference
-                        definitionId="saros.ui.definitions.contactsSelected">
-                  </reference>
-                  <reference
-                        definitionId="saros.ui.definitions.contactsOnline">
-                  </reference>
-               </and>
-            </visibleWhen>
-         </command>
-      </menuContribution>
    </extension>
    <extension
          id="saros.ui.definitions.isResource"
          point="org.eclipse.core.expressions.definitions">
+      <definition
+      		id="saros.ui.definitions.isConnectedIsSarosSessionRunningIsSarosSessionHostContactsSelectedContactsOnline">
+  		 <and>
+              <reference
+                    definitionId="saros.ui.definitions.isConnected">
+              </reference>
+              <reference
+                    definitionId="saros.ui.definitions.isSarosSessionRunning">
+              </reference>
+              <reference
+                    definitionId="saros.ui.definitions.isSarosSessionHost">
+              </reference>
+              <reference
+                    definitionId="saros.ui.definitions.contactsSelected">
+              </reference>
+              <reference
+                    definitionId="saros.ui.definitions.contactsOnline">
+              </reference>
+          </and>
+       </definition>
+      <definition
+      		id="saros.ui.definitions.isConnectedIsSarosSessionRunningResourcesSelected">
+      	 <and>
+             <reference
+                   definitionId="saros.ui.definitions.isConnected">
+             </reference>
+             <reference
+                   definitionId="saros.ui.definitions.isSarosSessionRunning">
+             </reference>
+             <reference
+                   definitionId="saros.ui.definitions.resourcesSelected">
+             </reference>
+		 </and>
+       </definition>
+      <definition
+      		id="saros.ui.definitions.notIsSarosSessionRunningResourcesSelected">
+        <and>
+          <not>
+             <reference
+                   definitionId="saros.ui.definitions.isSarosSessionRunning">
+             </reference>
+          </not>
+          <reference
+                definitionId="saros.ui.definitions.resourcesSelected">
+          </reference>
+        </and>
+      </definition>
+      <definition
+      		id ="saros.ui.definitions.isConnectedIsSarosSessionRunningSessionHeadlineSelectedIsSarosSessionHost">
+      	<and>
+          <reference
+                definitionId="saros.ui.definitions.isConnected">
+          </reference>
+          <reference
+                definitionId="saros.ui.definitions.isSarosSessionRunning">
+          </reference>
+          <reference
+                definitionId="saros.ui.definitions.sessionHeadlineSelected">
+          </reference>
+          <reference
+                definitionId="saros.ui.definitions.isSarosSessionHost">
+          </reference>
+        </and>
+      </definition>
+      <definition
+      		id = "saros.ui.definitions.notContactsSelectedNotParticipantsSelectedNotSessionHeadlineSelected">
+      	<and>
+          <not>
+             <reference definitionId="saros.ui.definitions.contactsSelected" />
+          </not>
+          <not>
+             <reference definitionId="saros.ui.definitions.participantsSelected" />
+          </not>
+          <not>
+             <reference definitionId="saros.ui.definitions.sessionHeadlineSelected" />
+          </not>
+        </and>
+        </definition>
+      <definition
+      		id ="saros.ui.definitions.isConnectedIsSarosSessionRunningSessionHeadlineSelected">
+		 <and>
+		  <reference
+		        definitionId="saros.ui.definitions.isConnected">
+		  </reference>
+		  <reference
+		        definitionId="saros.ui.definitions.isSarosSessionRunning">
+		  </reference>
+		  <reference
+		        definitionId="saros.ui.definitions.sessionHeadlineSelected">
+		  </reference>
+		 </and>
+      </definition>
+      <definition
+      		id="saros.ui.definitions.isConnectedNotIsSarosSessionRunningSessionHeadlineSelected">
+		<and>
+		  <reference
+		        definitionId="saros.ui.definitions.isConnected">
+		  </reference>
+		  <not>
+		     <reference
+		           definitionId="saros.ui.definitions.isSarosSessionRunning">
+		     </reference>
+		  </not>
+		  <reference
+		        definitionId="saros.ui.definitions.sessionHeadlineSelected">
+		  </reference>
+		</and>
+      </definition>	 	  
       <definition
             id="saros.ui.definitions.isConnected">
          <with
@@ -713,7 +707,7 @@
         	</reference>
       	</not>
       </definition>
-      <definition id="saros.ui.definitions.isConnectedAndSarosSessionRunning">
+      <definition id="saros.ui.definitions.isConnectedIsSarosSessionRunning">
       	<and>
       		<reference definitionId="saros.ui.definitions.isConnected">
         	</reference>
@@ -730,7 +724,7 @@
             </test>
          </with>
       </definition>
-      <definition id="saros.ui.definitions.isConnectedAndSarosSessionRunningAndSarosSessionHost">
+      <definition id="saros.ui.definitions.isConnectedIsSarosSessionRunningIsSarosSessionHost">
       	<and>
       		<reference definitionId="saros.ui.definitions.isConnected">
         	</reference>
@@ -740,7 +734,7 @@
         	</reference>
       	</and>
       </definition>
-      <definition id="saros.ui.definitions.isConnectedAndSarosSessionRunningAndNotSarosSessionHost">
+      <definition id="saros.ui.definitions.isConnectedIsSarosSessionRunningNotIsSarosSessionHost">
       	<and>
       		<reference definitionId="saros.ui.definitions.isConnected">
         	</reference>
