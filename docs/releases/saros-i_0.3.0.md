@@ -126,12 +126,12 @@ There are some bugs in the alpha version of Saros/I that we are already aware of
 
 If you encounter any other bugs not mentioned above, we would appreciate it if you would report them to our issue tracker (after checking that they have not already been reported).
 
-Our current bug tracker can be found on our [GitHub page](https://github.com/saros-project/saros/issues).
-Please make it clear that the issue is dealing with Saros/I.
+Our bug tracker can be found on our [GitHub page](https://github.com/saros-project/saros/issues).
+Please make clear that the issue pertains to Saros/I.
 
 When reporting a bug that concerns the plugin behavior, please provide the Saros log file (or all relevant excerpts) for a session where the bug was encountered.
 
-The log files for [IntelliJ platform based IDEs](https://www.jetbrains.org/intellij/sdk/docs/intro/intellij_platform.html#ides-based-on-the-intellij-platform) are located in the IDE system directory (here called`IDE_SYSTEM_DIR`).
+The log files for [IntelliJ platform based IDEs](https://www.jetbrains.org/intellij/sdk/docs/intro/intellij_platform.html#ides-based-on-the-intellij-platform) are located in the IDE system directory (here called `IDE_SYSTEM_DIR`).
 An overview over all configurations is given on [the support forum](https://intellij-support.jetbrains.com/hc/en-us/articles/206544519-Directories-used-by-the-IDE-to-store-settings-caches-plugins-and-logs).
 For specific releases, see the information for [2019.3 and earlier](https://www.jetbrains.com/help/idea/2019.3/tuning-the-ide.html#system-directory) or [2020.1 and later](https://www.jetbrains.com/help/idea/2020.1/tuning-the-ide.html#system-directory).
 
@@ -141,4 +141,4 @@ If you are encountering IDE errors connected to Saros (which will be displayed b
 They are located in `[IDE_SYSTEM_DIR]/log/` and are named `idea.log` (the log will be truncated at some point and older logs will be moved to `idea.log.1`, etc.).
 Please have a look at the contained timestamps to provide the correct file.
 
-Before attaching any log files, please make sure to redact any private information that you do not wish to make publicly available.
+Before attaching any log files, please make sure to redact any private information (such as project or file names) that you do not wish to make publicly available.
