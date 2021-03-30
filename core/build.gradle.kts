@@ -1,27 +1,34 @@
 plugins {
   id("saros.gradle.eclipse.plugin")
+  `java-library`
 }
 
 val versionQualifier = ext.get("versionQualifier") as String
+val commonsLang = ext.get("commons-lang3") as String
+val commonsIo = ext.get("commons-io2") as String
 
 val log4j2ApiVersion = ext.get("log4j2ApiVersion") as String
 val log4j2CoreVersion = ext.get("log4j2CoreVersion") as String
 val log4j2BridgeVersion = ext.get("log4j2BridgeVersion") as String
 
 configurations {
+    val bundle by getting {}
+    val bundleApi by getting {}
+    val api by getting {
+        extendsFrom(bundleApi)
+    }
+    val implementation by getting {
+        extendsFrom(bundle)
+    }
     // Defined in root build.gradle
     val testConfig by getting {}
-    val releaseDep by getting {}
 
     // Default configuration
-    val compile by getting {
-        extendsFrom(releaseDep)
-    }
     val testCompile by getting {
         extendsFrom(testConfig)
     }
     val plain by creating {
-        extendsFrom(compile)
+        extendsFrom(implementation, api)
     }
 }
 
@@ -33,26 +40,26 @@ sarosEclipse {
 }
 
 dependencies {
-    releaseDep("commons-codec:commons-codec:1.3")
-    releaseDep("commons-io:commons-io:2.0.1")
-    releaseDep("org.apache.commons:commons-lang3:3.8.1")
+    bundle("commons-codec:commons-codec:1.3")
+    bundle(commonsIo)
+    bundle(commonsLang)
 
-    releaseDep("javax.jmdns:jmdns:3.4.1")
-    releaseDep("xpp3:xpp3:1.1.4c")
-    releaseDep("com.thoughtworks.xstream:xstream:1.4.10")
-    releaseDep("org.gnu.inet:libidn:1.15")
+    bundle("javax.jmdns:jmdns:3.4.1")
+    bundle("xpp3:xpp3:1.1.4c")
+    bundle("com.thoughtworks.xstream:xstream:1.4.10")
+    bundle("org.gnu.inet:libidn:1.15")
 
-    releaseDep(log4j2ApiVersion)
-    releaseDep(log4j2CoreVersion)
-    releaseDep(log4j2BridgeVersion)
+    bundleApi(log4j2ApiVersion)
+    bundleApi(log4j2CoreVersion)
+    bundleApi(log4j2BridgeVersion)
 
     // TODO: use real release. This version is a customized SNAPSHOT
-    releaseDep(files("libs/weupnp.jar"))
+    bundleApi(files("libs/weupnp.jar"))
     // Workaround until we updated to a newer smack version
-    releaseDep(files("libs/smack-3.4.1.jar"))
-    releaseDep(files("libs/smackx-3.4.1.jar"))
+    bundleApi(files("libs/smack-3.4.1.jar"))
+    bundleApi(files("libs/smackx-3.4.1.jar"))
     // Workaround until we can publish and use (without a user token) the repackaged jar in GitHub Packages
-    releaseDep(rootProject.files("libs/picocontainer-2.11.2-patched_relocated.jar"))
+    bundleApi(rootProject.files("libs/picocontainer-2.11.2-patched_relocated.jar"))
 }
 
 sourceSets {
