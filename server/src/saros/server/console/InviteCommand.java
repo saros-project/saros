@@ -53,8 +53,7 @@ public class InviteCommand extends ConsoleCommand {
 
       for (JID jid : jids.get(true)) {
 
-        // -----------------------------------add contact if not
-        // already-----------------------------------
+        // --------------add contact if not already--------------
         boolean contactFound = false;
         for (XMPPContact contact :
             contactsService.getAllContacts()) { // loop and check if contact was already added
@@ -89,13 +88,16 @@ public class InviteCommand extends ConsoleCommand {
 
           try {
             contactsService.addContact(jid, null, questionDialogHandler);
-            log.info("The contact was added successfully");
+            log.info(
+                "The contact was added successfully. Please invite him again after he accepted");
+            out.println(
+                "The contact was added successfully. Please invite him again after he accepted");
+            return; // exit because the user cant accept the invite in time
           } catch (OperationCanceledException e) {
             log.error(e);
           }
         }
-        // -----------------------------------end add contact if not
-        // already-----------------------------------
+        // --------------end add contact if not already--------------
 
         sessionManager.invite(
             jid,
