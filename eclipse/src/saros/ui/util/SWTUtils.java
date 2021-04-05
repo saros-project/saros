@@ -21,6 +21,8 @@ public class SWTUtils {
 
   private static final Logger log = Logger.getLogger(SWTUtils.class);
 
+  private static Display display;
+
   private static class CallableResult<T> {
     private T result;
     private Exception exception;
@@ -187,7 +189,21 @@ public class SWTUtils {
    * @return the display of the current workbench
    */
   public static Display getDisplay() {
-    return PlatformUI.getWorkbench().getDisplay();
+    /**
+     * This is a temporary solution. Migrating the UI from Eclipse3 to Eclipse4 caused an earlier
+     * initialization of Saros and its context. Calling PlatformUI.getWorkbench.getDisplay() can not
+     * be used, since the Workbench wont be created at that point, when this function is first
+     * called. Continuing the migration it would be best to find an other solution by replacing all
+     * calls to this function and keeping track of the display another way or find an equivalent to
+     * PlatformUI.getWorkbench.getDisplay() working in E4.
+     */
+    if (display == null) {
+      display = Display.getCurrent();
+      if (display == null) {
+        display = Display.getDefault();
+      }
+    }
+    return display;
   }
 
   /**

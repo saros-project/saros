@@ -47,6 +47,9 @@ dependencies {
     // This is a workaround for https://github.com/saros-project/saros/issues/1114
     implementation("org.eclipse.platform:org.eclipse.ui.ide:3.17.200")
     implementation("org.eclipse.platform:org.eclipse.ui.workbench:3.120.0")
+	// This is a workaround for an Issues, same as https://github.com/saros-project/saros/issues/1114
+	implementation("org.eclipse.platform:org.eclipse.e4.ui.services:1.3.700")
+	implementation("javax.inject:javax.inject:1")
     testImplementation(project(path = ":saros.core", configuration = "testing"))
 }
 
