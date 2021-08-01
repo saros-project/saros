@@ -20,7 +20,7 @@ This is checked on our build server, so please make sure to format your code wit
 For ease of use, the formatter can also be integrated into the default formatting logic of Eclipse and IntelliJ through a plugin.
 Installation instructions are given in the IDE specific sections on the topic ([Eclipse](#install-and-enable-google-java-formatter), [IntelliJ](#install-and-enable-google-java-formatter-1)).
 
-**Important:** We still use [**google java format 1.6**](https://github.com/google/google-java-format/releases/tag/google-java-format-1.6) as the maintainers of the tool have not provided an official build of the corresponding Eclipse plugin for later versions.
+**Important:** We still use [**google java format 1.10**](https://github.com/google/google-java-format/releases/tag/v1.10.0).
 
 
 
@@ -45,7 +45,7 @@ If you develop on Eclipse you should have already installed the Eclipse version 
 
 #### Install and Enable Google Java Formatter
 
-* Install the [Eclipse Google Java Formatter](https://github.com/google/google-java-format#eclipse) **version 1.6**, which is available as a Drop-In in the [GitHub Releases](https://github.com/google/google-java-format/releases/tag/google-java-format-1.6).
+* Install the [Eclipse Google Java Formatter](https://github.com/google/google-java-format#eclipse), which is available as a Drop-In in the [GitHub Releases](https://github.com/google/google-java-format/releases).
 * Enable the formatter by choosing `google-java-format` in `Window > Preferences > Java > Code Style > Formatter > Formatter Implementation`
 
 ### Import the Saros Project
@@ -65,12 +65,7 @@ See [the Saros testing framework documentation](saros-testing-framework.md) for 
 
 #### Install and Enable Google Java Formatter
 
-* Install the [IntelliJ Google Java Formatter](https://plugins.jetbrains.com/plugin/8527-google-java-format) **version 1.6** which is available in the IntelliJ plugin repository (search for `google-java-format`) or in the [GitHub Releases](https://github.com/google/google-java-format/releases/tag/google-java-format-1.6).
-
-**Important:** If you are using an IntelliJ version newer than 2018.2, the official 1.6 release will not work for you as it's configured to be incompatible with newer IntelliJ releases.
-These compatibility settings were adjusted for later versions of the plugin, but such changes are not available for the 1.6 release.
-
-To avoid the issue, you can have a look at the discussion on the [PR #395](https://github.com/saros-project/saros/pull/395), where we provide a modified plugin zip and reference the adjusted version of the source code if you prefer to build the plugin yourself instead.
+* Install the [IntelliJ Google Java Formatter](https://plugins.jetbrains.com/plugin/8527-google-java-format) which is available in the IntelliJ plugin repository (search for `google-java-format`).
 
 #### Delegate IDE Action
 
@@ -108,7 +103,7 @@ The final build results are copied into the directory `<repository root>/build/d
 
 ### Formatting via Standalone Google Java Formatter
 
-* Download the **release 1.6** of the [Google Java Formatter](https://github.com/google/google-java-format/releases/tag/google-java-format-1.6) `google-java-format-<version>-all-deps.jar`
+* Download [Google Java Formatter](https://github.com/google/google-java-format/releases/) `google-java-format-<version>-all-deps.jar`
 * Call `java -jar google-java-format-<version>-all-deps.jar --dry-run --set-exit-if-changed **/*.java` in a shell with enabled globstar (`shopt -s globstar`) to **check the formatting**
   and add the option `--replace` and remove the option `--dry-run` if you want to **trigger automated formatting**.
 
@@ -133,7 +128,7 @@ Example hook that checks only java files that are staged.
   # download stand-alone formatter
   function download_formatter() {
     local jar_path=$1
-    local url="https://repo.maven.apache.org/maven2/com/google/googlejavaformat/google-java-format/1.6/google-java-format-1.6-all-deps.jar"
+    local url="https://repo.maven.apache.org/maven2/com/google/googlejavaformat/google-java-format/1.10.0/google-java-format-1.10.0-all-deps.jar"
     set -e
     curl -Lo $jar_path "$url" > /dev/null
     set +e
