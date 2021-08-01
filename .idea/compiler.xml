@@ -11,7 +11,7 @@
       <entry name="!?*.kt" />
       <entry name="!?*.clj" />
     </wildcardResourcePatterns>
-    <bytecodeTargetLevel>
+    <bytecodeTargetLevel target="1.8">
       <module name="saros.core_main" target="1.8" />
       <module name="saros.core_test" target="1.8" />
       <module name="saros.eclipse_main" target="1.8" />
