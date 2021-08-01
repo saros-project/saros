@@ -146,9 +146,7 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode implements Dispo
     User host = session.getHost();
     User localUser = session.getLocalUser();
 
-    session
-        .getUsers()
-        .stream()
+    session.getUsers().stream()
         .filter(user -> !user.equals(host) && !user.equals(localUser))
         .forEach(this::addUserNode);
   }

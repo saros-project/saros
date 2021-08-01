@@ -67,8 +67,7 @@ public abstract class AbstractPossibleRepresentationProvider
         computePossibleRepresentations(referencePoint);
 
     String flattenedPossibleRepresentations =
-        possibleRepresentations
-            .stream()
+        possibleRepresentations.stream()
             .map(
                 pair ->
                     ESCAPE_INNER.escape(pair.getLeft())

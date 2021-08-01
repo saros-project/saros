@@ -22,7 +22,7 @@ jobs:
         fetch-depth: 1
     - uses: m273d15/java-format-action@v1.1
       with:
-        version: '1.6'
+        version: '1.10.0'
 
   build:
     runs-on: ubuntu-latest

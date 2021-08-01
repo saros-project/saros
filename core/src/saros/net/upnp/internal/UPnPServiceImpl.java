@@ -197,8 +197,7 @@ public final class UPnPServiceImpl implements IUPnPService, Disposable {
     log.debug(deviceName + " - deleting port mapping... - port=" + port + ", protocol=" + protocol);
 
     final PortMappingRefreshTask task =
-        portMappingRefreshTasks
-            .stream()
+        portMappingRefreshTasks.stream()
             .filter(t -> t.device.equals(device) && t.protocol.equals(protocol) && t.port == port)
             .findFirst()
             .orElse(null);

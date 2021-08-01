@@ -706,8 +706,7 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
 
     for (IContainer container : containers) {
       boolean isChild =
-          baseContainers
-              .stream()
+          baseContainers.stream()
               .anyMatch((baseContainer) -> isChildResource(baseContainer, container));
 
       if (!isChild) {

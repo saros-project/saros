@@ -239,8 +239,7 @@ public class CollaborationUtils {
    * @return the reference point objects representing the given container objects
    */
   private static Set<IReferencePoint> getReferencePoints(Set<IContainer> referencePointContainers) {
-    return referencePointContainers
-        .stream()
+    return referencePointContainers.stream()
         .map(EclipseReferencePoint::new)
         .collect(Collectors.toSet());
   }
@@ -252,8 +251,7 @@ public class CollaborationUtils {
    * @return all projects that contain at least one of the given reference points
    */
   private static Set<IProject> getProjects(Set<IReferencePoint> referencePoints) {
-    return referencePoints
-        .stream()
+    return referencePoints.stream()
         .map(referencePoint -> ResourceConverter.getDelegate(referencePoint).getProject())
         .collect(Collectors.toSet());
   }

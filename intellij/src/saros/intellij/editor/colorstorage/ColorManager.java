@@ -69,8 +69,7 @@ public final class ColorManager {
    */
   @NotNull
   public static ColorKeys getColorKeys(final int colorId) {
-    return COLOR_KEYS
-        .stream()
+    return COLOR_KEYS.stream()
         .filter(x -> x.getId() == colorId)
         .findFirst()
         .map(ColorKeys.class::cast)

@@ -1638,8 +1638,7 @@ public class AnnotationManagerTest {
      * position for all subsequent calls.
      */
     List<Pair<Pair<Integer, Integer>, RangeHighlighter>> selectionRangePairs =
-        startSelectionRanges
-            .stream()
+        startSelectionRanges.stream()
             .map(
                 range -> {
                   int rangeStart = range.getLeft();
@@ -1664,8 +1663,7 @@ public class AnnotationManagerTest {
             .collect(Collectors.toList());
 
     List<Pair<Pair<Integer, Integer>, RangeHighlighter>> contributionRangePairs =
-        startContributionRanges
-            .stream()
+        startContributionRanges.stream()
             .map(
                 range -> {
                   int rangeStart = range.getLeft();
@@ -1740,8 +1738,7 @@ public class AnnotationManagerTest {
      *  for all subsequent calls.
      */
     List<Pair<Pair<Integer, Integer>, RangeHighlighter>> selectionRangePairs =
-        startSelectionRanges
-            .stream()
+        startSelectionRanges.stream()
             .map(
                 range -> {
                   int rangeStart = range.getLeft();
@@ -1763,8 +1760,7 @@ public class AnnotationManagerTest {
             .collect(Collectors.toList());
 
     List<Pair<Pair<Integer, Integer>, RangeHighlighter>> contributionRangePairs =
-        startContributionRanges
-            .stream()
+        startContributionRanges.stream()
             .map(
                 range -> {
                   int rangeStart = range.getLeft();
