@@ -196,7 +196,8 @@ public class SarosSessionManager implements ISarosSessionManager {
     try {
       if (!startStopSessionLock.tryLock(LOCK_TIMEOUT, TimeUnit.MILLISECONDS)) {
         log.warn(
-            "could not start a new session because another operation still tries to start or stop a session");
+            "could not start a new session because another operation still tries to start or stop a"
+                + " session");
         return;
       }
     } catch (InterruptedException e) {
@@ -208,7 +209,8 @@ public class SarosSessionManager implements ISarosSessionManager {
 
       if (sessionShutdown)
         throw new IllegalStateException(
-            "cannot start the session from the same thread context that is currently about to stop the session: "
+            "cannot start the session from the same thread context that is currently about to stop"
+                + " the session: "
                 + Thread.currentThread().getName());
 
       if (sessionStartup) {
@@ -287,7 +289,8 @@ public class SarosSessionManager implements ISarosSessionManager {
     try {
       if (!startStopSessionLock.tryLock(LOCK_TIMEOUT, TimeUnit.MILLISECONDS)) {
         log.warn(
-            "could not stop the current session because another operation still tries to start or stop a session");
+            "could not stop the current session because another operation still tries to start or"
+                + " stop a session");
         return;
       }
     } catch (InterruptedException e) {
@@ -299,7 +302,8 @@ public class SarosSessionManager implements ISarosSessionManager {
 
       if (sessionStartup)
         throw new IllegalStateException(
-            "cannot stop the session from the same thread context that is currently about to start the session: "
+            "cannot stop the session from the same thread context that is currently about to start"
+                + " the session: "
                 + Thread.currentThread().getName());
 
       if (sessionShutdown) {
@@ -602,7 +606,8 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     if (referencePointsToShare.isEmpty()) {
       log.warn(
-          "skipping resource negotiation because no new reference points were added to the current session");
+          "skipping resource negotiation because no new reference points were added to the current"
+              + " session");
       return;
     }
 

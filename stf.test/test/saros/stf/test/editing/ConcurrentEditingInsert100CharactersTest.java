@@ -70,7 +70,13 @@ public class ConcurrentEditingInsert100CharactersTest extends StfTestCase {
     Util.setUpSessionWithProjectAndFile(
         "foo",
         "readme.txt",
-        "package test;\n\npublic class paulaBean {\n\n\tprivate String paula = \"Brillant\";\n\n\tpublic String getPaula() {\n\t\treturn paula;\n\t}\n}",
+        "package test;\n\n"
+            + "public class paulaBean {\n\n"
+            + "\tprivate String paula = \"Brillant\";\n\n"
+            + "\tpublic String getPaula() {\n"
+            + "\t\treturn paula;\n"
+            + "\t}\n"
+            + "}",
         CONCURRENTLY,
         ALICE,
         BOB,

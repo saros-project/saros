@@ -15,7 +15,42 @@ import saros.stf.shared.Constants.TypeOfCreateProject;
 public class ChangeShareFilesEncodingTest extends StfTestCase {
 
   private static String CONTENT =
-      "Bittida en morgon, innan solen upprann,\nInnan foglarna började sjunga,\nBergatrollet friade till fager ungersven.\nHon hade en falskeliger tunga:\nHerr Mannelig, herr Mannelig, trolofven I mig.\nFör det jag bjuder så gerna;\nI kunnen väl svara endast ja eller nej.\nOm i viljen eller ej.\nEder vill jag gifva de gångare tolf,\nSom gå uti rosendelunden;\nAldrig har det varit någon sadel uppå dem,\nEj heller betsel uti munnen.\nEder vill jag gifva de qvarnarna tolf,\nSom stå mellan Tillö och Ternö;\nStenarna de äro af rödaste gull,\nOch hjulen silfverbeslagna.\nEder vill jag gifva ett förgyllande svärd,\nSom klingar utaf femton guldringar;\nOch strida huru I strida vill,\nStridsplatsen skolen i väl vinna.\nEder vill jag gifva en skjorta så ny,\nDen bästa I lysten att slita;\nInte är hon sömmad av nål eller trå,\nMen virkad af silket det hvita.\nSådana gåfvor jag toge väl emot,\nOm du vore kristelig qvinna,\nMen nu så är du det värsta bergatroll\nAf Neckens och djefvulens stämma.\nBergatrollet ut på dörren sprang,\nHon rister och jämrar sig svåra:\nHade jag fått den fager ungersven,\nSå hade jag mistat min plåga.\nHerr Mannelig herr Mannelig trolofven I mig.\nFör det jag bjuder så gerna;\nI kunnen väl svara endast ja eller nej,\nOm i viljen eller ej.";
+      "Bittida en morgon, innan solen upprann,\n"
+          + "Innan foglarna började sjunga,\n"
+          + "Bergatrollet friade till fager ungersven.\n"
+          + "Hon hade en falskeliger tunga:\n"
+          + "Herr Mannelig, herr Mannelig, trolofven I mig.\n"
+          + "För det jag bjuder så gerna;\n"
+          + "I kunnen väl svara endast ja eller nej.\n"
+          + "Om i viljen eller ej.\n"
+          + "Eder vill jag gifva de gångare tolf,\n"
+          + "Som gå uti rosendelunden;\n"
+          + "Aldrig har det varit någon sadel uppå dem,\n"
+          + "Ej heller betsel uti munnen.\n"
+          + "Eder vill jag gifva de qvarnarna tolf,\n"
+          + "Som stå mellan Tillö och Ternö;\n"
+          + "Stenarna de äro af rödaste gull,\n"
+          + "Och hjulen silfverbeslagna.\n"
+          + "Eder vill jag gifva ett förgyllande svärd,\n"
+          + "Som klingar utaf femton guldringar;\n"
+          + "Och strida huru I strida vill,\n"
+          + "Stridsplatsen skolen i väl vinna.\n"
+          + "Eder vill jag gifva en skjorta så ny,\n"
+          + "Den bästa I lysten att slita;\n"
+          + "Inte är hon sömmad av nål eller trå,\n"
+          + "Men virkad af silket det hvita.\n"
+          + "Sådana gåfvor jag toge väl emot,\n"
+          + "Om du vore kristelig qvinna,\n"
+          + "Men nu så är du det värsta bergatroll\n"
+          + "Af Neckens och djefvulens stämma.\n"
+          + "Bergatrollet ut på dörren sprang,\n"
+          + "Hon rister och jämrar sig svåra:\n"
+          + "Hade jag fått den fager ungersven,\n"
+          + "Så hade jag mistat min plåga.\n"
+          + "Herr Mannelig herr Mannelig trolofven I mig.\n"
+          + "För det jag bjuder så gerna;\n"
+          + "I kunnen väl svara endast ja eller nej,\n"
+          + "Om i viljen eller ej.";
 
   @BeforeClass
   public static void selectTesters() throws Exception {

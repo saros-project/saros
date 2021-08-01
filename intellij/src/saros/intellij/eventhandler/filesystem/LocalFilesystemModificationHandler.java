@@ -343,7 +343,8 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
     VirtualFile copy = virtualFileCopyEvent.getFile();
 
     assert !copy.isDirectory()
-        : "Unexpected copying event for directory. This should have been handled by the creation listener.";
+        : "Unexpected copying event for directory. This should have been handled by the creation"
+            + " listener.";
 
     if (log.isTraceEnabled()) {
       log.trace(
@@ -971,7 +972,8 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
               log.error(
                   "Renamed resource "
                       + resource
-                      + " is a root directory but not a reference point. This should not be possible.");
+                      + " is a root directory but not a reference point. This should not be"
+                      + " possible.");
             }
           }
 

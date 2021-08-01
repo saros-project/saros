@@ -39,7 +39,8 @@ public class RefactorInFollowModeTest extends StfTestCase {
           .append("()\n{myfoobar = ")
           .append(i)
           .append(
-              ";\n}\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+              ";\n"
+                  + "}\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 
     builder.append("}");
 

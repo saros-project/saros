@@ -127,7 +127,8 @@ public class AddReferencePointToSessionWizard extends Wizard {
 
           if (referencePointSelectionResult == null) {
             noisyCancel(
-                "Could not find a local representation selection result for the shared root directory "
+                "Could not find a local representation selection result for the shared root"
+                    + " directory "
                     + remoteReferencePointName,
                 null);
 

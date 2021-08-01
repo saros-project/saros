@@ -61,7 +61,8 @@ public class CreatingNewFileTest extends StfTestCase {
         .remoteBot()
         .editor("readme.txt")
         .typeText(
-            "eene meene miste es rappelt in der kiste, eene meene meck und du bist weck ! weck bist du noch lange nicht ...");
+            "eene meene miste es rappelt in der kiste, eene meene meck und du bist weck ! weck bist"
+                + " du noch lange nicht ...");
 
     assertFalse("Carls editor must not be opened", CARL.remoteBot().isEditorOpen("readme.txt"));
     assertFalse("Bobs editor must not be opened", BOB.remoteBot().isEditorOpen("readme.txt"));

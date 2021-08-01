@@ -42,7 +42,8 @@ public class OsgiDependencyConfigurator {
     String requireBundleValue = getRequireBundleValue(manifestFile);
     if (requireBundleValue == null) {
       throw new GradleException(
-          "Unable to add dependencies, because the 'Require-Bundle' entry is missing in the manifest file: "
+          "Unable to add dependencies, because the 'Require-Bundle' entry is missing in the"
+              + " manifest file: "
               + manifestFile.getAbsolutePath());
     }
     String[] bundles = parseRequireBundleValue(requireBundleValue, excludeManifestDependencies);

@@ -81,7 +81,8 @@ public class ResourceChangeValidator extends ModelProvider {
         referencePointDelta.accept(visitor);
       } catch (CoreException e) {
         log.warn(
-            "error occurred during delta visitation, some resources might have not been checked", //$NON-NLS-1$
+            "error occurred during delta visitation, some resources might have not"
+                + " been checked", //$NON-NLS-1$
             e);
       }
 

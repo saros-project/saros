@@ -267,8 +267,9 @@ public class ConsistencyAction extends Action implements Disposable {
         new MultiStatus(
             pluginID,
             0,
-            "The recovery process will perform changes to files and folders of the currently shared resources. "
-                + "The affected files and folders may be either modified, created, or deleted.\n\n"
+            "The recovery process will perform changes to files and folders of the currently shared"
+                + " resources. The affected files and folders may be either modified, created, or"
+                + " deleted.\n\n"
                 + "Press 'Details' for the affected files and folders.",
             null);
 

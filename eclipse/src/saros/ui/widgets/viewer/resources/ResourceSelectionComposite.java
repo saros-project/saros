@@ -219,7 +219,8 @@ public class ResourceSelectionComposite extends BaseResourceSelectionComposite {
                       } else {
                         SarosView.showNotification(
                             "Error while restoring a selection",
-                            "Could not restore a selection because there is none with the name you entered.",
+                            "Could not restore a selection because there is none with the name you"
+                                + " entered.",
                             savedSelectionPresetsCombo);
                       }
 

@@ -492,7 +492,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
     if (fileForEditor == null) {
       log.warn(
-          "Encountered editor without valid virtual file representation - file held in editor pool: "
+          "Encountered editor without valid virtual file representation - file held in editor pool:"
+              + " "
               + file);
 
       return;
@@ -502,7 +503,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
       log.debug(
           "Ignoring "
               + file
-              + " while sending viewport awareness information as the editor is not currently visible.");
+              + " while sending viewport awareness information as the editor is not currently"
+              + " visible.");
 
       return;
     }
@@ -686,7 +688,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
           if (!backgroundEditorPool.isEmpty()) {
             log.warn(
-                "BackgroundEditorPool already contains entries at session start! Possible memory leak.");
+                "BackgroundEditorPool already contains entries at session start! Possible memory"
+                    + " leak.");
           }
 
           session.getStopManager().addBlockable(stopManagerListener);

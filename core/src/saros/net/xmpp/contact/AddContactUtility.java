@@ -85,7 +85,8 @@ class AddContactUtility {
         throw new OperationCanceledException(dialogContent.invocationTargetExceptionMessage);
 
       log.warn(
-          "Problem while adding a contact.CancellationException User decided to add contact anyway. Problem: "
+          "Problem while adding a contact.CancellationException User decided to add contact anyway."
+              + " Problem: "
               + e.getMessage());
     }
 

@@ -125,7 +125,8 @@ public class XMPPConnectionSupport {
           MessageDialog.openQuestion(
               SWTUtils.getShell(),
               "Disconnecting from the current Saros Session",
-              "Connecting with a different account will disconnect you from your current Saros session. Do you wish to continue ?");
+              "Connecting with a different account will disconnect you from your current Saros"
+                  + " session. Do you wish to continue ?");
 
       if (!disconnectFromSession) {
         isConnecting = false;
@@ -160,7 +161,8 @@ public class XMPPConnectionSupport {
 
     if (accountToConnect == null) {
       log.warn(
-          "unable to establish a connection - no account was provided and no default account could be found");
+          "unable to establish a connection - no account was provided and no default account could"
+              + " be found");
 
       isConnecting = false;
       return;

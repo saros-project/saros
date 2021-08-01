@@ -69,7 +69,8 @@ public class AdditionalResourceDataFactory {
 
       if (!Collections.disjoint(additionalResourceData.keySet(), providerData.keySet())) {
         log.warn(
-            "Key sets used by additional resource data providers are not disjoint! Noticed while processing "
+            "Key sets used by additional resource data providers are not disjoint! Noticed while"
+                + " processing "
                 + additionalResourceDataProvider.getClass().getSimpleName());
       }
 

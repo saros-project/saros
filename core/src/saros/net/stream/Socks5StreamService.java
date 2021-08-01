@@ -232,7 +232,8 @@ public class Socks5StreamService implements IStreamService, BytestreamListener {
 
     log.debug(
         msg
-            + "and the server does not allow bidirectional connections. Wrapped session established.");
+            + "and the server does not allow bidirectional connections. Wrapped session"
+            + " established.");
 
     return new WrappedBidirectionalSocks5BytestreamSession(inSession, outSession);
   }
@@ -519,7 +520,8 @@ public class Socks5StreamService implements IStreamService, BytestreamListener {
 
         log.debug(
             prefix()
-                + "connection/session is mediated, performing additional connection optimization...");
+                + "connection/session is mediated, performing additional connection"
+                + " optimization...");
 
       } catch (IOException e) {
         exception = e;

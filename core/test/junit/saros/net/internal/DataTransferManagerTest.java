@@ -493,7 +493,8 @@ public class DataTransferManagerTest {
     dtm.connect(new JID("fallback@emergency"));
 
     assertEquals(
-        "established an outgoing connection also the remote side is already connected to the local side",
+        "established an outgoing connection also the remote side is already connected to the local"
+            + " side",
         1,
         mainTransport.getEstablishedConnections().size());
   }

@@ -429,43 +429,43 @@ public final class StunServiceImpl implements IStunService {
 
         case 401:
           log.error(
-              "401 (Unauthorized): The Binding Request did not contain a MESSAGE-INTEGRITY attribute."
-                  + " ["
+              "401 (Unauthorized): The Binding Request did not contain a MESSAGE-INTEGRITY"
+                  + " attribute. ["
                   + message
                   + "]");
           return false;
         case 420:
           log.error(
-              "420 (Unknown Attribute): The server did not understand a mandatory attribute in the request."
-                  + " ["
+              "420 (Unknown Attribute): The server did not understand a mandatory attribute in the"
+                  + " request. ["
                   + message
                   + "]");
           return false;
         case 430:
           log.error(
-              "430 (Stale Credentials): The Binding Request did contain a MESSAGE-INTEGRITY attribute, but it used a shared secret that has expired."
-                  + " ["
+              "430 (Stale Credentials): The Binding Request did contain a MESSAGE-INTEGRITY"
+                  + " attribute, but it used a shared secret that has expired. ["
                   + message
                   + "]");
           return false;
         case 431:
           log.error(
-              "431 (Integrity Check Failure): The Binding Request contained a MESSAGE-INTEGRITY attribute, but the HMAC failed verification."
-                  + " ["
+              "431 (Integrity Check Failure): The Binding Request contained a MESSAGE-INTEGRITY"
+                  + " attribute, but the HMAC failed verification. ["
                   + message
                   + "]");
           return false;
         case 432:
           log.error(
-              "432 (Missing Username): The Binding Request contained a MESSAGE-INTEGRITY attribute, but not a USERNAME attribute."
-                  + " ["
+              "432 (Missing Username): The Binding Request contained a MESSAGE-INTEGRITY attribute,"
+                  + " but not a USERNAME attribute. ["
                   + message
                   + "]");
           return false;
         case 433:
           log.error(
-              "433 (Use TLS): The Shared Secret request has to be sent over TLS, but was not received over TLS."
-                  + " ["
+              "433 (Use TLS): The Shared Secret request has to be sent over TLS, but was not"
+                  + " received over TLS. ["
                   + message
                   + "]");
           return false;

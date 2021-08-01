@@ -425,7 +425,9 @@ public final class NetworkPreferencePage extends PreferencePage
     Label socks5CandidatesLabel = new Label(group, SWT.CENTER);
     socks5CandidatesLabel.setText("Socks5 candidates:");
     socks5CandidatesLabel.setToolTipText(
-        "Comma separated list of Socks5 candidates (IP addresses or host names) that should be used during Socks5 connection establishment.\nLeave blank to use all local available IP addresses as candidates.");
+        "Comma separated list of Socks5 candidates (IP addresses or host names) that should be used"
+            + " during Socks5 connection establishment.\n"
+            + "Leave blank to use all local available IP addresses as candidates.");
 
     socks5CandidatesLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
 
@@ -469,7 +471,8 @@ public final class NetworkPreferencePage extends PreferencePage
     buttonIncludeUPNPGatewayAddress.setText("Include external IP address of UPNP gateway(s)");
 
     buttonIncludeUPNPGatewayAddress.setToolTipText(
-        "If checked the external IP address of the selected UPNP gateways(s) will be included in the Socks5 candidate list");
+        "If checked the external IP address of the selected UPNP gateways(s) will be included in"
+            + " the Socks5 candidate list");
 
     GridData data = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
 

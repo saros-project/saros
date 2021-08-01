@@ -213,7 +213,8 @@ public final class PackageExplorerView extends StfRemoteObject implements IPacka
       throw new RuntimeException(
           "the passed parameter '"
               + pkg
-              + "' is not valid, the package name should corresponds to the pattern [\\w\\.]*\\w+ e.g. PKG1.PKG2.PKG3");
+              + "' is not valid, the package name should corresponds to the pattern [\\w\\.]*\\w+"
+              + " e.g. PKG1.PKG2.PKG3");
     }
   }
 
@@ -226,7 +227,8 @@ public final class PackageExplorerView extends StfRemoteObject implements IPacka
       throw new RuntimeException(
           "the passed parameter '"
               + pkg
-              + "' is not valid, the package name should corresponds to the pattern [\\w\\.]*\\w+ e.g. PKG1.PKG2.PKG3");
+              + "' is not valid, the package name should corresponds to the pattern [\\w\\.]*\\w+"
+              + " e.g. PKG1.PKG2.PKG3");
     }
   }
 

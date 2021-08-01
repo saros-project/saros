@@ -47,11 +47,13 @@ public class ReferencePointOptionResult {
       case NEW_DIRECTORY:
         Objects.requireNonNull(
             newDirectoryName,
-            "The new directory name must not be null if the option to create a new directory is chosen");
+            "The new directory name must not be null if the option to create a new directory is"
+                + " chosen");
 
         Objects.requireNonNull(
             newDirectoryBase,
-            "The new directory base path must not be null if the option to create a new directory is chosen");
+            "The new directory base path must not be null if the option to create a new directory"
+                + " is chosen");
 
         break;
 

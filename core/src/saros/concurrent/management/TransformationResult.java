@@ -38,7 +38,8 @@ public class TransformationResult {
   public void addAll(TransformationResult other) {
     if (!Objects.equals(other.localUser, this.localUser)) {
       throw new IllegalArgumentException(
-          "can only merge two transformation result objects if they are managing the same local user");
+          "can only merge two transformation result objects if they are managing the same local"
+              + " user");
     }
     this.executeLocally.addAll(other.executeLocally);
     this.sendToPeers.addAll(other.sendToPeers);

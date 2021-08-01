@@ -344,7 +344,8 @@ final class EditorPool {
               + defaultDocumentProvider
               + " for editor with title '"
               + editorPart.getTitle()
-              + "' might not support shared access. It is likely that the editor content is not properly synchronized!");
+              + "' might not support shared access. It is likely that the editor content is not"
+              + " properly synchronized!");
 
       return;
     }
@@ -361,7 +362,8 @@ final class EditorPool {
               + editorDocumentProvider
               + " for editor with title '"
               + editorPart.getTitle()
-              + "' might not support shared access. It is likely that the editor content is not properly synchronized!");
+              + "' might not support shared access. It is likely that the editor content is not"
+              + " properly synchronized!");
     }
   }
 }

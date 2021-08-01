@@ -13,10 +13,11 @@ class IntellijConfigurator {
   private static final String LOCKFILE_NAME = "saros_sandbox.lock";
   private static final String SANDBOX_DIR_PREFIX = "idea-sandbox-";
   private static final String RACE_CONDITION_WARNING =
-      "\nThis issue might be caused by a race condition between two or more 'runIde'"
-          + "calls. In order to avoid that race condition: Call 'runIde' and wait until the IntelliJ instance started"
-          + "before starting the next instance with 'runIde'."
-          + "See issue #724 for the corresponding discussion.";
+      "\n"
+          + "This issue might be caused by a race condition between two or more 'runIde'calls. In"
+          + " order to avoid that race condition: Call 'runIde' and wait until the IntelliJ"
+          + " instance startedbefore starting the next instance with 'runIde'.See issue #724 for"
+          + " the corresponding discussion.";
 
   private Project project;
 

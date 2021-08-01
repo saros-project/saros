@@ -803,7 +803,8 @@ public final class SarosSession implements ISarosSession {
       throw new IllegalStateException(
           "component of class type "
               + ISarosSessionContextFactory.class.getName()
-              + " could not be found in the current global application context but is required for operation");
+              + " could not be found in the current global application context but is required for"
+              + " operation");
     }
 
     factory.createComponents(this, sessionContainer);
@@ -860,7 +861,8 @@ public final class SarosSession implements ISarosSession {
       throw new IllegalStateException(
           "component of class type "
               + componentType.getName()
-              + " could not be found in the current session context or application context but is required for operation");
+              + " could not be found in the current session context or application context but is"
+              + " required for operation");
 
     return result;
   }

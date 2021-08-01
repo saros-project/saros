@@ -319,7 +319,8 @@ public class ChangeColorManager extends AbstractActivityProducer implements Star
           if (favoriteUserColors.containsValue(UserColorID.UNKNOWN)
               && isValidColorAssignment(assignedColors)) {
             log.debug(
-                "color conflict resolve result = FAVORITE COLORS UNKNOWN, USING PREVIOUS COLOR ASSIGNMENT");
+                "color conflict resolve result = FAVORITE COLORS UNKNOWN, USING PREVIOUS COLOR"
+                    + " ASSIGNMENT");
             break resolveColorConflicts;
           }
 
