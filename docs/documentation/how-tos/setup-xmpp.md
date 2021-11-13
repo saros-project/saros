@@ -40,3 +40,13 @@ See [https://www.ejabberd.im](https://www.ejabberd.im/).
     disabled for Saros in the past.)
 
 ![](images/openfire_settings_02.png){:class="img-fluid"}
+
+5. Create user for example: username: low, password: low.
+   ![](images/openfire_create_user.png){:class="img-fluid"}
+6. In saros plugin fill: 
+- username: low
+- password: low
+- server: (check picture)
+- port: (check picture)
+![](images/openfire_server_info.png){:class="img-fluid"}
+
