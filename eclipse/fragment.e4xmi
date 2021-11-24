@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="ASCII"?>
+<fragment:ModelFragments xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:application="http://www.eclipse.org/ui/2010/UIModel/application" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/descriptor/basic" xmlns:commands="http://www.eclipse.org/ui/2010/UIModel/application/commands" xmlns:fragment="http://www.eclipse.org/ui/2010/UIModel/fragment" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmlns:ui="http://www.eclipse.org/ui/2010/UIModel/application/ui" xmi:id="_9R0kQDYLEeuIF8EFjFT7JQ">
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_AA2WUDYMEeuIF8EFjFT7JQ" featurename="commands" parentElementId="xpath:/">
+    <elements xsi:type="commands:Command" xmi:id="_FiO7QDYMEeuIF8EFjFT7JQ" elementId="saros.ui.commands.Empty" commandName="EMPTY COMMAND"/>
+    <elements xsi:type="commands:Command" xmi:id="_Ye-coDYNEeuIF8EFjFT7JQ" elementId="saros.ui.commands.GettingStarted" commandName="Getting Started..."/>
+    <elements xsi:type="commands:Command" xmi:id="_hvu2UDYNEeuIF8EFjFT7JQ" elementId="saros.ui.commands.StartSarosConfiguration" commandName="Start Saros Configuration..."/>
+    <elements xsi:type="commands:Command" xmi:id="_VbGKADYPEeuIF8EFjFT7JQ" elementId="saros.ui.commands.CreateXMPPAccount" commandName="Create Account..."/>
+    <elements xsi:type="commands:Command" xmi:id="_Y_2DIDYPEeuIF8EFjFT7JQ" elementId="saros.ui.commands.AddContact" commandName="Add Contact..."/>
+    <elements xsi:type="commands:Command" xmi:id="_h9fTkDYPEeuIF8EFjFT7JQ" elementId="saros.ui.commands.OpenSarosPreferences" commandName="Preferences..."/>
+    <elements xsi:type="commands:Command" xmi:id="_ji39ADYPEeuIF8EFjFT7JQ" elementId="saros.ui.commands.AddXMPPAccount" commandName="Add Account..."/>
+    <elements xsi:type="commands:Command" xmi:id="_pZa5oDYPEeuIF8EFjFT7JQ" elementId="saros.ui.commands.ShareResource" commandName="Share Resource(s)..."/>
+    <elements xsi:type="commands:Command" xmi:id="_rsWlkDYPEeuIF8EFjFT7JQ" elementId="saros.ui.commands.SessionLeave" commandName="Leave Session..."/>
+    <elements xsi:type="commands:Command" xmi:id="_wvkAwDYPEeuIF8EFjFT7JQ" elementId="saros.ui.commands.SessionAddResources" commandName="Add Resource(s)..."/>
+    <elements xsi:type="commands:Command" xmi:id="_0XH9UDYPEeuIF8EFjFT7JQ" elementId="saros.ui.commands.SessionAddContacts" commandName="Add Contacts..."/>
+    <elements xsi:type="commands:Command" xmi:id="_6kVtgDYPEeuIF8EFjFT7JQ" elementId="saros.ui.commands.SessionAddSelectedResources" commandName="Add to Saros Session"/>
+    <elements xsi:type="commands:Command" xmi:id="_8TldkDYPEeuIF8EFjFT7JQ" elementId="saros.ui.commands.SessionAddSelectedContacts" commandName="Add to Saros Session"/>
+  </fragments>
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_B_wWMDYQEeuIF8EFjFT7JQ" featurename="handlers" parentElementId="xpath:/">
+    <elements xsi:type="commands:Handler" xmi:id="_Fft18DYQEeuIF8EFjFT7JQ" elementId="saros.eclipse.handler.0" contributionURI="bundleclass://saros.eclipse/saros.ui.handlers.menu.GettingStartedHandler" command="_Ye-coDYNEeuIF8EFjFT7JQ"/>
+    <elements xsi:type="commands:Handler" xmi:id="_ymPZEDYQEeuIF8EFjFT7JQ" elementId="saros.eclipse.handler.1" contributionURI="bundleclass://saros.eclipse/saros.ui.handlers.menu.StartSarosConfigurationHandler" command="_hvu2UDYNEeuIF8EFjFT7JQ"/>
+    <elements xsi:type="commands:Handler" xmi:id="_AIKtADYREeuIF8EFjFT7JQ" elementId="saros.eclipse.handler.2" contributionURI="bundleclass://saros.eclipse/saros.ui.handlers.menu.CreateXMPPAccountHandler" command="_VbGKADYPEeuIF8EFjFT7JQ"/>
+    <elements xsi:type="commands:Handler" xmi:id="_J9snsDYREeuIF8EFjFT7JQ" elementId="saros.eclipse.handler.3" contributionURI="bundleclass://saros.eclipse/saros.ui.handlers.menu.AddXMPPAccountHandler" command="_ji39ADYPEeuIF8EFjFT7JQ"/>
+    <elements xsi:type="commands:Handler" xmi:id="_YHVb4DYREeuIF8EFjFT7JQ" elementId="saros.eclipse.handler.4" contributionURI="bundleclass://saros.eclipse/saros.ui.handlers.menu.AddContactHandler" command="_Y_2DIDYPEeuIF8EFjFT7JQ"/>
+    <elements xsi:type="commands:Handler" xmi:id="_k056sDYREeuIF8EFjFT7JQ" elementId="saros.eclipse.handler.5" contributionURI="bundleclass://saros.eclipse/saros.ui.handlers.menu.OpenSarosPreferencesHandler" command="_h9fTkDYPEeuIF8EFjFT7JQ"/>
+    <elements xsi:type="commands:Handler" xmi:id="_qIwZ8DYREeuIF8EFjFT7JQ" elementId="saros.eclipse.handler.6" contributionURI="bundleclass://saros.eclipse/saros.ui.handlers.menu.ShareResourcesHandler" command="_pZa5oDYPEeuIF8EFjFT7JQ"/>
+    <elements xsi:type="commands:Handler" xmi:id="_6dvEUDYREeuIF8EFjFT7JQ" elementId="saros.eclipse.handler.7" contributionURI="bundleclass://saros.eclipse/saros.ui.handlers.menu.SessionLeaveHandler" command="_rsWlkDYPEeuIF8EFjFT7JQ"/>
+    <elements xsi:type="commands:Handler" xmi:id="_FYilADYSEeuIF8EFjFT7JQ" elementId="saros.eclipse.handler.8" contributionURI="bundleclass://saros.eclipse/saros.ui.handlers.menu.SessionAddResourcesHandler" command="_wvkAwDYPEeuIF8EFjFT7JQ"/>
+    <elements xsi:type="commands:Handler" xmi:id="_NFBIgDYSEeuIF8EFjFT7JQ" elementId="saros.eclipse.handler.9" contributionURI="bundleclass://saros.eclipse/saros.ui.handlers.menu.SessionAddContactsHandler" command="_0XH9UDYPEeuIF8EFjFT7JQ"/>
+    <elements xsi:type="commands:Handler" xmi:id="_TUQR8DYSEeuIF8EFjFT7JQ" elementId="saros.eclipse.handler.10" contributionURI="bundleclass://saros.eclipse/saros.ui.handlers.menu.SessionAddSelectedResourcesHandler" command="_6kVtgDYPEeuIF8EFjFT7JQ"/>
+    <elements xsi:type="commands:Handler" xmi:id="_gPUaMDYSEeuIF8EFjFT7JQ" elementId="saros.eclipse.handler.11" contributionURI="bundleclass://saros.eclipse/saros.ui.handlers.menu.SessionAddSelectedContactsHandler" command="_8TldkDYPEeuIF8EFjFT7JQ"/>
+  </fragments>
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_w8wA0DYSEeuIF8EFjFT7JQ" featurename="menuContributions" parentElementId="xpath:/">
+    <elements xsi:type="menu:MenuContribution" xmi:id="_D-FjwDYTEeuIF8EFjFT7JQ" elementId="saros.eclipse.menucontribution.0" positionInParent="after=additions" parentId="org.eclipse.ui.main.menu">
+      <children xsi:type="menu:Menu" xmi:id="_Q9ag8DYTEeuIF8EFjFT7JQ" elementId="saros.ui.main.menu.e4" label="Saros">
+        <children xsi:type="menu:MenuSeparator" xmi:id="_bEDZwDYTEeuIF8EFjFT7JQ" elementId="saros.eclipse.menuseparator.DeveloperStart" accessibilityPhrase="DeveloperStart"/>
+        <children xsi:type="menu:MenuSeparator" xmi:id="_g7egIDYTEeuIF8EFjFT7JQ" elementId="saros.eclipse.menuseparator.DeveloperEnd" accessibilityPhrase="DeveloperEnd"/>
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_nW5rcDYTEeuIF8EFjFT7JQ" elementId="saros.eclipse.handledmenuitem.0" iconURI="platform:/plugin/saros.eclipse/icons/view16/saros_misc.png" command="_Ye-coDYNEeuIF8EFjFT7JQ"/>
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_wzI8YDYTEeuIF8EFjFT7JQ" elementId="saros.eclipse.handledmenuitem.1" iconURI="platform:/plugin/saros.eclipse/icons/view16/saros_misc.png" command="_hvu2UDYNEeuIF8EFjFT7JQ"/>
+        <children xsi:type="menu:MenuSeparator" xmi:id="_6GglMDYTEeuIF8EFjFT7JQ" elementId="saros.eclipse.menuseparator.RosterStart" accessibilityPhrase="RosterStart"/>
+        <children xsi:type="menu:HandledMenuItem" xmi:id="__T3a4DYTEeuIF8EFjFT7JQ" elementId="saros.eclipse.handledmenuitem.2" iconURI="platform:/plugin/saros.eclipse/icons/dlcl16/xmpp_create_account_tsk.png" command="_VbGKADYPEeuIF8EFjFT7JQ">
+          <visibleWhen xsi:type="ui:CoreExpression" xmi:id="_R2iE0DYUEeuIF8EFjFT7JQ" coreExpressionId="saros.ui.definitions.isCreateXMPPAccountEnabled"/>
+        </children>
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_0jwR0DYUEeuIF8EFjFT7JQ" elementId="saros.eclipse.handledmenuitem.3" iconURI="platform:/plugin/saros.eclipse/icons/elcl16/xmpp_create_account_tsk.png" command="_ji39ADYPEeuIF8EFjFT7JQ"/>
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_DNLZUDYVEeuIF8EFjFT7JQ" elementId="saros.eclipse.handledmenuitem.4" iconURI="platform:/plugin/saros.eclipse/icons/elcl16/session_add_contacts_tsk.png" command="_Y_2DIDYPEeuIF8EFjFT7JQ"/>
+        <children xsi:type="menu:MenuSeparator" xmi:id="_RkmK0DYVEeuIF8EFjFT7JQ" elementId="saros.eclipse.menuseparator.RosterEnd" accessibilityPhrase="RosterEnd"/>
+        <children xsi:type="menu:MenuSeparator" xmi:id="_2St4kDYVEeuIF8EFjFT7JQ" elementId="saros.eclipse.menuseparator.CollaborationStart" accessibilityPhrase="CollaborationStart"/>
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_6984oDYVEeuIF8EFjFT7JQ" elementId="saros.eclipse.handledmenuitem.5" iconURI="platform:/plugin/saros.eclipse/icons/elcl16/session_tsk.png" command="_pZa5oDYPEeuIF8EFjFT7JQ">
+          <visibleWhen xsi:type="ui:CoreExpression" xmi:id="_N9R-gDYYEeuIF8EFjFT7JQ" coreExpressionId="saros.ui.definitions.notIsSarosSessionRunning"/>
+        </children>
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_GqGWsDYWEeuIF8EFjFT7JQ" elementId="saros.eclipse.handledmenuitem.6" iconURI="platform:/plugin/saros.eclipse/icons/elcl16/session_add_reference_points_tsk.png" command="_wvkAwDYPEeuIF8EFjFT7JQ">
+          <visibleWhen xsi:type="ui:CoreExpression" xmi:id="_AHvngDYXEeuIF8EFjFT7JQ" coreExpressionId="saros.ui.definitions.isConnectedAndSarosSessionRunning"/>
+        </children>
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_VjNOEDYYEeuIF8EFjFT7JQ" elementId="saros.eclipse.handledmenuitem.7" iconURI="platform:/plugin/saros.eclipse/icons/elcl16/session_add_contacts_tsk.png" command="_0XH9UDYPEeuIF8EFjFT7JQ">
+          <visibleWhen xsi:type="ui:CoreExpression" xmi:id="_GKb30DYZEeuIF8EFjFT7JQ" coreExpressionId="saros.ui.definitions.isConnectedAndSarosSessionRunningAndSarosSessionHost"/>
+        </children>
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_NrpKADYaEeuIF8EFjFT7JQ" elementId="saros.eclipse.handledmenuitem.leavesession" label="Leave Session..." iconURI="platform:/plugin/saros.eclipse/icons/elcl16/session_leave_tsk.png" command="_rsWlkDYPEeuIF8EFjFT7JQ">
+          <visibleWhen xsi:type="ui:CoreExpression" xmi:id="_PlJCQDYaEeuIF8EFjFT7JQ" coreExpressionId="saros.ui.definitions.isConnectedAndSarosSessionRunningAndNotSarosSessionHost"/>
+        </children>
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_dQsMQDYaEeuIF8EFjFT7JQ" elementId="saros.eclipse.handledmenuitem.stopsession" label="Stop Session..." iconURI="platform:/plugin/saros.eclipse/icons/elcl16/session_terminate_tsk.png" command="_rsWlkDYPEeuIF8EFjFT7JQ">
+          <visibleWhen xsi:type="ui:CoreExpression" xmi:id="_i3eOkDYaEeuIF8EFjFT7JQ" coreExpressionId="saros.ui.definitions.isConnectedAndSarosSessionRunningAndSarosSessionHost"/>
+        </children>
+        <children xsi:type="menu:MenuSeparator" xmi:id="_VZsCgD1nEeuEmIEsBAz29g" elementId="saros.eclipse.menuseparator.CollaborationEnd" accessibilityPhrase="CollaborationEnd"/>
+        <children xsi:type="menu:MenuSeparator" xmi:id="_Vi-hYD1nEeuEmIEsBAz29g" elementId="saros.eclipse.menuseparator.OtherStart" accessibilityPhrase="OtherStart"/>
+        <children xsi:type="menu:MenuSeparator" xmi:id="_Voc3QD1nEeuEmIEsBAz29g" elementId="saros.eclipse.menuseparator.OtherEnd" accessibilityPhrase="OtherEnd"/>
+        <children xsi:type="menu:MenuSeparator" xmi:id="_Vs2PED1nEeuEmIEsBAz29g" elementId="saros.eclipse.menuseparator.additions" visible="false" accessibilityPhrase="additions"/>
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_migkoD1nEeuEmIEsBAz29g" elementId="saros.eclipse.handledmenuitem.8" iconURI="platform:/plugin/saros.eclipse/icons/elcl16/preferences_open_tsk.png" command="_h9fTkDYPEeuIF8EFjFT7JQ"/>
+      </children>
+    </elements>
+    <elements xsi:type="menu:MenuContribution" xmi:id="_ByuqgH4UEeuUg7lI4gSrKw" elementId="saros.eclipse.menucontribution.3" positionInParent="after=additions" parentId="popup">
+      <children xsi:type="menu:MenuSeparator" xmi:id="_FZumYH4UEeuUg7lI4gSrKw" elementId="CollaborationStart" accessibilityPhrase="CollaborationStart"/>
+      <children xsi:type="menu:MenuSeparator" xmi:id="_Fjm7IH4UEeuUg7lI4gSrKw" elementId="CollaborationEnd" visible="false" accessibilityPhrase="CollaborationEnd"/>
+    </elements>
+    <elements xsi:type="menu:MenuContribution" xmi:id="_d03YYG-WEeuyL4e0Us5MYQ" elementId="saros.eclipse.menucontribution.1" positionInParent="after=additions" parentId="popup">
+      <children xsi:type="menu:HandledMenuItem" xmi:id="_XrOIcG4IEeuU94HWMR4Cpw" elementId="saros.eclipse.handledmenuitem.shareresources" label="Share Resource(s)..." iconURI="platform:/plugin/saros.eclipse/icons/elcl16/session_tsk.png" tooltip="Share the Selected Resources With Your Contacts" command="_pZa5oDYPEeuIF8EFjFT7JQ">
+        <visibleWhen xsi:type="ui:CoreExpression" xmi:id="_efLvkG4IEeuU94HWMR4Cpw" coreExpressionId="saros.ui.definitions.notIsSarosSessionRunningResourcesSelected"/>
+      </children>
+      <children xsi:type="menu:HandledMenuItem" xmi:id="_4oNG4G4IEeuU94HWMR4Cpw" elementId="saros.eclipse.handledmenuitem.14" iconURI="platform:/plugin/saros.eclipse/icons/elcl16/session_add_reference_points_tsk.png" command="_6kVtgDYPEeuIF8EFjFT7JQ">
+        <visibleWhen xsi:type="ui:CoreExpression" xmi:id="_FSExcG4JEeuU94HWMR4Cpw" coreExpressionId="saros.ui.definitions.isConnectedIsSarosSessionRunningResourcesSelected"/>
+      </children>
+    </elements>
+    <elements xsi:type="menu:MenuContribution" xmi:id="_ZrPbIG-XEeuyL4e0Us5MYQ" elementId="saros.eclipse.menucontribution.2" positionInParent="before=menustart" parentId="popup">
+      <children xsi:type="menu:HandledMenuItem" xmi:id="_QgOE4G4JEeuU94HWMR4Cpw" elementId="saros.eclipse.handledmenuitem.15" iconURI="platform:/plugin/saros.eclipse/icons/elcl16/session_add_contacts_tsk.png" command="_8TldkDYPEeuIF8EFjFT7JQ">
+        <visibleWhen xsi:type="ui:CoreExpression" xmi:id="_Q0VTsG4JEeuU94HWMR4Cpw" coreExpressionId="saros.ui.definitions.isConnectedIsSarosSessionRunningIsSarosSessionHostContactsSelectedContactsOnline"/>
+      </children>
+    </elements>
+  </fragments>
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_Gf3wkFNKEeu08YCit0yDew" featurename="addons" parentElementId="xpath:/">
+    <elements xsi:type="application:Addon" xmi:id="_wM054FlrEeuEKZi6t0yNyA" elementId="saros.eclipse.addon.StartupSaros" contributionURI="bundleclass://saros.eclipse/saros.StartupSaros"/>
+    <elements xsi:type="application:Addon" xmi:id="_HnzB8FNKEeu08YCit0yDew" elementId="saros.eclipse.addon.lifecycle" contributionURI="bundleclass://saros.eclipse/saros.Saros"/>
+  </fragments>
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_xkz-4H5qEeuGAvmTv33xSw" featurename="descriptors" parentElementId="xpath:/">
+    <elements xsi:type="basic:PartDescriptor" xmi:id="_zr5AIH5qEeuGAvmTv33xSw" elementId="saros.ui.views.SarosView" label="Saros" iconURI="platform:/plugin/saros.eclipse/icons/view16/saros_misc.png" category="Saros" closeable="true" contributionURI="bundleclass://saros.eclipse/saros.ui.views.SarosView">
+      <tags>View</tags>
+      <menus xsi:type="menu:PopupMenu" xmi:id="_Cf1KkFpFEeuz3aO_wpndrQ" elementId="saros.ui.popup.menu" label="SarosViewPopUpMenu">
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_MXCgQFpFEeuz3aO_wpndrQ" elementId="saros.eclipse.handledmenuitem.9" iconURI="platform:/plugin/saros.eclipse/icons/elcl16/session_tsk.png" command="_pZa5oDYPEeuIF8EFjFT7JQ">
+          <visibleWhen xsi:type="ui:CoreExpression" xmi:id="_BAjykG4BEeuU94HWMR4Cpw" coreExpressionId="saros.ui.definitions.isConnectedNotIsSarosSessionRunningSessionHeadlineSelected"/>
+        </children>
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_YWLGwG4EEeuU94HWMR4Cpw" elementId="saros.eclipse.handledmenuitem.10" iconURI="platform:/plugin/saros.eclipse/icons/elcl16/session_add_reference_points_tsk.png" command="_wvkAwDYPEeuIF8EFjFT7JQ">
+          <visibleWhen xsi:type="ui:CoreExpression" xmi:id="_be81kG4EEeuU94HWMR4Cpw" coreExpressionId="saros.ui.definitions.isConnectedIsSarosSessionRunningSessionHeadlineSelected"/>
+        </children>
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_Yrh2QG4FEeuU94HWMR4Cpw" elementId="saros.eclipse.handledmenuitem.11" iconURI="platform:/plugin/saros.eclipse/icons/elcl16/contact_add_tsk.png" command="_Y_2DIDYPEeuIF8EFjFT7JQ">
+          <visibleWhen xsi:type="ui:CoreExpression" xmi:id="_Z6s_IG4FEeuU94HWMR4Cpw" coreExpressionId="saros.ui.definitions.notContactsSelectedNotParticipantsSelectedNotSessionHeadlineSelected"/>
+        </children>
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_M3lcMG4HEeuU94HWMR4Cpw" elementId="saros.eclipse.handledmenuitem.12" iconURI="platform:/plugin/saros.eclipse/icons/elcl16/session_add_contacts_tsk.png" command="_0XH9UDYPEeuIF8EFjFT7JQ">
+          <visibleWhen xsi:type="ui:CoreExpression" xmi:id="_RXeu8G4HEeuU94HWMR4Cpw" coreExpressionId="saros.ui.definitions.isConnectedIsSarosSessionRunningSessionHeadlineSelectedIsSarosSessionHost"/>
+        </children>
+        <children xsi:type="menu:MenuSeparator" xmi:id="_6rY9IG-pEeuyL4e0Us5MYQ" elementId="menustart" visible="false" accessibilityPhrase=""/>
+        <children xsi:type="menu:DynamicMenuContribution" xmi:id="_ROHFgG-REeuc6LVEtDwz7A" elementId="saros.eclipse.dynamicmenucontribution.0" contributionURI="bundleclass://saros.eclipse/saros.ui.views.PopupMenu"/>
+        <children xsi:type="menu:MenuSeparator" xmi:id="_tLuWMG-tEeuyL4e0Us5MYQ" elementId="additions" visible="false"/>
+      </menus>
+      <toolbar xmi:id="_WgxKUFo6Eeuz3aO_wpndrQ" elementId="saros.eclipse.toolbar.e4.SarosView">
+        <children xsi:type="menu:DirectToolItem" xmi:id="_bpvrwFyqEeutX8G7YSyCRA" elementId="saros.ui.handlers.toolbar.ChangeXMPPAccountHandler" iconURI="platform:/plugin/saros.eclipse/icons/elcl16/xmpp_connect_tsk.png" tooltip="Connect" contributionURI="bundleclass://saros.eclipse/saros.ui.handlers.toolbar.ChangeXMPPAccountHandler">
+          <menu xmi:id="_SuTcoGL-EeuqzJnMI0FALg" elementId="saros.eclipse.sarosView.toolbar.connectToolItem.menu">
+            <children xsi:type="menu:DynamicMenuContribution" xmi:id="_Oy5aMGMCEeuqzJnMI0FALg" elementId="saros.eclipse.sarosView.toolbar.connectToolItem.menu.AddAccountToMenu" label="" contributionURI="bundleclass://saros.eclipse/saros.ui.handlers.toolbar.XMPPAccountMenu"/>
+            <children xsi:type="menu:MenuSeparator" xmi:id="_AFfKEHB1EeucHoOln_1qcQ" elementId="saros.eclipse.menuseparator.0"/>
+            <children xsi:type="menu:HandledMenuItem" xmi:id="_hOAncGL-EeuqzJnMI0FALg" elementId="saros.eclipse.sarosView.toolbar.connectToolItem.menu.addXMPPAccount" label="" command="_ji39ADYPEeuIF8EFjFT7JQ"/>
+            <children xsi:type="menu:HandledMenuItem" xmi:id="_r56wgGL-EeuqzJnMI0FALg" elementId="saros.eclipse.sarosView.toolbar.connectToolItem.menu.OpenSarosPreferences" label="Configure Accounts..." command="_h9fTkDYPEeuIF8EFjFT7JQ"/>
+          </menu>
+        </children>
+        <children xsi:type="menu:DirectToolItem" xmi:id="_SWzAEFpBEeuz3aO_wpndrQ" elementId="saros.ui.handlers.toolbar.NewContactHandler" label="" iconURI="platform:/plugin/saros.eclipse/icons/elcl16/contact_add_tsk.png" tooltip="Add a New Contact" contributionURI="bundleclass://saros.eclipse/saros.ui.handlers.toolbar.NewContactHandler"/>
+        <children xsi:type="menu:DirectToolItem" xmi:id="_NjsA8FpCEeuz3aO_wpndrQ" elementId="saros.ui.handlers.toolbar.OpenPreferencesHandler" label="" iconURI="platform:/plugin/saros.eclipse/icons/elcl16/preferences_open_tsk.png" tooltip="Open Saros Preferences" contributionURI="bundleclass://saros.eclipse/saros.ui.handlers.toolbar.OpenPreferencesHandler"/>
+        <children xsi:type="menu:ToolBarSeparator" xmi:id="_klH_YF17EeuWqNejT8lZfw" elementId="saros.eclipse.toolbarseparator.1"/>
+        <children xsi:type="menu:DirectToolItem" xmi:id="_lagIMF17EeuWqNejT8lZfw" elementId="saros.ui.handlers.toolbar.FollowModeHandler" iconURI="platform:/plugin/saros.eclipse/icons/merged16/user_saros_followmode_enabled.png" tooltip="Enter follow mode" contributionURI="bundleclass://saros.eclipse/saros.ui.handlers.toolbar.FollowModeHandler">
+          <menu xmi:id="_yfKRUF17EeuWqNejT8lZfw" elementId="saros.eclipse.menu.0"/>
+        </children>
+        <children xsi:type="menu:DirectToolItem" xmi:id="_h_YQsF1xEeuWqNejT8lZfw" elementId="saros.ui.handlers.toolbar.ConsistencyHandler" iconURI="platform:/plugin/saros.eclipse/icons/etool16/in_sync.png" tooltip="No inconsistencies" enabled="false" contributionURI="bundleclass://saros.eclipse/saros.ui.handlers.toolbar.ConsistencyHandler"/>
+        <children xsi:type="menu:ToolBarSeparator" xmi:id="_hFxp4FyaEeutX8G7YSyCRA" elementId="saros.eclipse.toolbarseparator.0"/>
+        <children xsi:type="menu:DirectToolItem" xmi:id="_5WSc4FyZEeutX8G7YSyCRA" elementId="saros.ui.handlers.toolbar.LeaveSessionHandler" label="" iconURI="platform:/plugin/saros.eclipse/icons/elcl16/session_leave_tsk.png" tooltip="Leave Session" contributionURI="bundleclass://saros.eclipse/saros.ui.handlers.toolbar.LeaveSessionHandler"/>
+      </toolbar>
+    </elements>
+  </fragments>
+</fragment:ModelFragments>

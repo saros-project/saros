@@ -20,7 +20,18 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.equinox.security,
  org.junit;resolution:=optional,
  org.eclipse.jdt.launching;resolution:=optional,
- saros.core
+ org.eclipse.e4.ui.model.workbench,
+ org.eclipse.e4.ui.di,
+ org.eclipse.osgi,
+ org.eclipse.e4.ui.services,
+ org.eclipse.e4.core.di.annotations,
+ saros.core,
+ org.eclipse.osgi.services,
+ org.eclipse.e4.ui.workbench,
+ org.eclipse.equinox.ds,
+ org.eclipse.equinox.event,
+ org.eclipse.equinox.util,
+ org.eclipse.e4.ui.workbench.addons.swt
 Bundle-ActivationPolicy: lazy
 Export-Package: saros;
   uses:="org.eclipse.core.runtime,
@@ -93,13 +104,14 @@ Export-Package: saros;
    org.eclipse.jface.viewers,
    saros.invitation,
    saros.net",
- saros.ui.command_handlers,
  saros.ui.decorators;
   uses:="org.eclipse.core.runtime,
    saros.resource_change_handlers,
    org.eclipse.jface.viewers,
    saros.editor,
    saros.invitation",
+ saros.ui.e4.command_handlers,
+ saros.ui.handlers.menu,
  saros.ui.model,
  saros.ui.preference_pages,
  saros.ui.util,
@@ -129,4 +141,10 @@ Export-Package: saros;
  saros.util;uses:="org.eclipse.core.resources,org.jivesoftware.smack.packet"
 Bundle-Vendor: Saros Project
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Import-Package: org.eclipse.core.filesystem
+Import-Package: javax.annotation;version="1.2.0",
+ javax.inject,
+ org.eclipse.core.filesystem,
+ org.eclipse.e4.core.commands,
+ org.eclipse.e4.core.services.events,
+ org.eclipse.e4.ui.workbench.modeling,
+ org.osgi.service.event;version="1.4.0"
