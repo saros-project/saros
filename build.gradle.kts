@@ -133,7 +133,7 @@ subprojects {
      * Make common dependency definitions accessible by all sub-projects
      */
     val junitVersion = "junit:junit:4.12"
-    val log4j2VersionNr = "2.13.3"
+    val log4j2VersionNr = "2.15.0"
     val log4j2Api = "org.apache.logging.log4j:log4j-api:$log4j2VersionNr"
     val log4j2Core = "org.apache.logging.log4j:log4j-core:$log4j2VersionNr"
     // Bridge that routes log4j calls to log4j2
