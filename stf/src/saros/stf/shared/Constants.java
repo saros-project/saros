@@ -126,6 +126,7 @@ public interface Constants {
   String LABEL_SOURCE_FOLDER = "Source folder:";
   String LABEL_PACKAGE = "Package:";
   String LABEL_NAME = "Name:";
+  String LABEL_CREATE_MODULE = "Create module-info.java file";
 
   /* *********************************************
    *
