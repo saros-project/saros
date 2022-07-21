@@ -44,13 +44,6 @@ workflow with:
 See configuration [`stf.yml`](https://github.com/saros-project/saros/blob/master/.github/workflows/stf.yml).
 
 
-## Java 11 Compatibility
-
-We build Saros every week with JDK 11 to verify that the project is still compatible
-with JDK 11.
-
-See configuration [`build_jdk11.yml`](https://github.com/saros-project/saros/blob/master/.github/workflows/build_jdk11.yml)
-
 ## Documentation
 
 All documentation changes (via pushing a commit or opening a Pull Request) trigger a build of the Jekyll documentation.
