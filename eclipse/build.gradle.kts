@@ -40,13 +40,11 @@ sourceSets {
 
 dependencies {
     implementation(project(":saros.core"))
-    // This is a workaround for https://github.com/saros-project/saros/issues/1086
-    implementation("org.eclipse.platform:org.eclipse.urischeme:1.1.0")
-    // This is a workaround for https://github.com/saros-project/saros/issues/1138
-    implementation("org.eclipse.platform:org.eclipse.e4.core.di:1.7.600")
-    // This is a workaround for https://github.com/saros-project/saros/issues/1114
-    implementation("org.eclipse.platform:org.eclipse.ui.ide:3.17.200")
-    implementation("org.eclipse.platform:org.eclipse.ui.workbench:3.120.0")
+
+    // workaround for "signer information does not match signer information
+    // of other classes in the same package" when using older versions like 3.16.300
+    implementation("org.eclipse.platform:org.eclipse.jface.text:3.20.100")
+
     testImplementation(project(path = ":saros.core", configuration = "testing"))
 }
 
