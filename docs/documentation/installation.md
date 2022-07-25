@@ -11,14 +11,14 @@ have a look at the [getting started](getting-started.md) guide.
 {% capture eclipse %}
 
 Saros/E requires
-*  `JDK 8` or newer
+*  `JDK 11` (preferred [Eclipse Temurin](https://adoptium.net/de/temurin/releases?version=11)) or an Version older than Java 16 (see [current issue](https://github.com/saros-project/saros/issues/1142))
 *  `Eclipse 4.8` or newer (download [here](http://www.eclipse.org/downloads/))
 
 {% endcapture %}
 {% capture intellij %}
 
 Saros/I requires
- - `JDK 8` or newer
+*  `JDK 11` (preferred [Eclipse Temurin](https://adoptium.net/de/temurin/releases?version=11)) or an Version older than Java 16 (see [current issue](https://github.com/saros-project/saros/issues/1142))
  - `IntelliJ 2019.2.3` or newer (download [here](https://www.jetbrains.com/idea/download/))
    - Other [IDEs based on the IntelliJ platform](https://www.jetbrains.org/intellij/sdk/docs/intro/intellij_platform.html#ides-based-on-the-intellij-platform) version `2019.2.3` or newer are supported as well
 

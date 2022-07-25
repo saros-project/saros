@@ -17,7 +17,7 @@ If you have found an issue that you would like to work on, please first comment 
 In order to start with developing Saros you just need:
 
 * a **git** installation and
-* a **JDK 8** installation.
+* a **JDK 11** (preferred [Eclipse Temurin](https://adoptium.net/de/temurin/releases?version=11)) or an Version older than Java 16 (see [current issue](https://github.com/saros-project/saros/issues/1142))s installation.
 
 Clone the repository (`git clone https://github.com/saros-project/saros.git`) and build Saros via your IDE (more information [here](https://www.saros-project.org/contribute/development-environment.html))
 or via CLI (more information [here](https://www.saros-project.org/contribute/development-environment.html#develop-without-an-ide)).

@@ -189,6 +189,8 @@ public final class NewC extends StfRemoteObject implements INewC {
     SWTBotShell shell = new SWTBot().shell(SHELL_NEW_JAVA_PROJECT);
     shell.activate();
     shell.bot().textWithLabel(LABEL_PROJECT_NAME).setText(projectName);
+    shell.bot().button(NEXT).click();
+    shell.bot().checkBox(LABEL_CREATE_MODULE).deselect(); // otherwise we get a choose name dialog
     shell.bot().button(FINISH).click();
     shell.bot().waitUntil(Conditions.shellCloses(shell), SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
   }
