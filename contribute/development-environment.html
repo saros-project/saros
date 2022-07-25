@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+  <title>Saros Development Environment</title>
+  <meta charset='utf-8'>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,maximum-scale=2">
+
+  <!-- stylesheets -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+  <link rel="stylesheet" href="/assets/main.css">
+ 
+  <!-- favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#603cba">
+  <meta name="theme-color" content="#ffffff">
+</head>
+
+
+<body>
+  <div class="bg-dark">
+  <div class="container-fluid">
+    <nav id="top-nav" class="navbar navbar-expand-sm navbar-dark bg-dark py-2 px-0">
+      <!-- Logo -->
+      <a class="ml-md-3 navbar-brand" href="/">
+        <img class="float-left" src="/assets/images/logo/saros-logo.svg" />
+        <span class="text-decoration-none pl-2 d-inline d-sm-none d-md-inline pr-5">Saros</span>
+      </a>
+
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
+        aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <ul class="navbar-nav">
+        
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/documentation">User Docs</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/releases">Releases</a>
+        </li>
+        
+        
+        
+        <li class="nav-item active">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/contribute">Contribute</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/contact">Contact</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/research">Research</a>
+        </li>
+        
+      </ul>
+      </div>
+
+      <!-- Social Media -->
+      <div id="media-links-nav" class="collapse navbar-collapse">
+        </ul>
+        <ul class="navbar-nav ml-auto">
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/saros-project/saros">
+              <i class="fab fa-github fa-lg"> </i>
+            </a>
+          </li>
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://gitter.im/saros-project/saros/user">
+              <i class="fab fa-gitter fa-lg"> </i>
+            </a>
+          </li>
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://groups.google.com/forum/#!forum/saros-user">
+              <i class="fas fa-envelope fa-lg"> </i>
+            </a>
+          </li>
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://twitter.com/saros_project">
+              <i class="fab fa-twitter fa-lg"> </i>
+            </a>
+          </li>
+          
+        </ul>
+      </div>
+    </nav>
+  </div>
+</div>
+
+  <div class="container-fluid">
+
+    
+    
+
+    
+
+    <div class="row justify-content-left flex-xl-nowrap">
+      <!-- Left sidebar -->
+      <div class="col-12 col-md-4 col-xl-3 my-3 px-0  ">
+        
+        <div id="sidebar" class="pl-1">
+    <ul class="nav flex-column">
+        
+
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item active-link font-weight-bold py-0"
+                href="/contribute/development-environment.html">Development Environment</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/guidelines.html">Guidelines</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/best-practices.html">Best Practices</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/documentation.html">Documentation Writing</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/saros-testing-framework.html">Saros Testing Framework</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/saros-server.html">Saros Server Development</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/logging.html">Logging</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        
+        <li class="nav-item">
+
+            
+            
+            
+
+            <a class="font-weight-bold nav-link py-0 collapsable-side-item collapsed" href="#Processes"
+                data-target="#Processes" data-toggle="collapse">Processes</a>
+            <div id="Processes" class="collapse ">
+                <ul class="nav flex-column ml-2">
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/contribute/processes/development.html">Development Process</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/contribute/processes/continuous-integration.html">Continuous Integration</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/contribute/processes/review.html">Review Process</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/contribute/processes/release.html">Release Process</a></li>
+                    
+                </ul>
+            </div>
+        </li>
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/open-topics.html">Open Topics</a>
+        </li>
+
+        
+        
+    </ul>
+
+</div>
+        
+      </div>
+
+      <div id="main-content"
+        class="col-12 col-md-8 col-lg-6 main-content my-3 px-sm-2 px-md-1 px-xl-0">
+
+        <h1 class="display-4">Saros Development Environment</h1>
+        <p>The following page describes how a development environment can be set up in order to develop all Saros products (Eclipse-Plugin, IntelliJ-Plugin and Server).
+If you want to execute the STF tests it is recommended to use Eclipse. Otherwise it is also possible to develop with IntelliJ IDEA and execute the STF tests in a docker container.</p>
+
+<h2 id="common">Common</h2>
+
+<ul>
+  <li>You have to <a href="https://help.github.com/articles/cloning-a-repository/">clone</a> the Saros repository with <a href="https://git-scm.com/book/en/v2/Getting-Started-Installing-Git">git</a>.</li>
+  <li>You need a <strong>Java 11 JDK</strong> (preferred <a href="https://adoptium.net/de/temurin/releases?version=11">Eclipse Temurin</a>) or using <a href="https://sdkman.io/install">SDKMAN</a> to manage <a href="https://sdkman.io/jdks">multiple JDKs</a>).</li>
+  <li><em>Optional:</em> You can use a local <strong>IntelliJ IDEA</strong> installation (version <code class="language-plaintext highlighter-rouge">2019.2.3</code> or newer) for dependency resolution by setting the <strong>system-wide environment variable <code class="language-plaintext highlighter-rouge">INTELLIJ_HOME</code></strong> to the IntelliJ installation directory that contains the directory <code class="language-plaintext highlighter-rouge">lib</code>.
+If the <code class="language-plaintext highlighter-rouge">INTELLIJ_HOME</code> variable is not set, the intellij-gradle-plugin will download and use the IntelliJ version specified in the <code class="language-plaintext highlighter-rouge">build.gradle</code> file of the ‘intellij’ project.</li>
+  <li><em>Optional:</em> You can also set the <strong>system-wide environment variable <code class="language-plaintext highlighter-rouge">SAROS_INTELLIJ_SANDBOX</code></strong> to specify the base directory in which the IntelliJ sandboxes will be created. Otherwise, the directory <code class="language-plaintext highlighter-rouge">intellij/build</code> in the repository will be used by default.</li>
+</ul>
+
+<h3 id="google-java-format">Google Java Format</h3>
+
+<p>We are using <a href="https://github.com/google/google-java-format">google java format</a> to ensure that our source code adheres to unified formatting rules.
+This is checked on our build server, so please make sure to format your code with the tool before pushing.
+For ease of use, the formatter can also be integrated into the default formatting logic of Eclipse and IntelliJ through a plugin.
+Installation instructions are given in the IDE specific sections on the topic (<a href="#install-and-enable-google-java-formatter">Eclipse</a>, <a href="#install-and-enable-google-java-formatter-1">IntelliJ</a>).</p>
+
+<p><strong>Important:</strong> We still use <a href="https://github.com/google/google-java-format/releases/tag/google-java-format-1.6"><strong>google java format 1.6</strong></a> as the maintainers of the tool have not provided an official build of the corresponding Eclipse plugin for later versions.</p>
+
+<h3 id="gradle-setup-on-widows">Gradle Setup on Widows</h3>
+
+<p>If you are developing on a Windows system using multiple drives, please make sure that the Gradle cache (contained in the <code class="language-plaintext highlighter-rouge">.gradle</code> directory) is located on the same drive as the Saros repository.</p>
+
+<p>This can be done by either ensuring that the git repository is located on the same drive as the <a href="https://docs.gradle.org/current/userguide/directory_layout.html#dir:gradle_user_home">default Gradle user home directory</a> or by setting a different base directory for the Gradle user home using the environment variable <code class="language-plaintext highlighter-rouge">GRADLE_USER_HOME</code>.</p>
+
+<h2 id="develop-with-eclipse">Develop with Eclipse</h2>
+
+<p>If you develop on Eclipse you should have already installed the Eclipse version (if you plan to run the STF tests, please install the version specified in the <a href="/contribute/saros-testing-framework.html#prerequisites">STF documentation</a>) for “Eclipse Committers”.</p>
+
+<h3 id="configure">Configure</h3>
+
+<h4 id="use-the-saros-clean-up-profile">Use the Saros Clean-Up Profile</h4>
+
+<ul>
+  <li>Right-click the “Saros” project in the project explorer and navigate to<br />
+<code class="language-plaintext highlighter-rouge">Properties &gt; Java Code Style &gt; Clean up</code></li>
+  <li>Under the box <code class="language-plaintext highlighter-rouge">Active profile:</code>, click <code class="language-plaintext highlighter-rouge">Import...</code></li>
+  <li>Select the profile <a href="https://github.com/saros-project/saros/blob/master/eclipse/clean-up-profile.xml"><code class="language-plaintext highlighter-rouge">saros/clean-up-profile.xml</code></a></li>
+</ul>
+
+<h4 id="install-and-enable-google-java-formatter">Install and Enable Google Java Formatter</h4>
+
+<ul>
+  <li>Install the <a href="https://github.com/google/google-java-format#eclipse">Eclipse Google Java Formatter</a> <strong>version 1.6</strong>, which is available as a Drop-In in the <a href="https://github.com/google/google-java-format/releases/tag/google-java-format-1.6">GitHub Releases</a>.</li>
+  <li>Enable the formatter by choosing <code class="language-plaintext highlighter-rouge">google-java-format</code> in <code class="language-plaintext highlighter-rouge">Window &gt; Preferences &gt; Java &gt; Code Style &gt; Formatter &gt; Formatter Implementation</code></li>
+</ul>
+
+<h3 id="import-the-saros-project">Import the Saros Project</h3>
+
+<ul>
+  <li>Open a bash terminal, navigate to the repository directory and execute <code class="language-plaintext highlighter-rouge">./gradlew prepareEclipse</code> (use <code class="language-plaintext highlighter-rouge">./gradlew.bat</code> for windows)</li>
+  <li>Import the project as Git project</li>
+  <li>If you add dependencies you have to execute the <code class="language-plaintext highlighter-rouge">prepareEclipse</code> task again in order to regenerate the dependency information for Eclipse.</li>
+</ul>
+
+<h2 id="develop-with-intellij">Develop with IntelliJ</h2>
+
+<p>It is necessary to import the Saros project and change the project setting so that all build/test/debug actions are processed
+by Gradle.</p>
+
+<p>See <a href="/contribute/saros-testing-framework.html">the Saros testing framework documentation</a> for more information about interactive testing in the IntelliJ environment.</p>
+
+<h3 id="configure-1">Configure</h3>
+
+<h4 id="install-and-enable-google-java-formatter-1">Install and Enable Google Java Formatter</h4>
+
+<ul>
+  <li>Install the <a href="https://plugins.jetbrains.com/plugin/8527-google-java-format">IntelliJ Google Java Formatter</a> <strong>version 1.6</strong> which is available in the IntelliJ plugin repository (search for <code class="language-plaintext highlighter-rouge">google-java-format</code>) or in the <a href="https://github.com/google/google-java-format/releases/tag/google-java-format-1.6">GitHub Releases</a>.</li>
+</ul>
+
+<p><strong>Important:</strong> If you are using an IntelliJ version newer than 2018.2, the official 1.6 release will not work for you as it’s configured to be incompatible with newer IntelliJ releases.
+These compatibility settings were adjusted for later versions of the plugin, but such changes are not available for the 1.6 release.</p>
+
+<p>To avoid the issue, you can have a look at the discussion on the <a href="https://github.com/saros-project/saros/pull/395">PR #395</a>, where we provide a modified plugin zip and reference the adjusted version of the source code if you prefer to build the plugin yourself instead.</p>
+
+<h4 id="delegate-ide-action">Delegate IDE Action</h4>
+
+<p>This is necessary in order to allow IntelliJ to execute all build and test action via Gradle.</p>
+<ul>
+  <li>Navigate to <code class="language-plaintext highlighter-rouge">Settings &gt; Build, Exection, Deployment &gt; Build Tools &gt; Gradle &gt; Runner</code></li>
+  <li>Check the box <code class="language-plaintext highlighter-rouge">Delegate IDE build/run actions to gradle</code></li>
+  <li>Select <code class="language-plaintext highlighter-rouge">Gradle Test Runner</code> in the drop-down box with the caption <code class="language-plaintext highlighter-rouge">Run tests using</code></li>
+</ul>
+
+<h3 id="open-project">Open Project</h3>
+
+<p><strong>Don’t import the project.</strong> Otherwise all existing IntelliJ configurations (e.g. formatting rules) will be removed.</p>
+
+<ul>
+  <li>Click on <code class="language-plaintext highlighter-rouge">Open</code></li>
+  <li>Select the repository root as project root and click <code class="language-plaintext highlighter-rouge">OK</code></li>
+</ul>
+
+<h2 id="develop-without-an-ide">Develop Without an IDE</h2>
+
+<p>If you prefer to develop with a text editor (like Vim or Emacs) you can build and test
+the code via Gradle. In order to call a task you have to execute <code class="language-plaintext highlighter-rouge">./gradlew &lt;task&gt;...</code> in
+your local Saros repository root directory.</p>
+
+<p>The following tasks are used to build and test the different Saros components:</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">cleanAll</code> - Removes all build and test artifacts</li>
+  <li><code class="language-plaintext highlighter-rouge">sarosEclipse</code> - Triggers the build and test of the Saros Eclipse Plugin</li>
+  <li><code class="language-plaintext highlighter-rouge">sarosIntellij</code> - Triggers the build and test of the Saros IntelliJ Plugin</li>
+  <li><code class="language-plaintext highlighter-rouge">sarosServer</code> - Triggers the build and test of the Saros Server</li>
+  <li><code class="language-plaintext highlighter-rouge">prepareEclipse</code> - Executes all tasks which are required before developing in Eclipse</li>
+  <li><code class="language-plaintext highlighter-rouge">runIde</code> - Starts a IntelliJ IDE containing the Saros Plugin. The IDE version depends on the value of <code class="language-plaintext highlighter-rouge">INTELLIJ_HOME</code> or the <code class="language-plaintext highlighter-rouge">intellijVersion</code> specified in the build file of the IntelliJ package.</li>
+</ul>
+
+<p>In order to build the whole project without using existing build artifacts simply call <code class="language-plaintext highlighter-rouge">./gradlew cleanAll sarosEclipse sarosIntellij sarosServer</code>.</p>
+
+<p>Gradle checks whether the component specific sources are changed. Therefore a task become a NOP if nothing changed and the build results still exist.
+If you want to force Gradle to re-execute the tasks, you have to call <code class="language-plaintext highlighter-rouge">./gradlew --rerun-tasks &lt;task&gt;...</code> or call the <code class="language-plaintext highlighter-rouge">cleanAll</code> task before other tasks.
+The final build results are copied into the directory <code class="language-plaintext highlighter-rouge">&lt;repository root&gt;/build/distribute/(eclipse|intellij)</code>.</p>
+
+<h3 id="formatting-via-standalone-google-java-formatter">Formatting via Standalone Google Java Formatter</h3>
+
+<ul>
+  <li>Download the <strong>release 1.6</strong> of the <a href="https://github.com/google/google-java-format/releases/tag/google-java-format-1.6">Google Java Formatter</a> <code class="language-plaintext highlighter-rouge">google-java-format-&lt;version&gt;-all-deps.jar</code></li>
+  <li>Call <code class="language-plaintext highlighter-rouge">java -jar google-java-format-&lt;version&gt;-all-deps.jar --dry-run --set-exit-if-changed **/*.java</code> in a shell with enabled globstar (<code class="language-plaintext highlighter-rouge">shopt -s globstar</code>) to <strong>check the formatting</strong>
+and add the option <code class="language-plaintext highlighter-rouge">--replace</code> and remove the option <code class="language-plaintext highlighter-rouge">--dry-run</code> if you want to <strong>trigger automated formatting</strong>.</li>
+</ul>
+
+<h2 id="format-checking-in-a-git-hook">Format Checking in a Git Hook</h2>
+
+<p>If you want to check that your commit does not contain wrong formatted code use a git pre-commit hook.</p>
+<ul>
+  <li>Create an executable file in your repository <code class="language-plaintext highlighter-rouge">.git/hooks/pre-commit</code> which executes the standalone formatter as described in the previous section.</li>
+</ul>
+
+<h3 id="example-git-hook">Example Git Hook</h3>
+
+<p>Example hook that checks only java files that are staged.</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="c">#!/bin/bash</span>
+  <span class="c"># check for dependent tools</span>
+  <span class="nv">commands</span><span class="o">=</span><span class="s2">"grep tr curl java"</span>
+  <span class="k">for </span>cmd <span class="k">in</span> <span class="nv">$commands</span><span class="p">;</span> <span class="k">do
+    </span>which <span class="nv">$cmd</span> <span class="o">&gt;</span> /dev/null
+    <span class="o">[</span> <span class="s2">"</span><span class="nv">$?</span><span class="s2">"</span> <span class="o">!=</span> <span class="s2">"0"</span> <span class="o">]</span> <span class="o">&amp;&amp;</span> <span class="nb">echo</span> <span class="s2">"Command '</span><span class="nv">$cmd</span><span class="s2">' not available git hook is disabled"</span> <span class="o">&amp;&amp;</span> <span class="nb">exit </span>0
+  <span class="k">done</span>
+  <span class="c"># define jar location</span>
+  <span class="nv">formatter_jar_path</span><span class="o">=</span>/tmp/formatter.jar
+  <span class="c"># download stand-alone formatter</span>
+  <span class="k">function </span>download_formatter<span class="o">()</span> <span class="o">{</span>
+    <span class="nb">local </span><span class="nv">jar_path</span><span class="o">=</span><span class="nv">$1</span>
+    <span class="nb">local </span><span class="nv">url</span><span class="o">=</span><span class="s2">"https://repo.maven.apache.org/maven2/com/google/googlejavaformat/google-java-format/1.6/google-java-format-1.6-all-deps.jar"</span>
+    <span class="nb">set</span> <span class="nt">-e</span>
+    curl <span class="nt">-Lo</span> <span class="nv">$jar_path</span> <span class="s2">"</span><span class="nv">$url</span><span class="s2">"</span> <span class="o">&gt;</span> /dev/null
+    <span class="nb">set</span> +e
+  <span class="o">}</span>
+  <span class="c"># check whether formatter already exist</span>
+  <span class="o">[</span> <span class="o">!</span> <span class="nt">-f</span> <span class="s2">"</span><span class="nv">$formatter_jar_path</span><span class="s2">"</span> <span class="o">]</span> <span class="o">&amp;&amp;</span> download_formatter <span class="s2">"</span><span class="nv">$formatter_jar_path</span><span class="s2">"</span>
+  <span class="c"># get staged java files (deleted files are excluded)</span>
+  <span class="nv">files_to_check</span><span class="o">=</span><span class="sb">`</span>git diff <span class="nt">--cached</span> <span class="nt">--name-only</span> <span class="nt">--diff-filter</span><span class="o">=</span>d | <span class="nb">grep</span> <span class="s2">"^.*.java$"</span> | <span class="nb">tr</span> <span class="s1">'\n'</span> <span class="s1">' '</span><span class="sb">`</span>
+  <span class="c"># execute formatter if java files are staged</span>
+  <span class="k">if</span> <span class="o">[[</span> <span class="o">!</span> <span class="nt">-z</span> <span class="s2">"</span><span class="k">${</span><span class="nv">files_to_check</span><span class="p">// </span><span class="k">}</span><span class="s2">"</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then
+    </span>java <span class="nt">-jar</span> <span class="s2">"</span><span class="nv">$formatter_jar_path</span><span class="s2">"</span> <span class="nt">--dry-run</span> <span class="nt">--set-exit-if-changed</span> <span class="nv">$files_to_check</span>
+    <span class="nv">rc</span><span class="o">=</span><span class="nv">$?</span>
+    <span class="o">[</span> <span class="s2">"</span><span class="nv">$rc</span><span class="s2">"</span> <span class="o">!=</span> <span class="s2">"0"</span> <span class="o">]</span> <span class="o">&amp;&amp;</span> <span class="nb">printf</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">Git hook: Formatting issues in the file listed above</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="nb">exit</span> <span class="nv">$rc</span>
+  <span class="k">fi
+  </span><span class="nb">exit </span>0
+</code></pre></div></div>
+
+
+      </div>
+
+      <!-- Right sidebar (TOC) -->
+      <div id="toc-bar-column" class="d-none d-lg-block col-12 col-lg-3 col-xl-3 px-0">
+        
+        <!-- element filled by loadToc() from toc.js -->
+        <ul id="toc-bar" class="sticky-top text-decoration-none nav toc-bar py-3"></ul>
+        
+      </div>
+    </div>
+  </div>
+
+  <footer class="page-footer font-small w-100 position-absolute">
+
+  <div class="text-center my-3">
+    
+    
+    <a href="https://github.com/saros-project/saros">
+      <i class="fab fa-github fa-lg text-white mr-3 mr-md-5"> </i>
+    </a>
+    
+    
+    <a href="https://gitter.im/saros-project/saros/user">
+      <i class="fab fa-gitter fa-lg text-white mr-3 mr-md-5"> </i>
+    </a>
+    
+    
+    <a href="https://groups.google.com/forum/#!forum/saros-user">
+      <i class="fas fa-envelope fa-lg text-white mr-3 mr-md-5"> </i>
+    </a>
+    
+    
+    <a href="https://twitter.com/saros_project">
+      <i class="fab fa-twitter fa-lg text-white "> </i>
+    </a>
+    
+  </div>
+
+</footer>
+  <script src="/node_modules/jquery/dist/jquery.min.js"></script>
+<script src="/node_modules/popper.js/dist/umd/popper.min.js"></script>
+<script src="/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+
+<script src="/node_modules/mermaid/dist/mermaid.min.js"></script>
+<script>
+mermaid.initialize({
+    startOnLoad: true
+});
+</script>
+<!-- load after its dependency jquery -->
+
+<script src="/assets/js/ide-tabs.js"></script>
+<script src="/assets/js/toc.js"></script>
+<script src="/assets/js/header-anchor-links.js"></script>
+
+</body>
+
+</html>

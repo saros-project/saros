@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+  <title>HTML-GUI (Deprecated)</title>
+  <meta charset='utf-8'>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,maximum-scale=2">
+
+  <!-- stylesheets -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+  <link rel="stylesheet" href="/assets/main.css">
+ 
+  <!-- favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#603cba">
+  <meta name="theme-color" content="#ffffff">
+</head>
+
+
+<body>
+  <div class="bg-dark">
+  <div class="container-fluid">
+    <nav id="top-nav" class="navbar navbar-expand-sm navbar-dark bg-dark py-2 px-0">
+      <!-- Logo -->
+      <a class="ml-md-3 navbar-brand" href="/">
+        <img class="float-left" src="/assets/images/logo/saros-logo.svg" />
+        <span class="text-decoration-none pl-2 d-inline d-sm-none d-md-inline pr-5">Saros</span>
+      </a>
+
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
+        aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <ul class="navbar-nav">
+        
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/documentation">User Docs</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/releases">Releases</a>
+        </li>
+        
+        
+        
+        <li class="nav-item active">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/contribute">Contribute</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/contact">Contact</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/research">Research</a>
+        </li>
+        
+      </ul>
+      </div>
+
+      <!-- Social Media -->
+      <div id="media-links-nav" class="collapse navbar-collapse">
+        </ul>
+        <ul class="navbar-nav ml-auto">
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/saros-project/saros">
+              <i class="fab fa-github fa-lg"> </i>
+            </a>
+          </li>
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://gitter.im/saros-project/saros/user">
+              <i class="fab fa-gitter fa-lg"> </i>
+            </a>
+          </li>
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://groups.google.com/forum/#!forum/saros-user">
+              <i class="fas fa-envelope fa-lg"> </i>
+            </a>
+          </li>
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://twitter.com/saros_project">
+              <i class="fab fa-twitter fa-lg"> </i>
+            </a>
+          </li>
+          
+        </ul>
+      </div>
+    </nav>
+  </div>
+</div>
+
+  <div class="container-fluid">
+
+    
+    
+
+    
+
+    <div class="row justify-content-left flex-xl-nowrap">
+      <!-- Left sidebar -->
+      <div class="col-12 col-md-4 col-xl-3 my-3 px-0  ">
+        
+        <div id="sidebar" class="pl-1">
+    <ul class="nav flex-column">
+        
+
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/development-environment.html">Development Environment</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/guidelines.html">Guidelines</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/best-practices.html">Best Practices</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/documentation.html">Documentation Writing</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/saros-testing-framework.html">Saros Testing Framework</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/saros-server.html">Saros Server Development</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/logging.html">Logging</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        
+        <li class="nav-item">
+
+            
+            
+            
+
+            <a class="font-weight-bold nav-link py-0 collapsable-side-item collapsed" href="#Processes"
+                data-target="#Processes" data-toggle="collapse">Processes</a>
+            <div id="Processes" class="collapse ">
+                <ul class="nav flex-column ml-2">
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/contribute/processes/development.html">Development Process</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/contribute/processes/continuous-integration.html">Continuous Integration</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/contribute/processes/review.html">Review Process</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/contribute/processes/release.html">Release Process</a></li>
+                    
+                </ul>
+            </div>
+        </li>
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/contribute/open-topics.html">Open Topics</a>
+        </li>
+
+        
+        
+    </ul>
+
+</div>
+        
+      </div>
+
+      <div id="main-content"
+        class="col-12 col-md-8 col-lg-6 main-content my-3 px-sm-2 px-md-1 px-xl-0">
+
+        <h1 class="display-4">HTML-GUI (Deprecated)</h1>
+        <p>After starting the development of the Saros for IntelliJ version, the idea came up to develop an agnostic GUI that allows to maintain just one GUI independent of the IDE.
+The selected solution was to embed a browser that renders a JavaScript/HTML-GUI and communicates all information to the Java backend.
+The main issue with this approach is the integration of a browser that is easy to release without creating a big jar file that contains a whole browser.
+The first implementation used the SWT-Browser. The second approach used the JavaFX WebView that is based on WebKit.
+In the following you find a list of pro and cons for each approach and why we were not able to use the approach. If you want to go even more back in time see this <a href="https://www.inf.fu-berlin.de/inst/ag-se/theses/Cikryt15-saros-browser-as-ide-gui.pdf">thesis</a>.</p>
+
+<h2 id="swt-browser">SWT-Browser</h2>
+<p>The solution based on the SWT browser used the SWTBrowser which was delivered with the swt toolkit that is released with eclipse.</p>
+
+<h3 id="eclipse-integration">Eclipse Integration</h3>
+<p>In order to build and test Saros it was necessary to download an OS specific SWT version (this was handled by the build tool). It was easy to
+release the solution for eclipse, because eclipse already provides a swt version, because the whole IDE is written in swt.</p>
+
+<h3 id="intellij-integration">IntelliJ Integration</h3>
+<p>The IntelliJ version of the integration required to load a swt version manually which was loaded during runtime of Saros with a self-written
+SWT loader. This is not a solution that is safe to be released. The whole IntelliJ specific code was located in the package <code class="language-plaintext highlighter-rouge">saros.intellij.ui.swt_browser</code>.</p>
+
+<h3 id="issues-with-the-integration">Issues With the Integration</h3>
+<p>Even if the SWT library was available and loaded, the browser integration was brittle.
+This was rooted in the way the SWT browser was implemented. Instead of releasing an browser with swt, the OS default browser is used.
+This integration of the default browser was brittle on all platforms, but the most unstable was Linux. The newer versions of swt (e.g. swt released with eclipse 4.8) are more stable, but the <code class="language-plaintext highlighter-rouge">BrowserFunction</code> (allows to call java from javascript) was still not stable in all versions (unavailable in 4.8-4.12 due to <a href="https://bugs.eclipse.org/bugs/show_bug.cgi?id=538335">#538335</a>).</p>
+
+<h2 id="javafx">JavaFX</h2>
+<p>The second approach was to embed a view of the GUI toolkit JavaFX scene into the view of the Saros plugin. JavaFX provides a WebView with integrated WebKit version.
+Furthermore, JavaFX provides a bridge to swt as well as to swing. Therefore it is possible to embed a JavaFX component into an eclipse plugin (that uses swt) as well
+as into an IntelliJ plugin (that uses swing).</p>
+
+<h3 id="eclipse-integration-1">Eclipse Integration</h3>
+<p>We integrated JavaFX in eclipse with the help of the efxclipse tooling and integrated the feature <code class="language-plaintext highlighter-rouge">org.eclipse.fx.target.rcp.feature</code>.
+This feature provides the osgi bundle <code class="language-plaintext highlighter-rouge">org.eclipse.fx.ui.workbench3</code>. This bundle provides the class <code class="language-plaintext highlighter-rouge">org.eclipse.fx.ui.workbench3.FXPartView</code> that allows to write an e3 (old eclipse ui model) view with JavaFX components.
+This class simply wraps the <code class="language-plaintext highlighter-rouge">javafx.embed.swt.FXCanvas</code>. In order to load the JavaFX library during runtime the osgi bundle <code class="language-plaintext highlighter-rouge">org.eclipse.fx.osgi</code> is also provided. This bundle is a fragment of the bundle <code class="language-plaintext highlighter-rouge">org.eclipse.osgi</code> and adds a hook that enhances the classpath of eclipse in order to load the additional javafx/swt jar that allows to integrate javafx components into swt. If this bundle is missing, the class <code class="language-plaintext highlighter-rouge">javafx.embed.swt.FXCanvas</code> is missing.</p>
+
+<h3 id="intellij-integration-1">IntelliJ Integration</h3>
+<p>The integration into IntelliJ was straightforward: create and use a <code class="language-plaintext highlighter-rouge">javafx.embed.swing.JFXPanel</code>. The following <a href="https://stackoverflow.com/a/35611230/6948317">post</a> gives an implementation example.</p>
+
+<h3 id="eclipse-tests">Eclipse Tests</h3>
+<p>The first tests on Windows and Linux were successful (tested with Eclipse Neon, Oxygen, 2019-06 and JDK8-9). The only issue
+was that it was necessary with JDK8 to force eclipse to use GTK 2, because the JavaFX library (shipped with JDK8) was linked to GTK 2.</p>
+
+<p>For using this solution with JDK8-10 it would be necessary to install JavaFX or download a JDK with JavaFX.
+Unfortunately, it was decided that the JavaFX library is not released with the JDK anymore.
+Therefore, the way changed how JavaFX is used. The <a href="https://openjfx.io/openjfx-docs">official documentation</a> proposes the following solutions:</p>
+<ul>
+  <li>Add the JavaFX modules into the module path of your <code class="language-plaintext highlighter-rouge">java</code>/<code class="language-plaintext highlighter-rouge">javac</code> call (would require that the user changes the IDE start script).</li>
+  <li>Create a platform-specific runtime image/JRE containing the JavaFX version. (would require to ship a Saros JDK or the user would have to create an own JRE)</li>
+</ul>
+
+<p>Both variants are not applicable, because we are a plugin that has to use what is provided by the IDE.</p>
+
+<p>One approach that might work for eclipse, but not Intellij (therefore we never tried the approach) could be:</p>
+<ul>
+  <li>Create osgi bundles for each JavaFX module for each platform</li>
+  <li>Add a corresponding <code class="language-plaintext highlighter-rouge">Eclipse-PlatformFilter:</code> to the manifest file.</li>
+  <li>Add the line <code class="language-plaintext highlighter-rouge">Java-Module: &lt;JavaFX module name&gt;</code> to the manifest file.</li>
+  <li>Provide all bundles via an update-site an hope that the eclipse plugin installer decides which platform is required and installs only the required version.</li>
+  <li>The <code class="language-plaintext highlighter-rouge">org.eclipse.fx.osgi</code> bundle should detect the JavaFX bundle and add it to the class or module path during runtime.</li>
+</ul>
+
+<h3 id="intellij-tests">IntelliJ Tests</h3>
+<p>We tested the IntelliJ version only with 2019-01 and the corresponding JDKs after we noticed that the approach does not work in all cases.</p>
+
+<h2 id="usage-of-the-removed-html-gui">Usage of the Removed HTML-GUI</h2>
+<p><strong>This documentation is only relevant if you want to try the old HTML-GUI approach</strong><br />
+Below you can find how you can build and test the HTML-GUI. One prerequisite is to checkout the <a href="https://github.com/saros-project/saros/commit/18d77e9f18d50accd1267f4d801c8f74ef301715">last commit</a> including the HTML-GUI.</p>
+
+<p>The usage of the HTML version of Saros is guarded by a feature toggle.</p>
+
+<h3 id="eclipse-setup">Eclipse Setup</h3>
+
+<p>In Eclipse you have to uncomment the <code class="language-plaintext highlighter-rouge">SarosViewBrowserVersion</code> view in <code class="language-plaintext highlighter-rouge">eclipse/plugin.xml</code>.
+and provide the Java property</p>
+<div class="language-properties highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="py">saros.swtbrowser</span><span class="p">=</span><span class="s">true</span>
+</code></pre></div></div>
+<p>by changing the corresponding line in <code class="language-plaintext highlighter-rouge">eclipse/saros.properties</code>.</p>
+
+<p>To be able to see the HTML GUI in eclipse when running Saros, you have
+to open the Saros view in eclipse via Window &gt; Show View &gt; Other &gt; Saros &gt; Saros View.</p>
+
+<h3 id="intellij-setup">IntelliJ Setup</h3>
+
+<p>In IntelliJ you just have to provide</p>
+<div class="language-properties highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="py">-Dsaros.swtbrowser</span><span class="p">=</span><span class="s">true</span>
+</code></pre></div></div>
+<p>as VM Option (in the Run Configurations dialog).</p>
+
+<h3 id="installing-dependencies">Installing Dependencies</h3>
+
+<p>To develop the Saros GUI JavaScript application, the
+<a href="http://nodejs.org">NodeJS</a> package manager,
+<a href="https://www.npmjs.com/">NPM</a> is required. NPM is responsible for
+providing external JavaScript resources and tools for tasks like running
+unit tests and building the application. For more information about
+installing NodeJS and NPM see <a href="http://nodejs.org">here</a>.</p>
+
+<p>Before you are able to run the build tasks you have to navigate to
+<code class="language-plaintext highlighter-rouge">ui.frontend/html</code> and run <code class="language-plaintext highlighter-rouge">npm install</code> to
+download and install external dependencies.</p>
+
+<p>Required dependencies and tools as well as convenient script definitions
+are defined in <code class="language-plaintext highlighter-rouge">ui.frontend/html/package.json</code>
+see <a href="https://docs.npmjs.com/files/package.json">here</a> for a detailed
+documentation.</p>
+
+<h3 id="building-the-javascript-application">Building the JavaScript Application</h3>
+
+<p>Currently, the building of the JavaScript application is NOT integrated
+in the general Saros build process and must therefore be executed
+separately. To build the JavaScript application, navigate to
+<code class="language-plaintext highlighter-rouge">ui.frontend/html</code> and run <code class="language-plaintext highlighter-rouge">npm run build</code>.
+Alternatively it is also possible to run <code class="language-plaintext highlighter-rouge">npm run watch</code>, which builds
+the application once and then listens to any future changes and
+automatically rebuilds every time.</p>
+
+<h3 id="run-the-html-gui">Run the HTML-GUI</h3>
+
+<ul>
+  <li>Perform the IDE specific setup steps as described above.</li>
+  <li>Install javascript dependencies and build the pages as described above.</li>
+  <li>Start an intellij/eclipse test instance and search for the saros html view.</li>
+</ul>
+
+<p>If the view is empty, well you might have issues with the browser integration (which is the reason we stopped working on the approach).</p>
+
+
+      </div>
+
+      <!-- Right sidebar (TOC) -->
+      <div id="toc-bar-column" class="d-none d-lg-block col-12 col-lg-3 col-xl-3 px-0">
+        
+        <!-- element filled by loadToc() from toc.js -->
+        <ul id="toc-bar" class="sticky-top text-decoration-none nav toc-bar py-3"></ul>
+        
+      </div>
+    </div>
+  </div>
+
+  <footer class="page-footer font-small w-100 position-absolute">
+
+  <div class="text-center my-3">
+    
+    
+    <a href="https://github.com/saros-project/saros">
+      <i class="fab fa-github fa-lg text-white mr-3 mr-md-5"> </i>
+    </a>
+    
+    
+    <a href="https://gitter.im/saros-project/saros/user">
+      <i class="fab fa-gitter fa-lg text-white mr-3 mr-md-5"> </i>
+    </a>
+    
+    
+    <a href="https://groups.google.com/forum/#!forum/saros-user">
+      <i class="fas fa-envelope fa-lg text-white mr-3 mr-md-5"> </i>
+    </a>
+    
+    
+    <a href="https://twitter.com/saros_project">
+      <i class="fab fa-twitter fa-lg text-white "> </i>
+    </a>
+    
+  </div>
+
+</footer>
+  <script src="/node_modules/jquery/dist/jquery.min.js"></script>
+<script src="/node_modules/popper.js/dist/umd/popper.min.js"></script>
+<script src="/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+
+<script src="/node_modules/mermaid/dist/mermaid.min.js"></script>
+<script>
+mermaid.initialize({
+    startOnLoad: true
+});
+</script>
+<!-- load after its dependency jquery -->
+
+<script src="/assets/js/ide-tabs.js"></script>
+<script src="/assets/js/toc.js"></script>
+<script src="/assets/js/header-anchor-links.js"></script>
+
+</body>
+
+</html>

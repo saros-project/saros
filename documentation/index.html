@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+  <title>Saros Documentation</title>
+  <meta charset='utf-8'>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,maximum-scale=2">
+
+  <!-- stylesheets -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+  <link rel="stylesheet" href="/assets/main.css">
+ 
+  <!-- favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#603cba">
+  <meta name="theme-color" content="#ffffff">
+</head>
+
+
+<body>
+  <div class="bg-dark">
+  <div class="container-fluid">
+    <nav id="top-nav" class="navbar navbar-expand-sm navbar-dark bg-dark py-2 px-0">
+      <!-- Logo -->
+      <a class="ml-md-3 navbar-brand" href="/">
+        <img class="float-left" src="/assets/images/logo/saros-logo.svg" />
+        <span class="text-decoration-none pl-2 d-inline d-sm-none d-md-inline pr-5">Saros</span>
+      </a>
+
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
+        aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <ul class="navbar-nav">
+        
+        
+        
+        
+        <li class="nav-item active">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/documentation">User Docs</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/releases">Releases</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/contribute">Contribute</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/contact">Contact</a>
+        </li>
+        
+        
+        
+        <li class="nav-item ">
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
+            href="/research">Research</a>
+        </li>
+        
+      </ul>
+      </div>
+
+      <!-- Social Media -->
+      <div id="media-links-nav" class="collapse navbar-collapse">
+        </ul>
+        <ul class="navbar-nav ml-auto">
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/saros-project/saros">
+              <i class="fab fa-github fa-lg"> </i>
+            </a>
+          </li>
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://gitter.im/saros-project/saros/user">
+              <i class="fab fa-gitter fa-lg"> </i>
+            </a>
+          </li>
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://groups.google.com/forum/#!forum/saros-user">
+              <i class="fas fa-envelope fa-lg"> </i>
+            </a>
+          </li>
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="https://twitter.com/saros_project">
+              <i class="fab fa-twitter fa-lg"> </i>
+            </a>
+          </li>
+          
+        </ul>
+      </div>
+    </nav>
+  </div>
+</div>
+
+  <div class="container-fluid">
+
+    
+    
+
+    
+
+    <div class="row justify-content-left flex-xl-nowrap">
+      <!-- Left sidebar -->
+      <div class="col-12 col-md-4 col-xl-3 my-3 px-0  ">
+        
+        <div id="sidebar" class="pl-1">
+    <ul class="nav flex-column">
+        
+
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/documentation/installation.html?tab=eclipse">Installation</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/documentation/getting-started.html?tab=eclipse">Getting Started</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/documentation/awareness-information.html">Awareness Information</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        
+        <li class="nav-item">
+
+            
+            
+            
+
+            <a class="font-weight-bold nav-link py-0 collapsable-side-item collapsed" href="#How-Tos"
+                data-target="#How-Tos" data-toggle="collapse">How-Tos</a>
+            <div id="How-Tos" class="collapse ">
+                <ul class="nav flex-column ml-2">
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/documentation/how-tos/change-colors.html">Change Colors</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/documentation/how-tos/follow-mode.html">Follow Mode</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/documentation/how-tos/hostless-sessions.html">Hostless Sessions (alpha)</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/documentation/how-tos/manage-xmpp-accounts.html">Manage XMPP Accounts</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/documentation/how-tos/resolve-desynchronization.html">Resolve Desynchronization</a></li>
+                    
+
+                    
+                    
+                    
+
+                    
+                    <li class="nav-item"><a class="nav-link  py-0 pl-5"
+                            href="/documentation/how-tos/setup-xmpp.html">Setup XMPP Server</a></li>
+                    
+                </ul>
+            </div>
+        </li>
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/documentation/features.html">Features</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/documentation/compatibility.html">Compatibility</a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+
+        
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item  font-weight-bold py-0"
+                href="/documentation/faq.html">FAQ</a>
+        </li>
+
+        
+        
+    </ul>
+
+</div>
+        
+      </div>
+
+      <div id="main-content"
+        class="col-12 col-md-8 col-lg-6 main-content my-3 px-sm-2 px-md-1 px-xl-0">
+
+        <h1 class="display-4">Saros Documentation</h1>
+        <p>Saros is an Open Source IDE plugin for distributed collaborative software development.</p>
+
+<p>It works with and within <strong>Eclipse</strong>. Saros users can use all Eclipse functionality as usual.<br />
+We are working on a version for <strong>IntelliJ</strong> (and <a href="https://www.jetbrains.org/intellij/sdk/docs/intro/intellij_platform.html#ides-based-on-the-intellij-platform">IDEs based on the IntelliJ platform</a>) as well. See
+the <a href="/releases">release notes</a> of our latest alpha release for more information.</p>
+
+<h2 id="saros-is-a-real-timecollaborative-editor">Saros is a real-time collaborative editor.</h2>
+
+<ul>
+  <li>All collaborators have an <strong>identical copy of Eclipse projects.</strong></li>
+  <li>Two or more users can <strong>jointly edit files</strong> in the project.</li>
+  <li><strong>Each</strong> <strong>user</strong> has and <strong>modifies</strong> his or her own copy of the
+<strong>file locally.</strong></li>
+  <li>Saros <strong>keeps these copies in sync</strong> by transmitting each change to
+all of the other collaborators.</li>
+</ul>
+
+<h2 id="sarossupports-up-to-5-participantsat-once">Saros supports up to 5 participants at once.</h2>
+
+<ul>
+  <li>Saros is designed to at least work with two participants in a
+session - as inherent for pair programming.</li>
+  <li>But it supports <strong>up to 5 distributed parties</strong> in a session.</li>
+  <li>The initiator of a session, the <strong>host</strong>, has a <strong>privileged role</strong>.</li>
+</ul>
+
+<div class="alert alert-primary" role="alert">
+  <h1 class="alert-heading" id="the-host">The Host</h1>
+  <p>Before we get started, you should know that Saros is a host-based system.</p>
+  <hr />
+
+  <ul>
+    <li><span class="font-weight-bold">You are the host if you start the session.</span></li>
+    <li><span class="font-weight-bold">If the host leaves the session, it is closed for everyone.</span></li>
+  </ul>
+</div>
+
+<h2 id="sarosis-not-screen-sharing-desktop-sharing-or-application-sharing">Saros is not screen sharing, desktop sharing, or application sharing.</h2>
+
+<ul>
+  <li>That means for instance that it does not support joint
+interactive testing.</li>
+</ul>
+
+<h2 id="saros-can-be-used-in-various-scenarios">Saros can be used in various scenarios.</h2>
+
+<ul>
+  <li>
+    <p><strong>Joint review</strong></p>
+
+    <p>One participant (<strong>“driver”</strong>)
+reviews the contents of one or more
+files together with other
+participants
+(<strong>“observers”</strong>). Saros is set to
+always show the observers the same
+region of text (program code or
+whatever else) that the driver sees
+(<strong>“follow mode”</strong>). At any time,
+any participant (driver as well as
+observers) can highlight text with
+the mouse for all the others to
+see. Also, any participant can
+become driver at any time.</p>
+  </li>
+  <li>
+    <p><strong>Introducing beginners</strong></p>
+
+    <p>Much like before, except that
+explaining rather than reviewing is
+the goal. Each of the beginners
+(staying in the observer role) can
+individually peek at other regions
+of the file or even other files
+without influencing the flow of the
+session for the others. To do that,
+s/he will temporarily leave follow
+mode.</p>
+  </li>
+  <li>
+    <p><strong>Distributed Party Programming</strong></p>
+
+    <p><strong>Two or more participants work
+together in a loosely coupled
+fashion.</strong> They <strong>work independently
+much of the time, but can call one
+of the others to help whenever the
+need arises</strong>, for possibly only a
+very short time or for a longer
+episode. In this mode, distributed
+work can even be more powerful than
+working in the same room, as nobody
+needs to leave a seat to help
+multiple others in the course of an
+hour. Just think how this can speed
+up the coordination work just before
+release time after a code freeze!</p>
+  </li>
+  <li>
+    <p><strong>Distributed Pair Programming </strong>
+is a particular form of Distributed
+Party Programming in which two
+people develop code or text in
+continuous close collaboration,
+discussing the approach and
+combining the best of their ideas.</p>
+  </li>
+</ul>
+
+
+      </div>
+
+      <!-- Right sidebar (TOC) -->
+      <div id="toc-bar-column" class="d-none d-lg-block col-12 col-lg-3 col-xl-3 px-0">
+        
+      </div>
+    </div>
+  </div>
+
+  <footer class="page-footer font-small w-100 position-absolute">
+
+  <div class="text-center my-3">
+    
+    
+    <a href="https://github.com/saros-project/saros">
+      <i class="fab fa-github fa-lg text-white mr-3 mr-md-5"> </i>
+    </a>
+    
+    
+    <a href="https://gitter.im/saros-project/saros/user">
+      <i class="fab fa-gitter fa-lg text-white mr-3 mr-md-5"> </i>
+    </a>
+    
+    
+    <a href="https://groups.google.com/forum/#!forum/saros-user">
+      <i class="fas fa-envelope fa-lg text-white mr-3 mr-md-5"> </i>
+    </a>
+    
+    
+    <a href="https://twitter.com/saros_project">
+      <i class="fab fa-twitter fa-lg text-white "> </i>
+    </a>
+    
+  </div>
+
+</footer>
+  <script src="/node_modules/jquery/dist/jquery.min.js"></script>
+<script src="/node_modules/popper.js/dist/umd/popper.min.js"></script>
+<script src="/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+
+<script src="/node_modules/mermaid/dist/mermaid.min.js"></script>
+<script>
+mermaid.initialize({
+    startOnLoad: true
+});
+</script>
+<!-- load after its dependency jquery -->
+
+<script src="/assets/js/ide-tabs.js"></script>
+<script src="/assets/js/toc.js"></script>
+<script src="/assets/js/header-anchor-links.js"></script>
+
+</body>
+
+</html>
