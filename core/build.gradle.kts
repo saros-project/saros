@@ -39,7 +39,7 @@ dependencies {
 
     releaseDep("javax.jmdns:jmdns:3.4.1")
     releaseDep("xpp3:xpp3:1.1.4c")
-    releaseDep("com.thoughtworks.xstream:xstream:1.4.10")
+    releaseDep("com.thoughtworks.xstream:xstream:1.4.19")
     releaseDep("org.gnu.inet:libidn:1.15")
 
     releaseDep(log4j2ApiVersion)
