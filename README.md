@@ -1,7 +1,7 @@
 # <img src="docs/assets/images/logo/saros-logo.svg" alt="drawing" align="right" width="100"/> Saros - Distributed Party Programming
 [![Build](https://github.com/saros-project/saros/workflows/Build/badge.svg?branch=master)](https://github.com/saros-project/saros/actions?query=workflow%3ABuild+branch%3Amaster)
 [![STF Tests](https://github.com/saros-project/saros/workflows/STF%20Tests/badge.svg?branch=master&event=push)](https://github.com/saros-project/saros/actions?query=workflow%3A%22STF+Tests%22+branch%3Amaster)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/297b67607a5f4b5b8d00d0446615849b)](https://www.codacy.com/manual/Saros/saros)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/c6ea424d408d4cc691bc2f456de3ef17)](https://www.codacy.com/gh/saros-project/saros)
 [![Gitter](https://img.shields.io/gitter/room/saros-project/saros?color=%2346BC99&logo=gitter)](https://gitter.im/saros-project/saros)
 [![Release Saros/E](https://img.shields.io/badge/Saros%2FE-16.0.1-blue?logo=eclipse)](https://github.com/saros-project/saros/releases/tag/saros-eclipse-16.0.1)
 [![Release Saros/I](https://img.shields.io/badge/Saros%2FI-0.3.0-blue?logo=intellij-idea)](https://github.com/saros-project/saros/releases/tag/saros-intellij-0.3.0)
