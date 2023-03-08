@@ -316,7 +316,7 @@ public class ActivitySequencer implements Startable {
       return;
     }
 
-    sarosSession.exec(activities);
+    sarosSession.exec(sender, activities);
   }
 
   /** Sends an activity to the given recipients. */
@@ -336,7 +336,7 @@ public class ActivitySequencer implements Startable {
           new Runnable() {
             @Override
             public void run() {
-              sarosSession.exec(Collections.singletonList(activity));
+              sarosSession.exec(user.getJID(), Collections.singletonList(activity));
             }
           });
     }

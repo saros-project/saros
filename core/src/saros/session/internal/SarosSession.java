@@ -619,23 +619,38 @@ public final class SarosSession implements ISarosSession {
   }
 
   @Override
-  public void exec(List<IActivity> activities) {
+  public void exec(JID jid, List<IActivity> activities) {
     /**
      * @JTourBusStop 7, Activity sending, Incoming activities:
      *
      * <p>Incoming activities will arrive here. The ActivitySequencer calls this method for
      * activities received over the Network Layer.
      */
-    final List<IActivity> valid = new ArrayList<IActivity>();
+    final List<IActivity> validActivities = new ArrayList<IActivity>();
 
     // Check every incoming activity for validity
     for (IActivity activity : activities) {
-      if (activity.isValid()) valid.add(activity);
-      else log.error("could not handle incoming activity: " + activity);
+
+      if (!activity.isValid()) {
+        log.error("could not handle incoming activity: " + activity);
+        continue;
+      }
+
+      final User source = activity.getSource();
+
+      assert jid != null && source != null;
+
+      if (isHost() && !source.getJID().strictlyEquals(jid)) {
+        log.warn("detected spoofed activity from: " + jid + " -> " + activity);
+        // TODO kick the user
+        continue;
+      }
+
+      validActivities.add(activity);
     }
 
-    List<IActivity> processed = activityQueuer.process(valid);
-    activityHandler.handleIncomingActivities(processed);
+    final List<IActivity> executableActivites = activityQueuer.process(validActivities);
+    activityHandler.handleIncomingActivities(executableActivites);
   }
 
   /*

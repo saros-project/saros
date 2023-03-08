@@ -214,7 +214,7 @@ public interface ISarosSession {
   Set<Integer> getUnavailableColors();
 
   /** FOR INTERNAL USE ONLY ! */
-  void exec(List<IActivity> activities);
+  void exec(JID jid, List<IActivity> activities);
 
   /**
    * Adds an {@link IActivityProducer} so the production of its activities will be noticed.

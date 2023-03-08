@@ -289,7 +289,7 @@ public class ActivitySequencerTest {
 
     final Capture<List<IActivity>> capture = Capture.newInstance();
 
-    session.exec(EasyMock.capture(capture));
+    session.exec(EasyMock.anyObject(JID.class), EasyMock.capture(capture));
 
     EasyMock.expectLastCall()
         .andAnswer(() -> receivedActivitiesBuffer.addAll(capture.getValue()))
