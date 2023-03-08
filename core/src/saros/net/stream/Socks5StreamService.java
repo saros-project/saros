@@ -401,7 +401,7 @@ public class Socks5StreamService implements IStreamService, BytestreamListener {
             localAddress,
             new JID(peer),
             connectionIdentifier,
-            new XMPPByteStreamAdapter(inSession),
+            SecureByteStream.wrap(new XMPPByteStreamAdapter(inSession), false),
             StreamMode.SOCKS5_DIRECT,
             listener);
       } else {
@@ -430,7 +430,7 @@ public class Socks5StreamService implements IStreamService, BytestreamListener {
             localAddress,
             new JID(peer),
             connectionIdentifier,
-            new XMPPByteStreamAdapter(outSession),
+            SecureByteStream.wrap(new XMPPByteStreamAdapter(outSession), true),
             StreamMode.SOCKS5_DIRECT,
             listener);
       }
@@ -512,7 +512,7 @@ public class Socks5StreamService implements IStreamService, BytestreamListener {
               localAddress,
               new JID(peer),
               connectionIdentifier,
-              new XMPPByteStreamAdapter(outSession),
+              SecureByteStream.wrap(new XMPPByteStreamAdapter(outSession), true),
               StreamMode.SOCKS5_DIRECT,
               listener);
         }
@@ -588,7 +588,7 @@ public class Socks5StreamService implements IStreamService, BytestreamListener {
               localAddress,
               new JID(peer),
               connectionIdentifier,
-              new XMPPByteStreamAdapter(inSession),
+              SecureByteStream.wrap(new XMPPByteStreamAdapter(inSession), false),
               StreamMode.SOCKS5_DIRECT,
               listener);
         }
