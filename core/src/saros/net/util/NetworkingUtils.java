@@ -4,7 +4,6 @@ import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
@@ -77,26 +76,5 @@ public class NetworkingUtils {
     SmackConfiguration.setLocalSocks5ProxyEnabled(isLocalS5Penabled);
 
     return proxy;
-  }
-
-  /**
-   * Adds a specified IP (String) to the list of addresses of the Socks5Proxy. (the target attempts
-   * the stream host addresses one by one in the order of the list)
-   *
-   * @param ip String of the address of the Socks5Proxy (stream host)
-   * @param inFront boolean flag, if the address is to be inserted in front of the list. If <code>
-   *     false</code>, address is added at the end of the list.
-   */
-  public static void addProxyAddress(String ip, boolean inFront) {
-    Socks5Proxy proxy = getSocks5ProxySafe();
-
-    if (!inFront) {
-      proxy.addLocalAddress(ip);
-      return;
-    }
-    ArrayList<String> list = new ArrayList<String>(proxy.getLocalAddresses());
-    list.remove(ip);
-    list.add(0, ip);
-    proxy.replaceLocalAddresses(list);
   }
 }
